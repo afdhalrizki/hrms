@@ -81,7 +81,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Research/Integrate Face Recognition checks for mobile Check-In.
 - [x] Create Executive Analytics Cost Dashboard in Next.js.
 - [x] Implement Audit Trail (created_by/updated_by) across all models.
-- [x] Final documentation update.
+- [x] Final documentation update (Backend, Frontend, Mobile).
 - [x] Relocate documentation files to `docs/` folder.
 
 ## Phase 3: Operational Scale & Security (Advanced HR)
@@ -123,7 +123,11 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Complete Backend User Unit Tests (Auth & Tenant Access Middleware).
 - [x] Complete Backend Payroll Unit Tests (Tax TER 2024, BPJS, PDF).
 - [x] Refactor [settings.py](file:///d:/hr/hrms/backend/config/settings.py) for dynamic environment management.
-- [ ] Implement automated E2E tests for core flows (Playwright).
+- [x] Implement automated E2E tests for core flows (Playwright).
+    - [x] Install Playwright dependencies and browsers.
+    - [x] Configure `playwright.config.ts`.
+    - [x] Create `onboarding.spec.ts`.
+    - [x] Verify full registration flow via E2E test.
 - [ ] Conduct security audit for multi-tenant isolation.
 
 ## 17. Tenant Onboarding & Approval Flow
@@ -170,5 +174,25 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 ## 23. Frontend Identity Integration & Test Updates
 - [x] Implement `AuthContext` for user state.
 - [x] Hydrate Sidebar and Home with real identity data.
-- [x] Expand `api.test.ts` with fetch mocking.
 - [x] Create `Sidebar.test.tsx` to verify dynamic profile display.
+
+## Phase 14: Deployment Strategy & Documentation (New)
+- [x] Create `deployment/` directory for environment guides.
+- [x] Document Local Development deployment steps.
+- [x] Document Staging (VPS/Single Node) deployment steps.
+- [x] Document Production (Kubernetes/Hyperscaler) deployment steps.
+
+## Phase 24: Tenant Customization (Company Profile Hub)
+- [x] **Backend**: Update `Tenant` model with `logo`, `address`, `phone`.
+- [x] **Backend**: Configure `MEDIA_ROOT` and `MEDIA_URL` for file uploads.
+- [x] **Backend**: Run `makemigrations` and `migrate_schemas --shared`.
+- [x] **Backend**: Create API endpoint (`/api/tenant/settings/`) for updates.
+- [x] **Frontend**: Update `TenantContext` to fetch and store full profile data.
+- [x] **Frontend**: Create `src/app/settings/page.tsx` with logo upload form.
+- [x] **Frontend**: Update `Sidebar.tsx` to dynamically render the uploaded logo.
+
+## Phase 25: Admin & Employee Provisioning (RBAC Foundation)
+- [x] **Backend**: Update `EmployeeViewSet.create()` to handle `create_user` and `is_admin` flags.
+- [x] **Frontend**: Connect `EmployeesPage` (`/employees`) to the live API.
+- [x] **Frontend**: Build 'Add Employee' form modal with user account toggles.
+- [x] **Frontend**: Test dynamic list updating after creation.
