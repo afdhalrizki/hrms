@@ -138,4 +138,23 @@ Hydrating the UI from the real backend identity endpoint and verifying with auto
 - [x] **Integration Test**: Verify that the "Welcome, Admin" header dynamically updates based on the logged-in user.
 
 ---
+---
 **Status**: Milestone 🎉 Phase 3 100% Complete. Environment & QA Infrastructure Established. Attendance Logic Fully Verified.
+
+## Phase 30: Frontend Runtime Infrastructure (Complete)
+To ensure the frontend modernizes alongside the platform's scaling goals, the underlying runtime must be maintained.
+- [x] **Node.js Upgrade**: Upgrade base image from Node 18 to Node 20.18.
+- [x] **Compatibility**: Align infrastructure with Next.js 16 requirements (Node >= 20.9.0).
+- [x] **Build Optimization**: Implement `--no-cache` strategies to guarantee fresh environment parity across the team.
+
+## Phase 31: Local Multi-tenant Access Fix (Complete)
+Enable multi-tenant testing on local developer machines using `.localhost`.
+- [x] **CORS Policy**: Ensure support for `*.localhost:3000`.
+- [x] **API Logic**: Update `getBaseUrl` for local domain detection.
+- [x] **Docker Config**: Set domain suffix to `localhost`.
+
+## Phase 32: Build Resilience & Tailwind 4 Support (Complete)
+Address native binding issues and engine mismatches for Alpine Linux.
+- [x] **Runtime Upgrade**: Promote to Node.js 22-alpine (LTS).
+- [x] **Native Bindings**: Explicitly install `@tailwindcss/oxide-linux-x64-musl`.
+- [x] **Dev Server**: Stabilize Turbopack compilation in containerized environments.

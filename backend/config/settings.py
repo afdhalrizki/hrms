@@ -172,6 +172,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://.*\.localhost:3000$",
+    r"^http://localhost:3000$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 

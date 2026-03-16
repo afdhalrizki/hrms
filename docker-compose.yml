@@ -25,6 +25,7 @@ services:
       - ./backend:/app
     environment:
       - DATABASE_URL=postgres://hrms_user:hrms_password@pgbouncer:6432/hrms
+      - TENANT_DOMAIN_SUFFIX=localhost
     depends_on:
       - db
       - redis
@@ -69,6 +70,7 @@ services:
       - /app/.next
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - NEXT_PUBLIC_DOMAIN_SUFFIX=localhost
     depends_on:
       - backend
     restart: unless-stopped

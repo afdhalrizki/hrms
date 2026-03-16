@@ -6,9 +6,15 @@ export const getBaseUrl = () => {
     // In development/local setup, the backend might be on a different port (8000)
     // while frontend is on 3000.
     const apiPort = process.env.NEXT_PUBLIC_API_PORT || '8000';
+    const domainSuffix = process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'localhost';
     
-    if (host.includes('localhost') || host.includes('127.0.0.1')) {
-      return `http://${host}:${apiPort}/api`;
+    if (
+      host === 'localhost' || 
+      host === '127.0.0.1' || 
+      host.endsWith(`.${domainSuffix}`) || 
+      host === domainSuffix
+    ) {
+      return `http://${host.split(':')[0]}:${apiPort}/api`;
     }
     
     // For production/staging, usually same host but with /api prefix

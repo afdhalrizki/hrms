@@ -216,3 +216,42 @@ Significantly improved the reliability of both platforms through architectural r
 - **Accessibility**: Enhanced the login encounter with proper ARIA-compliant label associations for all inputs.
 
 **Status**: Milestone 🎉 Phase 29 (Secret Portal & Quality Hub) 100% Complete.
+
+## Phase 30: Frontend Runtime Infrastructure
+
+Upgraded the frontend execution environment to ensure compatibility with modern Next.js 16 requirements.
+- **Node.js Upgrade**: Promoted the runtime from Node.js 18 to `node:20.18-alpine` in the `frontend/Dockerfile`.
+- **Build Resilience**: Integrated `--no-cache` strategies to bypass legacy Node 18 layers and ensure fresh environments.
+- **Dependency Alignment**: Confirmed that all Next.js 16 features are now supported by the underlying Node.js version (>=20.9.0).
+
+### Verification
+- **Runtime Check**: Verified `node -v` inside the `hrms_frontend` container returns `v20.18.x`.
+- **Start-up Success**: Confirmed that `npm run dev` executes without the previously observed version mismatch errors.
+
+**Status**: Milestone 🎉 Phase 30 (Frontend Runtime Infrastructure) 100% Complete.
+
+## Phase 31: Local Multi-tenant Access Fix (.localhost)
+
+Enabled seamless local development across tenant subdomains (e.g., `company1.localhost:3000`).
+- **CORS Alignment**: Updated backend `ALLOWED_HOSTS` regex to support `*.localhost:3000`.
+- **API Base Discovery**: Refactored frontend `getBaseUrl` to correctly detect the local `localhost` domain and use `http` with port `8000`.
+- **Environment Sync**: Configured `TENANT_DOMAIN_SUFFIX` and `NEXT_PUBLIC_DOMAIN_SUFFIX` to `localhost` in `docker-compose.yml`.
+
+### Verification
+- **Tenant Access**: Confirmed that `company1.localhost:3000` can now communicate with the backend API without CORS errors.
+- **Port Parity**: Verified that frontend correctly maps API requests to port 8000 regardless of the local subdomain used.
+
+**Status**: Milestone 🎉 Phase 31 (Local Multi-tenant Access Fix) 100% Complete.
+
+## Phase 32: Build Resilience & Tailwind 4 Support
+
+Resolved native binding issues and aligned runtime with Next.js 16 engine requirements.
+- **Node.js LTS Upgrade**: Upgraded the frontend runtime to `node:22-alpine` to satisfy `^22.12.0` engine requirements.
+- **Native Binding Fix**: Explicitly integrated `@tailwindcss/oxide-linux-x64-musl` to resolve the "Cannot find native binding" error in Alpine/musl environments.
+- **Build Reliability**: Stabilized the Turbopack dev server by ensuring all optional native dependencies are correctly resolved during container build.
+
+### Verification
+- **Container Start-up**: Confirmed that `company1.localhost:3000` loads without "Error evaluating Node.js code" or "Cannot find native binding" screens.
+- **Styling Persistence**: Verified that Tailwind CSS 4 features are correctly compiled and rendered in the browser.
+
+**Status**: Milestone 🎉 Phase 32 (Build Resilience & Tailwind 4 Support) 100% Complete.

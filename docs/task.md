@@ -202,3 +202,20 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Backend**: Define `pre_delete` signal on `User` to prevent account termination of the last tenant admin.
 - [x] **Backend**: Define `m2m_changed` signal on `User.tenants.through` to prevent stripping the tenant M2M relationship.
 - [x] **Backend**: Create script to verify the safeguards logic locally.
+
+## Phase 30: Frontend Runtime Infrastructure
+- [x] **Dockerfile**: Update base image to `node:20.18-alpine`.
+- [x] **Verification**: Confirm Node version >= 20.9.0 inside the container.
+- [x] **Build Strategy**: Use `--no-cache` to ensure clean environment refresh.
+- [x] **Documentation**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.
+
+## Phase 31: Local Multi-tenant Access Fix (.localhost)
+- [x] **Backend**: Update `CORS_ALLOWED_ORIGIN_REGEXES` for localhost.
+- [x] **Frontend**: Refactor `getBaseUrl` in `lib/api.ts`.
+- [x] **Infra**: Add domain variables to `docker-compose.yml`.
+- [x] **Verification**: Test access via `company1.localhost:3000`.
+
+## Phase 32: Build Resilience & Tailwind 4 Support
+- [x] **Dockerfile**: Upgrade to `node:22-alpine`.
+- [x] **Alpine Fix**: Explicitly install `@tailwindcss/oxide-linux-x64-musl`.
+- [x] **Docs**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.
