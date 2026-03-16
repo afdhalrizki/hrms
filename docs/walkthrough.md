@@ -261,6 +261,11 @@ Resolved native binding issues and aligned runtime with Next.js 16 engine requir
   ```powershell
   docker-compose run --rm backend python manage.py migrate_schemas --shared
   docker-compose run --rm backend python manage.py bootstrap_tenants
+  docker-compose run --rm backend python manage.py seed_demo
   ```
+
+### Demo Credentials
+- **Global Admin**: `admin@harikerja.com` / `admin123` (Access via `localhost:8000/admin/`)
+- **Tenant Admin**: `admin@company1.localhost` / `admin123` (Access via `company1.localhost:3000/login`)
 
 **Status**: Milestone 🎉 Phase 32 (Build Resilience & Tailwind 4 Support) 100% Complete.
