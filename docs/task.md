@@ -1,4 +1,4 @@
-# Django HRMS SaaS Implementation Checklist
+# harikerja HRMS SaaS Implementation Checklist
 
 This checklist tracks the setup of the Django multi-tenant foundation and the core HR, Attendance, and Payroll models based on the reference features.
 

@@ -64,7 +64,7 @@ export default function SignupPage() {
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Request Submitted!</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Thank you for choosing Antigravity HRMS. Your registration request for 
+            Thank you for choosing harikerja HRMS. Your registration request for 
             <span className="text-white font-semibold"> {formData.company_name}</span> is being reviewed by our team.
           </p>
           <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-left">
@@ -97,7 +97,7 @@ export default function SignupPage() {
             <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center">
               <div className="h-5 w-5 bg-black rounded-sm rotate-45" />
             </div>
-            <span className="text-xl font-bold tracking-tighter">Antigravity HRMS</span>
+            <span className="text-xl font-bold tracking-tighter">harikerja HRMS</span>
           </div>
 
           <div className="space-y-8">
@@ -138,7 +138,7 @@ export default function SignupPage() {
           </div>
 
           <div className="text-sm text-muted-foreground font-medium">
-            © 2026 Antigravity HRMS. All rights reserved.
+            © 2026 harikerja HRMS. All rights reserved.
           </div>
         </div>
 

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HRMS SaaS | Antigravity",
+  title: "HRMS SaaS | harikerja",
   description: "Next-generation Human Resource Management System",
 };
 
