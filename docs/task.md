@@ -196,3 +196,9 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Frontend**: Connect `EmployeesPage` (`/employees`) to the live API.
 - [x] **Frontend**: Build 'Add Employee' form modal with user account toggles.
 - [x] **Frontend**: Test dynamic list updating after creation.
+
+## Phase 26: Admin Access Safeguard & Protections
+- [x] **Backend**: Define `pre_save` signal on `User` to prevent demoting `is_staff` or `is_active` for the last tenant admin.
+- [x] **Backend**: Define `pre_delete` signal on `User` to prevent account termination of the last tenant admin.
+- [x] **Backend**: Define `m2m_changed` signal on `User.tenants.through` to prevent stripping the tenant M2M relationship.
+- [x] **Backend**: Create script to verify the safeguards logic locally.

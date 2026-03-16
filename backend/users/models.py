@@ -42,3 +42,77 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+from django.db.models.signals import m2m_changed, pre_delete
+from django.dispatch import receiver
+from django.core.exceptions import ValidationError
+
+@receiver(m2m_changed, sender=User.tenants.through)
+def prevent_last_admin_removal_from_tenant(sender, instance, action, reverse, model, pk_set, **kwargs):
+    """
+    Prevents the last admin of a tenant from being removed from that tenant 
+    via the ManyToMany relationship (e.g. user.tenants.remove(tenant)).
+    """
+    if action == "pre_remove" and not reverse:
+        # instance is the User being removed from tenants identified in pk_set
+        if instance.is_staff and instance.is_active:
+            for tenant_id in pk_set:
+                admin_count = User.objects.filter(
+                    tenants__id=tenant_id, 
+                    is_staff=True,
+                    is_active=True
+                ).exclude(pk=instance.pk).count()
+                
+                if admin_count == 0:
+                    from tenants.models import Tenant
+                    tenant_name = Tenant.objects.get(id=tenant_id).name
+                    raise ValidationError(f"Cannot remove user from tenant '{tenant_name}'. They are the last active administrator.")
+
+@receiver(pre_delete, sender=User)
+def prevent_last_admin_deletion(sender, instance, **kwargs):
+    """
+    Prevents an admin user from being deleted entirely if they are the 
+    last admin of any tenant they belong to.
+    """
+    if instance.is_staff and instance.is_active:
+        tenants = instance.tenants.all()
+        for tenant in tenants:
+            admin_count = User.objects.filter(
+                tenants=tenant, 
+                is_staff=True,
+                is_active=True
+            ).exclude(pk=instance.pk).count()
+            
+            if admin_count == 0:
+                raise ValidationError(
+                    f"Cannot delete user. The tenant '{tenant.name}' must have at least one active administrator."
+                )
+
+from django.db.models.signals import pre_save
+@receiver(pre_save, sender=User)
+def prevent_last_admin_demotion(sender, instance, **kwargs):
+    """
+    Prevents an admin from being demoted or changed to inactive 
+    if they are the last admin of any tenant they belong to.
+    """
+    if not instance.pk:
+        return
+
+    try:
+        original = User.objects.get(pk=instance.pk)
+    except User.DoesNotExist:
+        return
+
+    if original.is_staff and (not instance.is_staff or not instance.is_active):
+        tenants = original.tenants.all()
+        for tenant in tenants:
+            admin_count = User.objects.filter(
+                tenants=tenant, 
+                is_staff=True,
+                is_active=True
+            ).exclude(pk=instance.pk).count()
+            
+            if admin_count == 0:
+                raise ValidationError(
+                    f"Cannot demote or deactivate user. The tenant '{tenant.name}' must have at least one active administrator."
+                )
