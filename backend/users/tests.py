@@ -147,3 +147,47 @@ class MiddlewareTestCase(TenantTestCase):
         request = self.create_mock_request(admin, self.tenant)
         response = self.middleware(request)
         self.middleware.get_response.assert_called_with(request)
+
+from django.core.exceptions import ValidationError
+
+class AdminSafeguardTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        # Tenant is already created as self.tenant from TenantTestCase
+        self.admin = User.objects.create_user(email='admin_safeguard@test.com', password='password', is_staff=True, is_active=True)
+        self.admin.tenants.add(self.tenant)
+        
+    def test_prevent_last_admin_demotion(self):
+        """Verify the last admin cannot have is_staff set to False."""
+        self.admin.is_staff = False
+        with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
+            self.admin.save()
+            
+    def test_prevent_last_admin_deactivation(self):
+        """Verify the last admin cannot be deactivated."""
+        self.admin.is_active = False
+        with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
+            self.admin.save()
+            
+    def test_prevent_last_admin_deletion(self):
+        """Verify the last admin cannot be deleted."""
+        with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
+            self.admin.delete()
+            
+    def test_prevent_last_admin_m2m_removal(self):
+        """Verify the last admin cannot be removed from their tenant mapping."""
+        with self.assertRaisesMessage(ValidationError, "They are the last active administrator"):
+            self.admin.tenants.remove(self.tenant)
+            
+    def test_allow_demotion_if_other_admin_exists(self):
+        """Verify an admin can be demoted if there is another active admin in the tenant."""
+        second_admin = User.objects.create_user(email='admin2@test.com', password='password', is_staff=True, is_active=True)
+        second_admin.tenants.add(self.tenant)
+        
+        # Now there are 2 admins. Demoting the first one should work.
+        self.admin.is_staff = False
+        self.admin.save()  # Should NOT raise ValidationError
+        
+        # Verify it actually saved
+        self.admin.refresh_from_db()
+        self.assertFalse(self.admin.is_staff)
