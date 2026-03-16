@@ -103,6 +103,21 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                         transport_allowance=30000
                     )
 
+                    # Create Default Access Roles
+                    from core.models import AccessRole
+                    emp_role = AccessRole.objects.create(
+                        name="Standard Employee",
+                        description="Default role for standard employees. Can view own data.",
+                        permissions={},
+                        is_default=True
+                    )
+                    hr_admin_role = AccessRole.objects.create(
+                        name="HR Administrator",
+                        description="Full access to HR, Attendance, and Payroll modules.",
+                        permissions={"manage_hr": True, "manage_attendance": True, "manage_payroll": True, "manage_settings": True},
+                        is_default=True
+                    )
+
                     # Create Employee record for the admin
                     from datetime import date
                     Employee.objects.create(
@@ -112,6 +127,7 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                         department=dept,
                         role=role,
                         golongan=gol,
+                        access_role=hr_admin_role,
                         status='PERMANENT',
                         join_date=date.today(),
                         ktp_number=f"ADM-{registration.id}" # Unique placeholder

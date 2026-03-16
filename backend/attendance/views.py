@@ -4,6 +4,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from django.core.cache import cache
 from core.audit import AuditModelMixin
+from core.permissions import HasRBACPermission
 from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule
 from .serializers import (
     AttendanceSerializer, LeaveRequestSerializer, OvertimeSerializer,
@@ -31,7 +32,8 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_attendance'
 
     def get_queryset(self):
         queryset = Attendance.objects.all()
@@ -109,25 +111,29 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
 class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = LeaveRequest.objects.all()
     serializer_class = LeaveRequestSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_attendance'
 
 
 class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Overtime.objects.all()
     serializer_class = OvertimeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_attendance'
 
 
 class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_settings'
 
 
 class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_attendance'
 
     def get_queryset(self):
         queryset = Schedule.objects.all()

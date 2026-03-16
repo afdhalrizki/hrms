@@ -29,6 +29,7 @@ interface Employee {
   status: string;
   department_name: string;
   role_name: string;
+  access_role_name: string;
   golongan_name: string;
   join_date: string;
 }
@@ -50,6 +51,7 @@ export default function EmployeesPage() {
   // Data for Selects
   const [departments, setDepartments] = useState<DropdownItem[]>([]);
   const [roles, setRoles] = useState<DropdownItem[]>([]);
+  const [accessRoles, setAccessRoles] = useState<DropdownItem[]>([]);
   const [golongans, setGolongans] = useState<DropdownItem[]>([]);
 
   // Form State
@@ -61,11 +63,12 @@ export default function EmployeesPage() {
     department: '',
     role: '',
     golongan: '',
+    access_role: '',
     status: 'PERMANENT',
     join_date: new Date().toISOString().split('T')[0],
     ktp_number: '',
     ptkp_status: 'TK/0',
-    create_user: true, // Default to true for self-service
+    create_user: true, 
     is_admin: false,
   });
 
@@ -93,6 +96,8 @@ export default function EmployeesPage() {
       setRoles(rls);
       const gols = await apiFetch('golongan/');
       setGolongans(gols);
+      const accRoles = await apiFetch('access-roles/');
+      setAccessRoles(accRoles);
     } catch (error) {
       console.error("Failed to fetch dropdowns:", error);
     }
@@ -223,6 +228,10 @@ export default function EmployeesPage() {
                         <div>
                           <p className="text-sm font-semibold">{emp.fullname}</p>
                           <p className="text-xs text-muted-foreground">{emp.nik} • {emp.role_name}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <ShieldCheck size={10} className="text-emerald-500" />
+                            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">{emp.access_role_name || 'No Role'}</span>
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -351,17 +360,38 @@ export default function EmployeesPage() {
                   </label>
 
                   {formData.create_user && (
-                    <label className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-xl cursor-pointer hover:bg-primary/10 transition-colors">
-                      <div className="space-y-1 pr-4">
-                        <p className="text-sm font-bold text-primary">Grant Tenant Admin Privileges</p>
-                        <p className="text-xs text-muted-foreground">Warning: Automatically promotes this account to Tenant Admin (is_staff). They will have full access to view and edit company data on this dashboard.</p>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Assign RBAC Access Role</label>
+                        <select 
+                          required 
+                          name="access_role" 
+                          value={formData.access_role} 
+                          onChange={handleInputChange} 
+                          className="w-full px-4 py-3 border bg-white/5 rounded-xl text-sm appearance-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                        >
+                          <option value="" className="bg-background">Select Access Level</option>
+                          {accessRoles.map(r => (
+                            <option key={r.id} value={r.id} className="bg-background">
+                              {r.name}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-[11px] text-muted-foreground">Standardized permissions for this employee's account.</p>
                       </div>
-                      <div className="relative">
-                        <input type="checkbox" name="is_admin" className="sr-only" checked={formData.is_admin} onChange={handleInputChange} />
-                        <div className={cn("block w-10 h-6 rounded-full transition-colors", formData.is_admin ? "bg-primary" : "bg-white/20")}></div>
-                        <div className={cn("absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform", formData.is_admin ? "translate-x-4" : "")}></div>
-                      </div>
-                    </label>
+
+                      <label className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-xl cursor-pointer hover:bg-primary/10 transition-colors">
+                        <div className="space-y-1 pr-4">
+                          <p className="text-sm font-bold text-primary">Grant Tenant Admin Privileges</p>
+                          <p className="text-xs text-muted-foreground">Warning: Automatically promotes this account to Tenant Admin (is_staff). They will have full access to view and edit company data on this dashboard.</p>
+                        </div>
+                        <div className="relative">
+                          <input type="checkbox" name="is_admin" className="sr-only" checked={formData.is_admin} onChange={handleInputChange} />
+                          <div className={cn("block w-10 h-6 rounded-full transition-colors", formData.is_admin ? "bg-primary" : "bg-white/20")}></div>
+                          <div className={cn("absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform", formData.is_admin ? "translate-x-4" : "")}></div>
+                        </div>
+                      </label>
+                    </div>
                   )}
                 </div>
                 

@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions
 from core.audit import AuditModelMixin
+from core.permissions import HasRBACPermission
 from .models import SalaryComponent, PayrollPeriod, Payslip, PayslipDetail
 from .serializers import (
     SalaryComponentSerializer,
@@ -11,12 +12,14 @@ from .serializers import (
 class SalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = SalaryComponent.objects.all()
     serializer_class = SalaryComponentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_payroll'
 
 class PayrollPeriodViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayrollPeriod.objects.all()
     serializer_class = PayrollPeriodSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_payroll'
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,7 +29,8 @@ from core.models import Employee
 class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Payslip.objects.all()
     serializer_class = PayslipSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_payroll'
 
     @action(detail=False, methods=['post'])
     def generate(self, request):

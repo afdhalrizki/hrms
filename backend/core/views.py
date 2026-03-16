@@ -2,32 +2,47 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from django.db import transaction
 from core.audit import AuditModelMixin
-from .models import Department, Role, Golongan, Employee
-from .serializers import DepartmentSerializer, RoleSerializer, GolonganSerializer, EmployeeSerializer
+from core.permissions import HasRBACPermission
+from .models import Department, Role, Golongan, Employee, AccessRole
+from .serializers import (
+    DepartmentSerializer, RoleSerializer, GolonganSerializer, 
+    EmployeeSerializer, AccessRoleSerializer
+)
 
 
 class DepartmentViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_hr'
 
 
 class RoleViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_hr'
 
 
 class GolonganViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Golongan.objects.all()
     serializer_class = GolonganSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_hr'
+
+
+class AccessRoleViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = AccessRole.objects.all()
+    serializer_class = AccessRoleSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_settings'
 
 
 class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_hr'
 
     def get_queryset(self):
         queryset = Employee.objects.all()

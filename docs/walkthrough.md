@@ -154,3 +154,25 @@ _The complete employee creation modal showcasing the Access Provisioning toggles
 
 ---
 **Status**: Milestone 🎉 Phase 25 (Admin Provisioning System) 100% Complete.
+
+## Phase 27: Hybrid Role-Based Access Control (RBAC)
+
+Implemented a hybrid RBAC system that provides default roles while allowing tenant-level customization.
+
+### Key Features
+- **AccessRole Model**: Created a flexible model with JSON permissions to define module-level access (HR, Attendance, Payroll, Settings).
+- **Default Roles**: Automatically seeds "Standard Employee" and "HR Administrator" roles for every tenant.
+- **Granular Permissions**: Added `HasRBACPermission` to protect all per-tenant API endpoints.
+- **Roles Management UI**: A new settings page to view, edit, and create custom roles.
+- **Provisioning Integration**: Employee creation now includes an RBAC role selection dropdown.
+- **CORS Support**: Updated backend to allow authenticated cross-origin requests from tenant subdomains.
+
+### Verification Results
+- **Backend Tests**: Verified that users are correctly blocked from modules they don't have permissions for, while admins bypass all checks.
+- **UI Walkthrough**: Confirmed the appearance of RBAC cards in Settings and role dropdowns in Employee Management.
+
+![RBAC UI Overview](./assets/rbac_walkthrough_proven_1773645692977.webp)
+*Recording showing the RBAC settings and employee integration.*
+
+---
+**Status**: Milestone 🎉 Phase 27 (Hybrid RBAC) 100% Complete. Rebranded to **harikerja** on March 16, 2026.

@@ -2,6 +2,24 @@ from django.db import models
 from core.audit import AuditModel
 
 
+class AccessRole(AuditModel):
+    """
+    Defines the RBAC permissions for a user within a specific tenant.
+    """
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    
+    # Store dynamic permissions as a JSON dictionary
+    # e.g. {"manage_hr": True, "manage_payroll": False}
+    permissions = models.JSONField(default=dict, blank=True)
+    
+    # If True, this is a system-generated default role that shouldn't be deleted
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+
 class Department(AuditModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -55,6 +73,9 @@ class Employee(AuditModel):
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='employees')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='employees')
     golongan = models.ForeignKey(Golongan, on_delete=models.SET_NULL, null=True, related_name='employees')
+    
+    # RBAC mapping
+    access_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
 
     status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='PROBATION')
     join_date = models.DateField()

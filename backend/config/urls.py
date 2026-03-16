@@ -21,7 +21,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 # Import ViewSets
 from users.views import UserViewSet
-from core.views import DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet
+from core.views import DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, AccessRoleViewSet
 from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
@@ -31,6 +31,7 @@ router.register(r'users', UserViewSet)
 router.register(r'departments', DepartmentViewSet)
 router.register(r'roles', RoleViewSet)
 router.register(r'golongan', GolonganViewSet)
+router.register(r'access-roles', AccessRoleViewSet)
 router.register(r'employees', EmployeeViewSet)
 router.register(r'attendance', AttendanceViewSet)
 router.register(r'leave-requests', LeaveRequestViewSet)
