@@ -14,6 +14,9 @@ import {
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useTenant } from '@/context/TenantContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const stats = [
   { 
@@ -52,6 +55,27 @@ const stats = [
 
 export default function Home() {
   const { user, loading } = useAuth();
+  const { isPublic } = useTenant();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user && isPublic) {
+      router.push('/signup');
+    }
+  }, [user, loading, isPublic, router]);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <p className="text-muted-foreground animate-pulse">Loading workspace...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // If not logged in and on public, we'll be redirecting, so show nothing
+  if (!user && isPublic) return null;
 
   return (
     <DashboardLayout>

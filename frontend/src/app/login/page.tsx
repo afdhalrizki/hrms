@@ -6,10 +6,15 @@ import { Mail, Lock, Briefcase, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
 
-export default function LoginPage() {
-  const { tenantName } = useTenant();
+export default function LoginPage({ forceShowForm = false }: { forceShowForm?: boolean }) {
+  const { tenantName, isPublic } = useTenant();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Determine if we should show the form: 
+  // 1. Not public domain, OR
+  // 2. Secret portal access (forceShowForm)
+  const showForm = !isPublic || forceShowForm;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -31,63 +36,97 @@ export default function LoginPage() {
               <Briefcase size={32} />
             </div>
             <h1 className="text-3xl font-bold tracking-tight">HRMS Login</h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome to <span className="text-primary font-bold">{tenantName}</span> portal
-            </p>
+            
+            {!showForm ? (
+              <div className="space-y-4 pt-2">
+                <p className="text-lg font-medium text-foreground">
+                  Akses Terbatas
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Login hanya tersedia melalui subdomain perusahaan Anda. 
+                  Silakan akses URL seperti <code className="text-primary font-mono bg-primary/5 px-2 py-0.5 rounded">perusahaan.harikerja.com</code>
+                </p>
+                
+                <div className="pt-4 flex flex-col gap-3">
+                  <a 
+                    href="/signup" 
+                    className="w-full py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                  >
+                    Daftarkan Perusahaan Baru
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {forceShowForm ? (
+                    <span className="text-accent font-bold uppercase tracking-widest text-[10px] bg-accent/10 px-2 py-1 rounded-full border border-accent/20">
+                      Portal Admin Global
+                    </span>
+                  ) : (
+                    <>Welcome to <span className="text-primary font-bold">{tenantName}</span> portal</>
+                  )}
+                </p>
+                {/* Form */}
+                <form className="space-y-5 pt-4" onSubmit={(e) => e.preventDefault()}>
+                  <div className="space-y-1.5 text-left">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
+                      <input 
+                        type="email" 
+                        placeholder="name@company.com"
+                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 rounded-2xl border border-transparent focus:border-primary/30 focus:bg-white/10 focus:outline-none transition-all text-foreground"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-left">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</label>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
+                      <input 
+                        type="password" 
+                        placeholder="••••••••"
+                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 rounded-2xl border border-transparent focus:border-primary/30 focus:bg-white/10 focus:outline-none transition-all text-foreground"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between px-1">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-white/5 accent-primary" />
+                      <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Remember me</span>
+                    </label>
+                    <button type="button" className="text-sm font-semibold text-primary hover:underline underline-offset-4">Forgot password?</button>
+                  </div>
+
+                  <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    Sign In
+                    <ArrowRight size={20} />
+                  </button>
+                </form>
+              </>
+            )}
           </div>
-
-          {/* Form */}
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
-                <input 
-                  type="email" 
-                  placeholder="name@company.com"
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/5 rounded-2xl border border-transparent focus:border-primary/30 focus:bg-white/10 focus:outline-none transition-all"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
-                <input 
-                  type="password" 
-                  placeholder="••••••••"
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/5 rounded-2xl border border-transparent focus:border-primary/30 focus:bg-white/10 focus:outline-none transition-all"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between px-1">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-white/5 accent-primary" />
-                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Remember me</span>
-              </label>
-              <button className="text-sm font-semibold text-primary hover:underline underline-offset-4">Forgot password?</button>
-            </div>
-
-            <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-              Sign In
-              <ArrowRight size={20} />
-            </button>
-          </form>
 
           {/* Footer */}
-          <div className="text-center pt-2">
-            <p className="text-sm text-muted-foreground">
-              Don't have an account? <span className="text-primary font-bold cursor-pointer hover:underline">Contact HR</span>
-            </p>
-          </div>
+          {showForm && (
+            <div className="text-center pt-2">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account? <span className="text-primary font-bold cursor-pointer hover:underline">Contact HR</span>
+              </p>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
   );
 }
+
+
