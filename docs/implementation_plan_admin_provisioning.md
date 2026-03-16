@@ -40,4 +40,4 @@ We will connect the currently static `EmployeesPage` to the Live API and build t
 - We deployed the browser subagent to click "Add Employee", fill out the form, toggle the "Grant Admin Access" switch, and submit it.
 - **Result**: The form correctly validated constraints, the API populated the dropdown metadata flawlessly, and the submission invoked the Django atomic transaction to link the `User` and `Employee` to the current `Tenant`.
 
-![Add Admin Employee Modal](file:///C:/Users/afdhal/.gemini/antigravity/brain/96299b9b-c0ee-4233-8a99-27732e67f049/add_employee_modal_before_submit_1773638661925.png)
+![Add Admin Employee Modal](./assets/add_employee_modal_before_submit_1773638661925.png)
