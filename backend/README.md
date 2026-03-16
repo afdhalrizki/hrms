@@ -1,24 +1,36 @@
-# HRMS SaaS Backend (Django)
+# harikerja HRMS SaaS Backend (Django)
 
-This is the core API for the HRMS SaaS application, built with Django, Django REST Framework, and `django-tenants` for multi-tenant isolation.
+The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Python 3.12 and Django, this backend employs a robust multi-tenant architecture with schema-level isolation to ensure maximum security and performance for enterprise clients.
 
-## Features
-- **Multi-Tenancy**: Isolated database schemas for each company.
-- **Biometric API**: Face recognition reference and liveness verification tracking.
-- **Indonesian Payroll Engine**: TER 2024 compliance, BPJS, and PDF Payslip generation.
-- **Attendance & Geofencing**: GPS-validated clock-in/out with shift-based status tracking.
-- **API Documentation**: Interactive Swagger UI via `drf-spectacular`.
+## 🚀 Key Features
 
-## Prerequisites
-- **Python**: 3.10 or higher
-- **PostgreSQL**: 14+ (Required for schema-based multi-tenancy)
-- **Redis**: For caching and connection pooling (optional for local dev but recommended)
+- **Multi-Tenant Foundation**: Complete data isolation using `django-tenants` and PostgreSQL schemas.
+- **Auto-Onboarding Flow**: Public registration request system with an internal admin approval workflow that auto-provisions tenants.
+- **Unified Identity (Admin-Employee)**: Integrated user profile API (`/api/users/me/`) that links Django users with their HR employee records.
+- **Indonesian Payroll Engine**: Full compliance with **TER 2024 PPh 21** regulations, BPJS calculations, and dynamic PDF payslip generation.
+- **Biometric Attendance**: Geofencing-validated clock-in/out with face reference tracking and liveness check metadata.
+- **Enterprise Ready**: Request caching with Redis and connection pooling with PgBouncer.
 
-## 1. Installation
+## 📁 Core Modules
 
-### Setup Virtual Environment
+- `tenants/`: Manages customer registration, domain routing, and schema migrations.
+- `users/`: Centralized authentication and identity management.
+- `core/`: Basic HR master data (Departments, Roles, Employee Records).
+- `attendance/`: Scheduling, Geofencing, and Biometric attendance logs.
+- `payroll/`: Salary components, TER 2024 tax engine, and payslip management.
+
+## 🛠 Prerequisites
+
+- **Python**: 3.12+
+- **PostgreSQL**: 14+ (Required for schema support)
+- **Redis**: For caching and background jobs (optional for local dev)
+
+---
+
+## 1. Setup & Installation
+
+### Virtual Environment
 ```bash
-cd backend
 python -m venv venv
 # Windows:
 venv\Scripts\activate
@@ -31,69 +43,45 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Environment Configuration
-The backend uses a PostgreSQL database. Ensure your local database is running. If using the root `docker-compose.yml`, run:
+### Environment Config
+Map your environment variables in a `.env` file or local settings:
+- `TENANT_DOMAIN_SUFFIX`: The suffix for tenant domains (default: `localhost`).
+- `DATABASE_URL`: Your PostgreSQL connection string.
+
+---
+
+## 2. Database Initialization
+
+The system uses a two-step migration process for multi-tenancy:
+
 ```bash
-docker-compose up -d db redis
-```
-
-Update `backend/config/settings.py` or use environment variables for `DATABASES`, `REDIS_URL`, and `TENANT_DOMAIN_SUFFIX`.
-
-- **`TENANT_DOMAIN_SUFFIX`**: Defaults to `localhost`. Change this to your base domain in staging/production (e.g., `myhrms.com`).
-
-## 2. Database Initialization (Multi-Tenant)
-
-### Run Migrations
-```bash
-# Migrate shared public tables (Tenants, Domains, Users)
+# 1. Migrate shared (public) tables (Tenants, Users, Registration)
 python manage.py migrate_schemas --shared
 
-# Migrate tenant-specific tables
+# 2. Migrate tenant-specific tables (HR, Payroll, Attendance)
 python manage.py migrate_schemas --tenant
 ```
 
-### Setup Initial Tenants
-Run the following script or use the Django shell to create the public and first sample tenant:
-```python
-# python manage.py shell
-from tenants.models import Tenant, Domain
-
-# 1. Create Public Tenant (Main Domain)
-tenant = Tenant(schema_name='public', name='HRMS SaaS Public')
-tenant.save()
-Domain.objects.create(domain='localhost', tenant=tenant, is_primary=True)
-
-# 2. Create Sample Company
-tenant = Tenant(schema_name='company1', name='First Company')
-tenant.save()
-from django.conf import settings
-domain_name = f'company1.{settings.TENANT_DOMAIN_SUFFIX}'
-Domain.objects.create(domain=domain_name, tenant=tenant, is_primary=True)
-```
-
-## 3. Running the Server
-
-### Start Django Dev Server
+### Creating the Foundation
+Use the bootstrap command to initialize the public schema and a sample tenant:
 ```bash
-python manage.py runserver
+python manage.py bootstrap_tenants
 ```
 
-The server will be available at:
-- Public Dashboard: `http://localhost:8000`
-- Tenant Dashboard: `http://company1.localhost:8000`
-- Admin Interface: `http://localhost:8000/admin/`
+---
 
-## 4. API Documentation
-Once the server is running, access the interactive documentation:
-- **Swagger UI**: `http://localhost:8000/api/schema/swagger-ui/`
-- **Redoc**: `http://localhost:8000/api/schema/redoc/`
+## 3. Developing & Testing
 
-## 5. Testing
-The project uses `pytest` for backend testing:
+### API Documentation
+The system automatically generates OpenAPI 3.0 schemas.
+- **Swagger UI**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
+- **Redoc**: [http://localhost:8000/api/schema/redoc/](http://localhost:8000/api/schema/redoc/)
+
+### Running Tests
+The backend uses `pytest` with `django-tenants` support:
 ```bash
 pytest
 ```
 
 ---
-**Note**: To access `company1.localhost` in your local browser, you must add an entry to your `hosts` file:
-`127.0.0.1 company1.localhost`
+**Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'payslip_screen.dart';
 import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
+import '../api/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,9 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
-    final employee = _userData?['employee'];
-    final fullName = employee?['fullname'] ?? _userData?['first_name'] ?? 'User';
-    final roleName = employee?['role_name'] ?? 'Staff';
+    final fullName = _userData?['fullname'] ?? 'User';
+    final roleName = _userData?['role_name'] ?? 'Staff';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 delegate: SliverChildListDelegate([
                   _buildWeatherDate(dateStr),
                   const SizedBox(height: 32),
-                  _buildAttendanceCard(context, employee?['id']),
+                  _buildAttendanceCard(context, _userData?['employee_id']),
                   const SizedBox(height: 32),
                   _buildSectionHeader("Quick Access"),
                   const SizedBox(height: 16),

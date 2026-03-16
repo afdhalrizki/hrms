@@ -18,7 +18,7 @@ Scaling for performance and adding business intelligence.
 - **Audit System**: Universal tracking of who created/updated any record in the system.
 - **Executive Analytics**: Real-time cost dashboards (Salary vs Overtime) and headcount growth tracking.
 
-![HR Dashboard](./assets/hrms_web_dashboard_premium_1773596128116.png)
+![HR Dashboard](./assets/dashboard_preview.png)
 
 ### Phase 3: Operational Scale & Security (Complete)
 Advanced security, biometric verification, and roster management.
@@ -29,7 +29,7 @@ Secure, AI-powered liveness check using `google_mlkit_face_detection`.
 - **Biometric Profiles**: Master face references stored securely in the database.
 - **Security Metadata**: Every attendance record now includes liveness verification status.
 
-![Mobile Dashboard](./assets/mobile_app_premium_1773596150297.png)
+![Mobile Dashboard](./assets/mobile_preview.png)
 
 #### 2. Shift & Roster Management
 Complex work rotation management for the modern workforce.
@@ -37,7 +37,7 @@ Complex work rotation management for the modern workforce.
 - **Weekly Scheduling**: Drag-and-drop style scheduling grid for administrators.
 - **Dynamic Logic**: Attendance automatically flags "LATE" based on assigned shifts.
 
-![Shift Management](./assets/shift_management_ui_mockup_v2_1773591186783.png)
+![Shift Management](./assets/shift_management.png)
 
 #### 3. Real-time Attendance Stream
 Connected the Next.js admin dashboard to the live API.
@@ -50,7 +50,7 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Interactive UI**: Test and explore all HR, Attendance, and Payroll endpoints.
 - **Endpoint**: [/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
 
-![API Documentation](./assets/swagger_documentation_1773607732275.png)
+![API Documentation](./assets/swagger_ui.png)
 
 ## Verification Proof
 
@@ -78,12 +78,12 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 ### 1. Premium Signup (Self-Service)
 The company signup page features a modern glassmorphism design, providing a premium onboarding experience for new tenants.
 
-![Premium Signup Page](./assets/signup_page_premium_glassmorphism_1773621627366.png)
+![Premium Signup Page](./assets/signup_preview.png)
 
 ### 2. Internal Admin Dashboard
 System administrators can manage pending registrations through a central dashboard with real-time status updates and action controls.
 
-![Admin Registration Management](./assets/admin_registration_dashboard_1773621637982.png)
+![Admin Registration Management](./assets/admin_registrations.png)
 
 ### 3. Frontend Identity Integration & Testing
 Established a robust identity layer and verified it with comprehensive unit tests using Vitest and React Testing Library.
@@ -111,6 +111,20 @@ Secured the core integration logic with robust automated tests and optimized dat
 2. **Access Admin**: Use `http://localhost:8000/admin/` for public management.
 3. **Tenant Portal**: Access `http://company1.localhost:8000/admin/` (ensure hosts file mapping).
 4. **API**: Explore the interactive documentation at `http://localhost:8000/api/schema/swagger-ui/`.
+
+### Phase 14: Mobile Identity Alignment & Unit Tests
+- **User Model Update**: Refactored the Flutter `User` model to match the backend's flattened identity response (Unified `fullname`, `employee_nik`, etc.).
+- **UI Hydration**: Updated `HomeScreen` to consume real identity data with robust null-safety.
+- **Testing**:
+  - Implemented manual mocks for `ApiService` to verify parsing logic.
+  - Resolved `WriteBuffer` and missing import compilation errors.
+  - **3/3 Tests Passing**: Verified core widget rendering and API data parsing.
+
+```bash
+cd mobile
+flutter test
+# Output: +3: All tests passed!
+```
 
 ---
 **Status**: Milestone 🎉 Phase 3 100% Complete.

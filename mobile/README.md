@@ -1,63 +1,69 @@
-# HRMS Mobile App (Flutter)
+# harikerja HRMS Mobile (Flutter)
 
-This is the employee self-service (ESS) mobile application for the HRMS SaaS platform, built with Flutter. It supports multi-tenancy, biometric attendance, and personal HR management.
+The employee self-service (ESS) application for the **harikerja HRMS** ecosystem. This Flutter app provides a secure, biometric-enabled portal for employees to manage their attendance, work schedules, and payroll.
 
-## Features
-- **Multi-Tenant Login**: Employees log in to their specific company domain.
-- **Biometric Attendance**: Face recognition with liveness detection (blink/movement) via Google ML Kit.
-- **Geofenced Check-in**: GPS validation to ensure attendance is recorded within office boundaries.
-- **Shift Viewer**: Personal work schedule and shift calendar with a premium glassmorphism UI.
-- **Payslip Viewer**: Detailed monthly earnings and deductions breakdown.
+## 📱 Key Features
 
-## Prerequisites
-- **Flutter SDK**: 3.x or higher
-- **Dart SDK**: 3.x or higher
-- **Android Studio / VS Code**: With Flutter and Dart plugins installed
-- **Android SDK / iOS environment**: For building and running the app
+- **Biometric Face Recognition**: AI-powered attendance verification with liveness checks using Google ML Kit.
+- **Smart Geofencing**: High-accuracy GPS validation to ensure attendance records are within office boundaries.
+- **Integrated Identity**: Real-time synchronization with the unified backend identity system (Employee NIK, Role, Department).
+- **Shift & Schedule**: Personal work calendar with real-time shift status.
+- **Dynamic Payslips**: View and download payroll details with TER 2024 compliance data.
 
-## 1. Installation
+## 🖼 UI Previews
 
-### Clone the repository and navigate to the mobile folder
+### Employee Dashboard
+![Mobile Dashboard](../docs/assets/mobile_dashboard.png)
+*Premium glassmorphism dashboard with real-time shift and attendance tracking.*
+
+### Face ID Attendance
+![Face ID Verification](../docs/assets/mobile_face_id.png)
+*AI-powered face recognition with liveness detection for secure clock-in.*
+
+## 🛠 Tech Stack
+
+- **Framework**: Flutter 3.19+
+- **Biometrics**: Google ML Kit (Face Detection)
+- **Maps/Location**: Geolocator API
+- **Storage**: Flutter Secure Storage (JWT)
+- **Fonts**: Plus Jakarta Sans (Google Fonts)
+
+---
+
+## 1. Getting Started
+
+### Prerequisites
+- Flutter SDK 3.x
+- Android SDK / iOS Environment
+
+### Setup
 ```bash
 cd mobile
-```
-
-### Install Dependencies
-```bash
 flutter pub get
 ```
 
-## 2. Configuration
-
-### API Connection
-The app connects to the HRMS Backend. By default, it is configured to use `http://localhost:8000`. You can update the API base URL in `lib/services/api_service.dart`.
-
-**Note for Emulator Users:**
-- Android Emulator: Use `http://10.0.2.2:8000`
-- iOS Simulator: Use `http://localhost:8000`
-
-### Multi-Tenancy
-On the login screen, users must provide their company domain (e.g., `company1`) which is used to route requests to the correct tenant schema in the backend.
-
-## 3. Running the App
-
-### Start the application
+### Running the App
 ```bash
 flutter run
 ```
 
-## 4. Key Dependencies
-- `google_mlkit_face_detection`: For AI-powered face liveness verification.
-- `camera`: Real-time preview for attendance selfies.
-- `geolocator`: High-accuracy GPS tracking for geofencing.
-- `flutter_secure_storage`: Encrypted storage for authentication tokens.
-- `google_fonts`: Premium typography (Plus Jakarta Sans).
+---
 
-## 5. Development & Testing
-To run the automated test suite:
+## 2. API Integration
+
+The app is pre-configured for local development connectivity:
+- **Android Emulator**: Uses `http://10.0.2.2:8000`
+- **iOS Simulator**: Uses `http://localhost:8000`
+
+---
+
+## 3. Testing
+
+Run the mobile test suite (API logic & Widgets):
 ```bash
 flutter test
 ```
+**Status**: All core flows verified with manual mocks and unit tests.
 
 ---
-**Status**: Milestone 🎉 Integrated with Phase 3 Face Recognition & Liveness Security.
+**Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

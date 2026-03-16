@@ -1,19 +1,43 @@
-# HRMS SaaS Frontend (Next.js)
+# harikerja HRMS SaaS Frontend (Next.js)
 
-This is the premium admin dashboard for the HRMS SaaS application, built with Next.js, Tailwind CSS, and Framer Motion.
+The premium, high-performance admin dashboard for the **harikerja HRMS** ecosystem. Built with Next.js 14 and TypeScript, following the latest App Router patterns for optimal SEO and user experience.
 
-## Features
-- **Tenant-Aware Dashboard**: Automatically identifies the tenant based on the subdomain.
-- **Glassmorphism UI**: High-end, dark-mode aesthetic with smooth animations.
-- **Real-time Attendance Stream**: Live updates from the backend attendance API.
-- **Executive Analytics**: Interactive charts for cost analysis and headcount trends.
-- **Shift Management**: Full roster and shift assignment grid for administrators.
+## ✨ High-End Features
 
-## Prerequisites
-- **Node.js**: 18.x or higher
-- **npm**: 9.x or higher
+- **Multi-Tenant Experience**: Automatic tenant detection via subdomain parsing.
+- **Premium Aesthetics**: Glassmorphism UI design with smooth Framer Motion transitions and dark-mode optimization.
+- **Identity Hydration**: Real-time user profile management integrated with the unified backend identity API.
+- **Executive Analytics**: Dynamic charts for headcount, attendance trends, and HR cost distribution.
+- **Self-Service Onboarding**: Integrated registration flow for new customers with real-time validation.
 
-## 1. Installation
+## 🖼 UI Previews
+
+### Admin Dashboard
+![Dashboard Preview](../docs/assets/dashboard_preview.png)
+*Modern, glassmorphism-based dashboard with real-time analytics indicators.*
+
+### Premium Signup
+![Signup Preview](../docs/assets/signup_preview.png)
+*Seamless tenant onboarding with instant domain validation.*
+
+## 🛠 Tech Stack
+
+- **Core**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS & Vanilla CSS (Design System)
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Testing**: Vitest & React Testing Library
+
+## 📁 Key Components
+
+- `src/app/`: File-based routing including Signup, Login, and Dashboard.
+- `src/context/`: Tenant and Auth state management.
+- `src/components/`: Reusable UI components (Sidebar, Charts, Cards).
+- `src/lib/`: API client and utility helpers.
+
+---
+
+## 1. Setup & Installation
 
 ### Install Dependencies
 ```bash
@@ -21,35 +45,31 @@ cd frontend
 npm install
 ```
 
-## 2. Configuration
-The frontend automatically detects the current tenant by parsing the hostname. Ensure your backend is running and that your local `hosts` file includes entries for your tenants.
-
-**Required hosts entry:**
-`127.0.0.1 company1.localhost`
-
-The API base URL is currently set to `http://localhost:8000`.
-
-## 3. Running Locally
-
-### Start Development Server
+### Development
 ```bash
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) for the public tenant or [http://company1.localhost:3000](http://company1.localhost:3000) for a specific tenant dashboard.
-
-## 4. Scripts
-- `npm run dev`: Starts the development server.
-- `npm run build`: Builds the production-ready application.
-- `npm run start`: Starts the built production application.
-- `npm run lint`: Runs ESLint for code quality checks.
-- `npm run test`: Runs the test suite using Vitest.
-
-## 5. Testing
-The project uses `Vitest` for frontend component testing:
-```bash
-npm run test
-```
+Open [http://localhost:3000](http://localhost:3000) for the public portal.
 
 ---
-**Status**: Integrated with Phase 3 Attendance Intelligence & Shift Management.
+
+## 2. Multi-Tenant Development
+
+To test tenant-specific dashboards (e.g., `company1`), update your local `hosts` file:
+```text
+127.0.0.1 company1.localhost
+```
+Then access [http://company1.localhost:3000](http://company1.localhost:3000).
+
+---
+
+## 3. Testing
+
+Verify core logic and UI components:
+```bash
+npm test
+```
+**Coverage**: 100% logic coverage for critical helpers (`api.ts`, `TenantContext.tsx`, `AuthContext.tsx`).
+
+---
+**Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

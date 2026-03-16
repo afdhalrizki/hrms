@@ -68,7 +68,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 ## 13. Unit Testing & Quality Assurance
 - [x] Implement Backend Payroll Engine tests.
 - [x] Implement Backend Multi-tenancy isolation tests (Core & Tenants).
-- [/] Fix and expand Mobile widget & logic tests.
+- [x] Fix and expand Mobile widget & logic tests.
 - [x] Add basic Frontend component smoke tests.
 
 ## 14. Final Verification & Handover

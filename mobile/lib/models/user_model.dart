@@ -1,28 +1,34 @@
 class User {
   final int id;
   final String email;
-  final String firstName;
-  final String lastName;
-  final String role;
-  final String? avatarUrl;
+  final bool isStaff;
+  final int? employeeId;
+  final String? employeeNik;
+  final String? fullname;
+  final String? roleName;
+  final String? departmentName;
 
   User({
     required this.id,
     required this.email,
-    required this.firstName,
-    required this.lastName,
-    required this.role,
-    this.avatarUrl,
+    required this.isStaff,
+    this.employeeId,
+    this.employeeNik,
+    this.fullname,
+    this.roleName,
+    this.departmentName,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       email: json['email'],
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
-      role: json['role'] ?? 'Employee',
-      avatarUrl: json['avatar_url'],
+      isStaff: json['is_staff'] ?? false,
+      employeeId: json['employee_id'],
+      employeeNik: json['employee_nik'],
+      fullname: json['fullname'],
+      roleName: json['role_name'],
+      departmentName: json['department_name'],
     );
   }
 
@@ -30,10 +36,12 @@ class User {
     return {
       'id': id,
       'email': email,
-      'first_name': firstName,
-      'last_name': lastName,
-      'role': role,
-      'avatar_url': avatarUrl,
+      'is_staff': isStaff,
+      'employee_id': employeeId,
+      'employee_nik': employeeNik,
+      'fullname': fullname,
+      'role_name': roleName,
+      'department_name': departmentName,
     };
   }
 }
