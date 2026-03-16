@@ -1,0 +1,4671 @@
+i 
+ SISTEM INFORMASI PENGGAJIAN KARYAWAN  BERBASIS WEB  
+(STUDI KASUS :PT. ADJITAMA PERSADA ) 
+ 
+Skripsi ini diajukan sebagai syarat melaksanakan kewajiban studi  
+Strata Satu Program Studi Teknik Informatika 
+ 
+ 
+ 
+ 
+ 
+Oleh : 
+DENI IRAWAN  
+107091002960  
+ 
+PROGRAM STUDI TEKNIK INFORMATIKA 
+FAKULTAS SAINS DAN TEKNOLOGI 
+UIN SYARIF HIDAYATULLAH JAKARTA 
+2014 M/143 5 H
+
+i 
+ SISTEM INFORMASI PENGGAJIAN KARYAWAN  BERBASIS WEB  
+(STUDI KASUS :PT. ADJITAMA PERSADA ) 
+ 
+Skripsi 
+Sebagai Salah Satu Syarat Untuk Memperoleh Gelar  
+Sarjana Komputer 
+Pada Fakultas Sains dan Teknologi 
+Universitas Islam Negeri Syarif Hidayatullah Jakarta 
+ 
+ 
+ 
+Disusun Oleh : 
+DENI IRAWAN 
+107091002960  
+ 
+ 
+ 
+PROGRAM STUDI TEKNIK INFORMATIKA 
+FAKULTAS SAINS DAN TEKNOLOGI 
+UIN SYARIF HIDAYATULLAH JAKARTA 
+2014 M/1435 H 
+ 
+ 
+
+ii 
+ PERNYATAAN 
+  
+ DENGAN INI SAYA MENYATAKAN BAHWA SKRIPSI INI BENAR-
+BENAR HASIL KARYA SENDIRI YANG BELUM PERNAH DIAJUKAN 
+SEBAGAI SKRIPSI ATAU KARYA ILMIAH PADA PERGURUAN TINGGI 
+ATAU LEMBAGA MANA PUN.   
+ 
+ 
+ 
+Jakarta, April   2014 
+ 
+ 
+Deni Irawan  
+107091002960  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+iii 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+iv 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+v 
+ Deni Irawan – 107091002960 .Sistem informasi penggajian karyawan berbasis WEB 
+(Studi Kasus : PT Adjitama Persada). (dengan bimbingan A. Hanifah Setyaningrum, 
+M.Si dan Imam Shofi, M.T ) 
+ 
+ABSTRAK 
+ 
+Salah satu kegiatan penting yang sering dilakukan oleh HRD PT Adjitama Persada 
+setiap bulannya adalah menghitung gaji bagi karyawan. Perhitungan gaji ini dilakukan 
+dengan mencatat semua data sesuai dengan variabel gaji yang ada di PT Adjitama 
+Persada. Data-data tersebut kemudian direkapitulasi dalam bentuk laporan  penggajian  
+sebagai hasil dari pengolahan data gaji karyawan. Report gaji  merupakan salah satu 
+dokumen penting yang akan dipertanggung jawabkan setiap bulan. Laporan perlu 
+dikelola dan diatur secara baik, sehingga lebih terstruktur dan pengaksesannya kembali 
+dapat dilakukan dengan mudah. Pada saat ini pencatatan absensi, lembur, pinjaman 
+dan pembuatan laporan masih manual dan belum memiliki sistem basis data, serta file 
+program  penggajian pun dibuat secara konvensional dengan memodifikasi file excel 
+penggajian  sebelumnya. Sistem informasi penggajian karyawan dikembangkan untuk 
+mencatat, mengolah, dan menyimpan data penggajian dengan baik ke dalam sebuah 
+sistem basis data. Sistem  ini juga dapat mencetak  langsung dokumen laporan  sebag ai 
+output. Oleh karena itu, sistem  ini juga akan mempermudah melakukan pembuatan 
+laporan penggajian. Sistem informasi penggajian karyawan dikembangkan dengan 
+pendekatan Rapid Application Development (RAD). Adapun bahasa pemrograman  
+yang digunakan untuk men gembangkan sistem ini adalah php, dan MySQL sebagai 
+pengolah sistem basis data .  
+ 
+Kata kunci  : Sistem, Informasi, Penggajian Karyawan, RAD. 
+Daftar Pustaka   : 11 (2002-2009) 
+ 
+
+vi 
+ KATA PENGANTAR  
+ 
+Bismillahirrahmanirrahim  
+Alhamdulillah, segala puji syukur peneliti panjatkan kepada Allah SWT atas 
+segala rahmat dan karunia-Nya  yang tak terhingga, sehingga peneliti bisa 
+menyelesaikan penelitian skripsi ini dengan sebaik-baiknya. Shalawat serta salam 
+selalu terlimpahkan pada junjungan Nabi Besar Muhammad SAW. 
+Skripsi ini berjudul “Sistem Informasi Penggajian Karyawan Berbasis 
+WEB (Studi Kasus: PT- Adjitama Persada) ”, yang disusun untuk memenuhi salah 
+satu syarat dalam menyelesaikan program S1 pada Program Studi Teknik Informatika 
+di Universitas Islam Negeri Syarif Hidayatullah Jakarta. 
+Ucapan terima kasih yang tak terhingga dan tak akan pernah sebanding dengan 
+apa yang telah mereka lakukan, saya haturkan kepada orang tua paling sabar. Orang 
+yang tak pernah berhenti memberi semangat mental maupun moriil pada saya, dan 
+selalu mengiringi langkah saya dengan doa yang mereka panjatkan siang dan malam 
+sejak saya dilahirkan hingga saat ini. Terima Kasih Bapak, Ibu. Skripsi dan gelar ini 
+untuk Bapak dan Ibu. Serta tid ak lupa untuk  kak Yuyung, kak Enggi, dan kak Pipit  
+yang  telah berkorban banyak untuk  membantu  saya.  
+Terima kasih kepada Ibu Anif Hanifah Setyaningrum, M.si  selaku dosen 
+pemb imbing I dan Bapak Imam Shofi , M.T selaku dosen pembimbing II  yang telah 
+
+vii 
+ rela dan dengan sabar mendukung dan membimbing saya dalam menyelesaikan tugas 
+akhir ini. 
+Terima kasih kepada jajaran staff  HRD  dari PT.Adjitama Persada tempat saya 
+melakukan penelitian. Orang -orang yang telah menerima saya dengan hangat  dan 
+mendukung penelitian saya. . 
+Skripsi ini bukanlah yang sempurna, saya sebagai penulis dan peneliti 
+mengharapkan saran dan kritiknya. Semoga bermanfaat. 
+ 
+Jakarta, 18 April 2014 
+ 
+         Deni Irawan 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+viii 
+ DAFTAR ISI 
+ 
+HALAMAN JUDUL  ........................................................................................... i 
+LEMBAR PERNYATAAN  ................................................................................ ii 
+LEMBAR PENGESAHAN PEMBIMBING  .................................................... iii 
+LEMBAR PENGESAHAN UJIAN  ................................................................... iv 
+ABSTRAK  ........................................................................................................... v 
+KATA PENGANTAR  ........................................................................................ vi 
+DAFTAR ISI  ....................................................................................................... viii 
+DAFTAR GAMBAR  .......................................................................................... xi  
+DAFTAR TABEL  ............................................................................................... xv 
+DAFTAR LAMPIRAN   ................................ ......................................................  xvii 
+ 
+BAB I PENDAHULUAN  ................................................................................... 1 
+1.1. Lata Belakang  ............................................................................................. 1 
+1.2. Rumusan Masalah  ....................................................................................... 2 
+1.3. Batasan Masalah  ......................................................................................... 3 
+1.4. Tujuan Penelitian  ........................................................................................ 3 
+1.5. Manfaat Penelitian  ...................................................................................... 4 
+1.5.1 Bagi Penulis  ....................................................................................... 4 
+1.5.2 Bagi Instansi  ...................................................................................... 4 
+1.6. Metodologi Penelitian ..................................................................................  4 
+1.6.1 Metode Pengumpulan Data  ............................................................... 4 
+1.6.2 Metode Pengembangan Sistem  .......................................................... 5 
+1.7. Sistematika Penulisan  ................................................................................. 6 
+BAB II LANDASAN TEORI  ............................................................................. 8 
+2.1. Sistem   ................................ ................................ ................................ .......... 8 
+2.1.1 Karakteristik Sistem   ................................ ................................ .......... 8 
+2.1.2 Klasifikasi Sistem ................................................................... .......... . 10 
+2.2. Informasi   ................................ ................................ ................................ ..... 12 
+2.3. Penggajian  ................................................................ ................................ ....  13 
+2.4. Karyawan ...................................................................................................  . 15 
+
+ix 
+ 2.5. Berbasis ........................................................................................ ..............  . 15 
+2.6. Website ......................................................................................................  .. 15 
+2.6.1  Pengertian Website  ..........................................................................   15      
+2.6.2   Konsep Dasar Website ....................................................................   16 
+2.7. Database   ................................ ................................ ................................ ...... 17 
+2.7.1 Database Relational   ................................ ................................ ........... 17 
+2.7.2 DBMS   ................................................................ ................................  18 
+2.7.3 MySQL  .............................................................................................. 18 
+2.8. Perancangan Sistem   ................................ ....................................................  20 
+2.8.1 Bagan Alur (Flowchart)   ................................ ................................ ..... 20 
+2.8.2 Data Flow Diagram   ................................ ................................ ........... 21 
+2.8.3 Kamus Data ............................................................... ......................... 24 
+ 2.8.4 State Transition Diagram ............................................................... .... 25 
+2.9. Perangkat Lunak   ................................ .........................................................  27 
+2.9.1 HTML   ................................................................ ...............................  27 
+2.9.2 PHP  ................................................................ ................................ .... 27 
+2.9.3 XAMPP   ................................................................ .............................  29 
+2.10. Pengujian  ..................................................................................................... 29 
+2.10.1 . Pengujian Black Box  …......................... ..........................................  30 
+BAB III METODOLOGI PENELITIAN  ......................................................... 31 
+3.1. Metode Pengumpulan Data  ......................................................................... 31 
+3.1.1 Studi Lapangan  ................................ ...................................................  32 
+ 3.1.1.1  Wawancara ............................................................................  32 
+ 3.1.1.2 Observasi ...............................................................................  32 
+3.1.2 Studi Pustaka  ..................................................................................... 33 
+3.1.3 Studi Literatur  .................................................................................... 34 
+3.2. Metode Pengembangan Sistem  ................................................................... 38 
+3.3. Diagram Alur  Penelitian  ................................ ................................ ............. 39 
+BAB IV HASIL PEMBAHASAN  ....................................................... ..............  . 41 
+4.1. Metode Pengumpulan Data  ......................................................................... 41 
+ 4.1.1 Studi Lapangan ..................................................................................  41 
+ 4.1.1.1  Wawancara  ................................ ................................ ............ 41 
+
+x 
+  4.1.1.2 Observasi  ................................ ...............................................  42 
+4.2. Metode Pengembangan Sistem  ................................................................... 43 
+4.2.1 Requirement Planning  ....................................................................... 43 
+4.2.1.1  Profil  .................................................................................... 43 
+4.2.1.2  Visi dan Misi Perusahaan   ....................................................  44 
+ 4.2.1.2.1 Visi .......................................................................  44 
+ 4.2.1.2.2 Misi .......................................................................  44 
+4.2.1.3  Struktur Organisasi   ................................ ..............................  45 
+4.2.1.4  Analisis Sistem Yang Berjalan ............................................   46 
+4.2.1.5  Identifikasi Masalah  ............................................................ 52 
+4.2.1.6  Solusi Permasalahan   ................................ ............................  52 
+ 4.2.1.6.1 Identifikasi Strategi IT ..........................................  53 
+ 4.2.1.6.2 Identifikasi Pola Solusi .........................................  54 
+ 4.2.1.6.3 Kebutuhan Fungsional Sistem ..............................  55 
+ 4.2.1.6.3 Kebutuhan Non Fungsional Sistem ......................  55 
+4.2.1.7  Perbandingan Sistem berjalan dengan Sistem Usulan  ......... 57 
+4.2.2 Workshop Design   ............................................................................... 58 
+4.2.2.1  Data Flow Diagram   ................................ .............................  58 
+4.2.2.2  Desain Database ..................................................................   77 
+4.2.2.2.1   ERD ....................................................................   77 
+4.2.2.2.2   Normalisasi .........................................................   78 
+4.2.2.2.3   Struktur Database................................................   82 
+4.2.2.3  State Transition Diagram ......................................................     88 
+4.2.2.4  Desain Interface .................................. ..................................     90 
+4.2.2.5  Coding  ................................ ..................................................  104 
+4.2.3 Implementation   .................................................................................. 105 
+4.2.3.1  Black Box Testing   ................................ ...............................  105 
+BAB V PENUTUP  .............................................................................................. 117 
+5.1. Kesimpulan  ................................................................................................. 117 
+5.2. Saran  ............................................................................................................ 117 
+DAFTAR PUSTAKA  ......................................................................................... 119 
+ 
+
+xi 
+ DAFTAR GAMBAR 
+ 
+Halaman 
+Gambar 2.1  Karakteristik Sistem  ................................ ................................ . 13 
+Gambar 2.2  Proses  ................................................................ .......................  20 
+Gambar 2.3 Dokumen ………………………………  ................................ .. 20 
+Gambar 2.4  Kegiatan Manual  ................................ ................................ ..... 20 
+Gambar 2.5  Terminal  ................................ ...................................................  20  
+Gambar 2.6  Simpanan Offline ................................ ................................ ..... 21  
+Gambar 2.7  Keputusan  ................................ .................................................  21  
+Gambar 2.8  Garis Alur  ................................ ................................................  21  
+Gambar 2.9  External Entity  ................................ ................................ ......... 22  
+Gambar 2.10  Proses  ................................................................ .......................  22  
+Gambar 2.11  Data Flow  ................................ .................................................  22  
+Gambar 2.12  Data Storage  ................................ ............................................  22 
+Gambar 2.13  Contoh perubahan State  ................................ ...........................  26 
+Gambar 2.14  Notasi Modul  ................................ ...........................................  26 
+Gambar 2.15  Notasi Kondisi  ................................ ................................ ......... 26 
+Gambar 2.16  Notasi Tindakan ................................ ................................ ....... 27 
+Gambar 3.1  Diagram Alur  Penelitian  ................................ ...........................  40 
+Gambar 4.1  Struktur Organisasi  ................................ ................................ ... 46 
+
+xii 
+ Gambar 4.2  Bisnis Proses Abs ensi ................................ ...............................  47 
+Gambar 4.3  Bisnis Proses Pinjaman ................................ .............................  48 
+Gambar 4.4  Bisnis Proses Lembur  ................................ ..............................  49 
+Gambar 4.5  Bisnis Proses Penggajian yang berjalan  ................................ ... 51 
+Gambar 4.6  Proses Bisnis Sistem Usulan  ....................................................  56 
+Gambar 4.7  Diagram Context  ................................ ................................ ...... 58 
+Gambar 4.8  DFD lv 0  ................................ ...................................................  59 
+Gambar 4.9  DFD lv 1 Manajemen  User  ................................ ......................  60 
+Gambar 4.10  DFD lv 1 Manajemen  Karyawan  ..............................................  61 
+Gambar 4.11  DFD lv 1 Manajemen Jabatan  ..................................................  62 
+Gambar 4.12  DFD lv 1 Manajemen  PTKP  ....................................................  63 
+Gambar 4.13  DFD lv 1  Manajemen  Absensi  .................................................  64 
+Gambar 4.14  DFD lv 1 Manajemen Lembur  .................................................  65 
+Gambar 4.15  DFD lv 1 Manajem en Pph21  ....................................................  66 
+Gambar 4.16  DFD lv 1  Manajemen penggajian  ............................................  67 
+Gambar 4.17  DFD lv 1  Manajemen Pinjaman  ..............................................  68 
+Gambar 4.18  DFD lv 1  Permohonan Pinjaman  .............................................  69 
+Gambar 4.19  DFD lv 1  laporan Pinjaman  ................................ ......................  70 
+Gambar 4.20  DFD lv 1 Laporan Karyawan  ...................................................  71 
+Gambar 4.21  DFD lv 1 Laporan Absensi  ................................ .......................  72 
+Gambar 4.22  DFD lv 1 Laporan Lembur ....................................................... 73 
+Gambar 4.23  DFD lv 1 Laporan Penggajian .................................................. 74 
+Gambar 4.24  DFD lv 1 Slip Penggajian ......................................................... 75 
+Gambar 4.25  Entity Relationship Diagram  ....................................................  78 
+Gambar 4.26  Second Normal Form (2NF)  .....................................................  81 
+
+xiii 
+ Gambar 4.27  Basis Data .................................................................................  87 
+Gambar 4.28  State Transition Diagram Admin ..............................................  88 
+Gambar 4.29  State Transition Diagram Accounting dan Finance  .................  88 
+Gambar 4.30  State Transition Diagram HRD  ................................................  89 
+Gambar 4.31  State Transition Diagram Direktur  ..........................................  89 
+Gambar 4.32  State Transition Diagram Karyawan........................................  90 
+Gambar 4.33 Tampilan Form Login...............................................................  90 
+Gambar 4.34  Tampilan Data User  ................................ ................................ ..  91 
+Gambar 4.35  Tampilan Form Input User  ................................ .......................   91 
+Gambar 4.36  Tampilan Data Jabatan  ................................ .............................   92 
+Gambar 4.37  Tampilan Form Input Jabatan  ...................................................   92 
+Gambar 4.38  Tampilan Data Karyawan  ................................ .........................   93 
+Gambar 4.39  Tampilan Form Input Karyawan  ..............................................   93 
+Gambar 4.40  Tampilan Data Lembur ................................ .............................   94 
+Gambar 4.41  Tampilan Form Input Lembur  ..................................................   94 
+Gambar 4.42  Tampilan Data Peminjaman  ................................ .....................   95 
+Gambar 4.43  Tampilan Form Input Peminjaman  ...........................................   95 
+Gambar 4.44  Tampilan Data Penggajian  ................................ .......................   96 
+Gambar 4.45  Tampilan Form Input Penggajian  .............................................   96 
+Gambar 4.46  Tampilan Data absensi  ................................ .............................   97 
+Gambar 4.47  Tampilan Form Input absensi  ...................................................   97 
+Gambar 4.48  Tampilan Data Pph21  ................................ ...............................   98 
+Gambar 4.49  Tampilan Form Input Pph21  ....................................................   98 
+Gambar 4.50  Tampilan Data PTKP  ................................ ...............................   99 
+
+xiv 
+ Gambar 4.51  Tampilan F orm Input PTKP  ................................ .....................   99 
+Gambar 4.52  Tampilan Menu Laporan  ................................ ..........................  100 
+Gambar 4.53  Tampilan laporan peminjaman  .................................................  100 
+Gambar 4.54  Tampilan laporan penggajian  ...................................................  101 
+Gambar 4.55  Tampilan laporan karyawan  ................................ .....................  101 
+Gambar 4.56  Tampilan laporan lembur  ................................ .........................  102 
+Gambar 4.57  Tampilan lap oran absensi  ................................ .........................  102 
+Gambar 4.58  Tampilan mencetak slip gaji  ................................ .....................  103 
+Gambar 4.59  Tampilan input permohonan pinjaman  ................................ ..... 103 
+Gambar 4.60  Tampilan validasi permohonan pinjaman  ...............................  104
+
+xv 
+  
+DAFTAR TABEL 
+ 
+Halaman 
+Tabel 3.1  Tabel Literatur Sejenis .....................................................................  36 
+Tabel 4.1  Tabel Identif ikasi Strategi IT  ................................ ...........................   53 
+Tabel 4.2  Tabel Identifikasi Pola Solusi  ................................ ..........................   54 
+Tabel 4.3  Tabel Perbedaan Antara Sistem Yang Sedang Berjalan dan Sistem  
+ yang Diusulkan ................................................................................  57 
+Tabel 4.4  Tabel Unnormalized  ........................................................................  79 
+Tabel 4.5  Tabel First Normal Form  ................................................................  80 
+Tabel 4.6  Tabel Tabel User .............................................................................  82 
+Tabel 4.7  Tabel Tabel Lembur ........................................................................  82 
+Tabel 4.8  Tabel Tabel Jabatan .........................................................................  83 
+Tabel 4.9  Tabel Tabel Karyawan  ................................ ................................ .....  83 
+Tabel 4.10  Tabel  Tabel Peminjaman  ................................ ................................ .  84 
+Tabel 4.11  Tabel Tabel Penggajian  ................................ ................................ ...  84 
+Tabel 4.12  Tabel Tabel Absensi  ................................ ................................ ........  85 
+Tabel 4.13  Tabel Tabel Pph21 ................................ ................................ ...........  85 
+Tabel 4.14  Tabel Tabel  PTKP  ................................ ................................ ...........  86 
+Tabel 4.15  Tabel Tabel permohonan pinjaman  .................................................   87 
+Tabel 4.16  Tabel Administrator  ................................ ................................ .........  105 
+
+xvi 
+ Tabel 4.17  Tabel HRD  ................................................................ .......................   108 
+Tabel 4.18  Tabel Accounting&Finance  .............................................................  111 
+Tabel 4.19  Tabel Direktur ..................................................................................  113 
+Tabel 4.20  Tabel Karyawan ...............................................................................  116 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+xvii 
+ DAFTAR LAMPIRAN  
+ 
+Lampiran I Hasil Wawancara .............................................................................. 120 
+Lampiran II Tampilan Antarmuka ....................................................................... 125 
+Lampiran III Source Codes  ................................................................................. 134 
+Lampiran IV Surat Penunjukan Dosen ................................................................ 144 
+Lampiran V Surat Penelitian ............................................................................... 146 
+Lampiran VI Bentuk Form pada Sistem yang sedang Berjalan .......................... 149
+
+1 BAB I 
+PENDAHULUAN 
+1.1 latar Belakang 
+ Kemajuan teknologi informasi beberapa tahun terakhir berkembang dengan 
+pesat. Hal tersebut salah satunya ditandai dengan penerapan sistem pelayanan yang 
+terkomputerisasi baik itu di rumah sakit, di sekolah, maupun di perusahaan. 
+Penerapan sistem yang terkomputerisasi pada berbagai sektor tersebut memberikan 
+kemudahan baik bagi instansi yang bersangkutan maupun bagi pengguna informasi 
+dalam mencari informasi yang diinginkan secara cepat dan tepat.Terkait dengan 
+perkembangan teknologi informasi tersebut, banyak perusahaan atau instansi 
+berlomba-lomba untuk mengadopsi dan melakukan pengembangan-pengembangan 
+sistem yang serba terkomputerisasi sesuai dengan kebutuhan perusahaan tersebut. 
+Salah satu sistem yang banyak dipergunakan perusahaan dalam rangka 
+mengoptimalkan layanan adalah dengan menerapkan sistem penggajian. Penerapan 
+sistem penggajian dalam suatu perusahaan atau instansi, baik yang di kelola 
+pemerintah maupun swasta dapat membantu manajemen dalam mengelola biaya 
+tenaga kerja atau yang biasa disebut dengan karyawan. Sistem penggajian akan 
+membantu manajemen perusahaan dalam meningkatkan pengendalian intern gaji 
+sehingga perusahaan dapat mencapai tujuan yang telah ditetapkan. Meskipun telah 
+banyak instansi atau perusahaan menerapkan sistem penggajian yang 
+terkomputerisasi, belum semua instansi atau perusahaan menerapkannya dalam 
+
+2 
+ 
+ menjalankan operasionalnya. Hal tersebut terjadi pada PT Adjitama Persada yang 
+selama ini menerapkan sistem penggajian secara manual.  
+PT Adjitama Persada merupakan perusahaan yang berdiri tahun 2010. 
+Penerapan sistem penggajian di PT Adjitama Persada tersebut memiliki kelemahan . 
+Diantaranya absens i yang masih manual dengan menggunakan kartu 
+amano/absensi, data lembur dan data peminjaman juga masih menggunakan kertas 
+sehingga penyimpanan data tersebut sebelum diolah menjadi data gaji kurang 
+terjamin, karena data-data tersebut terkadang hilang dan rusak. Dan   untuk 
+pengolahan gaji karyawan di PT Adjitama Persada masih menggunakan program 
+excel sehingga dalam proses penginputan data-data memungkinkan terjadinya 
+kesalahan serta  penggunaan file excel yang berulang kali sehingga memungkinkan 
+data yang lama hilang. Untuk  proses pembuatan laporan masih manual dan juga 
+birokrasi laporan yang lama . Berdasarkan latar belakang permasalahan yang telah 
+diuraikan serta melihat pentingnya pengembangan sistem penggajian di PT 
+Adjitama Persada, penulis tertarik untuk melakukan penelitian yang lebih 
+mendalam dengan mengambil judul “Sistem Informasi Penggaji an Karyawan 
+Berbasis Web Pada PT Adjitama Persada”.  
+1.2 Rumusan Masalah 
+ Berdasarkan masalah-masalah yang di temukan penulis, maka penulis 
+merumuskan masalah dalam penelitian ini sebagai berikut:  
+1. Bagaimana membuat sistem penggajian karyawan yang dapat memberikan 
+informasi tentang data absensi, data lembur, dan data pinjaman? 
+
+3 
+ 
+ 2. Bagaimana membuat sistem penggajian karyawan pada PT Adjitama 
+Persada yang dapat membantu dalam melakukan proses perhitungan gaji? 
+3. Bagaimana membuat sistem penggajian karyawan yang dapat memudahkan 
+pembuatan laporan? 
+1.3 Batasan Masalah 
+ Dalam pengembangan sistem ini, penulis membatasi masalah sebagai 
+berikut: 
+1. Analisis dan perancangan sistem penggajian karyawan disesuaikan 
+dengan kebutuhan PT Adjitama Persada. 
+2. Pembangunan aplikasi ini menggunakan bahasa pemprograman PHP 
+dan database My SQL. 
+3. Tidak memberi Hak akses ke sistem pada karyawan. 
+4. Sistem ini tidak menghitung upah yang diterima karyawan freelance 
+hanya karyawan inti/tetap perusahaan. 
+5. Tidak membuat laporan pajak penghasilan. 
+ 
+1.4 Tujuan Penelitian 
+ Tujuan penelitian ini adalah sebagai berikut: 
+1. Untuk membantu kegiatan perhitungan gaji karyawan agar memperkecil 
+terjadinya kesalahan. 
+2. Untuk mempermudah dalam pengelolaan data gaji karyawan. 
+
+4 
+ 
+ 3. Untuk mempermudah dalam pembuatan laporan. 
+ 
+1.5 Manfaat Penelitian 
+ Manfaat dari penelitian ini adalah: 
+1. Bagi Mahasiswa : 
+a. Mahasiswa dapat menerapkan ilmu yang didapat di perkuliahan 
+selama ini dengan membuat sistem informasi berbasis komputer. 
+b. Mahasiswa dapat memahami masalah-masalah yang ada dalam 
+sebuah perusahaan, terutama bagian penggajian karyawan. 
+2. Bagi Perusahaan : 
+a. Tersedianya sistem penggajian karyawan yang terkomputerisasi. 
+b. Tersedianya suatu informasi penggajian karyawan yang lebih 
+baik. 
+ 
+1.6 Metodologi Penelitian 
+1.6.1 Metode Pengumpulan Data 
+Metode penelitian yang digunakan pada penelitian ini meliputi: 
+1.Studi Lapangan 
+a. Observasi  
+
+5 
+ 
+ Observasi dilakukan dengan meninjau dan mengamati 
+secara langsung kegiatan mengenai proses perhitungan gaji dan 
+bisnis proses yang terjadi di PT Adjitama Persada .  
+b. Wawancara  
+Wawancara dilakukan dengan melakukan tanya jawab 
+secara langsung dengan pihak HRD PT.Adjitama Pesrsada 
+untuk mengumpulkan data mengenai kebutuhan pengguna 
+untuk diimplementasikan ke dalam aplikasi.  
+2. Studi Pustaka 
+Studi pustaka dilakukan dengan mengumpulkan data 
+pustaka, membaca, mencatat serta mengolah data pustaka 
+mengenai teori-teori yang terkait dalam skripsi ini. Teori-teori 
+yang digunakan terdapat dalam buku-buku, internet, literatur 
+sejenis, dan e-book . 
+1.6.2 Metode Pengembangan Sistem 
+Metode pengembangan sistem dalam pembuatan perangkat lunak 
+yang penulis lakukan adalah dengan menggunakan metode Rapid 
+Application Development (RAD). Pemilihan metodologi dengan alasan 
+bahwa aplikasi ini diharapkan mempunyai suatu desain yang dapat 
+diterima oleh pengguna dan dapat dikembangkan dengan mudah karena 
+perancangan sistem ini masih membutuhkan pengembangan lebih 
+
+6 
+ 
+ lanjut. Metode ini memiliki tiga tahap siklus pengembangan sebagai 
+berikut (Kendall, 2008:182) :  
+1. Fase Perencanaan Syarat-syarat 
+2. Workshop Desain RAD 
+3. Fase Implementasi 
+ 
+1.7 Sistematika Penulisan 
+  Dalam penulisan skripsi ini, penulis menjabarkan penelitian “ Sistem 
+Informasi Penggajian Karyawan Pada PT Adjitama Persada ” dibagi menjadi 5 
+(lima) Bab, diantaranya adalah :  
+BAB I  PENDAHULUAN 
+Bab ini berisi latar belakang masalah, rumusan masalah, 
+tujuan penelitian, manfaat penelitian, batasan masalah, 
+metodologi penelitian serta sistematika penulisan.  
+BAB II LANDASAN TEORI 
+Bab ini berisi pembahasan teori-teori dasar yang digunakan 
+sebagai panduan dasar dalam pembuatan sistem informasi 
+penggajian karyawan studi kasus PT Adjitama Persada   ini. 
+BAB III METODOLOGI PENELITIAN 
+Bab ini berisi metodologi penelitian yang dilakukan serta 
+langkah-langkah yang digunakan terkait dengan penelitian 
+yang dilakukan. 
+BAB IV ANALISIS DAN PERANCANGAN APLIKASI 
+
+7 
+ 
+ Bab ini berisi tentang analisis terhadap kebutuhan sistem , 
+desain sistem , serta implementasi pengembanganya secara 
+konkrit.  
+BAB V PENUTUP 
+Bab ini merupakan bab penutup yang berisi kesimpulan serta 
+saran yang dapat membantu  pengembangan sistem ini di 
+masa yang akan datang. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+8 
+ BAB II  
+LANDASAN TEORI  
+ 
+2.1  Sistem 
+Sistem adalah  sekumpulan elemen -elemen yang terintegrasi untuk 
+mencapai tujuan tertentu(McLeod dan Schell, 2004) . Menurut Ladjamudin 
+(2005), si stem adalah sekumpulan objek -objek yang saling berelasi dan 
+berinteraksi serta hubungan antar objek bisa dilihat sebagai satu kesatuan yang 
+dirancang untuk mencapai satu tujuan.  
+2.1.1 Karakteristik Sistem 
+Menurut Ladjamudin (2005), untuk memahami atau 
+mengembangkan suatu sistem, maka perlu membedakan unsur-unsur dari 
+sistem yang membentuknya. Suatu sistem mempunyai karakteristik atau 
+sifat-sifat yang tertentu(Jogiyanto, 2001) yaitu: 
+1. Komponen ( Component ) 
+Suatu sistem terdiri dari sejumlah komponen yang salin g 
+berinteraksi artinya saling bekerja sama membentuk satu 
+kesatuan. Komponen-komponen sistem atau elemen-elemen 
+dapat berupa satu subsistem atau bagian-bagian dari sistem. 
+2. Batas Sistem ( Boundary ) 
+Batas sistem merupakan daerah yang membatasi antar suatu 
+sistem dengan lingkungan luarnya. Batas sistem ini 
+memungkinkan suatu sistem dipandang sebagai satu kesatuan. 
+
+9 
+ 
+ 
+ Batas suatu sistem menunjukan ruang (score) dari sistem 
+tersebut. 
+3. Lingkungan Luar Sistem ( Environment ) 
+Lingkungan luar dari sistem adalah apapun di l uar batas dari 
+suatu sistem yang mempengaruhi operasi sistem. Lingkungan 
+luar sistem dapat bersifat menguntungkan dan juga merugikan 
+sistem tersebut.  
+4. Penghubung Sistem ( Interfaace ) 
+Merupakan media penghubung antara satu subsistem dengan 
+subsistem yang lainnya. Melalui penghubung ini 
+memungkinkan sumber -sumber daya mengatur dari satu sub 
+sistem ke sub sistem yang lainnya. Keluaran (output) dari suatu 
+subsistem akan menjadi suatu masukan (input) untuk subsistem 
+lainnya dengan melalui penghubung. Dengan pengh ubung satu 
+sub sistem dapat berintegrasi dengan satu subsistem yang 
+lainnya membentuk satu kesatuan.  
+5. Masukan Sistem ( Input ) 
+Masukan adalah energi yang dimasukkan ke dalam sistem. 
+Masukan dapat berupa Masukan Perawatan ( Maintenance 
+Input ) adalah energi yang  dimasukkan supaya sistem tersebut 
+dapat beroperasi. Mas ukan Sinyal ( Signal Input ) ada lah energi 
+yang diproses untuk men dapatkan keluaran.  
+6. Keluaran Sistem ( Output ) 
+
+10 
+ 
+ 
+ Keluaran adalah hasil energi yang diolah dan diklasifikasikan 
+menjadi keluaran yang berguna dari sisa pembuangan. 
+7. Pengolah Sistem (Process ) 
+Suatu sistem dapat berupa suatu bagian pengolahan atau sistem 
+itu sendiri sebagai pengolahnya. Pengolahan yang akan 
+mengubah masukan menjadi keluaran 
+8. Tujuan Sistem ( Goal) 
+Setiap sistem pasti mempunyai tujuan ataupun sasaran yang 
+mempengaruhi input yang dibutuhkan dan output yang 
+dihasilkan. Dengan kata lain suatu sistem akan dikatakan 
+berhasil kalau pengoperasian sistem itu mengenai sasaran atau 
+tujuannya. Sistem yang tidak mempunyai sasaran, maka operasi 
+sistem itu tidak akan ada gunanya. 
+ 
+Gambar 2.1 Karakteristik Sistem 
+ 
+2.1.2 Klasifikasi Sistem 
+Sistem dapat diklasifikasikan dari beberapa sudut pandang, 
+diantaranya sebagai berikut  (Jogiyanto,2005)  : 
+
+11 
+ 
+ 
+ 1. Sistem Abstrak dan Sistem Fisik 
+Sistem abstrak ( abstract system ) adalah sistem yang berisi 
+gagasan atau konsep. Misalnya, sistem teologi yang berisi 
+gagasan tentang hubungan manusia dan Tuhan. 
+Sistem fisik ( physical system) adalah sistem yang secara fisik 
+dapat dilihat. Misalnya, sistem computer, sistem sekolah, sistem 
+akuntansi dan sistem pelaporan. 
+2. Sistem Tertentu dan Sistem Tak Tertentu 
+Sistem tertentu ( deterministic system ) adalah suatu sistem yang 
+operasinya dapat diprediksi secara tepat. Misalnya, sistem 
+komputer. 
+Sistem tak tertentu ( probilistic system ) adalah sistem yang tidak 
+bisa diramal dengan pasti karena mengandung unsur probilitas. 
+Misalnya, sistem arisan dan sistem sediaan. 
+3. Sistem Tertutup dan Terbuka 
+Sistem tertutup ( closed system ) adalah sistem yang tidak 
+berhubungan dengan lingkungan luarnya. Sistem ini bekerja 
+secara otomatis tanpa adanya campur tangan dari pihak luar. 
+Sistem terbuka ( open system) adalah sistem yang berhubungan 
+dengan lingkungan dan dipengaruhi oleh lingkungan. Ciri-
+cirinya, sistem menerima masukan yang diketahui, yang bersifat 
+acak maupun gangguan. Selain itu, umumnya sistem melakukan 
+adaptasi terhadap lingkungan.  
+
+12 
+ 
+ 
+ 4. Sistem Alamiah dan Sistem Buatan Manusia 
+Sistem alamiah ( natural system ) adalah sistem yang terjadi 
+karena alam tidak dibuat oleh manusia. Misalnya, sistem tata 
+surya. 
+Sistem buatan manusia ( human made system ) adalah sistem 
+yang dibuat oleh manusia. Misalnya, sistem komputer dan 
+sistem mobil. 
+5. Sistem Sederhana dan Sistem Kompleks 
+Berdasarkan tingkat kerumitannya, sistem dibedakan menjadi 
+sistem yang sederhana misalnya sepeda dan sistem yang 
+kompleks misalnya otak manusia. 
+2.2  Informasi 
+Informasi adalah data yang diolah menjadi bentuk yang lebih berguna 
+dan lebih berarti bagi penerimanya. (Jogiyanto, 2001). Menurut George R. 
+Terry, bahwa informasi adalah data yang penting yang memberikan 
+pengetahuan yang berguna. Sedangkan menurut Gordon B. Davis, informasi 
+adalah data yang telah diolah menjadi sebuah bentuk yang penting bagi 
+penerima dan mempunyai nilai yang nyata atau yang dapat dirasakan dalam 
+keputusan-keputusan yang sekarang atau yang akan datang. Informasi akan 
+memiliki arti manakala informasi tersebut memiliki unsur-unsur sebagai 
+berikut:   
+
+13 
+ 
+ 
+ 1. Relevan artinya Informasi yang diinginkan benar-benar ada 
+relevansi dengan masalah yang dihadapi.   
+2. Kejelasan artinya terbebas dari istilah-istilah yang 
+membingungkan.    
+3. Akurasi artinya bahwa informasi yang hendak disajikan harus 
+secara teliti dan lengkap.   
+4. Tepat waktu artinya data yang disajikan adalah data terbaru dan 
+mutahir. 
+ 
+2.3  Penggajian 
+Gaji adalah sebuah komponen yang mutlak dikeluarkan oleh perusahaan 
+sebagai kompensasi bagi karyawan, yang mana hal ini untuk menjamin 
+keberlangsungan perusahaan itu sendiri (Huda dan Nugroho,2012;1). 
+Menurut Huda dan Nugroho (2012;1), konsep penetapan gaji ada 
+beberapa macam pendekatan: 
+1. Pay for position.   
+Pegawai dihargai berdasarkan posisi atau jabatannya dalam perusahaanya. 
+Perusahaan menerapkan sistem ini untuk jenis pegawai dengan pekerjaan 
+struktural dan dikarenakan sistem ini paling mudah dilakukan kebanyakan 
+perusahaan menerapkan sistem ini dalam penggajian pegawai mereka.  
+2. Pay for person  
+
+14 
+ 
+ 
+ Karyawan dihargai berdasarkan keahlian atau kompetensi yang dimiliki. 
+Sistem ini diberlakukan bagi pegawai fungsional, dimana pegawai dihargai 
+atas keahlian atau kompetensi yang bersifat tknis atau khusus.  
+3. Pay for performance.  
+Karyawan dihargai berdasarkan kinerjanya pada suatu periode tertentu. 
+Kinerja setiap pegawai di ukur sesuai dengan pencapaian indikator kinerja 
+yang telah ditetapkan targetnya.  
+4. Equal job equal pay.  
+Upah yang sama untuk jenis pekerjaan yang sama. Jika ada dua orang atau 
+lebih mengerjakan pekerjaan yang sama, maka upah mereka mesti sama.  
+5. Competence pay.  
+Penggajian yang dihubungkan secara langsung dengan bukti langsung 
+objektif terjadinya peningkatan dalam pengetahuan teknis, keterampilan 
+dan keahlian seseorang karyawan. . 
+6. Skill based pay.  
+Pembayaran dimana para pekerja digaji berdasarkan pengetahuan dan 
+keterampilannya daripada posisinya di perusahaan.  
+7. Merit based pay (berdasarkan jasa).  
+Sistem penggajian dimana pekerja digaji berdasarkan performancenya, 
+pencapaian finansial pekerja berdasarkan pada hasil yang dicapai oleh 
+individu itu sendiri. 
+ 
+ 
+
+15 
+ 
+ 
+ 2.4  Karyawan 
+Karyawan atau sumber daya manusia merupakan potensi yang 
+merupakan asset dan berfungsi sebagai modal non material atau finansial di 
+dalam organisasi bisnis, yang dapat diwujudkan menjadi potensi nyata(real) 
+secara fisik dan non fisik dalam mewujudkan eksistensi organisasi sedangkan 
+menurut nawawi (2000), sumber daya manusia atau karyawan adalah manusia 
+yang bekerja di lingkungan suatu organisasi disebut juga personil, tenaga kerja, 
+pegawai atau karyawan (Samsudin, 2006). 
+2.5  Berbasis 
+Menurut Kamus Besar Bahasa Indonesia, berbasis adalah mempunyai 
+basis atau  berdasarkan pada (Tim Pusat Bahasa:2008;144).  
+ 
+2.6 Website 
+2.6.1 Pengertian Website 
+World Wide Web  (WWW) atau yang biasa disebut dengan Web 
+merupakan salah satu sumber daya internet yang berkembang pesat. 
+Saat ini, informasi web didistribusikan melalui pendekatan hyperlink, 
+yang memungkinkan suatu teks, gambar, ataupun objek lain yang 
+menjadi acuan untuk membuka halaman-halam web yang lain. 
+Dengan pendekatan hyperlink inii, seseorang dapat memperoleh 
+
+16 
+ 
+ 
+ informasi dengan meloncat dari satu halaman ke halaman lain. 
+Halaman-halaman yang diakses pun dapat tersebar di berbagai mesin 
+dan bahkan di beberapa Negara. (Kadir, 2005)  
+Berkaitan dengan web, terdapat beberapa istilah penting seperti 
+situs web ( website ), homepage, halaman web ( web page) dan URL 
+yang perlu diketahui (Kadir, 2005) : 
+1. Situs web menyatakan lokasi pada web yang berisi 
+sekumpulan halaman web yang saling terkait. 
+2. Halaman web menyatakan sebuah halaman pada web 
+3. Homepage adalah halaman utama pada sebuah situs web. 
+Halaman inilah yang akan ditampilkan ketika memanggil 
+sebuah situs web walaupun tidak menyebutkan halaman 
+tersebut 
+4. URL ( Uniform Resource Locator ) adalah suatu teks yang 
+menyatakan alamat internet. 
+ 
+2.6.2 Konsep Dasar Website 
+Pertama kali aplikasi Web dibangun hanya dengan 
+menggunakan bahasa yang disebut Hypertext Markup Language  
+(HTML) dan protocol  yang digunakan dinamakan Hypertext Transfer 
+Protocol  (HTTP). Pada perkembangan berikutnya, sejumlah skrip dan 
+
+17 
+ 
+ 
+ objek dikembangkan untuk memperluas kemampuan HTML. 
+(Kadir,2005)   
+Konsep yang mendasari aplikasi web sebenarnya sederhana. 
+Operasi yang melatarbelakanginya melibatkan pertukaran informasi 
+antara komputer yang meminta informasi, yang disebut client , dan 
+komputer yang memasok informasi (atau disebut server ). Secara lebih 
+detail, server  yang melayani permintaan dari client  sesungguhnya 
+berupa suatu perangkat lunak yang disebut web server . Secara 
+internal, web server  inilah yang berkomunikasi dengan perangkat 
+lunak lain atau middleware  dan middleware  inilah yang berhubungan 
+dengan database . (Kadir, 2005)  
+2.7 Database  
+Database  adalah sebuah himpunan data yang terkait atau data yang 
+saling berhubungan, kumpulan data tersebut terorganisasi, dan bisa melibatkan 
+lebih dari satu organisasi. (Kadir:2009;10)  
+ 
+2.7.1 Database  Relasional  
+Database  relasional adalah jenis database  yang menggunakan 
+model relasional. Pada model relasional, data disusun dalam bentuk 
+sejumlah relasi atau tabel. Setiap table tersusun atas sejumlah baris dan 
+kolom. Baris mewakili satu kesatuan data. Kolom menyatakan bagian-
+bagian yang menyusun sebuah baris. Pada model relasional, satu table 
+
+18 
+ 
+ 
+ bisa berhubungan dengan tabel lain. Hubungan dibentuk melalui 
+mekanisme kunci primer ( primary key) dan kunci asing ( foreign key). 
+Kunci primer adalah suatu kolom (atau gabungan beberapa kolom) yang 
+dapat digunakan untuk membedakan antara satu baris dengan baris yang 
+lain (Kadir:2009;15).  
+ 
+2.7.2 DBMS  
+DBMS ( DataBase Management System ) adalah suatu perangkat 
+lunak yang ditujukan untuk menangani penciptaan, pemeliharaan, dan 
+pengendalian akses data. Dengan menggunakan perangkat lunak ini 
+pengelolaan data menjadi mudah dilakukan. Selain itu, perangkat lunak 
+ini juga menyediakan berbagai peranti yang berguna. Misalnya peranti 
+yang memudahkan dalam membuat berbagai bentuk laporan. Oracle 9i, 
+Microsoft SQL Server 7.0, dan Microsoft Access 200 merupakan contoh 
+produk DBMS yang terkenal di dunia. Produk non komersial untuk 
+pengelolaan database juga tersedia dan dapat diunduh di internet, seperti 
+MySQL ataupun PostgreSQL (Kadir:2009;17).  
+ 
+2.7.3 MySQL  
+MySQL dikembangkan oleh sebuah perusahaan Swedia bernama      
+MySQLAB yang pada saat itu bernama TcX DataKonsult AB sekitar 
+tahun 1994-1995, namun cikal bakal kodenya sudah ada sejak 1979. 
+Awalnya TcX membuat MySQL dengan tujuan mengembangkan aplikasi 
+
+19 
+ 
+ 
+ web untuk klien. TcX merupakan perusahaan pengembang software dan 
+konsultan database. Saat ini MySQL sudah diakuisisi oleh Oracle Corp 
+(Arief:2011;151).  
+MySQL adalah salah satu jenis database server yang sangat 
+terkenal banyak digunakan untuk membangun aplikasi web yang 
+menggunakan database sebagai sumber dan pengelolaan datanya. 
+Kepopuleran MySQL antara lain karena MySQL menggunakan SQL 
+sebagai bahasa dasar untuk mengakses database-nya sehingga mudah 
+untuk digunakan, kinerja query  cepat, dan mencukupi untuk kebutuhan 
+database perusahaan-perusahaan skala menengah-kecil. MySQL juga 
+bersifat open source  dan free (tidak perlu membayar untuk 
+menggunakannya) pada berbagai platform (kecuali pada Windows, yang 
+bersifat shareware ). MySQL didistribusikan dengan lisensi open source 
+GPL ( General Public License ) mulai versi 3.23, pada bulan Juni 2000 
+(Arief:2011;151).  
+MySQL termasuk RDBMS ( Relational Database Management 
+System ). Itulah sebabnya istilah tabel, baris, dan kolom digunakan pada 
+MySQL. Pada MySQL, sebuah database mengandung satu atau sejumlah 
+tabel. Tabel terdiri atas sejumlah kolom dan baris, di mana setiap kolom 
+berisi sekumpulan data yang memiliki tipe yang sejenis, dan baris 
+merupakan sekumpulan data yang saling berkaitan dan membentuk 
+informasi. Kolom biasanya juga disebut sebagai field dan informasi yang 
+tersimpan dalam baris disebut record (Arief:2011;152).  
+
+20 
+ 
+ 
+ 2.8  Perancangan Sistem 
+2.8.1  Bagan Alur (Flowchart) 
+Flowchart adalah untaian simbol gambar (chart) yang 
+menunjukan aliran (flow) dari proses terhadap data, simbol-simbol 
+untuk flowchart dapat di klasifikasikan menjadi simbol untuk program 
+dan simbol untuk sistem (peralatan hardware)  (Ladjamudin, 2006). 
+Bagan alir sistem digambar dengan menggunakan simbol-simbol yang 
+tampak pada gambar 2.1 sampai dengan gambar 2.8 berikut ini : 
+ Proses  
+ Menunjukkan kegiatan proses dan operasi program 
+komputer. 
+Gambar 2.2 Proses 
+ Dokumen 
+Menunjukkan dokumen input output baik untuk proses 
+manual, mekanik atau komputer. 
+       Gambar 2.3 Dokumen 
+ 
+ Kegiatan manual 
+  Menunjukkan pekerjaan manual. 
+ 
+        Gambar 2.4 Kegiatan Manual 
+ 
+  Terminal  
+  Digunakan untuk menunjukkan awal dan akhir program. 
+       Gambar 2.5 Terminal 
+ 
+
+21 
+ 
+ 
+  
+  Simpanan Offline 
+   Menunjukkan simpanan secara manual. 
+       Gambar 2.6 Simpanan Offline 
+  Keputusan 
+Menunjukkan pengambilan keputusan. 
+ 
+Gambar 2.7 Keputusan 
+ 
+  Garis Alur 
+  Menunjukkan arus dari proses. 
+ 
+Gambar 2.8 Garis Alur 
+ 
+2.8.2  Data Flow Diagram (DFD) 
+Pendekatan analisa terstruktur diperkenalkan oleh De Marco 
+(1978) dan Gane Sarson (1979) melalui buku metodologi terstruktur 
+analisa dan sistem informasi. Menggunakan data flow diagram (DFD) 
+dalam menggambarkan atau membuat model sistem yang lebih 
+menekankan pada segi proses. Pengertian secara umum dari data flow 
+diagram ini adalah suatu network yang menggambarkan suatu sistem 
+otomata/ komputerisasi, manualisasi atau gabungan dari keduanya, 
+yang penggambarannya disusun dalam bentuk kumpulan komponen 
+sistem yang berhubungan sesuai dengan aturan mainnya. Keuntungan 
+dari DFD adalah memungkinkan untuk menggambarkan sistem dari 
+
+22 
+ 
+ 
+ level yang paling tinggi kemudian menguraikannya menjadi level 
+yang lebih rendah (dekomposisi), sedangkan keunggulan dari DFD 
+adalah tidak menunjukkan proses pengulangan (looping), proses 
+keputusan dan proses perhitungan. 
+Simbol atau lambang yang digunakan dalam membuat DFD 
+ada empat buah, yaitu sebagaimana terlihat pada gambar 2.9 sampai 
+dengan 2.12 berikut : (Pressman, 2002 : 365) 
+  External Entity 
+  Simbol ini digunakan untuk menggambarkan asal 
+atau tujuan proses. Tujuan proses. 
+ 
+       Gambar 2.9 External Entity 
+    Proses 
+Simbol ini digunakan untuk proses pengolahan atau 
+transformasi data. 
+     Gambar 2.10 Proses 
+   Data Flow 
+Simbol ini menunjukkan arah aliran/ arus data. 
+ 
+     Gambar 2.11 Data Flow 
+ 
+Data Storage 
+Simbol ini menggambarkan data  yang sudah 
+disimpan. 
+ 
+       Gambar 2.12 Data Storage 
+
+23 
+ 
+ 
+ Untuk  memudahkan  pembacaan DFD, maka penggambaran 
+DFD disusun berdasarkan tingkatan atau level dari atas ke bawah. 
+Adapun tingkatan dalam DFD diantaranya : 
+1. Diagram Konteks (Context Diagram Level 0) 
+Merupakan diagram paling atas yang terdiri dari suatu proses dan 
+menggambarkan ruang lingkup proses. Hal yang digambarkan 
+dalam diagram konteks adalah hubungan terminator dengan 
+sistem dan juga sistem dalam suatu proses. Sedangkan hal yang 
+tidak digambarkan dalam diagram konteks adalah hubungan antar 
+terminator dan data store. 
+2. Diagram Zero  (Level 1) 
+Merupakan diagram yang berada diantara diagram konteks dan 
+diagram detail serta menggambarkan proses utama dari DFD. Hal 
+yang digambarkan dalam diagram zero adalah proses utama dari 
+sistem serta hubungan entity, proses, alur data dan data store. 
+3. Diagram Detail 
+Merupakan penguraian dari proses yang ada dalam diagram zero. 
+Diagram yang paling rendah yang tidak dapat diuraikan lagi.  
+ 
+ 
+ 
+
+24 
+ 
+ 
+ 2.8.3  Kamus Data 
+Seperti halnya kamus bahasa yang berfungsi menjelaskan 
+lebih detail suatu kata maupun kalimat, kamus data yang digunakan 
+dalam analisa struktur dan desain sistem informasi juga merupakan 
+suatu katalog yang menjelaskan lebih detail tentang data flow 
+diagram yang mencakup proses, data flow dan data store. 
+Apabila didefinisikan kamus data adalah katalog fakta 
+tentang data dan kebutuhan-kebutuhan informasi dari suatu sistem 
+informasi. Dengan kamus data, sistem analis dapat mendefinisikan 
+data yang mengalir pada sistem dengan lengkap. Perancangan 
+kamus data digunakan untuk merancang input, output/ laporan dan 
+database. Kamus data dan komponen-komponen lainnya yang 
+dikumpulkan pada saat analisis sistem sangat dibutuhkan dalam 
+perancangan sistem, kamus data juga berfungsi untuk menghindari 
+penggunaan kata-kata yang sama, karena kamus data disusun 
+menurut abjad. Kamus data harus dapat mencerminkan keterangan 
+yang jelas tentang data yang dicatatnya. Notasi yang digunakan 
+dalam kamus data, berikut ini adalah tabel 2.1 simbol kamus data. 
+ 
+ 
+ 
+ 
+
+25 
+ 
+ 
+ Tabel 2.1 Kamus Data 
+No  Simbol  Uraian  
+1 = Terdiri dari, mendefinisikan, diuraikan menjadi, artinya  
+2 + Dan 
+3 ( ) Opsional (boleh ada boleh tidak)  
+4 { } Pengulangan data  
+5 [ ] Memilih salah satu dari sejumlah alternatif, seleksi  
+6 * * Komentar  
+7 @ Identifikasi atribut kunci  
+8 ! Pemisahan  sejumlah alternatif pilihan antara simbol [ ]  
+ 
+2.8.4  State Transition Diagram  (STD) 
+State Transition Diagram  merupakan suatu bagian dari 
+diagram yang menggambarkan bagaimana state dihubungkan dengan 
+state yang lain pada suatu waktu yang mempunyai kondisi dimana 
+dapat menyebabkan perubahan satu state  ke state  yang lain. (Hoffer, 
+George, dan Valancich, 1996 : 364) 
+STD pada dasarnya merupakan sebuah diagram yang terdiri 
+dari state dan transisi atau perpindahan state. Tansisi atau perpindahan 
+
+26 
+ 
+ 
+ state terdiri atas kondisi dan aksi. Kondisi adalah suatu kejadian yang 
+dapat diketahui oleh sistem. Sedangkan aksi adalah keadaan yang 
+dilakukan oleh sistem apabila terjadi perubahan state atau merupakan 
+reaksi dari sistem. 
+  
+ 
+                               Aksi   
+  
+ 
+          Gambar 2.13 Contoh Perubahan State 
+ 
+Ada komponen yang digunakan dalam diagram yaitu : 
+a. Modul digambarkan dengan simbol lingkaran yang mewakili modul 
+yang dipanggil apabila terjadi suatu tindakan. 
+ 
+ 
+            Gambar 2.14 Notasi Modul 
+b. Tampilan kondisi (state) merupakan layer yang ditampilkan menurut 
+keadaan atau atribut, untuk memenuhi suatu tindakan  pada waktu 
+tertentu yang mewakili suatu bentuk atau kondisi tertentu. State 1  
+State 2  
+
+27 
+ 
+ 
+    
+ 
+                   Gambar 2.15 Notasi Kondisi 
+c. Tindakan (State Transition) merupakan simbol anak panah disertai 
+keterangan tindakan yang dilakukan. 
+ 
+ 
+                   Gambar 2.16 Notasi Tindakan 
+2.9 Perangkat Lunak  
+2.9.1 HTML  
+HTML ( Hypertext Markup Language ) adalah suatu bahasa yang 
+dikenali oleh web browser untuk menampilkan informasi dengan 
+lebih menarik dibandingkan dengan tulisan teks biasa ( plain text ) 
+(Oktaviar, dkk: 2010;13). HTML awalnya hanya didesain sebagai 
+bahasa untuk pertukaran dokumen teknis dan saintifik. Karena itu 
+HTML didesain secara sederhana, HTML me nggunakan tag -tag yang 
+dapat dipahami dengan mudah untuk membuat dokumen sederhana 
+(Zaki,dkk: 2008; 2). 
+ 
+2.9.2 PHP 
+Rasmus Lerdorf, merasa kurang puas dengan sistem yang ada 
+
+28 
+ 
+ 
+ pada saat itu sehingga dia menciptakan suatu model interface  
+(antarmuka ) yang dapat digunakan untuk menampung informasi 
+tentang para pengunjung situsnya. Pertama kali, Rasmus membuat 
+interface  dengan menggunakan PERL dan selanjutnya dia 
+mengembangkan dengan menggunakan bahasa C untuk memberikan 
+fleksibilitas pada interface /parser tersebut (Sakur:2009;3).  
+Pada mulanya, interface  tersebut diberi nama Personal Home 
+Page , yang memiliki kemampuan untuk mencatat seluruh informasi 
+dari pengunjung situs online-nya. Kemudian, interface  atau parser 
+tersebut dimodifikasi dengan mendukung database mSQL atau Mini 
+Structure Language dengan menggunakan parser SQL, 
+pengembangan ini diberi nama FI ( Form Interpreter ). Kemudian 
+PHP/FI version 2.0 diluncurkan dan merupakan awal kelahiran dari 
+PHP yang saat ini sudah mencapai versi 5.x.x. Selanjutnya, PHP ini 
+dikembangkan oleh tim untuk memberikan kemampuan dengan 
+aplikasi lainnya (Sakur:2009;3 ). 
+Saat ini, Zend menjadi pengembang utama dan telah 
+mendistribusikan Zend Engine-nya untuk perkembangan PHP. 
+Sampai sekarang, pengguna PHP sudah sangat banyak karena 
+kemudahan dan keandalannya di dalam proses pemrograman 
+(Sakur:2009;3).  
+PHP merupakan bahasa pemrograman yang disebut bahasa 
+scripting dalam arti PHP merupakan bahasa pemrograman yang 
+
+29 
+ 
+ 
+ ditempelkan/e mbedded  pada bahasa atau aplikasi lain. Sebagai 
+contoh, PHP ditempelkan ke dalam script HTML, yang merupakan 
+bahasa ibu untuk world wide web . PHP merupakan bahasa scripting 
+yang memiliki tipe interpreter, yang berarti PHP tidak perlu 
+melakukan proses compiling, namun cukup melakukan proses 
+pembacaan pada setiap sintaks yang kemudian melakukan 
+interprestasi hasil dari proses tersebut (Sakur:2009;7).  
+ 
+2.9.3 XAMPP  
+XAMPP adalah perangkat lunak bebas, yang mendukung 
+banyak sistem operasi, merupakan kompilasi dari beberapa program. 
+Fungsinya adalah sebagai server yang berdiri sendiri (localhost), yang 
+terdiri atas program Apache HTTP Server, MySQL database , dan 
+penerjemah bahasa yang ditulis dengan bahasa pemrograman PHP 
+dan Perl. Nama XAMPP merupakan singkatan dari X (empat sistem 
+operasi apapun), Apache, MySQL, PHP, dan Perl 
+(http://id.wikipedia.org/wiki/XAMPP ).  
+ 
+2.10 Pengujian Perangkat Lunak  
+Pengujian perangkat lunak adalah elemen kritis dari jaminan kualitas 
+perangkat lunak dan merepresentasikan kajian pokok dari spesifikasi, desain, 
+dan pengkodean. Meningkatnya visibilitas perangkat lunak sebagai suatu 
+
+30 
+ 
+ 
+ elemen sistem dan “biaya ” yang muncul akibat kegagalan perangkat lunak, 
+memotivasi dilakukannya perencanaan yang baik melalui pengujian yang 
+teliti (Pressman:2002;525 ). 
+2.10.1 Pengujian Black-Box 
+Pengujian black-box  berfokus pada persyaratan fungsional 
+perangkat lunak. Dengan demikian, pengujian black-box  
+memungkinkan perekayasa perangkat lunak mendapatkan serangkaian 
+kondisi input yang sepenuhnya menggunakan persyaratan fungsional 
+untuk suatu program (Pressman:2002;551).  
+Pengujian black-box  berusaha menemukan kesalahan dalam 
+kategori sebagai berikut (Pressman:2002;551) :  
+1. Fungsi-fungsi yang tidak benar atau hilang  
+2. Kesalahan interface  
+3. Kesalahan dalam struktur data atau akses database eksternal  
+4. Kesalahan kinerja  
+5. Inisialisasi dan kesalahan terminasi  
+ 
+ 
+ 
+
+31 
+ BAB III 
+METODOLOGI PENELITIAN 
+Sejumlah metode dipilih dan digunakan peneliti untuk menyusun dan 
+menyelesaikan skripsi ini. Secara garis besar, peneliti membaginya ke dalam dua 
+kerangka metodologi, yaitu metode pengumpulan data dan metode pengembangan 
+sistem. Beberapa cara yang dilalui peneliti sebagai metode pengumpulan data 
+antara lain observasi, wawancara, studi pustaka dan studi literatur. Sedangkan 
+sebagai metode pengembangan sistem dalam skripsi ini, peneliti menggunakan 
+metode Rapid Application Development (RAD) . Adapun tahap-tahap atau langkah-
+langkah yang dikerjakan peneliti dalam mengimplementasi metode RAD ini antara 
+lain requirements planning , workshop design, dan implementation.  Selain beberapa 
+metodologi tersebut, pada bab ini peneliti juga akan menjelaskan kerangka berfikir 
+yang dibuat untuk menyelesaikan skripsi ini 
+3.1 Metode pengumpulan Data 
+Dalam menyelesaikan skripsi ini diperlukan data-data serta informasi yang 
+relatif lengkap sebagai bahan yang dapat mendukung kebenaran materi uraian 
+dan peembahasan. Oleh karena itu sebelum melakukan penulisan, penulis 
+terlebih dahulu  melakukan riset untuk mendapatkan data serta informasi yang 
+terkait. 
+ 
+ 
+
+32 
+ 
+ 
+ 3.1.1 Studi Lapang an 
+Studi  lapangan dilakukan di PT Adjitama Persada yang beralamat 
+di Jl Taman Lebak Bulus Raya Blok L No 15. Penelitian dilakukan d i 
+bagian personalia atau HRD PT. Adjitama Persada karena  proses 
+perhitungan gaji  dilakukan di bagian tersebut.  Untuk studi la pangan di 
+bagi menjadi 2 tahap yaitu wawancara dan observasi.   
+3.1.1.1  Wawancara 
+Wawancara (interview ) adalah komunikasi dua arah untuk 
+mendapatkan data dari responden (Jogiyanto:2008;111) . 
+Wawancara dilakukan untuk mengumpulkan data 
+kebutuhan user, wawancara di sini termasuk ke dalam fase 
+perencanaan syarat-syarat dalam metodologi RAD. 
+3.1.1.2    Observasi  
+Observasi dilakukan untuk mengumpulkan data kebutuhan 
+user, observasi di sini termasuk ke dalam fase perencanaan 
+syarat-syarat dalam metodologi RAD. 
+Observasi dilakukan dengan meninjau dan mengamati 
+secara langsung proses perhitungan gaji di Bagian HRD PT 
+Adjitama Persada , kemudian mencari permasalahan yang ada dan  
+memberikan solusi dengan dibuatkan sebuah sistem aplikasi . 
+
+33 
+ 
+ 
+ 3.1.2  Studi pustaka  
+Studi pustaka adalah teknik pengumpulan data dengan 
+mengadakan studi penelaahan terhadap buku-buku, literatur-literatur, 
+catatan-catatan dan laporan-laporan yang ada hubungannya dengan 
+masalah yang dipecahkan (Nazir, 1988 : 111). 
+Studi pustaka yaitu mengadakan penelitian dengan cara 
+mempelajari dan membaca literatur-literatur yang ada hubungannya 
+dengan permasalahan yang menjadi objek penelitian. 
+Setelah melakukan observasi dan wawancara, dan mengetahui 
+bentuk aplikasi yang akan dikembangkan, peneliti kemudian 
+melakukan studi pustaka. Studi pustaka dilakukan terhadap buku-buku 
+yang memuat teori yang mendukung penelitian dan terhadap literatur 
+tentang penelitian sejenis yang telah dilakukan sebelumnya.  
+Buku-buku teks yang dibaca dan dipelajari selama melakukan 
+proses penelitian ini adalah buku-buku yang memuat pengetahuan 
+mengenai aplikasi, perancangan aplikasi, pengembangan aplikasi dan 
+beberapa metodenya, basis data dan pemrograman. Buku-buku tersebut 
+diperoleh peneliti dari perpustakaan Fakultas Sains dan Teknologi dan 
+Perpustakaan Umum Universitas Islam Negeri Syarif Hidayatullah 
+Jakarta, serta perpustakaan perguruan tinggi lainnya. Selain melalui 
+buku, peneliti juga melakukan pencarian terhadap pengetahuan-
+pengetahuan tersebut melalui beberapa website perpustakaan online , 
+
+34 
+ 
+ 
+ situs-situs internet dan beberapa forum online yang membicarakan 
+topik seputar pengetahuan yang berkaitan dengan penelitian ini. Daftar 
+buku dan situs dapat dilihat pada Daftar Pustaka. 
+ 
+3.1.3 Literatur Sejenis  
+Studi literatur merupakan penelusuran literatur yang bersumber 
+dari buku, media, pakar ataupun dari hasil penelitian orang lain yang 
+bertujuan untuk menyusun dasar teori yang kita gunakan dalam 
+melakukan penelitian. Studi literatur dalam sebuah penelitian berguna 
+untuk mendapatkan gambaran yang menyeluruh tentang apa yang 
+sudah dikerjakan orang lain dan bagaimana orang mengerjakannya, 
+kemudian seberapa berbeda penelitian yang akan kita lakukan. 
+Penting karena untuk mengetahui penelitian yang pernah 
+dilakukan orang lain dan mengambil hal-hal bisa digunakan pada 
+penelitian kita untuk menghemat waktu, tenaga dan biaya. Penting juga 
+untuk memberi arah penelitian selanjutnya yang perlu dilakukan untuk 
+melanjutkan misi penelitian (Gufron, 2009 : 3). 
+Dengan metode studi literatur ini, penulis mengumpulkan data 
+dan informasi dengan mencari, membaca, mencatat intisari dan 
+mempelajari karya ilmiah, jurnal, skripsi, serta tinjauan literatur yang 
+
+35 
+ 
+ 
+ berkenaan dengan topik yang dapat dijadikan acuan pembahasan dalam 
+menyusun skripsi ini.  
+Beberapa literatur sejenis yang menjadi acuan peneliti sebagai 
+bahan perbandingan terhadap penelitian yang dilakukan adalah sebagai 
+berikut : 
+1. Skripsi dengan judul : “Pengembangan Sistem Informasi 
+Penggajian PT. Mustika Abadi Sentosa” oleh Ade Sudrajat 
+tahun 2009 . Metode yang digunakan  SDLC , Analisis 
+menggunakan DFD dan ERD. Bahasa pemrograman yang 
+digunkan visual basic 6.0 dengan database My SQL  
+2. Skripsi dengan judul : “Perancangan Sistem Penggajian 
+dengan Hak Akses Karyawan Berbasis Web” oleh Sodikin 
+tahun 2011. Metode yang digunakan S DLC dengan model 
+waterfall , Analisis menggunakan DFD dan ERD. Bahasa 
+pemrograman yang digunkan PHP dengan database My 
+SQL.  
+3. Skripsi dengan judul : “Pengembangan Sistem Informasi 
+Penggajian” oleh Sigit Prasetyo tahun 2011. Metode yang 
+digunakan RAD , Analisis  menggunakan UML. Bahasa 
+pemrograman yang digunkan PHP dengan database My 
+SQL.  
+ 
+
+36 
+ 
+ 
+ Tabel 3.1 Literatur Sejenis 
+No. Judul  Kelebihan  Kekurangan  
+1. Pengembangan Sistem 
+Informasi Penggajian 
+PT. Mustika Abadi 
+Sentosa oleh Ade 
+Sudrajat , Jurusan 
+Sistem Informasi,  
+Fakultas Sains dan 
+Teknologi, UIN Syarif 
+Hidayatullah tahun 
+2009 . 1. Absensi 
+menggunakan 
+Barcode.  
+2. Dapat mencetak 
+slip gaji .  
+3. Laporan absensi 
+berbentuk 
+laporan harian 
+dan laporan per 
+2 minggu.  1. Tidak berbasis 
+Web . 
+2. Tidak melakukan 
+perhitungan 
+pajak, pajak  
+hany a berupa 
+form input .  
+2. Perancangan  Sistem 
+Penggajian dengan 
+Hak Akses Karyawan 
+Berbasis Web (studi 
+kasus PK Gaya Baru) 
+oleh Sodikin , Jurusan 
+Teknik Informasi, 
+Fakultas Sains dan 
+Teknologi, UIN Syarif 1. Sudah berbasis 
+Web . 
+ 1. Tidak 
+menjelaskan 
+rincian variabel 
+tunjangan yang 
+didapat.  
+2. Tidak 
+menjelaskan 
+rincian variabel 
+potongan, 
+
+37 
+ 
+ 
+ Hidayatullah  tahun 
+2011.  langsung pada 
+totalnya saja.  
+3. Semua proses 
+dilakukan oleh 
+admin.  
+4. Hak akses 
+karyawan hanya 
+melihat data 
+laporan saja.  
+5. Data Laporan 
+hanya berupa 
+informasi saja 
+tanpa bisa di 
+cetak.  
+6. Bagian keuangan 
+dan pimpinan 
+perusahaan tidak 
+mempunyai hak 
+akses.  
+3. Pengembangan Sistem 
+Informasi  Penggajian  
+oleh Sigit Prasetyo , 1. Sudah berbas is 
+Web .  1. Tidak membahas 
+pajak.  
+
+38 
+ 
+ 
+ Jurusan Sistem 
+Informasi, Fakultas 
+Sains dan Teknologi, 
+UIN Syarif 
+Hidayatullah  tahun 
+2011 , 2. Pegawai dapat 
+mencetak slip 
+gaji  2. Data rekap 
+absensi tidak 
+dapat dicetak.  
+ 
+3.2 Metode Pengembangan Sistem 
+Metode pengembangan yang digunakan adalah RAD atau Rapid 
+Application Development . Alasan penulis menggunakan metode RAD adalah 
+karena RAD memiliki sifat selalu melibatkan pengguna untuk mendapatkan 
+feedback dalam setiap fasenya, baik dalam fase requirement planning , fase 
+workshop design , dan fase implementation , sehingga meminimalisir terjadinya 
+kesalahan dalam pengembangan a plikasi. Berikut ini merupakan rincian 
+kegiatan dari fase RAD yang penulis lakukan:  
+1. Fase Requirement Planning  
+Dalam fase perencanaan syarat ini, penulis mengumpulkan data dari 
+hasil wawancara dan observasi, dan dari situlah penulis mendapat gambaran 
+kebutuhan-kebutuhan yang harus tersedia pada aplikasi. Kemudian penulis 
+menganalisis kebutuhan aplikasi dengan mencatat gambaran tersebut ke 
+dalam beberapa bagian, yakni analisis sistem yang berjalan, identifikasi 
+masalah, solusi permasalahan, dan perbandingan sistem berjalan dengan 
+
+39 
+ 
+ 
+ sistem usulan, Selanjutnya, hasil analisis tersebut direalisasikan ke dalam 
+proses pengembangan berikutnya, yaitu fase perancangan.  
+2. Fase Workshop Desain  
+Hasil analisis dari fase perencanaan syarat lalu dibuat rancangannya 
+per modul secara iterasi, selanjutnya diperlihatkan hasilnya kepada 
+pengguna, sampai seluruh modul selesai dibuat. Perancangan disini 
+menggunakan DFD  (Data Flow Diagram ) sebagai tools. Sebagai bahasa 
+pemodelan grafis untuk perangkat lunak, Selain itu penulis juga me rancang 
+tampilan antarmuka aplikasi dan database relasional. Perancangan 
+antarmuka menggunakan Microsoft Office Visio 2007 dan database 
+relasional menggunakan MySQL 5.1.41. Untuk  pembangunan kode 
+program menggunakan Notepad++ 5.4.5 , paket XAMPP 1.7.3 yang terdiri 
+dari Apache Server 2.2.14 , PHP 5.3.1, serta MySQL 5.1.41 . 
+3. Fase Implementasi  
+Pada tahap implementasi, penulis akan melakukan pengujian internal 
+aplikasi dengan metode black -box testing . Black -box testing  yaitu dengan 
+menguji kemampuan fungsional dari aplikasi, apakah input dari aplikasi 
+sesuai dengan output.  
+3.3 Diagram Alur Penelitian  
+Dari penjabaran metod ologi penelitian diatas, diagram   alur penelitian 
+yang penulis lakukan dapat dilihat pada diagram dibawah ini :  
+ 
+
+40 
+ 
+ 
+  
+ 
+Gambar 3.1 Diagram Alur Pe neliti an
+
+  
+ 
+41 
+ BAB IV 
+PEMBAHASAN 
+4.1 Metode pengumpulan Data  
+Dalam menyelesaikan skripsi ini diperlukan data-data serta informasi yang 
+relatif lengkap sebagai bahan yang dapat mendukung kebenaran materi uraian 
+dan pembahasan. Oleh karena itu sebelum melakukan penulisan, penulis 
+terlebih dahulu melakukan riset untuk mendapatkan data serta informasi yang 
+terkait. 
+4.1.1 Studi Lapangan 
+Studi  lapangan dilakukan  di PT Adjitama Persada yang beralamat 
+di Jl Taman Lebak Bulus Raya Blok L No 15. Penelitian dilakukan d i 
+bagian personalia atau HRD PT. Adjitama Persada karena  proses 
+perhitungan gaji  dilakukan di bagian tersebut.Untuk studi lapangan di 
+bagi menjadi 2 tahap yaitu wawancara dan observasi.  
+4.1.1.1  Wawancara 
+Wawancara dilakukan untuk mengumpulkan data 
+kebutuhan user, wawancara di sini termasuk kedalam fase 
+perencanaan syarat-syarat dalam metodologi RAD. 
+Wawancara di PT Adjitama Persada  dilakukan  dua kali.  
+Penulis  berhasil  mewawancarai  manager bagian HRD  yaitu  
+
+42 
+ 
+ 
+ Bapak Dudi Wahyudi dan staff HRD nya yaitu Henri Kurniawan. 
+Pada saat wawancara,  penulis  mewawancarai  Bapak  Dudi 
+Wahyudi  mengenai  sistem yang  sedang berjalan disana . Saat 
+mewawancarai Bapak Henri, penulis bertanya mengenai cara 
+perhitungan gaji disana.  
+4.1.1.2  Observasi 
+Observasi dilakukan untuk mengumpulkan data kebutuhan 
+user, observasi di sini termasuk kedalam fase perencanaan syarat-
+syarat dalam metodologi RAD. 
+Observasi dilakukan dengan meninjau dan mengamati 
+secara langsung proses perhitungan gaji di Bagian HRD PT 
+Adjitama Persada , kemudian  mencari permasalahan  yang ada  dan 
+memberikan solusi dengan dibuatkan sebuah sistem aplikasi . 
+Pada saat observasi ditemukan sebuah masalah dimana pada saat 
+menggunakan file excel, staff  HRD menggunakan file excel 
+penggajian yang lama dan mengganti isinya dengan data baru  
+serta saat proses perhitungan untuk pajak penghasilan masih 
+secara manual . Serta proses pembuatan laporan yang masih 
+menggunakan word dengan memindahkan data excel gaji ke 
+word.  
+ 
+
+43 
+ 
+ 
+ 4.2 Metode Pengembangan Sistem 
+ Untuk metode pengembangan sistem ini, penulis menggunakan metode 
+RAD yang terbagi dalam 3 fase, yaitu Requirement Planning, Workshop Design 
+dan Implementasi 
+ 4.2.1 Fase Requirement Planning 
+Sebagaimana telah diuraikan pada bab sebelumnya, fase requirement  
+adalah fase dimana peneliti melakukan  analisis da n identifikasi tujuan -
+tujuan aplikasi atau sistem serta mengidentifikasikan syarat -syarat 
+informasi yang ditimbulk an dari tujuan -tujuan tersebut.  
+4.2.1.1 Profil 
+Sejalan dengan roda pembangunan yang terus bergulir di 
+seluruh Indonesia dalam rangka meningkatkan kemakmuran dan 
+kesejahteraan masyarakat indonesia, sesuai dengan tujuan dan cita-
+cita bangsa maka seluruh masyarakat Indonesia di tuntut untuk 
+berpartisipasi dalam segala segi pembangunan guna mewujudkan 
+tujuan dan cita – cita bangsa tersebut. 
+Dengan segala ketulusan dan keihlasan maka pemuda – 
+pemudi yang berjiwa luhur bergabung dalam PT. Adjitama Persada 
+yang didirikan pada awal 2010  mencoba turut serta dalam 
+membangun bangsa. 
+
+44 
+ 
+ 
+ Dengan usia yang relatif masih belia PT. Adjitama Persada. 
+Dengan segala tantangan yang ada dalam pembangunan siap untuk 
+mengarungi dan menjawab tantangan dan hambatan yang dimaksud. 
+PT. Adjitama Persada yang sejak berdirinya mencoba untuk eksis 
+pada bidang catering, jasa konsultasi manajemen dan s umber daya 
+manusia , jasa kebers ihan, bisnis dengan segala keahlian dan 
+pengalaman serta konsisten untuk tetap mengikuti perkembangan 
+dan kemajuan teknologi.  
+Berpijak pada pengalaman yang telah dimiliki, tenaga ahli 
+yang profesional dibidangnya serta didukung oleh peralatan yang 
+cukup memadai, PT. Adjitama Persada siap menjadi rekanan 
+berbagai pihak, baik di departemen-departemen di pemerintahan 
+pusat, dinas-dinas di pemerintah daerah, BUMN,  BUMD serta 
+pihak- pihak swasta dalam melaksanakan pekerjaannya . 
+4.2.1.2  Visi dan Misi Perusahaan 
+4.2.1.2.1 Visi  
+Menjadi Perusahaan terdepan di industri jasa 
+katering,  manajemen ,  serta  jasa cleaning  service dalam 
+skala nasional dan internasional.  
+4.2.1.2.2 Misi  
+1. Mengembangkan perusahaandengan pengelolaan 
+manajemen secara professional. 
+
+45 
+ 
+ 
+ 2. Membangun kompetensi dan skill SDM yang 
+profesional dan bersertifikasi di bidangnya secara 
+bertahap. 
+3. Membangun jaringan mitra pengguna jasa di lembaga 
+pemerintah dan swasta nasional dan internasional. 
+4. Kemampuan penanganan proyek secara professional 
+dan berkualitas. 
+4.2.1.3 Struktur Organisasi  
+PT. Adjitama Persada mengedepankan profesionalitas dan 
+kualitas dalam pengelolaan dan penanganan proyek perusahaan, hal 
+tersebut tercermin dalam pembagian divisi/departemen kerja 
+perusahaan, agar tercipta pembagian wilayah kerja yang jelas dan 
+terukur serta tingkat efektifitas dan efesiensi hasil kerja yang 
+berkualitas. 
+Tiap departemen di kelola oleh SDM-SDM  muda, 
+berkualitas dan professional dibidangnya, dan dalam implementasi 
+tiap proyek di lakukan analisa oleh para tenaga ahli dibidangnya 
+untuk menghasilkan action plan yang tepat, adapun struktur 
+manajemen tersebut sebagai berikut : 
+1. Direktur 
+2. Financial dan Accounting Manager 
+3. Operational Manager 
+4. Business Development Manager 
+
+46 
+ 
+ 
+ 5. Human Resources Manager 
+6. Marketing Manager 
+7. Purchasing Manager 
+ 
+Gambar 4.1 Struktur Organisasi 
+4.2.1.4  Analisis Sistem Yang berjalan 
+Berdasarkan observasi dan wawancara yang dilakukan peneliti 
+terhadap proses penggajian karyawan di PT. Adjitama Persada 
+adalah sebagai berikut: 
+1. Bisnis proses absensi: 
+a. Karyawan mengisi kartu absensi dengan memasukan jam 
+masuk dan jam keluar setiap hari. 
+b. Selanjutnya kartu amano/absensi nanti akan di cek dan 
+ditandatangani oleh Manajer HRD.  
+
+47 
+ 
+ 
+  
+Gambar 4.2  Bisnis Proses Absensi 
+ 
+2. Bisnis Proses peminjaman uang: 
+a. Karyawan mengisi formulir permohonan pinjaman  
+b. Selanjutnya formulir diserahkan ke direktur selaku 
+pemilik perusahaan untuk dipertimbangkan. 
+
+48 
+ 
+ 
+ c. Kalau disetujui form akan diserahkan ke bagian keuangan 
+dan finance untuk diberikan uangnya kepada karyawan 
+ 
+Gambar 4.3  Bisnis Proses pinjaman 
+ 
+
+49 
+ 
+ 
+  
+3. Bisnis Proses Lembur 
+a. Manajer masing-masing bagian memerintahkan staffnya 
+untuk menambah jam kerja. 
+b. Lalu karyawan mengambil dan mengisi form lembur. 
+c. Form lembur di tandatangani manajer yang bersangkutan 
+lalu diserahkan pada bagian HRD untuk di tanda tangani 
+Manajer HRD. 
+ 
+Gambar 4.4  Bisnis Proses Lembur 
+
+50 
+ 
+ 
+  
+4. Bisnis proses penggajian : 
+a. Data pinjaman, data lembur, dan data absensi selama 
+sebulan yang telah divalidasi tadi beserta form-form 
+lainnya di input ke dalam file ms.excel daftar rekap gaji 
+oleh staff HRD. 
+b. Kemudian dari file rekap gaji tadi oleh staff HRD diolah 
+menjadi laporan penggajian dan di print. 
+c. Laporan penggajian kemudian divalidasi oleh manajer 
+HRD dan selanjutnya diserahkan pada direktur PT. 
+Adjitama persada untuk disetujui. 
+d. Selanjutnya laporan diserahkan ke bagian accounting dan 
+finance dan mentransfer gaji ke masing-masing rekening 
+karyawan. 
+e. Staff HRD kemudian menyiapkan slip gaji karyawan 
+setelah menerima bukti transfer dari bagian accounting 
+dan finance. 
+f. Slip gaji kemudian di validasi oleh manajer HRD dan di 
+distribusikan kepada karyawan. 
+ 
+
+51 
+ 
+ 
+  
+Gambar 4.5 Proses bisnis sistem penggajian yang berjalan  
+ 
+ 
+ 
+
+52 
+ 
+ 
+ 4.2.1.5  Identifikasi Masalah 
+Berdasarkan penjelasan pada sub  bab di atas mengenai alur 
+kerja yang sedang berjalan tersebut dan juga berdasarkan hasil 
+observasi serta wawancara yang telah penulis  lakukan,  terdapat 
+beberapa permasalahan yang lebih baik  ditindak lanjuti untuk 
+kemudian diberikan solusi -solusi yang tepat dan relevan. Berikut ini 
+adalah beberapa permasalahan tersebut:  
+1. Beberapa data yang masih manual dalam penginputan 
+memungkinkan pengolahan data menjadi terhambat apabila 
+berkasnya hilang . 
+2. Penggunaan file yang tidak baik dimana dalam 
+penggunaannya file Microsoft Excel  dengan membuka data 
+file lama , kemudian  menghapus semua isi table dan mengisi 
+nya dengan yang baru  
+3. Lambatnya proses informasi yang diterima oleh pihak 
+manajemen HRD  untuk membuat laporan kepada direktur.  
+ 
+4.2.1.6 Solusi Permasalahan 
+Proses pengolahan data gaji, data absensi , data pegawai  pada 
+PT.Adjitama Persada  masih memiliki kelem ahan. Dokumen masih 
+dikelola secara manual.  Belum terintegrasinya data -data dan  belum 
+adanya database  membuat dokumen dapat disimpan pada server 
+
+53 
+ 
+ 
+ atau pada PC masing-masing karyawan .Oleh sebab itu, maka 
+diperlukan strategi untuk menentukan solusi -solusi per masalahan 
+sebagai berikut:  
+4.2.1.6.1 Identifikasi Strategi IT 
+Tabel 4.1 Identifikasi Strategi IT  
+No. Judul  Tolak Ukur  Sasaran 
+Perbaikan  
+1. Master data masih 
+manual . Terdapat 
+kemungkinan kertas -
+kertas form hilang.  Pembuatan sistem 
+basis  data yang 
+dapat men yimpan 
+data form absensi, 
+lembur, 
+peminjaman . 
+2. Penggunaan file 
+program berulang  
+kali. Terdapat 
+kemungkinan hilang 
+atau terhapus secar a 
+sengaja maupun tidak 
+sengaja saat 
+penggunaan kembali 
+program ms.excel . Pembuatan 
+sebuah sistem  
+yang tidak 
+menyulitkan 
+pembuatan data  
+gaji yang baru . 
+
+54 
+ 
+ 
+ 3. Lambatnya proses 
+birokrasi laporan . Proses yang berbelit -
+belit.  Penyederhanaan 
+proses birokrasi  
+laporan . 
+ 
+4.2.1.6.2 Identifikasi Pola Solusi  
+Tabel 4.2 Identifikasi Pola solusi  
+No. Sasaran Perbaikan  Pola Solusi  
+1. Pembu atan sistem basisdata 
+untuk form -form manual 
+tersebut dan  saling 
+terhubung  ke penggajian . Pembuatan tabel absensi , tabel 
+lembur, dan peminjaman  yang 
+terhubung ke tabel karyawan dan ke 
+tabel pembayaran gaji. 
+2. Pembuatan sebuah sistem  
+yang tidak menyulitka n 
+pembuatan data gaji yang 
+baru. Dengan menginput periode gaji 
+berupa bulan dan tahun s ecara 
+otomatis sistem akan me mbuat   daftar 
+gaji baru. 
+3. Penyederhanaan proses 
+birokrasi laporan  Laporan gaji  bisa di  proses  langsung 
+di sistem  dengan memasukan tangga l 
+periode  dan user bisa melihat laporan 
+langsung di sistem . 
+ 
+Berdasarkan identifikasi strategi IT dan identifikasi pola 
+solusi di atas, sangat memungkinkan untuk pembuatan 
+sebuah aplikasi berbasis web yaitu Sistem informasi 
+
+55 
+ 
+ 
+ penggajian karyawan berbasis web pada PT. Adjitama 
+Persada  yang dapat mengakomodasi semua solusi yang telah 
+dipaparkan di atas.  
+4.2.1.6.3  Kebutuhan Fungsional Sistem 
+Sistem  yang dibuat harus memenuhi kebutuhan 
+fungsional ( functional requirements ) sebagai berikut :  
+1. Sistem informasi peng gajian karyawan dapat 
+melakukan penginputan data ke dalam database.  
+2. Sistem dapat mempermudah dalam proses 
+penghitungan gaji karyawan . 
+3. Dapat meng-generate laporan secara langsung  dan 
+mencetak berkas . 
+ 
+4.2.1.6.4 Kebutuhan Non Fungsional Sistem 
+Selain kebutuhan fungsional sistem ada pula kebutuhan 
+non fungsional sistem diantaranya yaitu: 
+1. Sistem dapat diakses oleh masing-masing user yang 
+telah ditentukan oleh admin. 
+2. Sistem berjalan pada sistem operasi windows. 
+3. Sistem dapat digunakan dengan web browser  yang 
+berbeda -beda, seperti Internet Explorer, Mozilla 
+Firefox, Opera, dan lain -lain. 
+
+56 
+ 
+ 
+  
+ 
+Gambar 4.6 Proses Bisnis Sistem Usulan  
+Keterangan Gambar :  Pada proses bisnis yang ditawarkan peran Admin 
+tugasn ya mengelola data user, data karyawan, data jabatan, dan data PT KP. 
+Untuk HRD mengolah absensi,  data lembur,  data gaji d an cetak slip gaji. 
+Untuk direktur  memvalidasi permohonan pinjaman serta melihat laporan dan 
+mencetaknya.  Untuk Accounting dan Finance mengelola data gaji dan 
+pinjaman. Untuk karyawan mengisi form per mohonan pinjaman.  
+ 
+ 
+
+57 
+ 
+ 
+ 4.2.1.7 Perbandingan sistem berjalan dengan sistem usulan 
+Pengembangan sistem bertujuan untuk membantu  pihak HRD 
+dalam melakukan tugas menghitung gaji dan pembuatan laporan serta form-
+form yang sudah terkomputerisasi. Selain itu dengan adanya sistem ini dapat 
+mempermudah HRD, direktur, accounting  dan finance  dalam mengakses 
+langsung ke dalam sistem penggajian. Sehingga mengurangi proses 
+birokrasi dokumen. 
+ 
+Tabel 4.3  Perbedaan Antara Sistem Yang Sedang Berjalan 
+Dan Sistem Yang   Diusulkan 
+No Sistem  yang sedang 
+berjalan  Sistem  yang diusulkan  
+1. Data absensi, lembur,  dan 
+pinjaman masih manual.  Sistem absensi, lembur, 
+karyawan, pinjaman, serta 
+penggajian 
+terkomputerisasi dan 
+saling terhubung. Jadi data 
+gaji otomatis ter -input .  
+2. Masih me nggunakan file 
+excel sehingga penggunaan 
+yang berulang untuk 
+menghitung gaji.  Sistem otomatis membuat 
+data baru sesuai periode 
+tanpa mengubah data yang 
+lama.  
+3. Proses birokrasi pembuatan 
+laporan berbelit -belit.  Proses birokrasi di 
+persingkat dengan ikut 
+login ke sistem.  
+ 
+ 
+
+58 
+ 
+ 
+ 4.2.2 Fase Workshop Desain 
+Dalam perancangan program aplikasi ini peneliti melakukan 
+perancangan dengan menggunakan DFD  yang terdiri dari Diagram Context , 
+DFD lv 0, dan DFD lv 1 . Kemudian peneliti  melakukan perancangan Struktur 
+Data,  STD  serta perancangan User Interface .  
+4.2.2.1 Data Flow Diagram 
+DFD merupakan alat perancangan sistem yang berorientasi 
+pada alur data dengan konsep dekomposisi yang dapat digunakan untuk 
+penggambaran analisa maupun rancangan sistem yang mudah di 
+komunikasikan oleh profesional sistem kepada pemakai maupun 
+pembuat program. 
+1. Diagram Konteks 
+Diagram konteks merupakan diagram yang memperlihatkan 
+aplikasi sebagai bentuk proses yang terjadi atau pemetaan yang 
+terjadi. 
+ 
+Gambar 4.7  Diagram Contex  
+
+59 
+ 
+ 
+ 2. Diagram zero 
+Diagram ini untuk mendetailkan setiap proses yang terjadi 
+pada diagram zero sistem yang di usulkan. 
+ 
+Gambar 4.8  DFD lv 0  
+
+60 
+ 
+ 
+  
+3. Data Flow Diagram Level 1 
+a. DFD level 1 proses ke 1  
+ 
+Gambar 4.9  DFD lv 1 Manajemen User  
+ Diagram gambar 4.9 menjelaskan secara detail dari pr oses ke 1 
+yaitu proses mengolah data user yakni proses penambahan data yang 
+akan di simpan di database , proses lihat data yang akan mengambil 
+data yang tersimpan di database , selanjutnya proses meng update  
+database  dengan mengambil data selanjutnya di ubah  dan di simpan. 
+Lalu  proses yang hapus data yang ada di database sistem 
+penggajian.  
+ 
+ 
+ 
+
+61 
+ 
+ 
+ b. DFD level 1 proses ke 2  
+ 
+ 
+Gambar 4.10  DFD lv 1 Manajemen Karyawan  
+ Diagram gambar 4.10 menjelaskan secara detail dari proses ke 2 
+yaitu proses mengolah data karyawan yakni proses penambahan data 
+yang akan di simpan di database , proses lihat data yang akan 
+mengambil data yang tersimpan di database,  selanjutnya proses 
+meng update database dengan mengambil data selanjutnya di ubah 
+dan di simpan. Lalu  proses yang hapus data yang ada di database 
+sistem penggajian. 
+ 
+ 
+
+62 
+ 
+ 
+ c. DFD level 1 proses ke 3  
+ 
+ 
+Gambar 4.11  DFD lv 1 Manajemen Jabatan  
+ 
+ Diagram gambar 4.11 menjelaskan secara detail dari proses 
+ke 3 yaitu proses mengolah data jabatan yakni proses 
+penambahan data yang akan di simpan di database , proses lihat 
+data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses meng update database dengan mengambil 
+data selanjutnya di ubah dan di simpan. Lalu  proses yang hapus 
+data yang ada di database sistem penggajian. 
+ 
+
+63 
+ 
+ 
+ d. DFD level 1 proses ke 4  
+ 
+ 
+Gambar 4. 12 DFD lv 1 Manajemen PTKP  
+ 
+ Diagram gambar 4.12 menjelaskan secara detail dari proses 
+ke 4 yaitu proses mengolah data ptkp yakni proses penambahan 
+data yang akan di simpan di database , proses lihat data yang 
+akan mengambil data yang tersimpan di database,  selanjutnya 
+proses meng update database dengan mengambil data 
+selanjutnya di ubah dan di simpan. Lalu  proses yang hapus data 
+yang ada di database sistem penggajian.  
+ 
+ 
+
+64 
+ 
+ 
+ e. DFD level 1 proses ke 5  
+ 
+ 
+Gambar 4.13  DFD lv 1 Manajem en Absensi  
+ 
+ Diagram gambar 4.13 menjelaskan secara detail dari proses 
+ke 5 yaitu proses mengolah data absensi yakni proses 
+penambahan data yang akan di simpan di database , proses lihat 
+data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses meng update database dengan mengambil 
+data selanjutnya di ubah dan di simpan. Lalu  proses yang hapus 
+data yang ada di database sistem penggajian.  
+ 
+
+65 
+ 
+ 
+ f. DFD level 1 proses ke 6  
+ 
+Gambar 4. 14 DFD lv 1 Manajemen Lembur  
+ 
+ Diagram gambar 4.14 menjelaskan secara detail dari proses ke 6 
+yaitu proses mengolah data lembur yakni proses penambahan data 
+yang akan di simpan di database , proses lihat data yang akan 
+mengambil data yang tersimpan di database,  selanjutnya proses 
+meng update database dengan mengambil data selanjutnya di ubah 
+dan di simpan. Lalu  proses yang hapus data yang ada di database 
+sistem penggajian.  
+ 
+ 
+
+66 
+ 
+ 
+ g. DFD level 1 proses ke 7  
+ 
+Gambar 4.15  DFD lv 1 Manajemen Pph21  
+ 
+ Diagram gambar 4.15 menjelaskan secara detail dari proses ke 7 
+yaitu proses mengolah data Pph21 yakni proses penambahan data 
+yang akan di simpan di database , proses lihat data yang akan 
+mengambil data yang tersimpan di database,  selanjutnya proses 
+meng update database dengan mengambil data selanjutnya di ubah 
+dan di simpan. Lalu  proses yang hapus data yang ada di database 
+sistem penggajian. 
+ 
+ 
+
+67 
+ 
+ 
+ h. DFD level 1 proses ke 8  
+ 
+Gambar 4.16  DFD lv 1 Manajemen Penggajian  
+ 
+Diagram gambar 4.16 menjelaskan secara detail dari proses 
+ke 8 yaitu proses mengolah data penggajian yakni proses 
+penambahan data yang akan di simpan di database , proses lihat data 
+yang akan mengambil data yang tersimpan di database,  selanjutnya 
+proses meng update database dengan mengambil data selanjutnya 
+di ubah dan di simpan. Lalu  proses yang hapus data yang ada di 
+database sistem penggajian.  
+ 
+
+68 
+ 
+ 
+ i. DFD level 1 proses ke 9  
+ 
+Gambar 4.17  DFD lv 1 Manajemen Pinjaman  
+ 
+Diagram gambar 4.17 menjelaskan secara detail dari proses 
+ke 9 yaitu proses mengolah data penggajian yakni proses 
+penambahan data yang akan di simpan di database , proses lihat data 
+yang akan mengambil data yang tersimpan di database,  selanjutnya 
+proses meng update database dengan mengambil data selanjutnya 
+di ubah dan di simpan. Lalu  proses yang hapus data yang ada di 
+database sistem penggajian.  
+ 
+
+69 
+ 
+ 
+ j. DFD level 1 proses ke 10  
+ 
+Gambar 4.18  DFD lv 1 Permohonan Pinjaman  
+ 
+Diagram gambar 4.18 menjelaskan secara detail dari proses 
+ke 10 yaitu proses mengolah data permohonan pinjaman yakni 
+proses penginputan sementara di tabel permohonan pinjaman oleh 
+karyawan yang login ke sistem, selanjutnya di halaman web direktur 
+akan tampil data permohonan untuk diberi respon untuk menerima 
+atu menolak. Apabila ditolak data pada tabel permohonan akan 
+terhapus. Selanjutna apabila di terima data pada tabel permohonan 
+akan terhapus dan selanjutnya tersimpan di tabel pinjaman yang 
+manajemen datanya dikelola oleh Accounting dan Finance. 
+ 
+
+70 
+ 
+ 
+ k. DFD level 1 proses ke 11  
+ 
+Gambar 4.19  DFD lv 1 Laporan Pinjaman  
+ 
+Diagram gambar 4.19 menjelaskan secara detail dari proses 
+ke 11 yaitu proses mengolah data laporan pinjaman yakni proses 
+lihat data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses mencetak laporan  dengan mengambil data 
+laporan yang di minta yang selanjutnya di ubah menjadi tampilan 
+pdf dan kemudian di cetak.  
+ 
+ 
+
+71 
+ 
+ 
+ l. DFD level 1 proses ke 12  
+ 
+Gambar 4. 20 DFD lv 1 Laporan Karyawan  
+ 
+Diagram gambar 4.20 menjelaskan secara detail dari proses 
+ke 12 yaitu proses mengolah data laporan karyawan yakni proses 
+lihat data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses mencetak laporan  dengan mengambil data 
+laporan yang di minta yang selanjutnya di ubah menjadi tampilan 
+pdf dan kemudian di cetak.  
+ 
+ 
+
+72 
+ 
+ 
+ m. DFD level 1 proses ke 13  
+ 
+Gambar 4. 21 DFD lv 1 Laporan Absensi  
+ 
+Diagram gambar 4.21 menjelaskan secara detail dari proses 
+ke 13 yaitu proses mengolah data laporan absensi yakni proses lihat 
+data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses mencetak laporan  dengan mengambil data 
+laporan yang di minta yang selanjutnya di ubah menjadi tampilan 
+pdf dan kemudian di cetak.  
+ 
+ 
+
+73 
+ 
+ 
+ n. DFD level 1 proses ke 14  
+ 
+Gambar 4. 22 DFD lv 1 Laporan Lembur  
+ 
+Diagram gambar 4.22 menjelaskan secara detail dari proses 
+ke 14 yaitu proses mengolah data laporan lembur yakni proses lihat 
+data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses mencetak laporan  dengan mengambil data 
+laporan yang di minta yang selanjutnya di ubah menjadi tampilan 
+pdf dan kemudian di cetak.  
+ 
+ 
+
+74 
+ 
+ 
+ o. DFD level 1 proses ke 15  
+ 
+Gambar 4. 23 DFD lv 1 Laporan Penggajian  
+ 
+Diagram gambar 4.23 menjelaskan secara detail dari proses 
+ke 15 yaitu proses mengolah data laporan penggajian yakni proses 
+lihat data yang akan mengambil data yang tersimpan di database,  
+selanjutnya proses mencetak laporan  dengan mengambil data 
+laporan yang di minta yang selanjutnya di ubah menjadi tampilan 
+pdf dan kemudian di cetak.  
+ 
+ 
+
+75 
+ 
+ 
+  
+p. DFD level 1 proses ke 16  
+  
+Gambar 4. 24 DFD lv 1 Slip Penggajian  
+ 
+Diagram gambar 4.24 menjelaskan secara detail dari proses 
+ke 16 yaitu proses mengolah data slip gaji yakni proses lihat data 
+yang akan mengambil data yang tersimpan di database,  selanjutnya 
+proses mencetak laporan  dengan mengambil data laporan yang di 
+minta yang selanjutnya di ubah menjadi tampilan pdf dan kemudian 
+di cetak.  
+ 
+ 
+
+76 
+ 
+ 
+ 4. Kamus Data 
+ Kamus Data atau Data Dictionary yang terdapat di 
+sistem informasi penggajian terdiri dari: 
+a. User : Kd_user + nm_user + Kd_karyawan +  username + 
+password + level. 
+b. Karyawan : kd_karyawan + nik + nm_karyawan + 
+kd_jabatan + kelamin + agama + alamat + no_telp + 
+tempat_lahir + tgl_lahir + status_kawin + jumlah_anak + 
+id ptkp + Tanggal_masuk. 
+c. Absensi : id + Kd_karyawan + tanggal + jam_masuk + 
+jam_keluar + status_kehadiran + keterangan + kd_user. 
+d. Lembur : id + tanggal + jam_masuk + jam_keluar + 
+jml_jam +uang_lembur + total_upah + keterangan + 
+status_lunas + kd_karyawan+ kd_user. 
+e. Ptkp : id_ptkp + kd_ptkp + total_ptkp + keterangan. 
+f. Peminjaman : no_pinjam + kd_karyawan + tanggal + 
+besar_pinjaman + keterangan + status_lunas +kd_user. 
+g. Jabatan : kd_jabatan + nm_jabatan +gaji_pokok + 
+uang_transport + uang_makan. 
+h. Permohonan pinjaman : id + user +kd_karyawan+ 
+besar_pinjaman + keterangan + timedate. 
+i. Pph21 : no_pph21 + periode_pph21 + tanggal + 
+gaji_pokok + tunj+transport + tunj_makan + total_lembur 
++ total_bonus + total_pinjaman + kd_user + bruto + 
+biaya_jabatan + netto_sebulan + netto_setahun + 
+total_ptkp + pkp + pph21_sebulan + pph21_sebulan. 
+
+77 
+ 
+ 
+ j. Penggajian : no_penggajian + periode_penggajian + 
+tanggal + gaji_pokok + tunj+transport + tunj_makan + 
+total_lembur + total_bonus + total_pinjaman + kd_user. 
+ 
+4.2.2.2 Desain  Databas e 
+ 
+ 4.2.2.2.1 ERD (Entity Relationship Diagram ) 
+  Untuk dapat melihat hubungan yang terjadi antara tabel saru dengan 
+yang lain maka digunakan ERD  untuk menggambarkannya. ERD adalah 
+notasi grafik dari sebuah model data/sebuah model jaringan yang 
+menjelaskan tentang data yang tersimpan (storage data)dalam sistem secara 
+abstrak. 
+
+78 
+ 
+ 
+  
+Gambar 4. 25 Entity Relationship Diagram  
+ 4.2.2.2.2 Normalisasi 
+  Pada proses normalisasi terdapat beberapa tahapan sebagai 
+berikut : 
+1. Bentuk Tidak Normal (Unnormalized) 
+
+79 
+ 
+ 
+  Bentuk ini merupakan kumpulan data yang akan direkam, 
+tidak ada keharusan mengikuti format tertentu. Data yang 
+dikumpilkan apa adanya sesuai dengan saat menginput. 
+Tabel 4.4  Tabel Unnormalized  
+Kd_user  
+ nm_user  
+Kd_karyawan  
+  username  
+ password  
+ level.  
+kd_karyawan  
+ nik  
+nm_karyawan  
+ kd_jabatan  
+kelamin  
+total_lembur  tanggal  
+ jam_masuk  
+ jam_keluar  
+ jml_jam  
+uang_lembur  
+ total_upah  
+ keterangan  
+status_lunas  
+kd_karyawan  
+ kd_user.  
+id_ptkp  
+total_bonus  
+ kd_ptkp  
+ total_ptkp  
+keterangan.  
+no_pinjam  
+ kd_karyawan  
+ tanggal  
+besar_pinjaman  
+ keterangan  
+ status_lunas  
+kd_user.  
+kd_jabatan  
+total_pinjaman  
+ nm_jabatan  
+gaji_pokok  
+ uang_transport  
+ uang_makan.  
+id  
+ user  
+kd_karyawan  
+besar_pinjaman  
+keterangan  
+ timedate.  
+no_pph21  
+kd_user.  
+ periode_pph21  
+ tanggal  
+ gaji_po kok  
+ tunj+transport  
+ tunj_makan  
+ total_lembur  
+ total_bonus  
+total_pinjaman  
+ kd_user  
+bruto  
+ biaya_jabatan  
+tunj_makan  
+  netto_sebulan  
+netto_setahun  
+ total_ptkp  
+pkp  
+ pph21_sebulan  
+pph21_sebulan.  
+no_penggajian  
+periode_penggajian  
+tanggal  
+ gaji_pok ok  
+ tunj_ transport  
+ 
+ 
+ 
+ 
+ 
+
+80 
+ 
+ 
+ 2. Bentuk Normal Pertama (1NF) 
+ Pada tahap ini di lakukan penghilangan beberapa elemen 
+yang berulang agar menjadi satu harga tunggal yang berinteraksi di 
+antara setiap baris pada suatu tabel. Ketentuan normalisasi pertama 
+(1NF) adalah tidak ada atribut yang berulang dan telah ditentukan  
+primary key  untuk tabel/relasi tersebut. 
+Tabel 4.5  Tabel First Normal Form  
+Kd_user * 
+ nm_user  
+  username  
+ password  
+ level.  
+kd_karyawan*   
+ nik  
+nm_karyawan  
+ kd_jabatan  
+kelamin  
+tanggal  jam_m asuk  
+ jam_keluar  
+ jml_jam  
+uang_lembur  
+ total_upah  
+ keterangan  
+status_lunas  
+id_ptkp *  
+kd_ptkp  
+ total_ptkp  
+keterangan.  no_pinjam *  
+ tanggal  
+besar_pinjaman  
+ keterangan  
+ status_lunas  
+kd_jabatan * 
+nm_jabatan  
+gaji_pokok  
+ uang_transport  
+ uang_maka n. 
+Id*  user  
+besar_pinjaman  
+keterangan  
+ timedate.  
+no_pph21 *  
+periode_pph21  
+ tanggal  
+ gaji_pokok  
+ tunj+transport  
+ tunj_makan  
+ total_lembur  total_bonus  
+total_pinjaman  
+bruto  
+ biaya_jabatan  
+netto_sebulan  
+netto_setahun  
+ total_ptkp  
+pkp  
+pph21_seb ulan  
+pph21_sebulan  
+no_penggajian * 
+periode_penggajian  
+ 
+
+81 
+ 
+ 
+ 3. Bentuk Normal Kedua (2-NF) 
+ Bentuk normal kedua didasari atas konsep full functional 
+depency (ketergantumgan fungsional sepenuhnya). Ketentuan 
+dari bentuk normal kedua(2-NF) adalah bentuk data telah 
+memenuhi kriteria bentuk normal kesatu, atribut bukan kunci 
+haruslah memiliki ketergantungan fungsional sepenuhnya pada 
+kunci utama. 
+ 
+ 
+ 
+Gambar 4. 26 Second Normal Form (2NF)  
+
+82 
+ 
+ 
+ 4.2.2.2.3 Struktur Database 
+1. Tabel User 
+Tabel yang digunakan untuk menyimpan data user 
+Primary Key  : kd_user 
+Tabel 4. 6 Tabel user 
+ 
+ 
+ 
+ 
+2. Tabel Lembur 
+Tabel yang digunakan untuk menyimpan data lembur 
+Primary Key  : id 
+Tabel 4. 7 Tabel Lembur  
+ 
+ 
+ 
+ Field  Type  Keterangan  
+Kd_user  Varchar( 3) Primary Key  
+Kd_karyawan  Varchar(10)   
+Nm_user  Varchar(100)   
+username  Char( 20)  
+password  Varchar(200)   
+level  Int(10)   
+Field  Type  Keterangan  
+Id int(4) Primary Key  
+Kd_karyawan  varchar(12)  Foreign Key  
+tanggal  Date   
+Jam_masuk  Time   
+Jam_keluar  Time   
+Jml_jam  Int(3)   
+Uang_lembur  Int(50)   
+Total_upah  Int(50 )  
+Keterangan  Varchar(100)   
+Kd_user  varchar(12)  Foreign Key  
+
+83 
+ 
+ 
+  3. Tabel Jabatan 
+Tabel yang digunakan untuk menyimpan data jabatan 
+Primary Key  : Kd_jabatan 
+Tabel 4. 8 Tabel jabatan  
+ 
+ 
+ 
+4. Tabel Karyawan 
+Tabel yang digunakan untuk menyimpan data Karyawan 
+Primary Key  : Kd_karyawan 
+Tabel 4.9 Tabel karyawan  
+ 
+ 
+ 
+ 
+ 
+ Field  Type  Keterangan  
+Kd_jabatan  Varchar (4) Primary Key  
+Nm_jabatan  varchar (10)   
+Gaji_pokok  Int(10)   
+Uang_transport  Int(10)   
+Uang_makan  Int(10)   
+Field  Type  Keterangan  
+Kd_karyawan  Varchar(5)  Primary Key 
+nik varchar(20 )  
+Nm_karyawan  varchar( 100)  
+Kd_jabatan  varchar(4)  Foreign Key  
+Kelamin  varchar( 10)  
+Agama  varchar( 20)  
+Alamat  varchar( 100)  
+No_telp  Varchar (20)  
+Tempat_lahir  varchar(20)   
+Tgl_lahir  date  
+Status_kawin  ENUM(‘Kawin’,Belum 
+Kawin’)   
+Jumlah_anak  Int(3)   
+Id_ptkp  Int(3)   
+Tgl_masuk  date  
+
+84 
+ 
+ 
+  
+5. Tabel Peminjaman 
+Tabel yang digunakan untuk menyimpan data peminjaman. 
+Primary Key  : No_pinjam 
+ 
+Tab Tabel 4. 10 Tabel Peminjaman  
+ 
+ 
+ 
+ 
+6. Tabel penggajian 
+Tabel yang digunakan untuk menyimpan data user 
+Primary Key  : No_penggajian 
+Tabel 4. 11 Tabel penggajian  
+ 
+ 
+ 
+ Field  Type  Keterangan  
+No_pinjaman  Varchar(3)  Primary Key  
+Kd_karyawan  Varchar(5)  Foreign Key  
+Tanggal  Date   
+Besar_pinjaman  Int(10)   
+keterangan  Varchar(100)   
+Status_lunas  Enum(‘Hutang’,’lunas’)   
+Kd_user  Varchar(4)  Foreign Key  
+Field  Type  Keterangan  
+No_penggajian  int(10)  Primary Key  
+Kd_karyawan  varchar(5 ) Foreign Key  
+Periode_gaji  Varchar(7)   
+Tanggal  date  
+Gaji_pokok  int(10)   
+Tunj_transport  int(10)   
+
+85 
+ 
+ 
+  
+ 
+ 
+7. Tabel absensi 
+Tabel yang digunakan untuk menyimpan dataabsensi 
+Primary Key  : Id 
+Tabel 4. 12 Tabel absensi  
+ 
+ 
+ 
+ 
+ 
+8. Tabel pph21 
+Tabel yang digunakan untuk menyimpan data user 
+Primary Key  : no_pph21 
+Tabel 4. 13 Tabel p ph21  
+ 
+ Tunj_makan  int(10)   
+Total_lembur  int(10)   
+Total_bonus  int(10)   
+Total_pinjaman  int(10)   
+Kd_user  Varchar(4)   
+Field  Type  Keterangan  
+Id int(4) Primary Key  
+Kd_karyawan  varcha r(12)  Foreign Key  
+tanggal  Date   
+Jam_masuk  Time   
+Jam_keluar  Time   
+Status_masuk  ENUM(‘0’,’1’,’2’,’3’)   
+Keterangan  Varchar(100)   
+Kd_user  Varchar(12)  Foreign Key  
+Field  Type  Keterangan  
+no_pph21  int(10)  Primary Key  
+Kd_karyawan  varchar(5 ) Foreign Key  
+Periode_gaji  Varchar(7)   
+
+86 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+9. Tabel ptkp 
+Tabel yang digunakan untuk menyimpan dataabsensi 
+Primary K ey : Id_ptkp 
+Tabel 4. 14 Tabel ptkp  
+ 
+ 
+ 
+10. Tabel Permohonan Peminjaman 
+Tabel yang digunakan untuk menyimpan data sementara di 
+permohonan pinjaman sebelum data pindah ke tabel 
+peminjaman. 
+Primary Key  : id Tanggal  Date  
+Gaji_pokok  int(10)   
+Tunj_transport  int(10)   
+Tunj_makan  int(10)   
+Total_lembur  int(10)   
+Total_bonus  int(10)   
+Bruto  int(10)   
+Biaya_jabatan  int(10)   
+Netto_setahun  int(10)   
+Total_ptkp  int(10)   
+Pkp int(10)   
+Pph21_setahun  int(10)   
+Pph21_sebulan  int(10)   
+Kd_user  Varchar(4)   
+Field  Type  Keterangan  
+Id_ptkp  int(4) Primary Key  
+Kd_ptkp  varchar(12)   
+Total_ptkp  Int(10)   
+Keterangan  Varchar(100)   
+
+87 
+ 
+ 
+ Tab Tabel 4. 15 Tabel permohonan Peminjaman  
+ 
+ 
+ 
+ 
+Berikut ini adalah struktur basisdata yang dibuat peneliti 
+berdasarkan rancangan basisdata yang dibuat pada fase perancangan. 
+Gambar berikut juga memperlihatkan hubungan masing-masing table 
+pada basisdata tersebut. 
+ 
+Gambar 4. 27 Basis Data  
+Field  Type  Keterangan  
+id int(3)  Primary Key  
+Kd_karyawan  Varchar(5)  Foreign Key  
+timedate  Date   
+Besar_pinjaman  Int(10)   
+keterangan  Varchar(100)   
+user Varchar(4)   
+
+88 
+ 
+ 
+ 4.2.2.3 State Transition Diagram  
+ 4.2.2.3.1 STD Halaman Admin 
+ 
+Gambar 4. 28 State Transition Diagram  Admin  
+ 4.2.2.3.2 STD Halaman  Accounting  dan Finance  
+ 
+Gambar 4. 29 State Transition Diagram  Accounting & Finance  
+ 
+
+89 
+ 
+ 
+ 4.2.2.3.3 STD Halaman  HRD  
+ 
+ 
+Gambar 4.30 State Transition Diagram  HRD  
+4.2.2.3.4 STD Halaman  Direktur  
+  
+Gambar 4. 31 State Transition Diagram  Direktur  
+ 
+
+90 
+ 
+ 
+ 4.2.2.3.5 STD Halaman  Karyawan  
+ 
+Gambar 4. 32 State Transition Diagram  Karyawan  
+ 
+4.2.2.4 Desain Interface  
+1.  Perancangan Form Login 
+  
+Gambar 4. 33 Tampilan Form Login  
+ 
+
+91 
+ 
+ 
+ 2. Perancangan manajemen user 
+a. Tampilan data user 
+ 
+Gambar 4. 34 Tampilan data user  
+   b. Tampilan form input user 
+ 
+Gambar 4. 35 Tampilan form input user  
+
+92 
+ 
+ 
+  3. Perancangan manajemen jabatan  
+ a. Tampilan data jabatan 
+ 
+Gambar 4. 36 Tampilan data jabatan  
+b. Tampilan form input jabatan 
+ 
+Gambar 4. 37 Tampilan  form input jabatan  
+ 
+
+93 
+ 
+ 
+  4. Perancangan manajemen karyawan 
+a. Tampilan data karyawan 
+ 
+Gambar 4. 38 Tampilan  data karyawan  
+ 
+b. Tampilan form input karyawan 
+ 
+Gambar 4. 39 Tampilan form  input karyawan  
+ 
+ 
+
+94 
+ 
+ 
+  5.  Perancangan manajemen lembur 
+a. Tampilan data lembur 
+ 
+Gambar 4. 40 Tampilan  data lembur  
+b. Tampilan form input lembur 
+ 
+Gambar 4. 41  Tampilan  form input lembur  
+ 
+
+95 
+ 
+ 
+  6. Perancangan manajemen peminjaman 
+a. Tampilan data pinjaman 
+ 
+Gambar 4.42 Tampilan  data pinjaman  
+b. Tampilan input pinjaman 
+ 
+Gambar 4. 43 Tampilan form input peminjaman  
+ 
+
+96 
+ 
+ 
+  7. Perancangan manajemen penggajian  
+a. Tampilan data penggajian 
+ 
+Gambar 4. 44 Tampilan  data penggajian  
+b. Tampilan form input penggajian 
+ 
+Gambar 4. 45 Tam pilan  form input penggajian  
+ 
+
+97 
+ 
+ 
+  8. Perancangan manajemen absensi  
+a. Tampilan data absensi 
+ 
+Gambar 4. 46 Tampilan  data absensi  
+b. Tampilan form input absensi 
+ 
+Gambar 4. 47 Tampilan  form input absensi  
+ 
+
+98 
+ 
+ 
+  9. Perancangan manajemen pph21  
+a. Tampilan data pph21 
+ 
+Gambar 4. 48 Tampilan  data pph21  
+b. Tampilan form input pph21 
+ 
+Gambar 4. 49 Tampilan  form input pph21  
+ 
+
+99 
+ 
+ 
+  10. Perancangan manajemen ptkp  
+a. Tampilan data ptkp 
+ 
+Gambar 4. 50 Tampilan  data ptkp 
+b. Tampilan form input ptkp 
+ 
+Gambar 4. 51 Tampilan  form input ptkp  
+
+100 
+ 
+ 
+  11. pilihan menu laporan 
+ 
+Gambar 4. 52 Tampilan  menu laporan  
+ 12. Perancangan laporan peminjaman 
+ 
+Gambar 4. 53 Tampilan laporan peminjaman  
+
+101 
+ 
+ 
+  13. Perancangan Laporan penggajian 
+ 
+Gambar 4. 54 Tampilan laporan penggajian  
+15. Perancangan laporan karyawan 
+ 
+Gambar 4.55 Tampilan  laporan karyawan  
+
+102 
+ 
+ 
+ 14. Perancangan laporan lembur 
+ 
+Gambar 4. 56 Tampilan  laporan lembur  
+16. Perancangan laporan absensi 
+ 
+Gambar 4.57 Tampilan laporan absensi 
+ 
+
+103 
+ 
+ 
+ 17. Perancangan mencetak slip gaji 
+ 
+Gambar 4.58 Tampilan mencetak slip gaji 
+18. Perancangan  permohonan pinjaman 
+ 
+Gambar 4.59 Tampilan input permohonan pinjaman 
+
+104 
+ 
+ 
+  
+Gambar 4.60 Tampilan validasi permohonan pinjaman 
+ 
+4.2.2.5 Coding 
+Pembangunan atau pengembangan aplikasi mencakup pembuatan 
+basisdata, pengkodean aplikasi, dan antarmuka pengguna.Bahasa 
+pemrograman yang digunakan peneliti pada pembutan aplikasi ini adalah 
+bahasa pemrograman PHP. Adapun tools  lain yang digunakan peneliti 
+adalah macromedia Dreamweaver 8  untuk mengembangkan komponen 
+perangkat lunak sehingga membantu untuk membu at antarmuka 
+pengguna yang baik. Sedangkan sebagai Web Server, peneliti 
+menggunakan Apache, dan aplikasi XAMPP 1.7.4 yang telah 
+terkonfigurasi dengan PHP, MySQL untuk membangun basis data. 
+
+105 
+ 
+ 
+ Dalam proses penulisan kode ( coding ) dan pengembangan aplikasi, 
+peneliti menggunakan aplikasi Notepad++ . 
+4.3  Implementasi ( Implementation ) 
+Fase terakhir pada pengembangan sistem ini dengan metode pengembangan 
+RAD ini adalah fase implementasi. Pada tahap ini peneliti mengimplementasikan 
+hasil rancangan pengembangan ke dal am sebuah aplikasi serta melakukan 
+pengujian dari aplikasi yang telah dibangun.  
+4.3.1 Blackbox Testing 
+Pada tahap pengujian dilakukan dengan cara  Blackbox Testing . 
+Pengujian dilakukan dengan menjalankan aplikasi , kemudian melihat 
+outputnya, apakah telah se suai dengan hasil yang diharapkan. Adapun 
+hasil pengujian terhadap aplikasi ini akan dijelaskan melalui beberapa 
+table berikut.  
+Tabel 4. 16 Administrator  
+No Test Case  Prasyarat  Hasil yang 
+diharapkan  Hasil 
+Pengujian  
+1 Login  Administrator 
+membuka aplikasi  Administrator masuk 
+ke dalam aplikasi  success  
+2 Input data 
+karyawan  Login sebagai 
+Administrator 
+kemudian memilih 
+menu data karyawan 
+dan klik tombol Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data 
+diisi dan administrator 
+meng-klik tombol 
+“simpan ”, maka akan success  
+
+106 
+ 
+ 
+ tambah karyawan  
+baru.  disimpan dalam 
+database  
+3 Ubah data 
+karyawan  Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data karyawan , 
+klik edit data yang 
+akan diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian 
+administrator menekan 
+tombol edit untuk 
+mengubah data yang 
+diperlukan.  success  
+4 Hapus  data 
+karyawan  Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data karyawan , 
+lalu klik icon “ hapus ” Aplikasi akan 
+menghapus data success  
+5 Input data 
+user Login sebaga i 
+Administrator 
+kemudian memilih 
+menu user dan klik 
+tombol tambah user 
+baru.  Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data 
+diisi dan administrator 
+meng -klik tombol 
+“simpan ”, maka akan 
+disimpan dalam 
+database  success  
+6 Ubah data    
+user Logi n sebagai 
+Administrator, 
+kemudian memilih 
+menu data user , klik 
+edit data yang akan 
+diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian 
+administrator menekan 
+tombol edit untuk 
+mengubah data yang 
+diperlukan.  success  
+
+107 
+ 
+ 
+ 7 Hapus Data     
+user Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data user, lalu 
+klik icon “ hapus ” Aplikasi akan 
+menghapus data success  
+8 Input data 
+ptkp Login sebagai 
+Administrator 
+kemudian memilih 
+menu ptkp dan klik 
+tombol tambah ptkp 
+baru.  Aplikasi menampilkan 
+form  pengisian data. 
+Setelah semua data 
+diisi dan administrator 
+meng -klik tombol 
+“simpan ”, maka akan 
+disimpan dalam 
+database  success  
+9 Ubah data    
+ptkp Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data ptkp , klik 
+edit data yang akan 
+diubah.  Aplikasi me nampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian 
+administrator menekan 
+tombol edit untuk 
+mengubah data yang 
+diperlukan.  success  
+10 Hapus Data     
+ptkp Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data ptkp , lalu 
+klik icon “ hapus ” Aplikasi akan 
+menghapus  data success  
+11 Input data 
+jabatan  Login sebagai 
+Administrator 
+kemudian memilih 
+menu jabatan  dan Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data 
+diisi dan administrator 
+meng -klik tombol success  
+
+108 
+ 
+ 
+ klik tombol tambah 
+jabatan  baru.  “simpan ”, mak a akan 
+disimpan dalam 
+database  
+12 Ubah data    
+jabatan  Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data jabatan , 
+klik edit data yang 
+akan diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian 
+administrator menekan 
+tombol edit untuk 
+mengubah data yang 
+diperlukan.  success  
+13 Hapus Data     
+jabatan  Login sebagai 
+Administrator, 
+kemudian memilih 
+menu data jabatan , 
+lalu klik icon “ hapus ” Aplikasi akan 
+menghapus  data success  
+ 
+Tabel 4. 17 HRD  
+No Test Case  Prasyarat  Hasil yang 
+diharapkan  Hasil 
+Pengujian  
+1 Login  Staff HRD  membuka 
+aplikasi  Staff HRD  masuk ke 
+dalam aplikasi  success  
+2 Input data 
+penggajian  Login sebagai Staff 
+HRD kemudian 
+memilih menu data 
+penggajian  dan klik 
+tombol tambah 
+penggajian baru.  Aplikasi menampilkan 
+form  pengisian data. 
+Setelah semua data 
+diisi dan meng -klik 
+tombol “ simpan ”, maka 
+akan disimpan dalam 
+database  success  
+
+109 
+ 
+ 
+ 3 Ubah data   
+penggajian  Login sebagai Staff 
+HRD , kemudian 
+memilih menu data 
+penggajian , klik edit 
+data yang akan 
+diubah.  Aplikasi menampilk an 
+halaman view dengan 
+tombol “edit”. 
+Kemudian menekan 
+tombol edit untuk 
+mengubah data yang 
+diperlukan.  success  
+4 Hapus Data    
+penggajian  Login sebagai Staff 
+HRD , kemudian 
+memilih menu data 
+penggajian , lalu klik 
+icon “ hapus ” Aplikasi akan 
+menghapus  data success  
+5 Input data 
+absensi  Login sebagai Staff 
+HRD  kemudian 
+memilih menu data 
+absensi dan klik 
+tombol tambah 
+absensi  baru.  Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data 
+diisi dan Staff HRD  
+meng -klik tombol 
+“simpan ”, maka akan 
+disimpan dal am 
+database  success  
+6 Ubah data 
+absensi  Login sebagai Staff 
+HRD , kemudian 
+memilih menu data 
+absensi , klik edit data 
+yang akan diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian Staff HRD  
+menekan tombol edit 
+untuk mengubah data 
+yang d iperlukan.  success  
+7 Hapus data 
+absensi  Login sebagai Staff 
+HRD , kemudian 
+memilih menu data Aplikasi akan 
+menghapus  data success  
+
+110 
+ 
+ 
+ absensi , lalu klik icon 
+“hapus ” 
+8 Lihat dan 
+Cetak Slip 
+Gaji Login sebagai Staff 
+HRD  kemudian 
+memilih menu slip 
+gaji dan pilih   periode 
+gaji dan klik tombol  
+cetak  slip gaji . Aplikasi menampilkan  
+Slip gaji yang di 
+maksud . Setelah klik 
+cetak untuk mencetak 
+slip gaji  success  
+9 Input data 
+lembur  Login sebagai Staff 
+HRD  kemudian 
+memilih menu data 
+lembur dan klik 
+tombol tambah 
+lembur baru.  Aplikasi menampilkan 
+form pengisian data. 
+Setelah sem ua data 
+diisi dan Staff HRD  
+meng -klik tombol 
+“simpan ”, maka akan 
+disimpan dalam 
+database  success  
+10 Ubah data 
+lembur  Login sebagai Staff 
+HRD , kemudian 
+memilih menu data 
+lembur , klik edit data 
+yang  akan diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian Staff HRD  
+menekan tombol edit 
+untuk mengubah data 
+yang diperlukan.  success  
+11 Hapus Data  
+lembur  Login sebagai Staff 
+HRD , kemudian 
+memilih menu data 
+lembur , lalu klik icon 
+“hapus” Aplikasi akan 
+menghapus data success  
+12 Input data 
+pph21  Login sebagai Staff 
+HRD  kemudian 
+memilih menu pph21  Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data success  
+
+111 
+ 
+ 
+ dan klik tombol 
+tambah pph21  baru.  diisi dan  Staff HRD  
+meng -klik tombol 
+“simpan ”, maka akan 
+disimpan dalam 
+database  
+13 Ubah data    
+pph21  Login sebagai Staff 
+HRD  kemudian 
+memilih menu data 
+pph21 , klik edit data 
+yang akan diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. 
+Kemudian 
+administrator menekan 
+tombol edit u ntuk 
+mengubah data yang 
+diperlukan.  success  
+14 Hapus Data     
+pph21  Login sebagai Staff 
+HRD  kemudian 
+memilih menu data 
+pph21 , lalu klik icon 
+“hapus ” Aplikasi akan 
+menghapus  data success  
+ 
+Tabel 4.18  Accounting&Finace  
+No Test Case  Prasyarat  Hasil yang dih arapkan  Hasil 
+Pengujian  
+1 Login  Staff Accounting dan 
+Finance  membuka 
+aplikasi  Staff  Accounting  dan 
+Finance masuk ke dalam 
+aplikasi  success  
+2 Input data 
+penggajian  Login sebagai Staff 
+Accounting&Finance  
+kemudian memilih 
+menu data penggajian  Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data diisi 
+dan meng -klik tombol success  
+
+112 
+ 
+ 
+ dan klik tom bol 
+tambah penggajian 
+baru.  “simpan ”, maka akan 
+disimpan dalam database  
+3 Ubah data   
+penggajian  Login sebagai Staff 
+Accounting&Finance , 
+kemudian memilih 
+menu data 
+penggajian , klik edit 
+data yang akan 
+diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. Kemudian 
+menekan tombol edit 
+untuk mengubah data 
+yang diperlukan.  success  
+4 Hapus Data    
+penggajian  Login sebagai Staff 
+Accounting&Finance , 
+kemudian  memilih 
+menu data 
+penggajian , lalu klik 
+icon “ hapus ” Aplikasi akan menghapus 
+data success  
+5 Input data 
+pinjaman  Login sebagai Staff 
+Accounting dan 
+Finance  kemudian 
+memilih menu data 
+pinjaman  dan klik 
+tombol tambah 
+pinjamn baru.  Aplikasi menampilkan 
+form pengisian data. 
+Setelah semua data diisi 
+dan Staff Accounting dan 
+Finance  meng -klik 
+tombol “ simpan ”, maka 
+akan disimpan dalam 
+database  success  
+6 Ubah data  
+pinjaman  Login sebagai Staff 
+Accounting dan 
+Finance kemudian 
+memilih menu data 
+pinjaman , klik edit 
+data yang akan 
+diubah.  Aplikasi menampilkan 
+halaman view dengan 
+tombol “edit”. Kemudian 
+Staff Accounting dan 
+Finance menekan tombol 
+edit untuk mengubah data 
+yang diperlukan.  success  
+
+113 
+ 
+ 
+ 7 Hapus Data   
+pinjaman  Login sebagai Staff 
+Accounting dan 
+Finance kemudi an 
+memilih menu data 
+pinjamn,  lalu klik 
+icon “ hapus ” Aplikasi akan menghapus  
+data success  
+ 
+Tabel 4. 18 Direktur  
+No Test Case  Prasyarat  Hasil yang 
+diharapkan  Hasil 
+Pengujian  
+1 Login  Direktur  membuka 
+aplikasi  Direktur  masuk ke 
+dalam aplikasi  success  
+2 Lihat dan 
+validasi 
+permohonan 
+pinjaman  Login sebagai 
+direktur, kemudian 
+pilih menu 
+permohonan 
+pinjaman, klik lihat 
+dan selanjutnya tekan 
+terima atau di tolak  Aplikasi dapat validasi 
+permohonan pinjaman. 
+Dengan menekan 
+tombol terima data di 
+tabel permohonan a kan 
+terhapus dan pindah ke 
+tabel pinjaman , lalu 
+dengan menekan 
+tombol tolak aplikasi 
+akan menghapus 
+permohonan secara 
+otomatis   success  
+3 Lihat dan 
+cetak  
+Laporan  
+karyawan  Login sebagai 
+Direktur  , kemudian 
+memilih menu 
+laporan, pilih 
+Laporan karyawan Aplikasi menampilkan 
+halaman view dengan 
+tombol “get report”. 
+Kemudian menekan 
+tombol get report untuk success  
+
+114 
+ 
+ 
+ pada  content  menu, 
+setelah itu klik 
+jabatan  untuk 
+memilih periode 
+tanggal yang akan di 
+rekam dalam laporan. 
+Untuk men -cetak  
+laporan, klik icon 
+printer . melih at dan mencetak  
+laporan.  
+4 Lihat dan 
+cetak  
+Laporan  
+lembur  Login sebagai 
+Direktur , kemudian 
+memilih menu 
+laporan, pilih 
+Laporan Lembur 
+padacontent  menu, 
+setelah itu k lik date  
+untuk memilih 
+periode tanggal yang 
+akan di rekam dalam 
+laporan. Untuk me n-
+cetak  laporan, klik 
+icon printer . Aplikasi menampilkan 
+halaman view dengan 
+tombol “get  report”. 
+Kemudian  menekan 
+tombol get report untuk 
+melihat dan mencetak  
+laporan.  success  
+5 Lihat dan 
+cetak  
+Laporan  
+absensi  Login sebagai 
+Direktur , kemudian 
+memilih me nu 
+laporan, pilih 
+Laporan absensi 
+padacontent  menu, 
+setelah itu klik date 
+untuk memilih 
+periode tanggal yang Aplikasi menampilkan 
+halaman view dengan 
+tombol “get  report”. 
+Kemudian  menekan 
+tombol get report untuk 
+melihat dan mencetak  
+laporan.  success  
+
+115 
+ 
+ 
+ akan di rekam dalam 
+laporan. Untuk men -
+cetak  laporan, klik 
+icon printer . 
+6 Lihat dan 
+cetak  
+Laporan  
+Penggajian  Login sebagai 
+Direktur , kemudian 
+memilih menu 
+laporan, pilih 
+Laporan Penggajian 
+padacontent  menu, 
+setelah itu k lik date  
+untuk memilih 
+periode tanggal yang 
+akan di rekam dalam 
+laporan. Untuk men -
+cetak  laporan, klik 
+icon printer . Aplikasi menampilkan 
+halaman view dengan 
+tombol “get report”. 
+Kemudian menekan 
+tombol get report untuk 
+melihat dan mencetak  
+laporan.  success  
+7 Lihat dan 
+cetak  
+Laporan  
+peminjama n Login sebagai 
+Direktur , kemudian 
+memilih menu 
+laporan, pilih 
+Laporan Peminjaman 
+padacontent  menu, 
+setelah itu klik date 
+untuk memilih 
+periode tanggal yang 
+akan di rekam dalam 
+laporan. Untuk men -
+cetak  laporan, klik 
+icon printer . Aplikasi menampilkan 
+halam an view dengan 
+tombol “get  report”. 
+Kemudian  menekan 
+tombol get report untuk 
+melihat dan mencetak  
+laporan.  success  
+ 
+
+116 
+ 
+ 
+ Tabel 4. 19 Karyawan  
+No Test Case  Prasyarat  Hasil yang 
+diharapkan  Hasil 
+Pengujian  
+1 Login  Karyawan  membuka 
+aplikasi  Karyawan  masuk ke 
+dalam  aplikasi  success  
+2 Input 
+permohonan 
+pinjaman  Login sebagai 
+Karyawan, kemudian 
+pilih menu 
+permohonan 
+pinjaman, lalu input 
+data permohonan dan 
+selanjutnya tekan 
+kirim  Aplikasi menginput 
+permohonan pinjaman. 
+Dengan menekan 
+tombol kirim, data akan 
+tersimpa n sementara di 
+tabel permohonan 
+menunggu di validasi 
+oleh direktur  success  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+  
+ 
+117 
+ BAB V 
+PENUTUP 
+5. Kesimpulan dan Saran  
+5.1. Kesimpulan 
+Berdasarkan hasil pengujian, sistem informasi penggajian karyawan 
+beserta b asis datanya telah membantu proses pengelolaan  dan pengolahan 
+data antara lain :  
+1. Mampu menginformasikan data karyawan, data lembur, data 
+absensi, data peminjaman dan data penggajian.  
+2. Mempermudah dalam melakukan perhitungan gaji.  
+3. Menghasilkan output berupa slip gaji, laporan penggajian, 
+laporan absensi , laporan peminjaman, laporan lembur, dan 
+laporan data karyawan  
+5.2. Saran 
+Sebagai sistem  yang pertama kali dikembangkan khusus di  PT Adjitama 
+Persada karena sesuai dengan variabel gaji dan cara hitung disana , sistem  
+ini masih berpotensi untuk dikembangkan menj adi lebih baik lagi. Adapun 
+beberapa saran terkait dengan hal ini antara lain:  
+1. Pengembangan sistem  dapat  dikembangkan lagi untuk menghitung upah 
+harian karyawan freelance .  
+2. Pengembangan sistem  yang dapat diintegrasikan dengan fitur fingerprint 
+dikemudian hari jika PT Adjitama sudah menggunakan Fingerprint .  
+
+118 
+ 
+ 
+ 3. Menambah Hak akses karyawan untuk mempermudah absensi.  
+4. Menambahkan variabel gaji yang lain tergantung kebijakan terbaru.  
+5. Sistem ini juga dapat dikembangkan dengan menambahkan fitur laporan 
+pajak penghasi lan sehingga dapat membantu dalam pembuatan SSP dan 
+SPT.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+119 
+ 
+ 
+ DAFTAR PUSTAKA 
+Jogiyanto, HM., MBA., Akt., Ph.D. 2005. Analisis & Desain Sistem Informasi : 
+Pendekatan Terstruktur Teori dan Prakrek Aplikasi Bisnis . Yogyakarta : 
+Andi. 
+Kadir, Abdul. 2009. Dasar Pemrograman Web Dinamis Menggunakan PHP . 
+Yogyakarta : Andi. 
+Kadir, Abdul. 2008. Dasar Perancangan dan Implementasi Database Relational . 
+Yogyakarta : Andi. 
+Kendall, Kenneth, E., & Kendall, Julie, E. 2003. Analisis dan Perancangan Sistem. 
+Jakarta: Gramedia. 
+Kendall, Kenneth, E., & Kendall, Julie, E. 2008. System Analysis And Design . 
+London: Pearson    International Edition 7th Edition.  
+Marakas, G.M. 2006. System Analysis Design: an Active Approach . New York: 
+Mc.Graw-Hill. 
+Nugroho, Bunafit. 2005. Dasar Perancangan dan Implementasi Database 
+Relasional . Yogyakarta : Andi. 
+Pressman, Roger S. 2002. Rekayasa Perangkat Lunak Pendekatan Praktis. 
+Terjemahan CN harnaningrum. Yogyakarta: ANDI. 
+Sutanta, Edhy. 2005. Pengantar Teknologi Informasi . Yogyakarta : Graha Ilmu. 
+Wahana. 2006. Panduan Lengkap Menguasai Pemrograman Web dengan PHP 5 . 
+Yogyakarta : Andi. 
+Jogiyanto. 2008. Metodologi Penelitian Sistem Informasi. Yogyakarta : Penerbit Andi 
+ 
+
+120 
+ 
+ 
+  
+ 
+ 
+ 
+LAMPIRAN I 
+Hasil Wawancara 
+ 
+ 
+ 
+ 
+
+121 
+ 
+ 
+ WAWANCARA  I 
+ 
+Tempat/Waktu : Jakarta , 03 Maret 2014  
+Nama : Dudi Wahyudi  
+Jabatan : Manajer Human Resource Departemen  
+Tujuan : Mengetahui proses   penggajian karyawan PT. Adjitama . 
+ 
+1. Dimana proses perhitungan gaji di PT. Adjitama dilakukan ? 
+ 
+Jawab : Proses pegolahan penggajian dilakukan dilakukan di bagian HRD 
+ 
+2. Bagaimana Proses penggajian sampai menjadi laporan berlangsung?  
+Jawab : setiap tanggal 1 sampai dengan tanggal 5 proses perhitungan gaji 
+dimulai, pertama kita kumpulin kartu amano/absensi lalu dihitung jumlah 
+masuknya dan di input ke excel. Sela njutnya kita lihat di arsip bulan lalu ada 
+atau tidaknya form lembur dan form peminjaman karyawan disana, kalau 
+ada langsung di input juga ke excel . Kalau sudah di input semua lalu di total. 
+Jadi kalau sudah di dapat totalnya lalu di buat laporannya di tan datangani 
+oleh manajer HRD dan direktur PT adjitama persada. Selanjutnya laporan 
+di kasih ke bag Accounting dan finance untuk di transfer ke masing -masing 
+karyawan. Laporan dan bukti transfer di arsipkan. Setelah itu dibuatkan slip 
+penggajiannya. Proses in i biasanya untuk karyawan tetap/inti yang ada di 
+adjitama. Kalau yang freelance, ada yang di bayar per hari atau per proyek 
+tergantung kesepakatan.  
+ 
+3. Ruang lingkup bisnis dari PT. Adjitama apa saja ? 
+ 
+Jawab : awalnya PT. Adjitama memulai dengan merintis usah a catering, 
+tidak lama CV Trip Consultant bergabung di bawah bendera PT. Adjitama 
+Persada. Jadi unit usahanya tambah dengan manajemen konsultan. Yang 
+terbaru, kita menambah dengan usaha cleaning service.    
+ 
+4. Kendala apa yang sering dihadapi saat melakukan perhitungan gaji ? 
+Jawab : untuk kendalanya biasanya saat proses pencarian berkas -berkas 
+form lembur, pinjaman dan kartu absensi. Formnya tercecer dan juga 
+
+122 
+ 
+ 
+ kadang-kadang ada yang hilang. Dalam menghitung pajak penghasilan 
+karyawan juga lama karena masih manual.  
+ 
+5. Bagaimana Proses Peminjaman Uang disini?  
+ 
+Jawab : Melakukan pinjaman, pertama harus isi formulir permohonan 
+pinjaman selanjutnya di kasih ke bagian akunting dan finance untuk di 
+setujui. Dan perlu persetujuan direktur PT. Adjitama Persada selaku pem ilik 
+perusahaan. Dengan catatan untuk permohonan uang pinjaman tidak lebih 
+dari 1/3 gaji pokok dan pemotongan otomatis di lakukan pada gaji bulan 
+berikutnya  
+ 
+6. Berapa uang lembur karyawan?  
+ 
+Jawab :  10.000/jam  
+ 
+7. Apakah sama untuk semua karyawan termasuk manaje r? 
+ 
+Jawab :   Semua staff sama, kalau untuk manajer tidak ada jam lembur. 
+Kalaupun harus pulang di luar jam keluar itu adalah loyalitas.  
+ 
+8. Berapa uang makan dan uang transport di sini?  
+Jawab :  Uang makan 20.000 dan transport 25.000  
+9. Apakah sama untuk semua ka ryawan?  
+Jawab :  ya, semua termasuk manajer  
+10. Adakah perbedaan gaji antar karyawan berdasarkan masa kerjanya?  
+Jawab :  Untuk kebijakan saat ini tidak ada, perbedaan hanya ada pada antar 
+bagian atau departemen dan posisi jabatan. Jadi bagian yang sama gajinya 
+sama. Rata -rata yang baru masuk dengan yang lama tidak terlalu jauh 
+jaraknya. Perusahaan ini juga belum terlalu lama berdirinya kurang lebih 
+baru 4 tahun.  
+11. Bagaimana kalau tentang kenaikan gaji di sini?  
+Jawab : untuk kenaikan gaji disesuaikan dengan UMP DKI  jakarta  setiap 
+tahunnya.  
+ 
+ 
+
+123 
+ 
+ 
+ WAWANCARA  II 
+ 
+Tempat/Waktu : Jakarta , 05 Maret 2014  
+Nama : Henri Kurniawan  
+Jabatan : Staff Human Resource Departement  
+Tujuan : Mengetahui cara perhitungan gaji dan pajaknya  
+ 
+1. Bagaimana cara hitung gaji disini ? 
+ 
+Jawab : untuk menghutung gaji kita lihat total absensi selama sebulan. 
+Setelah itu di kali dengan uang makan dan uang transport. Selanjutnya uang 
+tadi ditambahkan dengan gaji pokok dan uang lembur jika ada. Setelah 
+didapat hasilnya di kuarangi potongan pajak penghasilan dan hutang.  
+ 
+2. Bagaimana cara menghitung pajaknya?  
+Jawab : untuk pajak kita cari dulu brutonya, caranya jumlah semua gaji 
+pokok, uang makan, uang transport, uang lembur. Lalu di setahunkan 
+dengan di kali 12 dan di tambah dengan bonus. Maka akan di dapat bru to 
+setelah itu. Bruto di kurang biaya jabatan. Biaya jabatan adalah 5% dari 
+bruto dan maksimal 500.000 sebulan atau 6.000.000 setahun. Selanjutnya 
+bruto dikurangi dengan biaya jabatan menghasilkan netto setahun. 
+Selanjutnya setelah di dapat netto setahun d i kurang penghasilan tidak kena 
+pajak/PTKP maka di dapat penghasilan kena pajak/PKP. Selanjutnya PKP 
+dikalikan dengan tarif pajaknya maka di dapat pph21 setahun. Selanjutnya 
+pph 21 setahun di bagi 12 dan di dapatlah pph21 sebulan.    
+ 
+3. Kenapa bonus tidak di  setahunkan atau di kali 12 ? 
+ 
+Jawab : karena bonus hanya di dapat sekali setahun. Jadi tidak dikalikan 
+dengan 12.  
+ 
+4. Bagaimana cara mendapatkan PTKP ? 
+Jawab :  PTKP nominalnya sudah di tentukan oleh pemerinta lewat 
+Peraturan Menteri Keuangan Nomor 162/PMK.011 /2012 tentang 
+Penyesuaian Besarnya Penghasilan Tidak Kena Pajak . Untuk wajib pajak 
+
+124 
+ 
+ 
+ pribadi nominalnya 24.300.000. untuk wajib pajak yang telah menikah di 
+tambah 2.025.000 untuk istri. Untuk wajib pajak yang menikah dengan 1 
+anak di tambah 2.025.000 lagi un tuk anak. Untuk tanggungannya sampai 3 
+anak saja.  
+ 
+5. Bagaimana bagaimana kalau wajib pajaknya wanita menikah, adakah PTKP 
+untuk suami ?  
+ 
+Jawab : kalau kasus itu wanita hanya mendapat potongan untuk dirinya 
+pribadi. Kalau suaminya memang tidak bekerja dan ma u didaftarkan sebagai 
+tanggungan, harus ada surat keterangan tertulis dari pemerintah daerah 
+setempat serendah -rendahnya dari tingkat kecamatan yang menyatakan 
+bahwa suami tidak berpenghasilan.  
+ 
+6. Berapakah tarif pajak?  
+ 
+Jawab : untuk pkp antara 0 s/d 50.000 .000 dikali 5%. Untuk pkp antara 
+50.000.000 s/d 250.000.000 dikali 15%. Untuk pkp antara 250.000.000 s/d 
+500.000.000 dikali 25%. Dan untuk yang diatas 500.000.000 dikali 30%. 
+Setelah itu maka akan didapat pajak penghasilan setahun yang kemudian 
+dibagi 12 u ntuk mendapat pajak sebulan.  
+ 
+ 
+ 
+ 
+ 
+
+125 
+ 
+ 
+  
+LAMPIRAN II 
+Tampilan Antarmuka 
+
+126 
+ 
+ 
+  
+Login
+ 
+Manajemen Data User 
+ 
+
+127 
+ 
+ 
+  
+Manajemen Data Karyawan 
+ 
+Manajemen Data Lembur 
+ 
+
+128 
+ 
+ 
+  
+Manajemen Data Pinjaman 
+ 
+Manajemen Data Penggajian 
+ 
+
+129 
+ 
+ 
+  
+Manajemen Data Absensi 
+ 
+Manajemen  PTKP  
+
+130 
+ 
+ 
+  
+Manajemen Laporan 
+ 
+Input permohonan Pinjaman 
+
+131 
+ 
+ 
+  
+Data  permohonan Pinjaman  
+ 
+Validasi permohonan Pinjaman  
+ 
+
+132 
+ 
+ 
+  
+Tampilan cetak laporan pinjaman 
+ 
+Tampilan cetak laporan lembur 
+
+133 
+ 
+ 
+  
+Tampilan cetak laporan penggajian 
+ 
+ 
+Tampilan cetak slip gaji 
+
+134 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+LAMPIRAN III 
+Source Codes  
+
+135 
+ 
+ index.php 
+<?php 
+session_start(); 
+include_once 
+"library/inc.connection.php";  
+include_once 
+"library/inc.library.php";  
+include_once 
+"library/inc.tanggal.php";  
+ 
+date_default_timezone_set("Asia
+/Jakarta");  
+?> 
+<html>  
+ <html 
+xmlns="http://www.w3.org/1999/x
+html"> 
+<head> 
+<meta http- equiv="Content -Type" 
+content="text/html; 
+charset=iso- 8859-1" /> 
+<title> SISTEM INFORMASI 
+PENGGAJIAN KARYAWAN</title>  
+<link rel="stylesheet" 
+type="text/css" 
+href="plugins/tigra_calendar/tc
+al.css" /> 
+<script type="text/javascript" 
+src="plugins/tigra_calendar/tca
+l.js"></script>  
+<link href="styles/style.css" 
+type="text/css" 
+rel="stylesheet"/> 
+ </head> 
+<body> 
+<div id="wrapper"> 
+ <div id ="header">  
+  
+ </div> 
+   
+ <div id="mainnavigasi">  
+ <?php include "menu.php"; 
+?> 
+ </div> 
+ <div id="content" > 
+  <div id="content">  
+  <?php include 
+"buka_file.php";?> 
+  </div> 
+ 
+</div> 
+<div id="footer"> 
+</div> </div> 
+</body> 
+</html> 
+Penggajian_data .php 
+<?php 
+include_once 
+"library/inc.sesadmin.php";  
+# UNTUK PAGING (PEMBAGIAN 
+HALAMAN)  
+$row = 50;  
+$hal = isset($_GET['hal']) ? 
+$_GET['hal'] : 0;  
+$pageSql = "SELECT * FROM 
+penggajian";  
+$pageQry = 
+mysql_query($pageSql, 
+$koneksidb) or die ("error 
+paging: ".mysql_error());  
+$jml  = 
+mysql_num_rows($pageQry);  
+$max  = ceil($jml/$row);  
+?> 
+<table width="777" border="0" 
+cellpadding="2" cellspacing="0" 
+class="table -border">  
+  <tr> 
+    <td colspan="2" 
+align="right"><h1><b>DATA 
+PENGGAJIAN </b></h1></td>  
+  </tr> 
+  <tr> 
+    <td colspan="2" 
+align="right"><a 
+href="?page=Penggajian -Add" 
+target="_self"><img 
+src="images/btn_add_data.png" 
+width="134" height="36" 
+border="0" /></a></td>  
+  </tr> 
+  <tr> 
+    <td colspan="2">&nbsp;</td>  
+  </tr> 
+  <tr> 
+    <td colspan="2"><table 
+class="table -list" width="100%" 
+border="0" cellspacing="1" 
+cellpadding="2">  
+      <tr> 
+        <th 
+width="24"><b>No</b></th>  
+        <th 
+width="74"><strong>Periode</str
+ong></th>  
+
+136 
+ 
+         <th 
+width="82"><strong>Tanggal</str
+ong></th> 
+        <th width="92">NIK</th>  
+        <th width="200">Nama 
+Karyawan </th> 
+        <th width="125"><b>Gaji 
+Bersih (Rp) </b></th>  
+        <td colspan="3" 
+align="center" 
+bgcolor="#CCCCCC"><b>Tools</b><
+b></b></td> 
+        </tr> 
+      <?php 
+ $mySql  = "SELECT 
+penggajian.*, karyawan.nik, 
+karyawan.nm_karyawan FROM 
+penggajian 
+    LEFT JOIN 
+karyawan ON 
+penggajian.kd_karyawan=karyawan
+.kd_karyawan  
+    ORDER BY 
+penggajian.no_penggajian ASC 
+LIMIT $hal, $row"; 
+ $myQry  = 
+mysql_query($mySql, $koneksidb)  
+or die ("Query  salah : 
+".mysql_error()); 
+ $nomor  = 0;  
+ while ($myData = 
+mysql_fetch_array($myQry)) {  
+  $nomor++;  
+  $Kode = 
+$myData['no_penggajian'];  
+   
+ ?> 
+      <tr> 
+        <td><?php echo $nomor; 
+?></td> 
+        <td><?php echo 
+$myData['periode_gaji']; 
+?></td> 
+        <td><?php echo 
+IndonesiaTgl($myData['tanggal']
+); ?></td> 
+        <td><?php echo 
+$myData['nik']; ?></td>  
+        <td><?php echo 
+$myData['nm_karyawan']; ?></td> 
+        <td align="right"><?php 
+echo $myData['total_gaji']; 
+?></td>  
+        <td width="38" 
+align="center"><a 
+href="?page=Penggajian -
+Edit&amp;Kode=<?php echo $Kode; 
+?>" target="_self" alt="Edit 
+Data"><img 
+src="images/edit.png"  
+/></a></td>  
+  <td width="52" 
+align="center"><a 
+href="?page=Penggajian -
+Delete&amp;Kode=<?php echo 
+$Kode; ?>" target="_self" 
+alt="Delete Data" 
+onclick="return confirm('ANDA 
+YAKIN AKAN MENGHAPUS DATA 
+PENGGAJIAN INI ... ?')"><img 
+src="images/hapus.png"  
+/></a></td>  
+      </tr> 
+      <?php } ?> 
+    </table>    </td>  
+  </tr> 
+  <tr class="selKecil">  
+    <td width="360" height="22" 
+bgcolor="#CCCCCC"><b>Jumlah 
+Data :</b> <?php echo $jml; ?> 
+</td> 
+    <td width="409" 
+align="right" 
+bgcolor="#CCCCCC"><b>Halaman ke 
+:</b> 
+      <?php 
+ for ($h = 1; $h <= $max; 
+$h++) { 
+  $list[$h] = $row * 
+$h - $row; 
+  echo " <a 
+href='?page=Penggajian -
+Data&hal=$list[$h]'>$h</a> ";  
+ } 
+ ?></td> 
+  </tr> 
+</table>  
+Penggajian_data .php 
+<?php 
+include_once 
+"library/inc.sesadmin.php";  
+ 
+if(isset($_POST['btnSimpan'])) { 
+ # VALIDASI FORM, jika ada 
+kotak yang kosong, buat pesan 
+
+137 
+ 
+ error ke dalam kotak 
+$pesanError 
+ $pesanError = array();  
+ if 
+(trim($_POST['cmbKaryawan'])=="
+BLANK") { 
+  $pesanError[] = 
+"Data <b>Karyawan</b> tidak 
+boleh kosong, <b> ini adalah 
+karyawan yang akan digaji</b> 
+!";   
+ }  
+ if 
+(trim($_POST['txtGajiPokok'])==
+"" or ! 
+is_numeric(trim($_POST['txtGaji
+Pokok']))) { 
+  $pesanError[] = 
+"Data <b>Gaji Pokok (Rp) harus 
+diisi angka</b>, silahkan 
+perbaiki datanya !";    
+ }  
+ if 
+(trim($_POST['txtTunjTransport'
+])=="" or ! 
+is_numeric(trim($_POST['txtTunj
+Transport']))) { 
+  $pesanError[] = 
+"Data <b>Tunjangan Transport 
+(Rp) harus diisi angka</b>, 
+silahkan perbaiki datanya !";
+   
+ }  
+ if 
+(trim($_POST['txtTunjMakan'])==
+"" or ! 
+is_numeric(trim($_POST['txtTunj
+Makan']))) { 
+  $pesanError[] = 
+"Data <b>Tunjangan Makan (Rp) 
+harus diisi angka</b>, silahkan 
+perbaiki datanya !";    
+ }  
+ if 
+(trim($_POST['txtTotalLembur'])
+=="" or ! 
+is_numeric(trim($_POST['txtTota
+lLembur']))) { 
+  $pesanError[] = 
+"Data <b>Total Gaji Lembur (Rp) 
+harus diisi angka</b>, silahkan 
+perbaiki datanya !";    
+ }   if 
+(trim($_POST['txtTotalBonus'])=
+="" or ! 
+is_numeric(trim($_POST['txtTota
+lBonus']))) {  
+  $pesanError[] = 
+"Data <b>Total Bonus (Rp) harus 
+diisi angka</b>, silahkan 
+perbaiki datanya !";    
+ }  
+ if 
+(trim($_POST['txtTotalPinjaman'
+])=="" or ! 
+is_numeric(trim($_POST['txtTota
+lPinjaman']))) {  
+  $pesanError[] = 
+"Data <b>Total Pinjaman (Rp) 
+harus diisi angka</b>, silahkan 
+perbaiki datanya !";    
+ }  
+ if 
+(trim($_POST['txtPPh21Sebulan']
+)=="" or ! 
+is_numeric(trim($_POST['txtPPh2
+1Sebulan']))) {  
+  $pesanError[] = 
+"Data <b>Total Pph21 sebulan  
+(Rp) harus diisi angka</b>, 
+silahkan perbaiki datanya !";
+   
+ } 
+ if 
+(trim($_POST['txtTotalGaji'])==
+"" or ! 
+is_numeric(trim($_POST['txtTota
+lGaji']))) {  
+  $pesanError[] = 
+"Data <b>Total Total Gaji  
+Bersih  (Rp) harus diisi 
+angka</b>, silahkan perbaiki 
+datanya !";    
+ }  
+ # BACA DATA DALAM FORM, 
+masukkan datake variabel  
+ $cmbBulan   = 
+$_POST['cmbBulan'];  
+ $cmbTahun   = 
+$_POST['cmbTahun'];  
+ $cmbKaryawan  = 
+$_POST['cmbKaryawan'];  
+ $txtGajiPokok  = 
+$_POST['txtGajiPokok'];  
+
+138 
+ 
+  $txtTunjTransport  = 
+$_POST['txtTunjTransport'];  
+ $txtTunjMakan  = 
+$_POST['txtTunjMakan'];  
+ $txtTotalLembur   = 
+$_POST['txtTotalLembur'];  
+ $txtTotalBonus   = 
+$_POST['txtTotalBonus'];  
+ $txtTotalPinjaman  = 
+$_POST['txtTotalPinjaman'];  
+ $txtPPh21Sebulan  = 
+$_POST['txtPPh21Sebulan'];  
+ $txtTotalGaji  = 
+$_POST['txtTotalGaji'];  
+ # JIKA ADA PESAN ERROR 
+DARI VALIDASI 
+ if (count($pesanError)>=1 
+){ 
+  echo "<div 
+class='mssgBox'>"; 
+  echo "<img 
+src='images/attention.png'> 
+<br><hr>"; 
+   $noPesan=0;  
+   foreach 
+($pesanError as 
+$indeks=>$pesan_tampil) {  
+   $noPesan++;  
+    echo 
+"&nbsp;&nbsp; $noPesan. 
+$pesan_tampil<br>";   
+   }  
+  echo "</div> <br>";  
+ } 
+ else { 
+  # SIMPAN DATA KE 
+DATABASE. Jika tidak menemukan 
+pesan error, simpan data ke 
+database 
+  $userLogin  = 
+$_SESSION['SES_LOGIN'];  
+  $kodeBaru  = 
+buatKode("penggajian", "PG");  
+  $tanggalGaji= 
+date('Y-m- d'); 
+  $mySql   = "INSERT 
+INTO penggajian(no_penggajian, 
+periode_gaji, tanggal, 
+kd_karyawan, gaji_pokok, 
+tunj_transport, tunj_makan,  
+     
+       total_lembur, 
+total_bonus, total_pinjaman,  
+     
+     
+  pph21_sebulan, 
+total_gaji, kd_user)  
+     
+ VALUES ('$kodeBaru',  
+     
+   '$cmbBulan -
+$cmbTahun',  
+     
+   '$tanggalGaji',  
+     
+   '$cmbKaryawan',  
+     
+  
+ '$txtGajiPokok',  
+     
+  
+ '$txtTunjTransport',  
+     
+  
+ '$txtTunjMakan',  
+     
+  
+ '$txtTotalLembur',  
+     
+  
+ '$txtTotalBonus',  
+     
+  
+ '$txtTotalPinjaman',  
+     
+  
+ '$txtPPh21Sebulan',  
+     
+  
+ '$txtTotalGaji',  
+     
+   '$userLogin')";  
+ 
+ $myQry=mysql_query($mySql, 
+$koneksidb) or die ("Gagal 
+query 1".mysql_error());  
+  if($myQry){  
+   // Update 
+status Pinjaman Lunas  
+   $my2Sql  = 
+"UPDATE pinjaman SET 
+status_lunas='Lunas' WHERE 
+kd_Karyawan='$cmbKaryawan'";  
+
+139 
+ 
+   
+ mysql_query($my2Sql, 
+$koneksidb) or die ("Gagal 
+query 2".mysql_error());  
+    
+   // Refresh 
+Jendela baru 
+   echo 
+"<script>"; 
+   echo 
+"window.open('penggajian_nota.p
+hp?noNota=$kodeBaru', 
+width=330,height=330,left=100, 
+top=25)"; 
+   echo 
+"</script>"; 
+ 
+   echo "<meta 
+http-equiv='refresh' 
+content='0; 
+url=?page=Penggajian -Add'>"; 
+  } 
+  exit; 
+ }  
+} // Penutup POST 
+ 
+# MASUKKAN DATA KE VARIABEL  
+$dataKode   = 
+buatKode("penggajian", "PG");  
+$dataKaryawan  = 
+isset($_POST['cmbKaryawan']) ? 
+$_POST['cmbKaryawan'] : '';  
+ 
+$dataBulan   = 
+isset($_POST['cmbBulan']) ? 
+$_POST['cmbBulan'] : date('m') -
+1; // bulan kemaren (asumsi 
+Penggajian dilakukan di tanggal 
+1, bulan berikutnya)  
+ 
+// Membuat angka bulan selalu 2 
+digit (01, 02, 03.....12)  
+if(strlen($dataBulan)=="1") { 
+$dataBulan= "0".$dataBulan; } 
+else { $dataBulan = $dataBulan; 
+} 
+ 
+$dataTahun   = 
+isset($_POST['cmbTahun']) ? 
+$_POST['cmbTahun'] : date('Y'); 
+// tahun sekarang 
+ // Mendapatkan Informasi Gaji 
+Poko + Tunjangan dari tabel 
+JABATAN 
+$mySql = "SELECT jabatan.* FROM 
+jabatan, karyawan WHERE 
+karyawan.kd_jabatan=jabatan.kd_
+jabatan AND 
+karyawan.kd_karyawan='$dataKary
+awan'"; 
+$myQry = mysql_query($mySql, 
+$koneksidb)  or die ("Query 1 
+salah : ".mysql_error());  
+$myData= 
+mysql_fetch_array($myQry);  
+ 
+$dataGajiPokok   = 
+isset($_POST['txtGajiPokok']) ? 
+$_POST['txtGajiPokok'] : '0';  
+$dataGajiPokok   = 
+isset($myData['gaji_pokok']) ? 
+$myData['gaji_pokok'] : 
+$dataGajiPokok; 
+// Menghitung Total uang 
+transport  
+$my5Sql = "SELECT COUNT(*) 
+tot_transport FROM absensi  
+   WHERE 
+kd_karyawan='$dataKaryawan' AND 
+status_kehadiran='1'  
+      AND 
+LEFT(tanggal,4)='$dataTahun' 
+AND 
+MID(tanggal,6,2)='$dataBulan'";  
+$my5Qry = mysql_query($my5Sql, 
+$koneksidb)  or die ("Query 2 
+salah : ".mysql_error());  
+$my5Data= 
+mysql_fetch_array($my5Qry);   
+$totaltransport = 
+$my5Data['tot_transport'] * 
+$myData['uang_transport'];  
+ 
+$dataTunjTransport  = 
+isset($_POST['txtTunjTransport'
+]) ? $_POST['txtTunjTransport'] 
+: '0'; 
+$dataTunjTransport  = 
+isset($my5Data['tot_transport']
+) ? $totaltransport : 
+$dataTunjTransport;  
+// Menghitung Total uang makan  
+$my4Sql = "SELECT COUNT(*) 
+tot_makan FROM absensi  
+
+140 
+ 
+    WHERE 
+kd_karyawan='$dataKaryawan' AND 
+status_kehadiran='1'  
+      AND 
+LEFT(tanggal,4)='$dataTahun'  
+AND 
+MID(tanggal,6,2)='$dataBulan'";  
+$my4Qry = mysql_query($my4Sql, 
+$koneksidb)  or die ("Query 2 
+salah : ".mysql_error());  
+$my4Data= 
+mysql_fetch_array($my4Qry);   
+$totalmakan = 
+$my4Data['tot_makan'] * 
+$myData['uang_makan'];  
+$dataTunjMakan  = 
+isset($_POST['txtTunjMakan']) ? 
+$_POST['txtTunjMakan'] : '0';  
+$dataTunjMakan  = 
+isset($my4Data['tot_makan']) ? 
+$totalmakan : $dataTunjMakan;  
+ 
+// Menghitung Total Lembur  
+$my2Sql = "SELECT 
+SUM(total_upah) AS tot_lembur 
+FROM lembur  
+   WHERE 
+kd_karyawan='$dataKaryawan'  
+      AND 
+LEFT(tanggal,4)='$dataTahun' 
+AND 
+MID(tanggal,6,2)='$dataBulan'";  
+$my2Qry = mysql_query($my2Sql, 
+$koneksidb)  or die ("Query 2 
+salah : ".mysql_error());  
+$my2Data= 
+mysql_fetch_array($my2Qry);   
+$totalLembur = 
+$my2Data['tot_lembur'];  
+ 
+$dataTotalLembur = 
+isset($_POST['txtTotalLembur']) 
+? $_POST['txtTotalLembur'] : 
+'0'; 
+$dataTotalLembur = 
+isset($my2Data['tot_lembur']) ? 
+$totalLembur : 
+$dataTotalLembur; 
+// total Bonus 
+$dataTotalBonus  = 
+isset($_POST['txtTotalBonus']) 
+? $_POST['txtTotalBonus'] : 
+'0'; // Menghitung Total Pinjaman  
+$my3Sql = "SELECT 
+SUM(besar_pinjaman) AS 
+tot_pinjaman FROM pinjaman  
+   WHERE 
+kd_karyawan='$dataKaryawan' AND 
+status_lunas='Hutang'  
+         AND 
+LEFT(tanggal,4)='$dataTahun' 
+AND 
+MID(tanggal,6,2)='$dataBulan'";  
+$my3Qry = mysql_query($my3Sql, 
+$koneksidb)  or die ("Query 3 
+salah : ".mysql_error());  
+$my3Data= 
+mysql_fetch_array($my3Qry);   
+$totalPinjaman = 
+$my3Data['tot_pinjaman'];  
+ 
+$dataTotalPinjaman  = 
+isset($_POST['txtTotalPinjaman'
+]) ? $_POST['txtTotalPinjaman'] 
+: '0'; 
+$dataTotalPinjaman  = 
+isset($my3Data['tot_pinjaman']) 
+? $totalPinjaman : 
+$dataTotalPinjaman;  
+//menghitung PPh21 sebulan  
+$my7Sql = "SELECT pph21_sebulan 
+FROM pph21  
+    WHERE 
+kd_karyawan='$dataKaryawan'  
+      AND 
+periode_pph21='$dataBulan -
+$dataTahun'";  
+$my7Qry = mysql_query($my7Sql, 
+$koneksidb)  or die ("Query 1 
+salah : ".mysql_error());  
+$my7Data= 
+mysql_fetch_array($my7Qry);  
+$dataPPh21Sebulan = 
+isset($_POST['txtPPh21Sebulan']
+) ? $_POST['txtPPh21Sebulan'] : 
+'0'; 
+$dataPPh21Sebulan = 
+isset($my7Data['pph21_sebulan']
+) ? $my7Data['pph21_sebulan'] : 
+$dataPPh21Sebulan;  
+// total total gaji  
+$totalGaji = ($dataGajiPokok + 
+$dataTunjTransport + 
+$dataTunjMakan + 
+$dataTotalLembur + 
+
+141 
+ 
+ $dataTotalBonus) - 
+($dataTotalPinjaman + 
+$dataPPh21Sebulan);  
+$dataTotalGaji = 
+isset($_POST['txtTotalGaji']) ? 
+$_POST['txtTotalGaji'] : '0';  
+$dataTotalGaji = 
+isset($totalGaji) ? $totalGaji 
+: $dataTotalGaji; 
+?> 
+<SCRIPT language="JavaScript">  
+function submitform() {  
+ document.form1.submit();  
+} 
+</SCRIPT>  
+<form action="<?php  
+$_SERVER['PHP_SELF']; ?>" 
+method="post" name="form1" 
+target="_self"> 
+  <table width="100%" 
+class="table- list" border="0" 
+cellspacing="1" 
+cellpadding="4"> 
+    <tr> 
+      <th 
+colspan="3"><b>TRANSAKSI 
+PENGGAJIAN BARU</b></th>  
+    </tr> 
+    <tr> 
+      <td><strong>No. 
+Penggajian </strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="textfield" type="text" 
+value="<?php echo $dataKode; 
+?>" size="10" maxlength="10" 
+readonly="readonly"/></td>  
+    </tr> 
+    <tr> 
+      <td><strong>Periode Bulan 
+</strong></td> 
+      
+<td><strong>:</strong></td>  
+      <td><select 
+name="cmbBulan"> 
+          <?php 
+ $namaBulan = array("01" => 
+"Januari", "02" => "Februari", 
+"03" => "Maret", 
+      
+"04" => "April", "05" => "Mei", 
+"06" => "Juni", "07" => "Juli",        
+"08" => "Agustus", "09" => 
+"September", "10" => "Oktober",  
+      
+"11" => "November", "12" => 
+"Desember");  
+ 
+   foreach($namaBulan as 
+$bulanKe => $bulanNM) {  
+    if ($bulanKe == 
+$dataBulan) {  
+   $cek = " 
+selected";  
+  } else { $cek=""; }  
+    echo "<option 
+value='$bulanKe' $cek>$bulanKe 
+- $bulanNM</option>";  
+   } 
+   ?> 
+        </select> 
+          <select 
+name="cmbTahun">  
+            <?php 
+  $tahunKemaren = 
+date('Y') - 1; 
+   for($thn= $tahunKemaren; 
+$thn <= date('Y'); $thn++) {  
+    if ($thn == 
+$dataTahun) {  
+   $cek = " 
+selected";  
+  } else { $cek=""; }  
+    echo "<option 
+value='$thn' 
+$cek>$thn</option>";  
+   } 
+   ?> 
+        </select></td>  
+    </tr> 
+    <tr> 
+      <td><strong>Karyawan 
+</strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><select 
+name="cmbKaryawan"  
+onchange="javascript:submitform
+();"> 
+        <option 
+value="BLANK">....</option>  
+        <?php 
+   $dataSql = "SELECT * 
+FROM karyawan ORDER BY nik";  
+
+142 
+ 
+    $dataQry = 
+mysql_query($dataSql, 
+$koneksidb) or die ("Gagal 
+Query".mysql_error());  
+   while ($dataRow = 
+mysql_fetch_array($dataQry)) {  
+    if ($dataKaryawan == 
+$dataRow['kd_karyawan']) {  
+   $cek = " 
+selected"; 
+  } else { $cek=""; }  
+    echo "<option 
+value='$dataRow[kd_karyawan]' 
+$cek>[ $dataRow[nik] ] 
+$dataRow[nm_karyawan]</option>"
+; 
+   } 
+   $sqlData ="";  
+   ?> 
+      </select> 
+      <input type="submit" 
+name="Submit" value=" Hitung " 
+/></td> 
+    </tr> 
+    <tr> 
+      <td><strong>Gaji Pokok  
+(Rp)</strong></td> 
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="txtGajiPokok" type="text" 
+value="<?php echo 
+$dataGajiPokok; ?>" size="30" 
+maxlength="12" /></td>  
+    </tr> 
+    <tr> 
+      <td><strong>Tunjangan 
+Transport (Rp)</strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="txtTunjTransport" 
+type="text" value="<?php echo 
+$dataTunjTransport; ?>" 
+size="30" maxlength="12" 
+/></td> 
+    </tr> 
+    <tr> 
+      <td><strong>Tunjangan 
+Makan  (Rp)</strong></td>  
+      
+<td><strong>:</strong></td>        <td><input 
+name="txtTunjMakan" type="text" 
+value="<?php echo 
+$dataTunjMakan; ?>" size="30" 
+maxlength="12" /></td>  
+    </tr> 
+    <tr> 
+      <td><strong>Total Lembur  
+(Rp)</strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="txtTotalLembur" 
+type="text"  value="<?php echo 
+$dataTotalLembur; ?>" size="30" 
+maxlength="12" /></td>  
+    </tr> 
+    <tr> 
+      <td><strong>Total Bonus  
+(Rp)</strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="txtTotalBonus" 
+type="text"  value="<?php echo 
+$dataTotalBonus; ?>" size="30" 
+maxlength="12" /></td>  
+    </tr> 
+    <tr> 
+      <td><strong>Total 
+Pinjaman  (Rp)</strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="txtTotalPinjaman" 
+type="text"  value="<?php echo 
+$dataTotalPinjaman; ?>" 
+size="30" maxlength="12" 
+/></td> 
+    </tr> 
+ <tr> 
+      <td><strong>Total PPh21 
+Sebulan  (Rp)</strong></td>  
+      
+<td><strong>:</strong></td>  
+      <td><input 
+name="txtPPh21Sebulan" 
+type="text"  value="<?php echo 
+$dataPPh21Sebulan; ?>" 
+size="30" maxlength="12" 
+/></td> 
+    </tr> 
+ <tr> 
+
+143 
+ 
+       <td><strong>Total Gaji 
+bersih  (Rp)</strong></td>  
+      
+<td><strong>:</strong></td> 
+      <td><input 
+name="txtTotalGaji" type="text"  
+value="<?php echo 
+$dataTotalGaji; ?>" size="30" 
+maxlength="12" /></td>  
+    </tr> 
+    <tr> 
+      <td 
+width="181">&nbsp;</td>  
+      <td width="5">&nbsp;</td>  
+      <td width="1000">  
+      <input type="submit" 
+name="btnSimpan" value=" Simpan 
+" />      </td> 
+    </tr> 
+  </table> 
+</form> 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+144 
+ 
+ 
+  
+ 
+LAMPIRAN IV 
+Surat Penunjukan Dosen 
+
+145 
+ 
+ 
+   
+
+146 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+LAMPIRAN V 
+Surat Penelitian 
+ 
+ 
+
+147 
+ 
+ 
+  
+
+148 
+ 
+ 
+   
+
+149 
+ 
+ 
+  
+ 
+ 
+LAMPIRAN VI 
+Bentuk Form pada Sistem  
+yang sedang Berjalan  
+ 
+ 
+ 
+ 
+
+150 
+ 
+ 
+  
+
+151 
+ 
+ 
+  
+
+152 
+ 
+ 
+  
+
+153 
+ 
+ 
+  
+ 
+ 
+ 
+

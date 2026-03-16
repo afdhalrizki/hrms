@@ -1,0 +1,7 @@
+# Ignore all real environment files
+.env*
+# But don't ignore example files
+!.env*.example
+# Ignore real secrets
+secrets/*
+!secrets/.gitkeep

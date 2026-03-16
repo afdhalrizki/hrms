@@ -1,0 +1,2152 @@
+ 
+ 
+ 
+ 
+ 
+      
+ 
+ 
+ 
+ 
+RANCANG BANGUN APLIKASI ABSENSI DAN 
+PENGGAJIAN KARYAWAN PADA PT MENTARI SMART 
+GUNA SIDOARJO  BERBASIS DESKTOP  
+ 
+ 
+KERJA PRAKTIK 
+ 
+Program Studi 
+S1 Sistem Informasi 
+ 
+ 
+Oleh: 
+SARAH HASNA SHIBA 
+15410100 038 
+ 
+ 
+ 
+ 
+ 
+FAKULTAS TEKNOLOGI DAN INFORMATIKA  
+INSTITUT BISNIS DAN INFORMATIKA STIKOM SURABAYA 
+2018 
+
+ 
+ 
+ 
+  
+LAPORAN KERJA PRAKTIK 
+ 
+RANCANG BANGUN APLIKASI ABSENSI DAN PENGGAJIAN 
+KARYAWAN PADA PT MENTARI SMART GUNA SIDOARJO  
+BERBASIS DESKTOP  
+ 
+Diajukan sebagai salah satu syarat untuk menempuh ujian Tahap Akhir 
+Program Strata Satu (S1) 
+ 
+Disusun oleh : 
+Nama  : Sarah Hasna Shiba  
+NIM  : 15410100 038 
+Program : Strata Satu (S1) 
+Jurusan : Sistem Informasi 
+ 
+ 
+ 
+ 
+ 
+ 
+FAKULTAS TEKNOLOGI DAN INFORMATIKA 
+INSTITUT BISNIS DAN INFORMATIKA STIKOM SURABAYA 
+2018  
+  
+
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+“Tidak selamanya semua sesuai dengan yang kita harapkan. Kadang kerikil kecil 
+muncul tiba-tiba dan membuat kita tersandung dan terjatuh. ” 
+  
+
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ “Karena sesungguhnya sesudah kesulitan itu ada kemudahan .– (Q.S Al -Insyirah: 
+5-6)” 
+ 
+ 
+  
+
+ 
+ 
+ 
+  
+
+ 
+ 
+ 
+  
+ 
+ 
+
+ 
+ 
+ 
+ 
+vii 
+ ABSTRAK 
+ 
+ PT Mentari Smart Guna adalah suatu perusahaan perseroan yang  beroperasi 
+sebagai badan usaha jasa pengamanan dan penyelamatan  di Sidoarjo . hingga saat 
+ini sudah mempekerjakan 90 orang karyawan tetap, memiliki 34 nasabah,  dan telah 
+memiliki 40 armada aktif.  Namun PT mentari smart Guna  masih memiliki  kendala 
+dalam pencatatan absensi dan perhitungan gaji karyawan.  Proses pencatatan  absensi 
+dan penggajian karyawan  yang masih manual  serta  proses pembuatan  laporan . 
+Selama ini,  proses pencatatan absensi dan penggajian karyawan  yang dilakukan 
+didalam PT Mentari Smart Guna  masih dilakukan secara manual yaitu dengan 
+melakukan absensi melalui microsoft word  dan perhitungan gaji masih 
+menggunakan Microsoft exce l dengan memasukkan data satu demi satu  sehingga 
+membuang banyak waktu dan berisiko mengalami kesalahan dalam pencatatan dan 
+perhitungan serta berisiko dalam kehilangan dokumen .  
+PT Mentari Smart Guna Sidoarjo  memerlukan suatu aplikasi yang dapat 
+mendukung operasional absensi dan penggajian  secara tepat waktu dan akurat. 
+Aplikasi ini diharapkan dapat mempermudah jalannya absensi dan perhitungan gaji 
+karyawan  agar lebih mudah dalam operasional serta lebih efektif dan efisien.  
+Rancang Bangun Aplikasi  absensi dan penggajian  karyawan dalam 
+pencatatan  absensi dan proses penggajian  serta mendata laporan . Sehingga 
+meningkatkan efektivitas dan efisiensi bagi PT Mentari Smart Guna . 
+ 
+Kata Kunci  absensi, penggajian, PT Mentari Smart Guna.    
+
+ 
+ 
+ 
+ 
+viii 
+ KATA PENGANTAR 
+ 
+Pujian dan rasa syukur saya panjatkan kepada Tuhan Yang Maha Esa, 
+karena atas rahmat dan karunia -Nya, saya dapat menyelesaikan kerja praktik ini  
+dengan berjalan lancar dan baik . Laporan ini adalah salah satu bagian dari 
+matakuliah  yang disebut k erja praktik . Kerja praktik  adalah salah satu  mata kuliah 
+wajib di dalam  Institut Bisnis dan Informatika Stikom Surabaya yang bertujuan agar 
+mahasiswa  Institut Bisnis dan Informatika Stikom Surabaya  dapat menerapkan 
+ilmu-ilmu yang telah dipelajari di dunia perkuliahan selama kurang lebih 5 (lima) 
+semester ini  kedalam dunia kerja . Selain itu kerja praktik adalah  salah satu mata 
+kuliah prasyarat agar  bisa menempuh mata kuliah   tugas akhir.  Laporan ini dibuat 
+berdasarkan kegiatan kerja praktik yang telah saya laksanakan selama 1 (satu) bulan 
+di PT Mentari Smart Guna Sid oarjo .  
+ Saya juga berterimakasih kepada banyak pihak yang membantu saya dalam 
+menyelesaikan laporan ini. Karna l aporan ini juga dapat terselesaikan, berkat 
+bantuan berupa kritik, saran, hiburan dan motivasi  yang diberikan kepada saya . 
+Untuk itu saya mengucapkan terima kasih kepada :  
+1. Bapak Prof. Dr. Budi Jatmiko, M.Pd. selaku Rektor Institut Bisnis dan 
+Informatika Stikom Surabaya. 
+2. Bapak Dr. Anjik Sukmaaji, S.Kom., M.Eng.  Kepala Program Studi S1 Sistem 
+Informasi.    
+3. Ibu Sri Hariani Eko Wu landari, S.Kom., M.MT. , selaku dosen pembimbing .  
+
+ 
+ 
+ 
+ 
+ix 
+ 4. Bapak R. Brahmantyo Rezky, S. Psi.  dan Ibu Iva Erladiana, SE , selaku 
+Pembimbing yang telah membimbing Penulis dalam pelaksanaan Kerja 
+Praktek di PT Mentari Smart Guna Sidoarjo . 
+5. Segenap Karyawan dan Staf PT Mentari Smart Guna Sidoarjo  yang telah 
+membantu penyusunan laporan.  
+ Semoga Tuhan Yang Maha Esa memberikan yang terbaik kepada semua 
+pihak atas segala bantuan yang telah mereka berikan. Saya menyadari bahwa 
+laporan ini masih banyak kekurangan, sehingga kritik dan saran sangatlah 
+diharapkan. Semoga laporan ini dapat bermanfaat bagi para pembaca. 
+ 
+Surabaya,  Juli 2018 
+ 
+Penulis 
+  
+
+ 
+ 
+ 
+ 
+x 
+ DAFTAR ISI 
+ 
+                                                                                                                     Halaman  
+ABSTRAK  ................................ ................................ ................................ ............  vii 
+KATA PENGANTAR ................................................................ ......................... viii  
+DAFTAR ISI  ................................ ................................ ................................ ...........  x 
+DAFTAR TABEL  ................................ ................................ ................................  xiii 
+DAFTAR GAMBAR  ................................ ................................ ...........................  xiv 
+DAFTAR LAMPIRAN  ................................ ................................ .......................  xvii  
+BAB I  PEND AHULUAN  ................................ ................................ .......................  1 
+1.1 Latar Belakang Masalah  ................................ ................................ ...........  1 
+1.2 Rumusan Masalah  ................................ ................................ ....................  2 
+1.3 Batasan Masalah  ................................ ................................ .......................  3 
+1.4 Tujuan  ................................ ................................ ................................ ....... 3 
+1.5 Manfaat  ................................ ................................ ................................ ..... 3 
+1.6 Sistematika Penulisan  ................................ ................................ ...............  4 
+BAB II  GAMBARAN UMUM INSTANSI  ................................ ..........................  5 
+2.1 Sejarah  PT Mentari Smart Guna Sidoarjo  ................................ ................  5 
+2.2 Logo Perusahaan  ................................ ................................ ......................  6 
+2.3 Visi d an Misi  ................................ ................................ ............................  7 
+2.3.1  Visi:  ................................ ................................ ................................ ... 7 
+2.3.2  Misi:  ................................ ................................ ................................ .. 7 
+2.4 Struktur Organ isasi ................................ ................................ ...................  7 
+2.5 Deskripsi Tugas  ................................ ................................ ........................  8 
+BAB III  LANDASAN TEORI  ................................ ................................ ..............  12 
+3.1 Pencatatan Absensi  ................................ ................................ .................  12 
+
+ 
+ 
+ 
+ 
+xi 
+ 3.1.1  Absensi Catatan Tangan  ................................ ................................ .. 13 
+3.1.2  Absensi Almano (Sistem Ceklok)  ................................ ...................  13 
+3.1.3  Absensi Sidik Jari (Finger Scan)  ................................ .....................  13 
+3.1.4  Absensi Telapak Tangan  ................................ ................................ . 14 
+3.2 Perhitungan Gaji  ................................ ................................ .....................  14 
+3.2.1  Gaji pokok  ................................ ................................ .......................  14 
+3.2.2  Tunjangan  ................................ ................................ ........................  14 
+3.2.3  Potongan  ................................ ................................ ..........................  15 
+3.2.4  Uang Lembur  ................................ ................................ ..................  15 
+3.3 Aplikasi Berbasis Desktop  ................................ ................................ ..... 15 
+3.4 System Flow  ................................ ................................ ............................  16 
+3.5 Data Flow Diagram  ................................ ................................ ...............  17 
+3.6 System Development Life Cycle  (SDLC)  ................................ ................  19 
+BAB IV D ESKRIPSI PEKERJAAN  ................................ ................................ .... 21 
+4.1 Analisis Sistem  ................................ ................................ .......................  21 
+4.1.1  Communication  ................................ ................................ ...............  21 
+4.1.2  Analisis Kebutuhan Pengguna  ................................ ........................  21 
+4.1.3  Analisis Kebutuhan Fungsional  ................................ ......................  23 
+4.1.4  Analisis Kelayakan Teknik  ................................ .............................  24 
+4.2 Perancangan Sistem  ................................ ................................ ................  26 
+4.2.1  Document Flow  ................................ ................................ ...............  26 
+4.2.2  System Flow chart  ................................ ................................ ............  28 
+4.2.3  Diagram Berjenjang  ................................ ................................ ........  34 
+4.2.4  Context Diagram  ................................ ................................ .............  36 
+4.2.5  Data Flow Diagram ( DFD)  Level 0  ................................ ...............  37 
+4.2.6  Conceptual Data Model ................................ ................................ ... 41 
+
+ 
+ 
+ 
+ 
+xii 
+ 4.2.7  Physical Data Model  ................................ ................................ ....... 42 
+4.2.8  Struktur Tabel ................................ ................................ ..................  43 
+4.2.9  Desain I/O  ................................ ................................ .......................  48 
+4.3 Implementasi  ................................ ................................ ..........................  57 
+4.3.1  Implementasi Aplikasi Absensi Dan Penggajian Karyawan  ...........  57 
+4.4 Testing Sistem  ................................ ................................ ........................  72 
+4.4.1  Uji  Coba Form Login Aplikasi Absensi dan Penggajian 
+Karyawan....  ................................ ................................ ................................ .. 72 
+4.4.2  Uji Coba Form Tambah Data Absensi Karyawan ...........................  73 
+4.4.3  Uji Coba Edit Data Absensi Karyawan  ................................ ...........  73 
+4.4.4  Uji  Coba Form Tambah Permohonan Karyawan  ...........................  74 
+4.4.5  Uji  Coba Form Tambah Golongan Karyawan  ...............................  74 
+4.4.6  Uji Coba Form Tambah Jabatan Karyawan  ................................ .... 75 
+4.4.7  Uji Coba Form Tambah Potongan Gaji Karyawan  .........................  76 
+4.4.8  Uji Coba Form Tambah Pegawai  ................................ ....................  76 
+BAB V PENUTUP  ................................ ................................ ................................  78 
+5.1 Kesimpulan  ................................ ................................ .............................  78 
+5.2 Saran  ................................ ................................ ................................ ....... 78 
+DAFTAR PUSTAKA  ................................ ................................ ...........................  79 
+LAMPIRAN  ................................ ................................ ................................ ..........  80 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+xiii 
+ DAFTAR TABEL 
+                  
+Tabel 2.1  Deskripsi Tugas Struktur Organisasi  ................................ ......................  8 
+Tabel 4.1 Final Elisitasi  Aplikasi Absensi  ................................ ............................  22 
+Tabel 4.2  Final Elisitasi  Aplikasi Penggajian  ................................ .......................  22 
+Tabel 4.3 Daftar Kebutuhan Perangkat Keras................................ ....................... 24  
+Tabel 4.4 Daftar Kebutuhan Perangkat Lunak ................................ ...................... 26  
+Tabel 4.5 Tabel User pada Aplikasi Absensi Karyawan ................................ ....... 43 
+Tabel 4.6 Tabel Karyawan pada Aplikasi Absensi Karyawan  ..............................  44 
+Tabel 4.7  Tabel Absensi  Karyawan  ................................ ................................ ...... 44 
+Tabel 4.8  Tabel User pada Aplikasi Penggajian Karyawan  ................................ .. 45 
+Tabel 4.9  Tabel Karyawan pada Aplikasi Penggajian Karyawan  .........................  45 
+Tabel 4.10  Tabel Jabatan pada Aplikasi Penggajian Karyawan  ...........................  46 
+Tabel 4.11  Tabel Golongan pada Aplikasi Penggajian Karyawan  .......................  47 
+Tabel 4.12  Tabel Potongan pada Aplik asi Penggajian Karyawan  ........................  47 
+Tabel 4.13  Tabel Slip Gaji pada Aplikasi Penggajian Karyawan  .........................  48 
+Tabel 4.14  Uji  Coba Form Login Aplikasi Absensi dan Penggajian Karyawan  . 72 
+Tabel 4.15  Uji Coba Form Tambah Data Absensi Karyawan  ..............................  73 
+Tabel 4.16  Uji Coba Edit Dat a Absensi Karyawan ................................ ...............  73 
+Tabel 4.17  Uji  Coba Form Tambah Golongan Karyawan  ................................ ... 75 
+Tabel 4.18  Uji Coba Form Tambah Jabatan Karyawan  ................................ ........  75 
+Tabel 4.19  Uji Coba Form Tambah Potongan Gaji Karyawan  .............................  76 
+Tabel 4.20  Uji Coba Form Tambah Pegawai  ................................ ........................  76 
+ 
+
+ 
+ 
+ 
+ 
+xiv 
+ DAFTAR GAMBAR  
+                                                                                                                     Halaman 
+Gambar 2.1 Logo PT Mentari Smart Guna  ................................ .............................  6 
+Gambar 2.2 Struktur Organisasi PT Mentari Smart Guna Sidoarjo ........................  7 
+Gambar 3.1  Simbol-simbol pada system flow ................................ ...................... 16  
+Gambar 4.1 Document Flowchart Absensi Karyawan  ................................ ..........  27 
+Gambar 4.2  Document Flowchart Perhitungan Gaji Karyawan  ...........................  28 
+Gambar 4.3  System Flowchart Fungsi Data Master  Absensi Karyawan  ..............  29 
+Gambar 4.4 Fungsi Pengolahan Data Absensi Karyawan  ................................ .... 30 
+Gambar 4.5 Fungsi Pembuatan Laporan Absensi Karyawan ................................  31 
+Gambar 4.6 Fungsi Pembuatan Laporan ............................................................... 32  
+Gambar 4.7  Fungsi Perhitungan Gaji Karyawan  ................................ ..................  33 
+Gambar 4.8  Fungsi Pembuatan Laporan Penggajian Karyawan  ...........................  34 
+Gambar 4.9  Diagram Berjenjang Absensi Karyawan  ................................ ...........  35 
+Gambar 4.10  Diagram Berjenjang Penggajian Karyawan  ................................ .... 35 
+Gambar 4.11  Context Diagram Aplikasi Absensi Karyawan  ...............................  36 
+Gambar 4.12 Context Diagram Aplikasi Penggajian Karyawan  ..........................  37 
+Gambar 4.13  DFD Level 0 Aplikasi Absensi Kar yawan  ................................ ...... 37 
+Gambar 4.14  DFD Level 0 Aplikasi Penggajian Karyawan  ................................ . 38 
+Gambar 4.15  DFD level 1 Fungsi data master aplikasi absensi karyawan  ...........  38 
+Gambar 4.16  DFD level 1 Fungsi data master aplikasi penggajian karyawan  ..... 39 
+Gambar 4.17  DFD level 1 fungsi pembuatan laporan aplikasi absensi karyawan  40 
+Gambar 4.18  DFD level 1 fungsi pembuatan laporan aplikasi penggajian 
+karyawan  ................................ ................................ ................................ ...............  40 
+
+ 
+ 
+ 
+ 
+xv 
+ Gambar 4.19 Conceptual  Data Model Aplikasi Absensi Karyawan  ....................  41 
+Gambar 4.20  Conceptual  Data Model Aplikasi Penggajian Karyawan  ...............  41 
+Gambar 4.21 Physical Data Model Aplikasi Absensi Karyawan  .........................  42 
+Gambar 4.22  Physical Data Model Aplikasi Penggajian Karyawan .....................  43 
+Gambar 4.23  Desain Form Halaman Login Aplikasi Absensi Karyawan  ............  49 
+Gambar 4.24  Desain Form Halaman Absensi Karyawan  ................................ ..... 50 
+Gambar 4.25  Desain Form Halaman Edit Aplikasi Absensi Karyawan  ...............  50 
+Gambar 4.26  Desain Form Halaman Laporan Aplikasi Absensi Karyawan  ........  51 
+Gambar 4.27  Desain Output Laporan Aplikasi Absensi Karyawan  .....................  52 
+Gambar 4.28  Desain Halaman Login Aplikasi Penggajian Karyawan  .................  53 
+Gambar 4.29  Desain Halaman Form Jabatan  ................................ ........................  53 
+Gambar 4.30  Desain Halaman Form Golongan  ................................ ....................  54 
+Gambar 4.31  Desain Halaman Form Potongan ................................ .....................  55 
+Gambar 4.32  Desain Halaman Form Karyawan  ................................ ...................  55 
+Gambar 4.33  Desain Halaman Form Slip Gaji  ................................ .....................  56 
+Gambar 4.34  Desain Output Laporan Aplikasi Penggajian Karyawan .................  56 
+Gambar 4. 35  Halaman Login Aplikasi Absensi dan Penggajian Karyawan  ....... 57 
+Gambar 4.36  Halaman Menu  Utama Aplikasi Absensi dan Penggajian Karyawan
+ ................................ ................................ ................................ ...............................  58 
+Gambar 4.37  Halaman Gagal Masuk Menu Utama  ................................ ..............  58 
+Gambar 4.38  Menu Strip Master Pada Aplikasi Absensi dan Penggajian 
+Karyawan  ................................ ................................ ................................ ..............  59 
+Gambar 4. 39  Halaman Form Data Master Golongan  ................................ ..........  59 
+Gambar 4.40  Halaman Input  Data Master  Golongan  ................................ ...........  60 
+
+ 
+ 
+ 
+ 
+xvi 
+ Gambar 4.41  Halaman Input Data Master Tidak Lengkap  ................................ ... 60 
+Gambar 4. 42  Halaman Data Master  Jabatan ................................ ........................  61 
+Gambar 4.43  Tambah Data Master  Jabatan  ................................ ..........................  62 
+Gambar 4.44  Halaman Form Potongan  ................................ ................................ . 62 
+Gambar 4.45  Tambah Data Master  Potongan  ................................ .......................  63 
+Gambar 4.46  Tambah Data Master  Pegawai  ................................ ........................  64 
+Gambar 4.47  Pilih Transaksi Penggajian  ................................ ..............................  64 
+Gambar 4.48  Total Perhitungan Gaji  ................................ ................................ .... 65 
+Gambar 4.49  Pilih Transaksi Absensi Karyawan  ................................ .................  65 
+Gambar 4.50  Mengelola Absensi Karyawan  ................................ ........................  66 
+Gambar 4.51  Form Permohonan Karyawan ................................ ..........................  67 
+Gambar 4.52  Menu Strip Laporan Pada Aplikasi Penggajian Karyawan  .............  67 
+Gambar 4.53  Halaman Cetak Laporan Master  Pada Aplikasi Penggajian 
+Karyawan  ................................ ................................ ................................ ..............  68 
+Gambar 4. 54  Halaman Cetak Laporan Absensi Karyawan  ................................ . 68 
+Gambar 4.55  Tampilan Laporan Master  Golongan  ................................ ..............  69 
+Gambar 4.56  Tampilan Laporan Master Jabatan  ................................ ..................  70 
+Gambar 4.57  Tampilan Laporan Master  Potongan  ................................ ...............  70 
+Gambar 4.58  Tampilan Laporan Master Pegawai ................................ .................  71 
+Gambar 4.59  Tampilam Laporan Slip Gaji Karyawan  ................................ .........  71 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+xvii 
+ DAFTAR LAMPIRAN 
+Lampiran 1 . Surat Balasan Instansi  ................................ ................................ ....... 80 
+Lampiran 2 . Form KP 5 – Acuan Kerja  ................................ ................................  81 
+Lampiran 3 . Form KP 5 – Garis Besar Rencana Kerja Mingguan ........................  82 
+Lampiran 4 . Form KP – 6 Log Harian dan Catatan Perubahan Acu an Kerja ....... 83 
+Lampiran 5 . Form KP – 7 Kehadiran Kerja Praktik  ................................ .............  85 
+Lampiran 6 . Kartu Bimbingan Kerja Praktik  ................................ ........................  87 
+Lampiran 7. Biodata Penulis……………………………………………………..88  
+ 
+
+ 
+ 
+1 
+ BAB I   
+PENDAHULUAN 
+ 
+1.1 Latar Belakang Masalah 
+PT Mentari Smart Guna berdiri pada tahun 2008, pada awal usaha hanya 
+bergerak pada bidang usaha penyedia personil sekuriti. Hingga pada tahun 2010 
+ditambah dengan dorongan nasabah-nasabahnya, terbentuklah usaha cash pickup  
+management  dan telah berjalan sampai dengan saat ini. Saat ini PT Mentari Smart 
+Guna telah berdiri selama 10 tahun. Dengan 35 nasabah yang akan bertambah 
+dengan terus jumlahnya. Perusahaan ini memiliki jumlah karyawan sebanyak 90 
+orang karyawan dan telah memiliki 40 armada aktif. PT Mentari Smart Guna  
+merupakan sebuah perseroan terbatas  yang melayani kebutuhan masyarakat dalam 
+bidang jasa pengamanan dan penyelamatan sesuai dengan kebutuhan nasabah dan 
+tentunya dikantongi izin operasi yang diberikan oleh Markas Besar Kepolisian 
+Republik Ind onesia, yaitu j asa kawal angkut Uang dan Barang berharga  dan j asa 
+penyediaan dan pengelolaan tenaga keamanan.  
+Proses bisnis PT Mentari Smart Guna adalah Cash In Transit (CIT)  – 
+Regular Service dimana layanan pengambilan uang tunai dan barang berharga dari 
+satu tempat ke tempat yang lain secara terjadwal dengan frekuensi tinggi. PT 
+Mentari Smart Guna sebagian besar proses bisnisnya masih menggunakan proses 
+secara manual dan han ya menggunakan Microsoft Word  dan Microsoft Excel  untuk 
+pembuatan laporan . Salah satunya ialah proses absensi karyawan dan perhitungan 
+gaji bagi karyawan . Dengan proses absensi dan perhitungan gaji karyawan  yang 
+dilakukan secara manual menyebabkan kurang e fisien dalam segi waktu , tidak ada 
+
+2 
+ 
+ 
+ Salinan dokumen yang telah dibuat sehingga dokumen sering hilang, dan sering 
+kali terjadi kesalahan dalam perhitungan gaji. Sehingga dampak yang akan terjadi 
+ialah banyaknya complain  dari karyawan karena tidak valid nya data yang mereka 
+terima. 
+Dengan adanya  permasalahan  pada  proses absensi karyawan dan 
+perhitungan gaji di PT Mentari Smart Guna ,  maka untuk menangani permasalahan 
+tersebut dengan cara membuat  aplikasi  desktop  absensi untuk karyawan dan 
+perhitunga n gaji yang dapat di gunakan untuk memantau kedisiplinan waktu kerja 
+dan perhitungan gaji karyawan yang sesuai dengan jumlah jam kerja dan jumlah 
+gaji sesuai dengan jabatan setiap karyawan . Pemilihan sistem desktop di karenakan 
+sistem ini dapat membantu kinerja karyawa n pada perusahaan PT Mentari Smart 
+Guna Sidoarjo.  Sehingga dengan adanya sistem desktop  absensi dan perhitungan 
+gaji diharapkan  kedisiplinan waktu dalam bekerja dan  tidak terjadi kesalahan dalam 
+perhitungan gaji. 
+Berdasarkan uraian di atas maka dirancang aplikasi absensi dan penggajian  
+pada  PT Mentari Smart Guna Sidoarjo  berbasis desktop. Dengan adanya solusi ini, 
+proses absensi karyawan dan perhitungan penggajian  pada PT Mentari Smart Guna 
+Sidoarjo  dapat lebih efektif dan efisien serta laporan yang diberik an  dapat lebih 
+akurat. 
+1.2 Rumusan Masalah  
+Berdasarkan analisis mengenai permasalahan pada PT Mentari Smart Guna, 
+maka perlu adanya solusi untuk menangani absensi dan perhitungan gaji 
+karyawan  yang dapat mempermudah karyawan dan menghemat waktu . Maka 
+
+3 
+ 
+ 
+ dibuatkan aplikasi absensi karyawan dan perhitungan gaji karyawan berbasis 
+desktop . 
+1.3 Batasan Masalah 
+Batasan masalah aplikasi absensi dan perhitungan gaji  pada PT Mentari 
+Smart Guna  meliputi:  
+a. Aplikasi yang dibuat adalah aplikasi yang hanya menyangkut pengolahan 
+data absensi dan perhitungan gaji di PT Mentari Smart Guna. 
+b. Aplikasi yang dikembangkan dibangun dengan menggunakan Visual Basic 
+dan menggunakan software database SQL server . 
+c. Aplikasi ini hanya digunakan di lingkungan PT Mentari Smart Guna saja 
+dan merupakan desktop aplikasi bukan web aplikasi. 
+1.4 Tujuan  
+Berdasarkan latar belakang dan rumusan masalah di atas, maka tujuan dari 
+penelitian permasalahan yang ada pada PT Mentaeri Smart Guna Sidoarjo adalah 
+untuk merancang bangun sistem absensi dan perhitungan  gaji berbasis desktop . 
+1.5 Manfaat 
+Manfaat yang diharapkan dari pembuatan aplikasi ini adalah : 
+1. Memudahkan proses absensi yang semula masih dilakukan secara manual. 
+2. Menetralisir adanya kesalahan perhitungan gaji be rdasarkan jumlah hari 
+kerja.  
+3. Menghemat waktu dalam pembuatan laporan tiap bulannya.  
+
+4 
+ 
+ 
+ 1.6 Sistematika Penulisan 
+Untuk memudahkan dalam memahami persoalan dan pembahasannya 
+maka penulisan Laporan Kerja Praktik ini dibuat dengan sistematika sebagai 
+berikut: 
+BAB I: PENDAHULUAN 
+Bab ini membahas mengenai latar belakang masalah, inti permasalahan 
+yang disebutkan dalam rumusan masalah, tujuan dari Kerja Praktik dalam tujuan 
+penelitian, batasan masalah dari Kerja Praktik, serta manfaat yang diharapkan dapat 
+diambil dari pengerjaan Kerja Praktik ini. 
+BAB II: GAMBARAN UMUM INSTANSI 
+Bab ini membahas mengenai gambaran umum organisasi, visi dan misi 
+instansi, struktur organisasi, serta deskripsi tugas dari masing-masing bagian yang 
+bersangkutan. 
+BAB III: LANDASAN TEORI 
+Bab ini membahas mengenai berbagai macam teori yang berhubungan 
+dengan topik yang diangkat dalam permasalahan meliputi konsep dasar dari 
+informasi, aplikasi, struktur data, dan model pengembangan aplikasi. 
+BAB IV: DESKRIPSI PEKERJAAN 
+Bab ini membahas mengenai perancangan sistem yang dikerjakan pada saat 
+kerja praktik yang terdiri atas identifikasi dan analisis masalah,  identifikasi dan 
+analisis kebutuhan sistem, perancangan sistem, struktur tabel database , desain 
+interface aplikasi feedback perbaikan komputer pada Laboratorium Komputer Lt.6 
+Stikom Surabaya. 
+ 
+
+5 
+ 
+ 
+ BAB V: PENUTUP 
+Bab ini membahas tentang kesimpulan dari seluruh isi laporan dan saran 
+yang bisa diberikan terkait dengan pengembangan sistem di masa mendatang. 
+  
+
+ 
+ 
+5 
+ BAB II    
+GAMBARAN UMUM INSTANSI  
+ 
+2.1 Sejarah  PT Mentari Smart Guna Sidoarjo  
+PT Mentari Smart Guna terletak di Jl. Lingkar Timur, Perum Pesona Permata 
+Gading 1 Blok F -10 Sidoarjo . PT Mentari Smart Guna  berdiri pada tahun 2008, 
+pada awal usaha hanya bergerak pada bidang usaha penyedia personil sekuriti. 
+Hingga pada tahun 2010 ditambah dengan dorongan nasabah -nasabahnya, 
+terbentuklah usaha cash pickup  management dan telah berjalan sampai dengan saat 
+ini. Saat ini PT Mentari Smart Guna telah berdiri selama 10 tahun. Dengan puluhan 
+nasabah dan akan bertambah dengan keberadaannya. PT Mentari Smart Guna 
+hingga saat ini sudah mempekerjakan 90 orang karyawan tetap, memiliki 34 
+nasabah,  dan telah memil iki 40 armada aktif.  
+ PT Mentari Smart Guna memiliki jasa pengelolahan SDM yang biasa 
+disebut Outsourcing . Outsoucing  merupakan bentuk jasa pengelolahan SDM yang 
+juga memberikan solusi peningatan produktivitas yang tetatp berorientasi pada 
+efesiensi biaya. Jasa layanan outsourcing  PT Mentari Smart Guna meliputi proses 
+rekrutmen, assessment , monitoring , evaluasi, pengemba ngan karyawan, 
+perhitungan gaji karyawan, dan pengangkatan karyawan tetap PT Mentari Smart 
+Guna(MSG). Proses bisnis PT Mentari Smart Guna beroperasi sebagai badan 
+usaha jasa pengamanan dan penyelamatan sesuai kebutuhan nasabah  sesuai 
+dengan kebutuhan nasab ah dan tentunya dikantongi izin operasi yang diberikan 
+oleh Markas Besar Kepolisian Republik Indonesia, yaitu j asa kawal angkut Uang 
+dan Barang berharga  dan j asa penyediaan dan pengelolaan tenaga keamanan.  
+
+6 
+ 
+ 
+ Proses bisnis utamanya adalah Cash In Transit (CIT)  – Regular Service 
+dimana layanan pengambilan uang tunai dan barang berharga dari satu tempat ke 
+tempat yang lain secara terjadwal dengan frekuensi tinggi. PT Mentari Smart Guna 
+menyediakan jasa Interior Design dan General Contractor. PT Mentari Smart Gun a 
+melayani jasa lengkap design bangunan atau renovasi yang dikhususkan bagi 
+personel maupun korporat yang merencanakan proyek dan menginginkan 
+ketepatan waktu, design yang kreatif dengan hasil pekerjaan yang berkualitas 
+dengan harga yang bersaing. 
+2.2 Logo Perusahaan  
+Berikut ini logo dari PT Mentari Smart Guna Sidoarjo  pada Gambar 2.1  : 
+ 
+Gambar 2. 1 Logo PT Mentari Smart Guna  
+
+7 
+ 
+ 
+ 2.3 Visi dan Misi 
+2.3.1 Visi: 
+“Menjadikan PT Mentari Smart Guna sebagai perusahaan berintegritas 
+yang efektif, efisien, tangguh dan terpercaya. ” 
+2.3.2 Misi: 
+1. Memberdayakan Sumber Daya Manusia (SDM) menjadi manusia yang 
+mandiri dan tangguh dalam setiap keadaan. Serta memiliki keimanan da n 
+pemahaman agama yang kuat. 
+2. Selalu meningkatkan kualitas layanan dan memberikan harga terbaik yang 
+menjadikan konsumen nyaman dengan pelayanan yang kami sediakan. 
+2.4 Struktur Organisasi 
+PT Mentari Smart Guna Sidoarjo  terdapat beberapa bagian  pada struktur 
+organisasi  yang memiliki tanggung jawab masing masing kegiatan bisnis yang ada. 
+Semua bagian bertanggung jawab langsung kepada  Direktur Utama , dapat dilihat 
+pada Gambar 2.2.  
+ 
+Gambar 2.2  Struktur Organisasi PT Mentari Smart Guna Sidoarjo   
+
+8 
+ 
+ 
+ 2.5 Deskripsi Tugas 
+Berdasarkan struktur organisasi pada Gambar 2.2 dapat dideskripsikan tugas 
+yang dimiliki oleh tiap bagian yang bersangkutan sebagai berikut : 
+Tabel 2.1  Deskripsi Tugas Struktur Organisasi  
+Jabatan  Tanggung Jawab  
+Direktur  a. Menyusun rencana kerja bersama Manager 
+untuk memperlancar proses operasional.  
+b. Membicarakan masalah -masalah yang terjadi 
+agar dapat dicarikan solusi yang terbaik.  
+c. Membuat kesepakatan bersama tentang 
+pelaksanaan operasional sesuai dengan yang 
+dibutuhkan untuk mencapai target.  
+d. Mengkoordinasikan semua Departemen yang 
+terkait agar saling mensupport, sehingga dapat 
+memperlancar operasional di lapangan.  
+Memastikan komunikasi antar Divisi berjalan 
+lancar, sehingga tidak ada hambatan untuk 
+menjalankan  tugas sesuai dengan fungsi dan 
+tanggungjawab masing -masing divisi.  
+Marketing 
+Development  
+ a. Menerjemahkan target pemasaran yang telah 
+ditentukan oleh perusahaan ke dalam 
+penyusunan program kerja divisi marketing.  
+b. Menyusun rencana anggaran operasional 
+divis i marketiing.  
+
+9 
+ 
+ 
+ c. Melakukan pemetaan pasar untuk 
+memfokuskan program kerja divisi.  
+d. Melakukan kegiatan ekspansi pasar untuk 
+mendapatkan pelanggan baru.  
+Keuangan  a. Membuat laporan keuangan perusahaan, 
+meliputi:  
+- Laporan keuangan harian  
+- Laporan keuangan mingguan  
+- Laporan keuangan bulanan  
+- Laporan saldo akhir (rugi/laba)  
+b. Bertanggung jawab terhadap dokumen -
+dokumen yang berhubungan dengan laporan 
+keuangan.  
+c. Bertanggung jawab terhadap operasional 
+keuangan yang ada di kas perusahaan.  
+d. Menyiapkan berkas -berkas yang berhubun gan 
+dengan transaksi pihak luar (Tagihan, 
+membuat faktur, kwitansi pembayaran, tanda 
+terima penyetoran atau pengambilan uang dll)  
+e. Membuat laporan pajak  
+f. Memberikan analisa dan solusi segubungan 
+dengan optomalisasi dan pengembangan 
+sumber daya dari masing -masing bagian di 
+divisi keuangan setiap bulan.  
+
+10 
+ 
+ 
+ g. Mengadakan rapat bulanan untuk membahas 
+masalah yang terjadi didalam kegiatan sehari -
+hari dan mencari solusi terhadap 
+permasalahan tersebut.  
+h. Mengatur, mengawasi, menganalisa dan 
+mengevaluasi keuangan perusahaan sehingga 
+dapat menyusun action plan.  
+ 
+Operasional  
+ a. Membuat perencanaan program kerja 
+koordinator lapangan ditiap area.  
+b. Menyusun jadwal dan program 
+pengembangan team CIT dan WARKAT 
+secara efektif dan efesien.  
+c. Melakukan pengontrolan ke lapangan untuk 
+mengatasi masalah yang terjadi di masing -
+masing area.  
+d. Melakukan koordinasi dengan masing -masing 
+koordinator lapangan untuk melihat hasil kerja 
+team.  
+e. Memonitor kinerja koordinator lapangan 
+ditiap area team CIT dan WARKAT, apakah 
+sudah sesuai dengan jobdesk dan SOP yang 
+sudah ditentukan.  
+
+11 
+ 
+ 
+ f. Memonitor dan mengontrol biaya operasional 
+dan administrasi yang berhubungan dengan 
+team.  
+Personalia Umum  
+ a. Mengarsip surat -surat yang berhubungan 
+dengn data karyawan baik yang internal 
+maupun eksternal (Surat ijin karyawan, surat 
+peringatan, dll).  
+b. Meng -update data karyawan (kontrak 
+kerja,cuti,dll).  
+c. Membuat laporan absensi karyawan.  
+d. Membuat laporan gaji karyawan.  
+Corporate Secretary  a. Mengontrol penggunaan fasilitas kantor.  
+b. Mengontrol kebersihan dan keamanan kantor.  
+c. Mengidentif ikasi kebutuhan pelatihan 
+karyawan.  
+
+ 
+ 
+12 
+ BAB III   
+LANDASAN TEORI  
+ 
+Dalam membangun aplikasi ini, terdapat teori-teori ilmu terkait yang 
+digunakan untuk membantu penelitian serta menyelesaikan permasalahan yang ada 
+dan berkaitan dengan sistem yang akan dibuat. Tujuannya adalah agar aplikasi ini 
+memiliki pijakan pustaka yang dapat dipertanggungjawabkan. 
+3.1 Pencatatan Absensi 
+Absensi atau kartu jam hadir ialah dokumen yang mencatat jam hadir setiap 
+karyawan di perusahaan. Catatan jam hadir karyawan tersebut dapat berupa daftar 
+hadir biasa, dapat juga pula berbentuk kartu hadir yang diisi dengan mesin pencatat 
+waktu. Pekerjaan mencatat waktu pada dasarnya dapat dipisahkan menjadi 2(dua) 
+bagian yakni p encatatan waktu hadir (attendance time keeping ) dan juga pencatatan  
+waktu kerja ( shop time keeping ) (Setiawan, 2015) . 
+Pencatatan jam hadir pada hadir pada kartu jam hadir yang dilakukan oleh 
+pada setiap pegawai atau pekerja bisa mempengaruhi gaji bersih atau take home 
+pay yang akan diterima oleh si pegawai atau pekerja setiap bulannya. Karena jika 
+pegawai atau pekerja lupa ataupun tidak mencatatkan jam hadirnya pada kartu jam 
+hadir akan dapat mempengaruhi komponen -komponen ya ng ada pada gaji, terutama 
+sekali pada pos tunjangan, Dikarena tunjangan yang diberikan perusahaan pada 
+setiap pegawai atau pekerjatergantung dari beberapa banyak pegawai atau pekerja 
+hadir pada jam kerja. Seperti tunjangan makan dan juga transportasi,  apabila 
+pegawai atau pekerja tidak mencatatkan jam hadirnya pada kartu jam hadir maka 
+tunjangan makan dan hyga transpotasinya yang diterima pegawai atau pekerja 
+
+13 
+ 
+ 
+ setiap bulannya akan berkurang dan juga akan mempengaruhi gaji bersih yang 
+diterima pegawai atau p ekerja tersebut.  
+Pencatatan waktu hadir tersebut dimaksudkan untuk mengumpulkan data 
+mengenai jumlah jam hadir pegawai atau pekerja dalam suatu periode pembayaran 
+dan juga kadang -kadang juga tentang tarif upah untuk pekerjaan yang dilakukan. 
+Pencatatan wak tu kerja dimaksudkan untuk dapat mencatat jam kerja sesungguhnya 
+yang digunakan oleh pegawai atau pekerja dalam setiap pekerjaan ( job) atau 
+departemennya. Catatan waktu kerja tersebut dapat digunakan untuk mengecek 
+catatan waktu hadir serta juga mendapatka n data produksi yang diperlukan untuk 
+dapat distribusi upah serta gaji dan juga perhitungan intensif.  Pencatatan absensi 
+pegawai atau pekerja dapat dilakukan dengan beberapa cara, yakni :  
+3.1.1 Absensi Catatan Tangan 
+Absensi catatan tangan biasanya terdapat dipe rusahaan -perusahaan 
+kecil. Setiap karyawan tiba maupun pulang kantor.  
+3.1.2 Absensi Almano (Sistem Ceklok) 
+Absensi tersebut menggunakan masin almano atau mesin absensi 
+dengan sistem ceklok. Jadi karyawan atau pekerja yang ingin mengisi 
+kartu jam hadir harus memasukkan kartu jam hadir ke mesin almano, 
+dan secara otomatis kartu jam hadir akan mencetak jam hadir maupun 
+pulang karyawan sesuai dengan jam kantor.  
+3.1.3 Absensi Sidik Jari (Finger Scan)  
+Biasanya absensi sidik jari digunakan oleh perusahaan menengah ke 
+atas. Cara kerja pada sistem Finger Scan ini ialah dengan cara 
+
+14 
+ 
+ 
+ menempelkan salah satu jadri pada mesin setelah memasukkan nomor 
+identitas pekerja.  
+3.1.4 Absensi Telapak Tangan 
+Biasanya sistem ters ebut dignakan oleh perusahaan -perusahaan 
+berskala besar. Cara kerja pada sistem tersebut mirip dengan cara kerja 
+finger scan, yakni dengan cara menempelkan telapak tangan atau lima 
+jari pada mesin setelah memasukkan nomor identitas karyawan atau 
+pekerja . 
+3.2 Perhitungan Gaji 
+Setiap karyawan berhak atas upah atau gaji setiap bulannya. Menurut Pasal 1 
+ayat 30 UU Nomor 13 Tahun 2003, upah atau gaji dinyatakan dalam bentuk uang 
+sebagai imbalan dari pengusaha kepada karyawan yang ditetapkan dan dibayarka 
+sesuai perj anjian kerja, kesepakatan, atau peraturan perundang-undangan. Dalam 
+upah atau gaji ada beberapa komponen yang harus ada dalam penyusunan gaji. 
+Perhitungan gaji dibagi menjadi 4, yaitu: (Rahmani, 2017) 
+3.2.1 Gaji pokok 
+Gaji pokok merupakan gaji dasar yang ditentukan sesuai dengan jabatan 
+atau tugas tertentu. Jabatan mencerminkan tingkat kesulitan dan tanggungjawab 
+pekerjaan yang diemban. Makin tinggi jabatan maka makin berat juga 
+tanggungjawab pekerjaan yang dipikul. Kompetensi pek erja pun dapat digunakan 
+sebagai acuan memberikan jabatan kepada seorang pegawai.  
+3.2.2 Tunjangan 
+Tunjangan merupakan pelengkap dari gaji pokok. Tunjangan lebih 
+berfungsi secara sosial dan juga fungsi insentif. Tunjangan memiliki dua jenis yaitu 
+
+15 
+ 
+ 
+ tunjangan tetap dan tunjangan tidak tetap yang biayanya tidak selalu dibebankan 
+pada perusahaan setiap bulan. Contoh tunjangan  diantaranya adalah tunjangan 
+jabatan, tunjangan transport, tunjangan makan, tunjangan kesehatan, dan lain 
+sebagainya.  
+3.2.3 Potongan  
+Potongan biasanya  dapat diambil ketika ada beberapa hal terkait dengan 
+pegawai. Berbagai macam potongan yang umum diberlakukan antara lain, 
+Potongan Pajak Penghasilan (PPh), potongan iuran kesehatan, potongan iuran hari 
+tua, dan lain sebagainya.  
+3.2.4 Uang Lembur  
+ Uang lembur ad alah upah atau gaji yang dibayarkan karena bekerja di luar 
+waktu jam kerja secara resmi. Upah lembur juga bisa ditambahkan untuk 
+melengkapi gaji total yang diperoleh pekerja.  
+3.3 Aplikasi Berbasis Desktop  
+Aplikasi desktop adalah aplikasi yang dapat berjalan secara sendiri atau  
+independen dalam sistem desktop komputer atau laptop dan dapat  menjalankan 
+serangkaian aktivitas dengan diatur oleh pengguna(Neobytesolutions, 2012). 
+ Pemilihan aplikasi berbasis desktop biasanya ditujukan kepada mereka  
+yang memiliki koneksi internet yang kurang baik dan sangat peduli dengan  
+keamanan system(Joy, 2011). 
+Berikut keunggulan dari aplikasi berbasis desktop (Joy, 2011) : 
+1. Keamanan sistem lebih baik daripada aplikasi berbasis web 
+dikarenakan dengan menggunakan basis web, serangan virus atau 
+
+16 
+ 
+ 
+ keamanan password yang dapat ditembus sehingga menimbulkan 
+keraguan untuk mencoba aplikasi berbasis web. 
+2. Fitur lebih lengkap dibanding aplikasi berbasis web. 
+3. Biaya pengeluaran dalam pembuatan aplikasi berbasis desktop lebih 
+murah. 
+4. Kehandalan dari performa sistem yang lebih baik daripada aplikasi 
+berbasis web karena jika server aplikasi berbasis web sedang tidak 
+bagus maka anda akan mengalami gangguan dalam proses bisnis 
+anda. 
+5. Akses secara offline sehingga lebih nyaman menggunakan aplikasi 
+tanpa perlu koneksi dengan internet. 
+3.4 System Flow 
+System flow  atau bagan alir sistem merupakan bagan yang menunjukan arus 
+pekerjaan secara keseluruhan dari sistem. System flow menunjukan urutan-urutan 
+dari prosedur yang ada didalam sistem dan menunjukan apa yang dikerjakan sistem. 
+Berikut adalah simbol-simbol yang terdapat pada system flow  
+ 
+Gambar 3. 1 Simbol-simbol pada system flow 
+
+17 
+ 
+ 
+ 1. Simbol dokumen 
+Menunjukkan dokumen input  dan output baik proses manual atau 
+komputer. 
+2. Simbol kegiatan manual  
+Menunjukkan kegiatan non-komputer yang dilakukan  
+3. Simbol simpanan offline 
+Menunjukkan file non-komputer yang diarsip 
+4. Simbol proses 
+Menunjukkan kegiatan proses dari operasi program computer 
+5. Simbol database 
+Menunjukkan tempat untuk menyimpan data hasil operasi komputer 
+6. Simbol garis air 
+7. Simbol penghubung di dalam halaman  
+Menunjukkan penghubung ke halaman yang sama  
+8. Simbol penghubung di lain halaman  
+Menunjukkan penghubung ke beda halaman 
+9. Simbol display  
+Menunjukkan respon kepada user setelah dilakukan kegiatan. 
+3.5 Data Flow Diagram 
+Menurut (Raymond McLeod, 2010), Data Fow Diagram (DFD) adalah 
+suatu gambaran grafis dari suatu sistem yang menggunakan sejumlah bentuk-
+bentuk simbol untuk menggambarkan bagaimana data mengalir melalui suatu 
+proses yang saling berkaitan. Data Flow Diagram lebih menekankan pada proses 
+yang terjadi. Data Flow Diagram fokus pada aliran data dari dan kedalam sistem 
+
+18 
+ 
+ 
+ serta memproses data tersebut. Penggambaran DFD disusun berdasarkan tingkatan 
+dibawah ini: 
+1. Context Diagram  
+Yaitu diagram awal yang terdiri dari sebuah proses dan menggambarkan 
+area lingkup proses. 
+2. Diagram Level 0 
+Adalah diagram yang menggambarkan proses penting dari sistem serta 
+interaksi entity, proses, alur data, dan data source. 
+3. Diagram Detail 
+Adalah penguraian dalam proses yang ada terhadap diagram level 0. 
+Diagram ini merupakan diagram yang paling rendah dan tidak dapat 
+diuraikan lagi. 
+Data Flow Diagram (DFD) memiliki 4 (empat) komponen, yaitu: 
+1. External Entity  
+External entity ialah kesatuan di lingkungan sistem yang dapat berupa orang 
+atau sistem yang berada di lingkungan luar sistem yang memberikan 
+masukan atau menerima keluaran dari sistem.  
+2. Proses  
+Adalah komponen yang berfungsi untuk mentransformasikan sistem dari 
+input menuju ke output . Proses diberi nama untuk menerangkan proses yang 
+dilaksanakan.  
+ 
+ 
+ 
+
+19 
+ 
+ 
+ 3. Alur Data  
+Alur data digambarkan dengan anak panah yang menuju ke dalam proses 
+maupun ke luar proses. Alur data dipakai untuk menerangkan perpindahan 
+data atau informasi dari suatu bagian ke bagian lainnya.  
+4. Data Store  
+Adalah tempat pengumpulan data (data tersimpan) yang disimbolkan 
+dengan dua garis horizontal parallel . Data store perlu diberikan nama untuk 
+menjelaskan nama dari file-nya. Data store menyangkut dengan 
+penyimpanan data dengan cara terkomputerisasi.  
+3.6 System Development Life Cycle  (SDLC) 
+Menurut System Development Life Cycle (SDLC) ialah proses untuk 
+memahami bagaimana sebuah sistem informasi dapat mendukung kebutuhan bisnis 
+dengan merancang suatu sistem, membangun sistem tersebut, dan 
+menyampaikannya kepada pengguna (Tegarden, Dennis, Wixon, 2013). 
+SDLC memiliki empat fase dasar, yaitu planning, analysis, design, dan 
+implemention yang dimana tiap fase tersebut terdiri dari serangkaian langkah yang 
+menggunakan cara tertentu dalam menghasilkan tujuan yang ingin dicapai. Berikut 
+penjelasan dari tiap fase : 
+1. Identifikasi ( Planning)  
+Fase planning,  merupakan proses dasar dalam memahami mengapa 
+sistem informasi harus dibangun dan menentukan bagaimana proyek akan 
+dibangun. 
+2. Analisa (Analysis ) 
+
+20 
+ 
+ 
+ Fase analysis, merupakan jawaban dari pertanyaan siapa yang akan 
+menggunakan sistem, apa yang akan dilakukan oleh sistem, dan dimana 
+serta kapan sistem tersebut akan digunakan. Pada fase ini perlu 
+menginvestigasi sistem yang telah ada sebelumnya, mengidentifikasi 
+peluang untuk perbaikan dan mengembangkan konsep yang baru untuk 
+sistem yang akan dibuat. 
+3. Desain ( Design ) 
+Fase design,  ialah fase untuk menentukan bagaiman sistem akan 
+beroperasi, dalam hal ini antara lain perangkat keras ( hardware ), 
+perangkat lunak ( software ), infrastruktur jaringan ( user interface ), forms 
+dan laporan (basis data dan file yang dibutuhkan aplikasi). 
+4. Implementasi ( Implementation ) 
+Fase implementation , ialah fase akhir dari SDLC yaitu pada saat sistem 
+selesai dibuat. Implementasi pada fase ini paling banyak mengambil 
+perhatian karena dalam keseluruhan sistem, tahap implementasi, adalah 
+tahap yang paling banyak memakan waktu serta biaya karena mencoba 
+keseluruhan sistem.  
+
+ 
+ 
+21 
+ BAB IV  
+DESKRIPSI PEKERJAAN  
+ 
+Deskripsi pekerjaan praktik mengikuti pengembangan System Development 
+Life Cycle (SDLC) menggunakan model waterfall . Tahapan-tahapan dalam System 
+Development Life Cycle (SDLC) dengan model waterfall  meliputi communication, 
+planning, modeling, constructor dan deployment. 
+4.1 Analisis Sistem 
+4.1.1 Communication  
+Langkah pertama diawali dengan komunikasi kepada pengguna dan 
+konsumen. Pada langkah ini merupakan langkah yang penting karena menyangkut 
+pengumpulan informasi tentang kebutuhan konsumen atau pengguna. Dalam 
+pengumpulan informasi dilakukan beberapa proses yaitu wawancara, observasi, 
+dan studi literatur. Wawancara dan observasi dilakukan pada PT Mentari Smart 
+Guna Sidoarjo untuk mengetahui proses bisnis yang ada. Sedangkan studi pustaka 
+bertujuan untuk mencari literature yang berisi teori-teori atau sebagai sumber data 
+sekunder yang berkaitan dengan aplikasi yang akan dibuat. Proses bisnis yang ada 
+akan digambarkan dalam document flow (alur dokumen).   
+4.1.2 Analisis Kebutuhan Pengguna    
+Pengumpulan data kebutuhan  dengan teknis elisitasi. Teknis elisitasi adalah 
+teknik pengumpulan data dengan mengajukan pertanyaan yang terarah dan 
+langsung kepada narasumber . Berikut adalah hasil final elisitasi dari kebutuhan 
+Rancang bangun aplikasi absensi dan penggajian  pada  PT Mentari Smart Guna . 
+
+22 
+ 
+ 
+ A. Final elisitasi  
+  Ini merupakan hasil akhir yang dicapai dari suatu proses elisitasi yang 
+dapat digunakan sebagai dasar pembuatan suatu sistem yang akan dikembangkan.  
+Berikut adalah hasil elisitasi pada aplikasi absensi:  
+Tabel 4.1  Final Elisitasi  Aplikasi Absensi  
+No Pengguna  Kebutuhan sistem  
+1.  Admin  Dapat menampilkan form login admin 
+untuk melihat data absensi .  
+2.  Admin  Dapat menampilkan form data absensi 
+karyawan.    
+3.  Admin  Dapat mengupdate  form data absensi 
+karyawan  
+4.  Admin  Dapat menampilkan laporan data absensi  
+perbulan dalam bentuk tabel  
+5.  Admin  Dapat mencetak laporan data absensi 
+karyawan   
+Berikut adalah hasil final alisitasi pada aplikasi penggajian: 
+Tabel 4.2  Final Elisitasi  Aplikasi Penggajian  
+No Pengguna  Kebutuhan sistem  
+1.  Admin  Dapat menampilkan form login admin 
+untuk melihat data penggajian.  
+2.  Admin  Dapat menampilkan form data  jabatan   
+karyawan  
+
+23 
+ 
+ 
+ No Pengguna  Kebutuhan sistem  
+3.  Admin  Dapat menampilkan  form data golongan 
+karyawan  
+4.  Admin  Dapat menampilkan laporan data 
+peng gajian  perbulan dalam bentuk tabel  
+5.  Admin  Dapat mencetak laporan data penggajian 
+karyawan  
+Kesimpulan dari final elisitasi adalah setiap komponen dari tiap user 
+requirement tidak ada yang harus dihilangkan dan dihapus karna setiap bagian 
+termasuk hal yang penting dalam program manajemen antrian. 
+4.1.3 Analisis Kebutuhan Fungsional 
+Persyaratan fungsional mendefinisikan fungsi dari suatu sistem atau 
+komponen. Sebuah fungsi digambarkan sebagai satu set input, perilaku, dan output. 
+Persyaratan fungsional didukung oleh persyaratan non-fungsional, yang 
+memaksakan kendala pada desain atau pelaksanaan. Functional Requirement untuk 
+Aplikasi Absensi dan Penggajian Karyawan pada PT Mentari Smart Guna Sidoarjo  
+adalah sebagai berikut :  
+A. Analisis Kebutuhan Fungsional Aplikasi Absensi 
+1. Fungsional Data Master Absensi , meliputi :   
+1.1. Data Master User  
+1.2. Data Master Absensi  
+1.3. Data Master Karyawan   
+2. Fungsional pengelolaan data absensi  karyawan  
+3. Fungsi pembuatan laporan, meliputi : 
+
+24 
+ 
+ 
+ 3.1. Laporan jumlah karyawan  masuk atau ijin kerja   
+3.2. Laporan detail informasi absensi karyawan  
+B. Analisis Kebutuhan Fungsional Aplikasi Penggajian 
+1. Fungsional Data Master Penggajian, meliputi: 
+1.1. Data Master User 
+1.2. Data Master Jabatan 
+1.3. Data Master Golongan 
+1.4. Data Master Potongan 
+1.5. Data Master Slip Gaji 
+2. Fungsi perhitungan gaji karyawan 
+3. Fungsi pembuatan laporan gaji, meliputi: 
+3.1. Laporan gaji setiap karyawan 
+3.2. Laporan detail informasi seluruh gaji karyawan 
+4.1.4 Analisis Kelayakan Teknik 
+  Analisis kelayakan Teknik berupa kebutuhan perangkat keras dan 
+perangkat lunak yang dibutuhkan PT Mentari Smart Guna Sidoarjo adalah sebagai 
+berikut.   
+A. Perangkat Keras  
+  Aplikasi peminjaman alat yang sudah dirancang dan dibangun membutuhkan 
+beberapa spesifikasi perangkat keras.  Beberapa spesifikasi perangkat keras yang 
+perlu diperhatikan pada Aplikasi Absensi dan Penggajian Karyawan  pada PT 
+Mentari Smart Guna Sidoarjo  adalah sebagai berikut:  
+Tabel 4.3  Daftar Kebutuhan Perangkat Keras 
+
+25 
+ 
+ 
+ B. Perangkat Lunak  
+  Setelah perangkat keras ditentukan selanjutnya pengguna harus dapat 
+menentukan perangkat lunak yang akan dipakai demi mendukung sistem. 
+Pemenuhan kebutuhan perangkat lunak agar aplikasi dapat berjalan dengan baik 
+pada Aplikasi Absensi dan Penggajian Karyaw an pada PT Mentari Smart Guna 
+Sidoarjo adalah adalah sebagai berikut:  No. Perangkat Keras  
+1 Processor type  AMD A4 -5000 APU with radeon(TM) 
+HD Graphics  
+2 Memory  2Gb DDR3 Max 16Gb (2 DIMMs)  
+3 Hard drive type 1TB Serial ATA  
+4 Network  Gigabit Network  
+5 Optical drive  Type DVD -RW 
+6 Monitor  Monitor 15”  
+7 Keyboard  USB Keyboard  
+8 Mouse  USB Optical Mouse  
+
+26 
+ 
+ 
+ Tabel 4.4  Daftar Kebutuhan Perangkat Lunak 
+No. Perangkat Lunak  Kegunaan  
+1 Windows XP / Windows 7 / Windows 8  / 
+Windows 10  Sistem Operasi  
+2 Visual Studio  Pemograman Desktop  
+3 Mozilla Firefox,  Google Chrome,  Internet 
+Explorer  Web Browser  
+4 SQL Server  management  Database server  
+ 
+4.2 Perancangan Sistem 
+Setelah melakukan analisis sistem, tahap selanjutnya adalah merancang 
+sistem. Proses pada tahapan ini bertujuan  untuk menetukan k ebutuhan-k ebutuhan 
+aplik asi yang nantinya akan  diterapk an pada aplika si yang akan dibangu n. 
+4.2.1 Document Flow 
+  Alur p roses absensi karyawan  dimulai ketika karyawan  melakukan  ceklok 
+masuk jam kerja  ke PT Mentari Smart Guna Sidoarjo . Karyawan  akan meletakkan 
+kartu ceklok  pada tempat  yang tersedia. Setelah itu bagian personalia  akan mencatat 
+karyawan yang sudah hadir . Bagian personalia juga akan mencatat karyawan yang 
+ijin bekerja.  Pada jam pulang kerja karyawan melakukan ceklok lagi dan akan 
+langsung dicatat oleh bagian personalia . Setelah pencatatan kebutuhan absensi  
+selesai maka bagian personalia akan membuat laporan absensi . Berikut adalah 
+docflow dari proses absensi karyawan  yang digambarkan pada Gambar 4. 1 
+
+27 
+ 
+ 
+  
+Gambar 4.1  Document Flowchart Absensi Karyawan  
+  Alur p roses perhitungan gaji karyawan  dimulai ketika bagian keuangan  
+melakukan pencatatan jabatan dan golongan karyawan  pada  PT Mentari Smart 
+Guna Sidoarjo. Bagian personalia menyetorkan data jumlah jam kerja selama 
+sebulan pada bagian keuangan  yang akan dihitung sesuai jam kerja ataupun jam 
+lembur . Setelah itu bagian keuangan  akan menghitung jumlah potongan gaji  
+karyawan  dan me lakukan perhitungan gaji bersih yang akan diterima karyawan . 
+Setelah perhitungan gaji  karyawan  selesai maka bagian keuangan  akan membuat 
+laporan penggajian karyawan . Berikut adalah docflow dari proses perhitungan gaji  
+karyawan  yang digambarkan pada Gambar 4.2 
+
+28 
+ 
+ 
+  
+Gambar 4.2  Document Flowchart Perhitungan Gaji Karyawan  
+4.2.2 System Flow chart  
+                 Di bawah ini merupakan  system flowchart  dari proses Aplikasi  Absensi 
+dan Penggajian Karyawan  pada PT Mentari Smart Guna Sidoarjo . 
+
+29 
+ 
+ 
+ A. System Flowchart Fungsi Data Master Absensi 
+ 
+Gambar 4.3  System Flowchart Fungsi Data Master  Absensi Karya wan 
+     Pada Gambar 4. 3. System Flowchart  Fungsi Data Master dapat 
+dijelaskan sebagai  proses dari alur pengelolaan data master pada Rancang Bangun 
+aplikasi absensi , dimula i dari admin login kedalam server database program lalu 
+membuat tabel -tabel pada database absensi  sesuai dengan kebutuhan kemudian 
+
+30 
+ 
+ 
+ disimpan kedalam database lalu memasukan semua data yang dibutuhkan ke tiap 
+tabel yang kemudian disimpan ke database.  Setelah semua data telah disimpan di 
+database antrian maka selesailah proses pada gambar 4. 3. 
+B. System Flowchart  Fungsi Pengolahan Data  Absensi Karyawan 
+ 
+Gambar 4.4  Fungsi Pengolahan Data  Absensi  Karyawan  
+            System flow  dari pengolahan data absensi karayawan dapat dijelaskan 
+sebagai berikut. Admin personalia  akan menginputkan form absensi karyawan 
+
+31 
+ 
+ 
+ dimana akan menginputkan jam masuk kerja, jam pulang kerja, dan status 
+keterangan karyawan . Pencatatan absensi memiliki sistem mengupdate  status 
+keterangan karyawan seperti, ijin, cuti, terlambat, dll. Data absensi  karayawan  
+tersebut akan disimpan  dan sistem akan meng update  status tabel  yang sudah ada 
+pada database .  
+C. System Flowchart Fungsi Pembuatan Laporan Absensi Karyawan 
+Fungsi Pembuatan Laporan Absensi Karyawan meliputi: laporan jumlah 
+karyawan yang masuk dan ijin serta laporan detail status kehadiran karyawan.   
+ 
+Gambar 4.5  Fungsi Pembuatan Laporan Absensi Karyawan  
+
+32 
+ 
+ 
+ D. System Flowchart  Fungsi Data Master Penggajian 
+System Flowchart  Fungsi Data Master dapat dijelaskan sebagai  proses dari alur 
+pengelolaan data master pada Rancang Bangun aplikasi penggajian , dimulai dari 
+admin login kedalam server database program lalu membuat tabel -tabel pada 
+database penggajian sesuai dengan kebutuhan kemudian disimpan kedalam 
+database lalu memasukan semua data yang dibutuhkan ke tiap tabel yang kemudian 
+disimpan ke databa se.  Setelah semua data telah disimpan di database antrian maka 
+selesailah proses pada gambar 4. 6. 
+ 
+Gambar 4. 6 Fungsi Pembuatan Laporan 
+
+33 
+ 
+ 
+ E. System Flowchart Fungsi Perhitungan Gaji Karyawan 
+ 
+Gambar 4. 7 Fungsi Perhitungan  Gaji Karyawan  
+            Proses dari System Flow  Fungsi Perhitungan Gaji karyawan dimulai dari 
+admin yang membuka form slip gaji lalu admin melakukan proses pengambilan 
+data dari database penggajian jika pengambilan data berjalan lancar maka admin 
+akan menginputkan NIP karyawan yang sesuai dan disimpan kedalam database.  
+
+34 
+ 
+ 
+ F.  System Flowchart Fungsi Pembuatan Laporan Absensi Karyawan 
+Fungsi System Flowchart Fungsi Pembuatan Laporan ini meliputi : 
+Laporan gaji setiap  karyawan  dan Laporan detai l informasi  gaji seluruh karyawan . 
+ 
+Gambar 4.8  Fungsi Pembuatan Laporan Penggajian Karyawan  
+4.2.3 Diagram Berjenjang 
+       Diagram berjenjang merupakan alat perancangan sistem yang dapat 
+menampilkan seluruh proses yang terdapat  pada suatu aplikasi tertentu dengan jelas 
+dan terstruktur. Diagram berjenjang Aplikasi  Absensi dan Penggajian karyawan  
+pada PT Mentari Smart Guna Sidoarjo  dapat dilihat pada gambar 4.11 dan 4.12 
+dibawah ini.  
+
+35 
+ 
+ 
+  
+Gambar 4.9  Diagram  Berjenjang  Absensi Karyawan  
+ 
+Gambar 4.10  Diagram Berjenjang  Penggajian Karyawan  
+
+36 
+ 
+ 
+ 4.2.4 Context Diagram 
+  Context diagram  menggambarkan proses sistem secara umum. Dalam 
+context diagram dari aplikasi ini, terdiri dari dua  entitas yang terkait, yaitu dari 
+pihak admin personalia, dan karyawan .    
+Berikut ini adalah context diagram  dari aplikasi absensi karyawan  Pada 
+PT Mentari Smart Guna Sidoarjo . Context diagram  dapat dilihat pada Gambar 4. 11. 
+ 
+Gambar 4.11  Context Diagram Aplikasi Absensi Karyawan  
+Dalam context diagram dari aplikasi ini, terdiri dari dua entitas yang terkait, 
+yaitu dari pihak admin keuangan , dan karyawan . Berikut ini adalah context diagram  
+dari aplikasi penggajian karyawan pada PT Mentari Smart Guna Sidoarjo . Context 
+diagram  dapat dilihat pada Gambar 4. 12. 
+
+37 
+ 
+ 
+  
+Gambar 4.12  Context Diagram Aplikasi Penggajian Karyawan  
+4.2.5 Data Flow Diagram ( DFD)  Level 0  
+Data Flow Diagram  (DFD) level 0 merupakan hasil decompose  dari context 
+diagram . Berikut adalah DFD Level 0  aplikasi absensi  dan penggajian  yang 
+terdapat pada PT Mentari Smart Guna Sidoarjo  dapat dilihat  pada  gambar dibawah 
+4.13 dan 4.14 . 
+ 
+Gambar 4.13  DFD Level 0 Aplikasi Absensi Karyawan  
+
+38 
+ 
+ 
+  
+Gambar 4.14  DFD Level 0 Aplikasi Penggajian Karyawan  
+A. Data Flow Diagram Level 1 Fungsi Data Master 
+               Pada DFD level 1 fungsi data master  aplikasi absensi  dibagi menjadi 3 
+proses yaitu mengelola data user, data karyawan , dan data absensi . Semua proses 
+tersebut memiliki fungsi untuk menyimpan kedalam database. DFD level 1 fungsi 
+data master adalah sebagai berikut.  
+ 
+Gambar 4. 15 DFD level 1 Fungsi data master aplikasi absensi karyawan  
+
+39 
+ 
+ 
+ Dan DFD level 1 fungsi data master  aplikasi penggajian  karyawan  dibagi 
+menjadi 6 proses yaitu mengelola data user, data karyawan ,data jabatan, data 
+golongan, data potongan, dan data slip gaji . Semua proses tersebut memiliki fungsi 
+untuk menyimpan kedalam dat abase. DFD level 1 fungsi data master adalah sebagai 
+berikut.  
+ 
+Gambar 4. 16 DFD level 1 Fungsi data master aplikasi penggajian karyawan  
+B. Data Flow Diagram Level 1 Pembuatan Laporan 
+   Pada DFD level 1 pembuatan laporan  aplikasi absensi karyawan  
+digunakan untuk mengetahui informasi laporan jumlah karyawan  masuk dan ijin 
+kerja,  informasi  laporan  detail absensi karyawan . DFD level 1 pembuatan laporan  
+dapat dilihat pada gambar 4.16 . 
+
+40 
+ 
+ 
+  
+Gambar 4. 17 DFD level 1 fungsi pembuatan laporan  aplikasi absensi  karyawan  
+Sedangkan pada  DFD level 1 pembuatan laporan aplikasi penggajian  
+karyawan digunakan untuk mengetahui informasi laporan gaji setiap  karyawan, 
+informasi laporan detail informasi gaji seluruh  karyawan. DFD level 1 pembuatan 
+laporan dapat dilihat pada gambar 4.17. 
+ 
+Gambar 4. 18 DFD level 1 fungsi pembuatan laporan aplikasi penggajian 
+karyawan  
+
+41 
+ 
+ 
+ 4.2.6 Conceptual Data Model  
+ 
+Gambar 4.19  Conceptual  Data Model Aplikasi Absensi Karyawan  
+ Pada tahap merancang basis data bertujuan untuk merancang skema 
+database yang akan digunakan dalam aplikasi. Rancangan basis data tersebut akan 
+dijelaskan dalam bentuk Conceptual Data Model, Physical Data Model dan struktur 
+tabel. CDM dari aplikasi absensi karyawan ini memiliki 4  entitas yaitu entitas data 
+absensi, entitas karyawan, entitas cetak laporan,  dan entitas login. 
+ 
+Gambar 4.20  Conceptual  Data Model Aplikasi Penggajian Karyawan  
+
+42 
+ 
+ 
+  Berikut ini adalah bentuk CDM dari aplikasi penggajian yang memiliki 6 
+entitas yaitu entitas gaji, entitas jabatan, entitas golongan, entitas potongan, entitas 
+user, dan entitas karyawan. 
+4.2.7 Physical Data Model 
+  Berikut ini adalah bentuk PDM yang digunakan pada aplikasi absensi 
+karyawan yang dapat dilihat pada Gambar 4.18 .  
+ 
+Gambar 4.21  Physical Data Model Aplikasi Absensi Karyawan  
+Berikut ini adalah bentuk PDM yang digunakan pada aplikasi absensi 
+karyawan yang dapat dilihat pada Gambar 4.18. 
+
+43 
+ 
+ 
+  
+Gambar 4.22  Physical Data Model Aplikasi Penggajian  Karyawan  
+4.2.8 Struktur Tabel 
+  Berdasarkan PDM yang sudah terbentuk, dapat disusun struktur tabel yang 
+akan digunaka n untuk menyimpan data. Tabel -tabel yang digunakan untuk  aplikasi 
+absensi  dan penggajian karyawan  pada PT Mentari Smart Guna Sidoarjo  adalah 
+sebagai berikut . 
+A. Tabel User pada Aplikasi Absensi Karyawan 
+Primary key : ID  
+Foreign key :  - 
+Fungsi  : Menyimpan data admin personalia  
+Tabel 4.5  Tabel User  pada Aplikasi Absensi Karyawan  
+B. Tabel Karyawan pada Aplikasi Absensi Karyawan 
+Primary key : NIK 
+Foreign key : - 
+Fungsi : Menyimpan data karyawan  
+
+44 
+ 
+ 
+ Tabel 4.6  Tabel Karyawan pada Aplikasi Absensi Karyawan  
+C. Tabel Absensi Karyawan 
+Primary key : Tanggal_absensi  
+Foreign key : ID 
+                      NIK 
+Fungsi : Menyimpan data abensi karyawan  
+Tabel 4.7  Tabel Absensi  Karyawan  Nama Field  Tipe Data  Size Deskripsi  
+ID Varchar  50 Id admin   
+USERNAME   Varchar  50 Username  admin  personalia  
+PASS WORD   Varchar  50 Password admin  personalia  
+Nama Field  Tipe Data  Size Deskripsi  
+NIK Varchar  50 Nomor induk karyawan  
+NAMA_KARYAWAN   Varchar  200 Nama  karayawan   
+Nama Field  Tipe Data  Size Deskripsi  
+TANGGAL_ABSENSI  Date   Tanggal karyawan melakukan 
+absensi  
+ID Varchar  50 Id admin personalia  
+NIK Varchar  50 Nomor induk karyawan  
+JAM_MASUK  Time   Menunjukkan waktu check clock 
+masuk  
+JAM_PULANG  Time   Menunjukkan waktu check clock 
+pulang  
+
+45 
+ 
+ 
+  
+D. Tabel User pada Aplikasi Penggajian Karyawan 
+Primary key : id  
+Foreign key : - 
+Fungsi : Menyimpan data admin keuangan 
+Tabel 4.8  Tabel User pada Aplikasi Penggajian Karyawan  
+ 
+E. Tabel Karyawan pada Aplikasi Penggajian Karyawan  
+Primary key : NIK 
+Foreign key : No_slip 
+Fungsi : Menyimpan data karyawan 
+Tabel 4.9  Tabel Karyawan pada Aplikasi Penggajian Karyawan  
+ STATUS_KEHADIRAN  Vachar  100 Keterangan hadir atau ijin 
+karyawan  
+Nama Field  Tipe Data  Size Deskripsi  
+Id Varchar  50 Id admin  
+username  Varchar  50 Username admin keuangan  
+password  Varchar  50 Password admin keuangan  
+Nama Field  Tipe Data  Size Deskripsi  
+NIK Varchar   20 Nomor induk karyawan   
+No_slip  Varchar  10 Nomor slip gaji karyawan   
+Nama  Varchar  50 Nama karyawan   
+
+46 
+ 
+ 
+ F. Tabel Jabatan pada Aplikasi Penggajian Karyawan 
+Primary key : kode_jabatan  
+Foreign key : NIK 
+Fungsi : Menyimpan data jabatan karyawan  
+Tabel 4.10  Tabel Jabatan pada Aplikasi Penggajian Karyawan  
+ 
+G. Tabel Golongan pada Aplikasi Penggajian Karyawan 
+Primary key : Golongan  
+Foreign key : NIK Jenis_kelamin  Varchar  20 Jenis kelamin karyawan  
+Status_nikah  Varchar  20 Status menikah karyawan  
+Jumlah_anak  integer   Junlah anak yg dimiliki karyawan  
+Alamat  Varchar  100 Alamat karyawan  
+Nama Field  Tipe Data  Size Deskripsi  
+Kode_jabatan  Varchar   50 Kode jabatan karyawan   
+NIK Varchar  20 Nomor induk  karyawan  
+jabatan  Varchar  20 jabatan  karyawan  
+gaji_pokok  Varchar  100 Gaji pokok setiap  karyawan  
+tujangan_jabatan  Varchar  100 Tunjangan jabatan setiap  karyawan  
+
+47 
+ 
+ 
+ Fungsi : Menyimpan data golongan karyawan  
+Tabel 4.11  Tabel Golongan pada Aplikasi Penggajian Karyawan  
+ 
+H. Tabel Potongan pada Aplikasi Penggajian Karyawan 
+Primary key : kode_potonga n 
+Foreign key : No_slip  
+Fungsi : Menyimpan data potongan gaji  karyawan  
+Tabel 4.12  Tabel Potongan pada Aplikasi Penggajian Karyawan  
+ Nama Field  Tipe Data  Size Deskripsi  
+golongan  Varchar  10 Golongan setiap karyawan  
+NIK Varchar  20 Nomor induk karyawan  
+Tunjangan_suami_istri  Varchar  50 Tunjangan suami atau istri  karyawan  
+Tunjangan_anak  Varchar  50 Tunjangan anak setiap  karyawan  
+Uang_lembur  Varchar  50 Uang lembur  karyawan  
+askes  Varchar  50 Asuransi kesehatan karyawan  
+Uang_makan  Varchar  50 Uang makan karyawan  
+Nama Field  Tipe Data  Size Deskripsi  
+Kode_potongan  Varchar  50 Kode potongan gaji  setiap karyawan  
+
+48 
+ 
+ 
+ I. Tabel Slip Gaji pada Aplikasi Penggajian Karyawan 
+Primary key : No_slip  
+Foreign key : id 
+            NIK 
+Fungsi : Menyimpan data slip gaji setiap  karyawan  
+Tabel 4.13  Tabel Slip Gaji pada Aplikasi Penggajian Karyawan  
+4.2.9 Desain I/O 
+  Pada bagain ini ditampilkan desain sistem input/output. Bagian ini memuat 
+rancangan awal desain antarmuka pengguna, hal ini bertujuan untuk menyamakan No_slip  Varchar  10 Nomor slip gaji  karyawan  
+potongan  Varchar  100 Jenis potongan gaji setiap  karyawan  
+Nama Field  Tipe Data  Size Deskripsi  
+No_slip  Varchar  10 Nomor slip gaji karyawan  
+Id Varchar  50 Id admin keuangan  
+NIK Varchar  20 Nomor induk karyawan  
+Tanggal  Date   Tanggal perhitungan gaji karyawan  
+Pendapatan  Varchar  100 Pendatan setiap karyawan  
+Gaji_bersih  Varchar  100 Hasil akhir perhitungan gaji setiap 
+karyawan  
+
+49 
+ 
+ 
+ pandangan kembali antara pengguna sistem dan pengembang sistem tentang 
+rancangan aplikasi yang sudah dibahas sebelumnya. 
+A. Desain Form Halaman Login Aplikasi Absensi Karyawan 
+   Form login menjadi form yang pertama di akses oleh admin personalia. 
+Desain halaman login dibuat memiliki logo perusahaan disisi atas dan terdapat 
+username serta kata sandi disisi bawah setelahnya agar dapat mengakses form dari 
+admin personlia disertai  tombol login. 
+Setelah form login diakses admin akan memasukan username  kata sandi atau 
+password  kedalam textbox  yang ada pada form login sesuai dengan kata sandi dan 
+username yang telah disepakati untuk mengakses form selanjutnya yaitu form 
+admin absensi.  Desain form login dapat dilihat pada Gambar 4.23  sebagai berikut. 
+ 
+Gambar 4.23  Desain Form Halaman Login Aplikasi Absensi Karyawan  
+
+50 
+ 
+ 
+ B. Desain Form Halaman Absensi Karyawan  
+ 
+Gambar 4.24  Desain Form Halaman Absensi Karyawan  
+Desain form absensi seperti Gambar 4.24  memiliki tombol button  untuk 
+menyimpan data dan menghapus data  serta memasukkan waktu pada textbox .  
+C. Desain Form Halaman Edit Aplikasi Absensi Karyawan 
+ 
+Gambar 4.25  Desain Form Halaman Edit Aplikasi Absensi Karyawan  
+Desain Form edit absensi ditujukan untuk mengubah status kehadiran 
+karyawan. Ketika salah button  ditekan maka system  akan otomatis mengupdate data 
+sesuai dengan yang diminta.  
+
+51 
+ 
+ 
+ D. Desain Form Halaman Laporan Aplikasi Absensi Karyawan  
+Desain Form Laporan Absensi adalah form yang berisi informasi absensi 
+karyawan saat ini. Didalam form memiliki textbox untuk mencari informasi yang 
+dibutuhkan. Form laporan absensi dibuat seperti Gambar 4.26  sebagai berikut.   
+ 
+Gambar 4. 26 Desain Form Halaman Laporan Aplikasi Absensi Karyawan  
+E. Desain Output Laporan Aplikasi Absensi Karyawan 
+Desain output laporan digunakan admin untuk mencetak data-data absensi 
+karyawan serta banyaknya karyawan yang masuk dan ijin tiap harinya. Desain 
+output laporan dibuat seperti Gambar 4.27 sebagai berikut.  
+
+52 
+ 
+ 
+  
+Gambar 4.27  Desain Output Laporan Aplikasi Absensi Karyawan  
+F. Desain Halaman Login Aplikasi Penggajian Karyawan 
+Form login menjadi form yang pertama di akses oleh admin personalia. 
+Desain halaman login dibuat memiliki logo perusahaan disisi atas dan terdapat 
+username serta kata sandi disisi bawah setelahnya agar dapat mengakses form dari 
+admin personlia disertai tombol login. 
+Setelah form login diakses admin akan memasukan username  kata sandi 
+atau password  kedalam textbox  yang ada pada form login sesuai dengan kata sandi 
+dan username yang telah disepakati untuk mengakses form selanjutnya yaitu form 
+admin absensi. Desain form login dapat dilihat pada Gambar 4.2 8 sebagai berikut.  
+
+53 
+ 
+ 
+  
+Gambar 4.28  Desain Halaman Login Aplikasi Penggajian Karyawan  
+G. Desain Halaman Form Jabatan 
+ 
+Gambar 4. 29 Desain Halaman Form Jabatan  
+Desain Form jabatan ditujukan untuk mengupdate dan mengubah jabatan 
+karyawan. Ketika salah button  ditekan maka system  akan otomatis mengupdate data 
+sesuai dengan yang diminta serta otomatis database akan bertambah atau terupdate.  
+H. Desain Halaman Form Golongan 
+Desain Form golongan karyawan ditujukan untuk mengupdate dan 
+mengubah golongan karyawan. Ketika salah button  ditekan maka system  akan 
+
+54 
+ 
+ 
+ otomatis mengupdate data sesuai dengan yang diminta serta otomatis database akan 
+bertambah atau terupdate. Desain form golongan dapat dilihat pada gambar 4.30.  
+ 
+Gambar 4. 30 Desain Halaman Form Golongan  
+I. Desain Halaman Form Potongan 
+Desain Form potongan gaji karyawan ditujukan untuk mengupdate dan 
+mengubah potongan gaji karyawan. Ketika salah button  ditekan maka system  akan 
+otomatis mengupdate data sesuai dengan yang diminta serta otomatis database akan 
+bertambah atau terupdate. Desain form potongan dapat dilihat pada gambar 4.31. 
+
+55 
+ 
+ 
+  
+Gambar 4. 31 Desain Halaman Form Potongan  
+J. Desain Halaman Form Karyawan 
+ 
+Gambar 4. 32 Desain Halaman Form Karyawan  
+Desain Form karyawan ditujukan untuk mengupdate dan mengubah data 
+karyawan. Ketika salah button  ditekan maka system  akan otomatis mengupdate data 
+sesuai dengan yang diminta serta otomatis database akan bertambah atau terupdate.  
+K. Desain Halaman Form Slip Gaji 
+Desain Form slip gaji karyawan ditujukan untuk menghitung gaji 
+karyawan dengan mengmbil data-data yang dibutuhkan. Ketika salah button  
+
+56 
+ 
+ 
+ ditekan maka system akan otomatis menyimpan data sesuai perhitungan gaji bersih 
+setiap karyawan. Desain form slip gaji dapat dilihat pada gambar 4.33.  
+ 
+Gambar 4. 33 Desain Halaman Form Slip Gaji  
+L. Desain Output Laporan Aplikasi Penggajian Karyawan 
+Desain output laporan digunakan admin untuk mencetak data-data 
+penggajian karyawan serta banyaknya jumlah seluruh gaji karyawan tiap bulannya. 
+Desain output laporan dibuat seperti Gambar 4.34 sebagai berikut.  
+ 
+Gambar 4.34  Desain  Output Laporan Aplikasi Penggajian Karyawan  
+
+57 
+ 
+ 
+ 4.3 Implementasi 
+Berikut merupakan hasil implementasi sistem yang sudah dibuat. Meliputi 
+hasil dari desain I/O yang akan dijelaskan sebagai berikut. 
+4.3.1 Implementasi Aplikasi Absensi Dan Penggajian Karyawan 
+Halaman aplikasi absensi dan penggajian karyawan merupakan sebuah 
+halaman yang digunakan untuk mengolah data absensi dan perhitungan gaji 
+karyawan PT Mentari Smart Guna yang akan ditindak lanjut oleh bagian personalia . 
+Untuk mengakses aplikasi, pihak yang berwenang yakni staf personalia yang 
+sebagai admin di aplikasi absensi dan penggajian karyawan yang memiliki 
+tanggung jawab dalam perhitungan gaji karyawan PT Mentari Smart Guna. Pertama 
+admin harus membuka aplikasi absensi dan penggajian terlebih dahulu. Saat 
+aplikasi sudah berjalan admin akan mengunjungi halaman login . Berikut halaman 
+login  pada aplikasi penggajian karyawan seperti yang terlihat pada gambar 4.35 . 
+ 
+Gambar 4. 35 Halaman Logi n Aplikasi  Absensi dan  Penggajian Karyawan  
+
+58 
+ 
+ 
+ Jika admin memasukkan password  atau username  dengan benar maka 
+admin akan masuk pada halaman menu utama, maka admin akan diarahkan ke 
+halaman menu utama seperti yang terlihat pada gambar 4.36 . 
+ 
+Gambar 4. 36 Halaman Menu Utama Ap likasi  Absensi dan  Penggajian Karyawan  
+Jika admin memasukkan user dan password  tidak benar makan admin 
+akan mengunjungi halaman login  kembali, maka admin diarahkan untuk 
+memasukkan user dan password  seperti yang terlihat pada gambar 4.37 . 
+ 
+Gambar 4. 37 Halaman Gagal Masuk Menu Utama  
+Jika admin sudah memasuki halaman menu utama aplikasi absensi dan 
+penggajian karyawan lalu ingin mengolah data master, maka admin klik pada menu 
+strip master. Apabila admin sudah klik menu strip master admin akan mengujungi 
+
+59 
+ 
+ 
+ pilihan data master mana yang akan di inputkan terlebih dahulu seperti yang terlihat 
+pada gambar 4.38. 
+ 
+Gambar 4.38  Menu  Strip Master  Pada Aplikasi  Absensi dan  Penggajian 
+Karyawan  
+Jika admin akan melakukan penginputan data golongan, maka admin klik 
+pilihan golongan. Apabila admin sudah klik pilihan golongan maka admin akan 
+mengunjungi halaman form penginputan data master golongan seperti yang terlihat 
+pada gambar 4.39. 
+ 
+Gambar 4. 39  Halaman Form Data Master  Golongan   
+
+60 
+ 
+ 
+ Jika admin sudah mengisi form data master  golongan penggajian 
+karyawan maka admin klik pada button  yang bertulis simpan dan data yang 
+diinputkan akan tersimpan seperti yang terlihat pada gambar 4.40 . 
+ 
+Gambar 4.40  Halaman Input  Data Master  Golongan  
+Jika admin melakukan penginputan data master  yang kurang lengkap atau 
+tidak sesuai dengan form yang ada pada form data master golongan, maka admin 
+harus klik button  ok untuk masuk halaman form master  golongan seperti yang 
+terlihat pada gambar 4.41.  
+ 
+Gambar 4.41  Halaman Input Data Master Tidak Lengkap  
+
+61 
+ 
+ 
+ Jika admin ingin mengolah data master  jabatan, maka admin harus klik 
+menu strip master  jabatan. Apabila admin sudah klik menu strip pilihan master  
+jabatan maka admin akan mengunjungi halaman master  jabatan seperti yang terlihat 
+pada gambar 4.42. 
+ 
+Gambar 4. 42 Halaman Data Master  Jabatan  
+Jika admin ingin menambah data master  jabatan maka admin harus 
+mengisi form data master  jabatan. Apabila form data master  jabatan sudah diisi 
+maka admin klik button  simpan seperti yang telihat pada gambar 4.43. 
+
+62 
+ 
+ 
+  
+Gambar 4. 43 Tambah Data Master  Jabatan  
+Jika admin masih di halaman data master  dan ingin mengolah data master  
+potongan, maka admin harus klik potongan. Apabila admin sudah klik maka admin 
+akan masuk ke halaman form data master  potongan seperti yag terlihat pada gambar 
+4.44. 
+ 
+Gambar 4. 44 Halaman Form Potongan   
+
+63 
+ 
+ 
+ Jika admin ingin menambah data master  potongan maka admin harus 
+mengisi form data master  potongan . Apabila form data master  habatan sudah diisi 
+maka admin klik button simpan seperti yang telihat pada gambar 4.45. 
+ 
+Gambar 4. 45 Tambah Data Master  Potongan  
+Jika admin masih di halaman data master  dan ingin menambah data 
+pegawai baru, maka admin harus klik pegawai.  Apabila admin sudah masuk pada 
+halaman form pegawai, maka admin harus mengisikan data pegawai sesuai dengan 
+data yang dibutuhkan pada form pegawai seperti yang terlihat pada gambar 4.46 . 
+
+64 
+ 
+ 
+  
+Gambar 4. 46 Tambah Data  Master  Pegawai  
+Jika admin ingin melakukan perhitungan gaji pada setiap karyawan, maka 
+admin kembali ke menu utama dan klik menu strip transaksi pilih penggajian seperti 
+yang terlihat pada gambar 4.47 . 
+ 
+Gambar 4. 47 Pilih Transaksi Penggajian   
+Jika admin sudah masuk pada halaman perhitungan gaji karyawan, maka 
+admin harus mengetikkan NIP yang akan di proses perhitungan gajinya serta admin 
+harus mengisi jumlah masuk pegawai selama sebulan dan berapa hari lebur yang 
+dilakukan oleh pegawai tersebut. Apabila sudah mengisi NIP, jam masuk/bulan, 
+
+65 
+ 
+ 
+ dan jam lembur maka admin harus memasukkan jumlah potongan yang dilakukan 
+pegawai tersebut. Jika semua data yang harus di masukkan sudah terisi maka total 
+gaji bersih yang akan di dapat akan tercantum pada kolom gaji bersih seperti yang 
+terlihat pada gambar 4.48.  
+ 
+Gambar 4. 48 Total Perhitungan Gaji  
+Jika admin ingin melakukan absensi pada setiap karyawan, maka admin 
+kembali ke menu utama dan klik menu strip transaksi pilih absensi seperti yang 
+terlihat pada gambar 4.49. 
+ 
+Gambar 4. 49 Pilih Transaksi Absensi Karyawan  
+
+66 
+ 
+ 
+ Jika admin sudah masuk pada halaman absensi karyawan, maka admin 
+harus mengetikkan NIP yang akan di proses absensi serta admin harus mengisi 
+jumlah masuk pegawai selama sebulan dan berapa hari lebur yang dilakukan oleh 
+pegawai tersebut. Jika semua data yang harus di masukkan sudah terisi maka admin 
+klik simpan dan data akan tersimpan pada database seperti yang terlihat pada 
+gambar 4.50 . 
+ 
+Gambar 4. 50 Mengelola Absensi Karyawan  
+Jika admin ingin melakukan pengisian form permohonan karyawan maka 
+admin masuk ke menu utama kembali dan klik menu strip transaksi pilih 
+permohonan.  Jika admin sudah masuk pada halaman form permohonan admin harus 
+mengisi form seperti yang terlihat pada gambar 4.51 . 
+
+67 
+ 
+ 
+  
+Gambar 4. 51 Form Permohonan Karyawan  
+Jika admin ingin mencetak laporan maka admin harus kembali ke menu 
+utama dan  klik menu strip laporan dan pilih laporan mana yang akan dicetak seperti 
+yang terlihat pada gambar 4.5 2. 
+ 
+Gambar 4.52  Menu Strip Laporan Pada Aplikasi Penggajian Karyawan  
+
+68 
+ 
+ 
+ Jika admin sudah masuk pada halaman laporan master  maka admin harus 
+memilih laporan master  yang akan dicetak seperti yang terlihat pada gambar 4.53 . 
+ 
+Gambar 4.53 Halaman Cetak Laporan Master  Pada Aplikasi Penggajian 
+Karyawan  
+Jika admin ingin melakukan cetak proses absensi maka admin harus klik 
+cetak pada menu strip laporan dan halaman cetak akan juncul seperti yang terlihat 
+pada gambar 4.54. 
+ 
+Gambar 4. 54  Halaman Cetak Laporan Absensi Karyawan   
+
+69 
+ 
+ 
+ Jika admin ingin mencetak data master  golongan maka admin harus klik 
+button  golongan. Apabila admin sudah klik button  golongan maka admin akan 
+melihat tampilan laporan master  golongan seperti yang terlihat pada gambar 4.55 . 
+ 
+Gambar 4. 55 Tampilan Laporan Master  Golongan  
+Jika admin ingin mencetak data master  jabatan maka admin harus klik 
+button  jabatan. Apabila admin sudah klik button  jabatan maka admin akan melihat 
+tampilan laporan master  jabatan seperti yang terlihat pada gambar 4.56 . 
+
+70 
+ 
+ 
+  
+Gambar 4. 56 Tampilan Laporan Master Jabatan  
+Jika admin ingin mencetak data master  potongan maka admin harus klik 
+button  potongan. Apabila admin sudah klik button  potongan  maka admin akan 
+melihat tampilan laporan master  potongan seperti yang terlihat pada gambar 4.57 . 
+ 
+Gambar 4. 57 Tampilan Laporan Mast er Potongan  
+Jika admin ingin mencetak data master  pegawai maka admin harus klik 
+button  pegawai. Apabila admin sudah klik button  pegawai maka admin akan 
+melihat tampilan laporan master  pegawai seperti yang terlihat pada gambar 4.58 . 
+
+71 
+ 
+ 
+  
+Gambar 4. 58 Tampilan Laporan Master Pegawai  
+Jika admin ingin mencetak laporan gaji setiap karyawan maka admin harus 
+klik button  tutup untuk kembali ke menu utama dan klik laporan penggajian. 
+Apabila admin sudah klik penggjian maka admin akan melihat tampilan laporan 
+penggajian setiap karyawan seperti yang terlihat pada gambar 4.59 . 
+ 
+Gambar 4.59  Tampilam Laporan Slip Gaji Karyawan  
+ 
+ 
+
+72 
+ 
+ 
+ 4.4 Testing Sistem 
+Uji coba aplikasi ini dilakukan untuk memastikan apakah semua fungsi 
+pada aplikasi berjalan sesuai dengan tujuan. Uji coba ini memiliki tahapan menguji 
+semua inputan. Data inputan yang digunakan merupakan data synopsis  yang telah 
+disetuji oleh perusahaan. 
+4.4.1 Uji  Coba Form Login Aplikasi Absensi dan Penggajian Karyawan 
+Form login digunakan untuk keamanan dalam melakukan akses aplikasi 
+absensi dan penggajian karayawan. Berikut merupakan hasil uji coba form login 
+admin aplikasi absensi dan penggajian karyawan. 
+Tabel 4.14  Uji  Coba Form Login Aplikasi Absensi dan Penggajian Karyawan  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form login 
+admin 
+aplikasi 
+absensi 
+karyawan  Login bagian 
+admin 
+personalia & 
+admin 
+keuangan  Pengguna bagian admin personalia & 
+admin keuangan dapat mengakses 
+aplikasi sesuai dengan hak akses  Sesuai  
+Validasi jika 
+username dan 
+password 
+salah  Muncul pemberitahuan bahwa 
+username atau password yang telah 
+dimasukkan salah  Sesuai  
+ 
+
+73 
+ 
+ 
+ 4.4.2 Uji Coba Form Tambah Data Absensi Karyawan 
+From tambah data absensi ini digunakan untuk admin yang ingin 
+memasukkan data absensi karyawan. Berikut merupakan hasil uji coba form tambah 
+data absensi karyawan. 
+Tabel 4.15  Uji Coba Form Tambah Data Absensi Karyawan  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form 
+tambah 
+data 
+absensi 
+karyawan  Tambah data 
+absensi  Admin dapat melakukan tambah data 
+absensi karyawan  Sesuai  
+Data absensi 
+karyawan 
+tersimpan 
+pada database  Data akan tersimpan di database dan 
+akan tertampil pada kolom data 
+absensi  Sesuai  
+ 
+4.4.3 Uji Coba Edit Data Absensi Karyawan 
+Form edit data absensi ini digunakan untuk admin yang akan melakukan 
+edit sebelum data absensi karyawan di cetak. Berikut hasil uji coba form edit data 
+absensi karyawan. 
+Tabel 4.16  Uji Coba Edit Data Absensi Karyawan  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form edit 
+data 
+absensi 
+karyawan  Edit data 
+absensi  Admin dapat mengubah data absensi 
+karyawan  Sesuai  
+Data absensi 
+karyawan Data akan tercatat di database dan 
+akan tertampil pada kolom data 
+absensi  Sesuai  
+
+74 
+ 
+ 
+ tersimpan 
+pada database  
+ 
+4.4.4 Uji  Coba Form Tambah Permohonan Karyawan 
+Form permohonan karyawan ini digunakan untuk memasukkan data 
+permohonan karyawan ke dalam aplikasi absensi dan penggajian karyawan. Berikut 
+merupakan hasil uji coba form tambah golongan karyawan. 
+Tabel 4.17  Uji  Coba Form Tambah Permohonan Karyawan  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form 
+tambah 
+permohonan 
+karyawan  Tambah 
+permohonan  Admin dapat melakukan tambah 
+data permohonan karyawan  Sesuai  
+Data 
+permohonan 
+karyawan 
+tersimpan 
+pada 
+database  Data akan tercatat di database dan 
+akan tertampil pada kolom data 
+permohonan karyawan  
+Sesuai  
+ 
+4.4.5 Uji  Coba Form Tambah Golongan Karyawan 
+Form golongan karyawan ini digunakan untuk memasukkan data golongan 
+karyawan ke dalam aplikasi absensi dan penggajian karyawan. Berikut merupakan 
+hasil uji coba form tambah golongan karyawan.  
+ 
+
+75 
+ 
+ 
+ Tabel 4.18  Uji  Coba Form Tambah Golongan Karyawa n 
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form 
+tambah 
+golongan 
+karyawan  Tambah 
+golongan  Admin dapat melakukan tambah data 
+golongan karyawan  Sesuai  
+Data 
+golongan 
+karyawan 
+tersimpan 
+pada database  Data akan tercatat di database dan 
+akan tertampil pada kolom data 
+golongan  karyawan  Sesuai  
+ 
+4.4.6 Uji Coba Form Tambah Jabatan Karyawan 
+Form jabatan karyawan ini digunakan untuk memasukkan data jabatan 
+karyawan ke dalam aplikasi absensi dan penggajian karyawan. Berikut merupakan 
+hasil uji coba form tambah jabatan karyawan. 
+Tabel 4.19  Uji Coba Form Tambah Jabatan Karyawan  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form 
+tambah 
+jabatan 
+karyawan  Tambah 
+jabatan  Admin dapat melakukan tambah data 
+jabatan karyawan  Sesuai  
+Data jabatan 
+karyawan 
+tersimpan 
+pada database  Data akan tercatat di database dan 
+akan tertampil pada kolom data 
+jabatan  karyawan  Sesuai  
+ 
+
+76 
+ 
+ 
+ 4.4.7 Uji Coba Form Tambah Potongan Gaji Karyawan 
+Form potongan gaji karyawan ini digunakan untuk memasukkan data 
+potongan gaji karyawan ke dalam aplikasi absensi dan penggajian karyawan. 
+Berikut merupakan hasil uji coba form tambah potongan gaji karyawan. 
+Tabel 4.20  Uji Coba Form Tambah Potongan Gaji Karyawan  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form 
+tambah 
+potongan 
+gaji 
+karyawan  Tambah 
+potongan gaji  Admin dapat melakukan tambah data 
+potongan gaji karyawan  Sesuai  
+Data 
+potongan gaji 
+karyawan 
+tersimpan 
+pada database  Data akan tercatat di database dan 
+akan tertampil pada kolom data 
+potongan gaji karyawan  Sesuai  
+ 
+4.4.8 Uji Coba Form Tambah Pegawai 
+Form pegawai ini digunakan untuk memasukkan data pegawai ke dalam 
+aplikasi absensi dan penggajian karyawan. Berikut merupakan hasil uji coba form 
+tambah pegawai. 
+Tabel 4.21  Uji Coba Form Tambah Pegawai  
+Nama Tes  Proses  Output yang diharapkan  Hasil  
+Uji coba 
+form Tambah data 
+pegawai  Admin dapat melak ukan tambah data 
+pegawai  Sesuai  
+
+77 
+ 
+ 
+ tambah 
+pegawai  Data pegawai 
+tersimpan 
+pada database  Data akan tercatat di database dan 
+akan tertampil pada kolom data 
+pegawai  Sesuai  
+
+ 
+ 
+78 
+ BAB V  
+PENUTUP 
+ 
+5.1 Kesimpulan  
+ Setelah melakukan analisis dan perancangan, serta implementasi aplikasi 
+absensi dan penggajian karyawan  Pada PT Mentari Smart Guna Sidoarjo , maka 
+dapat diperoleh kesimpulan sebagai berikut:  
+a. Aplikasi ini mampu me lakukan proses pencata tan absensi dan perhitungan gaji  
+serta  menyimpan data kebutuhan pengguna . 
+b. Aplikasi ini menghasilkan laporan jumlah karyawan yang masuk dan ijin, 
+laporan detail status kehadiran karyawan,  laporan gaji setiap karyawan  dan 
+laporan detai l informasi  gaji seluruh karyawan . 
+5.2 Saran  
+Aplikasi Absensi dan Penggajian Karyawan  Pada PT Mentari Smart Guna 
+Sidoarjo  yang telah di buat ini tentunya masih terdapat beberapa kekurangan. Oleh 
+sebab itu, disarankan dalam pengembangan aplikasi ini agar menjadi lebih bai k 
+yaitu dengan melakukan pembaruan aplikasi  database server  menjadi lebih terbaru 
+serta sambungan jaringan agar terus di perhatikan dan diperbaiki demi kelancaran 
+aplikasi program ini.  Selain itu, penggunaan aplikasi  secara baik  dan efisien , 
+pengoperasi an sistem dengan sebaik -baiknya  sesuai dengan ketentuan yang t elah 
+disepakati . 
+
+ 
+ 
+ 
+ DAFTAR PUSTAKA 
+Hall, A. J. (2017). Sistem Informasi Akuntansi  (Ketiga ed.). (A. A. Yusuf, Trans.) 
+Jakarta: Salemba Empat. 
+McLeod. (2010). Sistem Informasi Manajemen.  Jakarta: Indeks. 
+Murphy, B. I., & Udjulawa, D. (2013). Fasilitas Sistem Informasi Akademik 
+Berbasis Web untuk SMA Negeri oleh PT. XL Axiata, Tbk. Palembang.  
+Palembang: STMIK GI MDP. 
+Rahmani, A. (2017, Desember 7). Mengenal Komponen Gaji Karyawan dan Cara 
+Mehitungnya . Retrieved from Jurnal: http://www.jurnal.id 
+Raymond McLeod, J. (2010). Sistem Informasi Edisi 7 Jilid 2  (Tujuh ed.). Jakarta: 
+Prenhallindo. 
+Satzinger, J. W. (2010). System Analysis and Design in a Changing World.  
+Boston: Course Technology. 
+Setiawan, P. (2015, Februari 6). Pengertian dan Jenis-jenis Absensi . Retrieved 
+from gurupendidikan: http://http://www.gurupendidikan.co.id/pengertian-
+dan-jenis-jenis-absensi/ 
+Sutabri, T. (2013). Konsep Sistem Informasi.  Yogyakarta: Andi. 
+Sutarman. (2012). Buku Pengantar Teknologi Informasi.  Jakarta: Bumi Aksara. 
+ 
+ 
+  
+
+ 
+ 
+80 
+ LAMPIRAN 
+Lampiran 1 . Surat Balasan Instansi    
+  
+
+ 
+ 
+81 
+ Lampiran 2 . Form KP 5 – Acuan Kerja  
+ 
+
+ 
+ 
+82 
+ Lampiran 3 . Form KP 5 – Garis Besar Rencana Kerja Mingguan   
+ 
+ 
+ 
+  
+
+ 
+ 
+83 
+ Lampiran 4 . Form KP – 6 Log Harian dan Catatan Perubahan Acuan Kerja  
+  
+
+ 
+ 
+84 
+  
+
+ 
+ 
+85 
+ Lampiran 5 . Form KP – 7 Kehadiran Kerja Praktik  
+ 
+ 
+
+ 
+ 
+86 
+  
+
+ 
+ 
+87 
+  
+Lampiran 6 . Kartu Bimbingan Kerja Praktik  
+ 
+ 
+ 
+
+ 
+ 
+88 
+ 
+Lampiran  7. Biodata Penulis  
+ 
+ 
+ 
+ 
+SMA    
+Tahun Lulus  : 2012 – 2015  
+Jurusan  : IPA 
+Nama Institusi  : SMA Kemala Bhayangkari 1 Surabaya  
+Alamat Institusi  : Jl. A. Yani 30 – 32  
+Kota Institusi  : Surabaya  
+ 
+ 
+ 
+ Nama  : Sarah Hasna Shiba  
+Tempat / Tgl  Lahir  : Blitar, 5 Januari 1997  
+Jenis Kelamin  : Perempuan  
+Agama  : Islam  
+Kewarganegaraan  : Indonesia  
+Alamat  : Jl. Simowau Indah Blok D/23  
+Hobi  : Menyanyi , Menonton Film  
+No Telp / Hp  : 081333745449  
+E-mail : 15410100 038@stikom.edu  
+ 
+Riwayat Pendidikan    
+SD   
+Tahun Lulus  : 2003 - 2009  
+Nama Institusi  : SDN Kebonsari II  No. 415 
+Alamat Institusi  : Jl. Kebonsari Sekolahan I  
+Kota Institusi  : Surabaya  
+   
+SMP    
+Tahun Lulus  : 2009 - 2012  
+Nama Institusi  : SMP Negeri 36 Surabaya  
+Alamat Institusi  : Jl. Kebonsari Sekolahan No. 15  
+Kota Institusi  : Surabaya  
+Perguruan Tinggi    
+Tahun Lulus  : 2015 – Sekarang  
+Jurusan  : S1 Sistem Informasi  
+Nama Institusi  : Institut Bisnis Dan Informatika Stikom Surabaya  
+Alamat Institusi  : Jl. Raya Kedung Baruk No. 98  
+Kota Institusi  : Surabaya, Jawa Timur  
+
+ 
+ 
+89 
+   Keahlian  
+1. Bahasa Pemrograman (HTML, PHP, CSS, Javascript, JAVA) 
+2. Bahasa Kueri (Oracle Database, SQL Server, MySQL) 
+3. Microsoft Office (Word, Powerpoint, Excel, Access, Visio) 
+  Pengalaman Organisasi dan Kepanitiaan  
+1. Sie Acara DPR I UKM STIKOMUSIC   2015  
+2. Sekertaris Acara SIGN IN  2016  
+3. Panitia Acara BigEvent STIKOMUSIC 2016    
+4. Paniti Diklat VI STIKOMUSIC 2016  
+5. Panitia DPR I UKM STIKOMUSIC 2016  
+6. Ketua Pelaksana Baksos Ramashan STIKOMUSIC 2017   
+7. Sekertaris Diklat VII STIKOMUSIC 2017   
+8. Panitia Acara BigEvent 2017  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+

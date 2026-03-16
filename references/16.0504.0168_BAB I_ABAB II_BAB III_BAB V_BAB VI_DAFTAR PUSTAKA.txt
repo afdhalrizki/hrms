@@ -1,0 +1,1759 @@
+SKRIPSI  
+APLIKASI PENGGAJIAN BERBASIS WEB SERTA 
+PERHITUNGAN PPH 21 STUDI KASUS :  
+( CV.RESTU JAYA TANGERANG )  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+OLEH :  
+  
+AGIT ARDIAN  
+NPM.  16.0504 .0168  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+PROGRAM STUDI TEKNIK INFORMATIKA  
+FAKULTAS TEKNIK  
+UNIVERSITAS MUHAMMADIYAH  
+2020
+
+ii 
+ 
+HALAMAN P ENEGASAN  
+ 
+ 
+Tugas Akhir/Skripsi ini adalah hasil karya saya sendiri, dan semua sumber baik  
+yang dikutip maupun dirujuk telah saya nyatakan dengan benar.  
+Nama  :  AGIT ARDIAN  
+NPM  :  16.0504 .0168  
+ 
+ 
+ 
+ 
+Magelang, 19 Agustus 2020  
+ 
+ 
+AGIT ARDIAN  
+NPM . 16.0504 .0168  
+ 
+ 
+ 
+  
+iii 
+ 
+HALAMAN  PENGESAHAN  
+ 
+SKRIPSI   
+APLIKASI PENGGAJIAN BERBASIS WEB SERTA PERHITUNGAN     
+PPH 21 STUDI KASUS : ( CV.RESTU JAYA TANGERANG )  
+ 
+ 
+dipersiapkan dan disusun oleh  
+ 
+NPM.  16.0504 .0168  
+ 
+Telah dipertahankan di depan Dewan Penguji  
+Pada tang gal ................................  
+ 
+ 
+Susunan Dewan Penguji  
+ 
+Pembimbing I  
+ 
+ 
+ 
+Agus Setiawan, M.Eng.  
+NIDN . 0617088801  Pembimbing II  
+ 
+ 
+ 
+Setiya Nugroho, S.T., M.Eng  
+NIDN. 0631088203  
+ 
+Penguji I  
+ 
+ 
+ 
+R. Arri Widyanto, S.Kom., M.T.  
+NIDN. 0616127102   
+Penguji II  
+ 
+ 
+ 
+Endah Ratna Arumi, M.Cs.   
+NIDN. 0601129001  
+ 
+Skripsi ini telah diterima sebagai salah satu persyaratan  
+ 
+untuk memperoleh gelar Sarjana Komputer  
+Tanggal .........................   
+Dekan  
+ 
+ 
+Yun Arifatul Fatimah, ST., MT., Ph.D.  
+NIDN. 1006067403  
+
+iv 
+  
+KATA PENGAN TAR  
+ 
+ 
+Segala puji dan syukur kepada Allah SWT yang telah melimpahkan rahmat dan 
+karunia -Nya kepada penulis, sehingga penulis bisa menyelesaikan skripsi ini. 
+Shalawat dan juga salam senantiasa tercurah kepada Junjungan kita semua Nabi 
+Muhammad SAW .  sebagai  syarat dalam menyelesaiakan Program Sarjana (S1) 
+dalam Program Sarjana Fakultas Teknik  Jurusan Teknik Informatika  Universitas 
+Muhammadiyah Magelang .  
+Penulis menyadari mengenai penulisan ini tidak bisa terselesaikan tanpa pihak -
+pihak yang mendukung baik  secara moril dan juga materil. Maka, penulis 
+menyampaikan banyak -banyak terima kasih kepada pihak -pihak yang membantu 
+penulis dalam penyusunan skripsi ini terutama kepada:  
+1. Kedua orang tua, ayahanda tersayang Aripin dan ibunda tercinta Yayah.C 
+yang memberi kan dukungan moril dan materil serta doa yang dipanjatkan 
+kepada ALLAH SWT untuk penulis.  
+2. Segenap keluarga  dan sahabat yang selalu menemani dan menyemangati 
+bahkan ikut membantu penyelesaian skripsi ini.  
+3. Keluarga besar Mapala WAMADIKA STIMIK AKAKOM Yogyak arta telah 
+memberi pengalaman ilmu  organisasi dan petualangan  
+4. Agus Setiawan, M.Eng selaku dosen pembimbing utama yang telah 
+menyediakan waktu, tenaga, dan pikiran untuk mengarahkan penyusunan 
+skripsi  ini; 
+5. Setiya Nugroho, S.T., M.Eng selaku  dosen  pembimbi ng pendamping  
+v 
+ 
+yang  telah menyediakan waktu, tenaga, dan pikiran untuk mengarahkan 
+penyusunan skripsi  ini; 
+6. Beberapa pihak yang telah banyak membantu dalam usaha memperoleh data 
+yang diperlukan;  
+ Penulis menyadari bahwa skripsi yang penulis buat ini masih ja uh dari 
+sempurna hal ini karena terbatasnya pengetahuan dan pengalaman yang dimiliki 
+penulis. Oleh sebab itu, penulis mengharapkan adanya saran dan masukan bahkan 
+kritik membangun dari berbagai pihak. Semoga skripsi ini bisa bermanfaat bagi 
+para pembaca da n pihak -pihak khususnya dalam bidang kompuer . 
+ 
+ 
+Magelang, 19 Agustus 2020  
+ 
+ 
+AGIT ARDIAN  
+NPM . 16.0504 .0168  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+vi 
+ 
+HALAMAN PERNYATAAN PERSETUJUAN PUBLIKASI  
+SKRIPSI UNTUK KEPENTINGAN AKADEMIS  
+ 
+Sebagai sivitas akademik Universitas Muhammadiyah Magelang, yan g 
+bertandatangan di bawah ini :  
+Nama  :  Agit Ardian  
+NPM  :  16.0504 .0168  
+Program Studi   :  Teknik Informatika  
+Fakultas  :  Teknik  
+Jenis karya  :  Skripsi  
+ 
+Menyatakan bahwa demi pengembangan ilmu pengetahuan, menyetujui untuk 
+memberikan kepada Fakultas Tekni k Universitas Muhammadiyah Magelang Hak 
+Bebas Royalti Noneksklusif ( Non-exclusive Royalty -Free Right ) atas karya 
+ilmiah yang berjudul  : 
+APLIKASI PENGGAJIAN BERBASIS WEB SERTA PERHITUNGAN PPH 
+21 STUDI KASUS : ( CV.RESTU JAYA TANGERANG )  
+ 
+beserta perangkat y ang ada (jika diperlukan).Dengan Hak Bebas Royalti 
+Noneksklusif ini Fakultas Teknik Universitas Muhammadiyah Magelang berhak 
+menyimpan, mengalihmedia/memformatkan, mengelola dalam bentuk pangkalan 
+data ( database ), merawat, dan mempublikasikan Tugas Akhir/S kripsi tersebut 
+selama tetap mencantumkan nama saya sebagai penulis/pencipta dan sebagai 
+pemilik Hak Cipta.  
+Demikian pernyataan ini dibuat dengan sebenar -benarnya tanpa paksaan dari 
+pihak manapun.  
+Dibuat  di  : Magelang  
+Pada  tanggal   :  19 Agustus 2020  
+Yang menyatakan  
+ 
+ 
+ 
+Agit Ardian  
+NPM. 16.0504 .0168  
+ 
+vii 
+ ABSTRAK  
+ 
+ 
+Selama ini proses penggajian di CV Restu Jaya Tangerang dilakukan secara 
+manual, dengan proses yang masih manual, kekeliruan perhitungan pun tak dapat 
+dihindarkan. Hal ini mengakibatkan ketidaknyam anan bagi karyawan dalam 
+bekerja, yang pada akhirnya dapat mengurangi produktifitas karyawan itu sendiri. 
+Dengan adanya permasalahan tersebut, penulis merasa perlu untuk membuat suatu 
+aplikasi pemrograman yang dapat membantu pekerjaan administrator CV Rest u 
+Jaya Tangerang dalam mengelola data kehadiran karyawan yang menjadi dasar 
+untuk melakukan perhitungan gaji, sehingga pada akhirnya diperoleh sistem 
+penggajian yang efektif dan efisien.Aplikasi penggajian berbasis web CV Restu 
+Jaya Tangerang ini dibuat de ngan menggunakan Php dan MySQL sebagai 
+databasenya. Aplikasi penggajian ini dapat digunakan untuk mengelola data 
+karyawan, kerja, libur, gaji, juga untuk melakukan perhitungan gaji berdasarkan 
+data yang telah diinputkan, dan dapat digunakan untuk mencetak laporan. 
+Akhirnya dengan adanya sistem informasi penggajian ini, proses perhitungan gaji 
+dapat dilakukan secara otomatis tanpa perlu menghitung secara manual dan data 
+gaji yang diperoleh sudah sesuai, dengan catatan sesuai dengan data yang telah di 
+inputka n. 
+ 
+  
+viii 
+ DAFTAR ISI  
+ 
+ 
+HALAMAN JUDUL  ................................ ................................ ...........................  i 
+HALAMAN PENEGASAN  ................................ ................................ ...............  ii 
+HALAMAN  PENGESAHAN  ................................ ................................ ...........  iii 
+KATA PENGANTAR  ................................ ................................ .......................  iv 
+HALAMAN PERNYATAAN PERSETUJUAN PUBLIKASI  ........................  vi 
+ABSTRAK  ................................ ................................ ................................ ........  vii 
+DAFTAR ISI  ................................ ................................ ................................ ... viii 
+BAB 1  PENDAHULUAN ................................ ................................ ...................  1 
+A. Latar Belakang  ................................ ................................ ....... 1 
+B. Rumusan Masalah  ................................ ................................ .. 3 
+C. Tujuan Penelitian  ................................ ................................ ... 3 
+D. Manfaat Penelitian  ................................ ................................ . 3 
+BAB II  TINJAUAN PUSTAKA  ................................ ................................ ..... 4 
+A. Penelitian yang Relevan  ................................ .........................  4 
+B. Penjelasan secara teoritis masing masing variable penelitian  .. 5 
+1. Sistem Informasi  ................................ ................................ .... 5 
+2. Tunjangan  ................................ ................................ ..............  6 
+3. Perpajakan  ................................ ................................ ..............  6 
+4. Basis Data  ................................ ................................ ..............  7 
+5. DBMS (Database Management System)  ................................ . 8 
+6. ERD (Entity Relationship Diagram)  ................................ ....... 8 
+7. DFD (Data Flow  Diagram)  ................................ .....................  8 
+8. PHP (Hypertext Preprocessor)  ................................ ...............  9 
+9. MySQL  ................................ ................................ ..................  9 
+10. XAMPP (Explorer Apache MySQL PHP PHPMyAdmin)  ...... 9 
+BAB III  ANALISIS DAN PERANCANGAN SISTEM  ................................  10 
+A. Analisis  ................................ ................................ .......................  10 
+1. Analisis Sistem Yang Sedang Berjalan  ................................ . 11 
+2. Proses Penghitungan Penggajian  ................................ ..........  11 
+a. Diagram flowmap  ................................ ..........................  12 
+b. Anilisis Aturan Bisnis  ................................ ....................  13 
+c. Aturan Bisnis Pada Sistem Yang Sedang Berjalan  .........  13 
+ix 
+ d. Aturan Bisnis Pada Sistem Yang Akan Dibangun  ..........  14 
+e. Analisis Kebutuhan Non Fungsional  ..............................  14 
+f. Analisis Perangkat Keras  ................................ ...............  15 
+g. Analisis  Kebutuhan Fungsional  ................................ ..... 16 
+h. Analisis Perangkat Lunak/Software  ...............................  16 
+3. Analisis Pengguna/User  ................................ ........................  17 
+B. Perancangan Sistem  ................................ ................................ .... 18 
+1. Diagram  Konteks  ................................ ................................ . 18 
+2. DFD  Level  1 ................................ ................................ ........  19 
+3. DFD Level  2 Proses 2 Pengolahan Data Master  ....................  20 
+4. DFD  Level 3 Proses 2. 1 Pengolahan Data User  ....................  21 
+5. DFD Level  3 Proses 2. 2 Pengolahan Data absens i ................  22 
+6. DFD Level 3 Proses 2.3 Pengolahan pajak  ...........................  22 
+7. DFD Level 3 Proses 2.4 Pengolahan Data karyawan .............  23 
+8. Spesifikasi Proses DFD  ................................ ........................  23 
+9. Kamus Data DFD  ................................ ................................ . 27 
+10. Rancangan basis data ................................ ............................  29 
+11. Struktur Tabel  ................................ ................................ ...... 31 
+12. Tabel Relasi  ................................ ................................ .........  34 
+13. Rancang Interface  ................................ ................................ . 35 
+14. Perancangan Antar Muka Data Penggajian  ...........................  42 
+BAB IV  IMPLEMENTASI DAN PENGUJIAN  ................................ ...........  45 
+A. Implementasi  ................................ ................................ ........  45 
+B. Pengujian  ................................ ................................ .............  54 
+BAB V  HASIL DAN PEMBAHASAN  ................................ .........................  69 
+A. Hasil ................................ ................................ .....................  69 
+B. Pembahasan  ................................ ................................ .........  72 
+BAB VI  PENUTUP  ................................ ................................ ........................  74 
+A. Kesimpulan  ................................ ................................ ..........  74 
+B. Saran  ................................ ................................ ....................  74 
+DAFTAR PUSTAKA  ................................ ................................ .......................  75 
+ 
+1 
+ BAB 1  
+PENDA HULUAN  
+A. Latar Belakang  
+Gaji umumnya merupakan wujud penghargaan yang  diberikan dari 
+perusahaan kepada para pekerjanya atas kontribusi  untuk perusahaan tersebut. 
+Gaji juga merupakan  kebutuhan pokok dari para pekerja, sehingga pemberian 
+gaji tidak  boleh sampa i terlambat atau salah perhitungan. Perhitungan gaji  
+yang salah dapat menyebabkan mundurnya waktu pemberian gaji,  yang dapat 
+menimbulkan huru -hara di sebuah perusahaan, dan  dapat merugikan 
+karyawan yang bekerja di peru sahaan tersebut.  
+CV Restu Jaya Tangera ng adalah sebuah perusahaan yang bergerak di 
+bidang pembuatan beton, seperti tiang listrik, paku bumi, tiang pancang,  
+pembatas jalan tol  dan lain -lain. CV. Restu Jaya Tangerang memiliki 
+kekhususan atau spesialisasi produksi yaitu sebagai produsen tiang lis trik dan 
+pembatas jalan tol. CV. Restu Jaya Tangerang diketahui memiliki 235 
+karyawan saat ini juga berbenah dalam rangka memperbaiki kompetensi pada 
+organisasinya, baik kompetensi perusahaan maupun kompetensi tiap individu. 
+Perusahaan ini masih menggunaka n microsoft words dan microsoft excel 
+dalam proses penggajian karyawan sampai dengan proses laporan penggajian.  
+Perusahan  CV. Restu Jaya Tanggaerang memiliki beberapa 
+permaslahan di pengarsipan data yang belum terkomputerisai dengan baik 
+misalnya  absesns i karyawan yg masih menggunakan  absensi secara manual  
+2 
+ dan di arsipakn berbentuk kertas print, laporan tidak tersimpan dengan aman 
+dan sering terlambatnya pembuatan  laporan keuangan .  
+Karyawan merupakan aset perusahaan yang paling berharga apalagi 
+dalam perusahaan, jasa karyawan adalah komponen penting dalam produk 
+perusahaan. Berkaitan dengan hal tersebut, maka penggajian juga merupakan 
+hal yang sangat peka terhadap kemajuan dan keberhasilan suatu perusahaan, 
+karena penggajian berkaitan langsung pada mot ivasi dan loyalitas pegawai 
+terhadap perusahaan.   
+Membuat skema perancangan database (basis data) untuk Sistem 
+Informasi Penggajian, sangat membantu bagian pengembangan perangkat 
+lunak dalam membuat Sistem Informasi Penggajian dan memudahkan bagian 
+keuanga n dalam mengelola data penggajian dan dengan mudah mendapat 
+informasi yang dibutuhkan .  
+PPh Pasal 21 yang dimaksud adalah pajak penghasilan yang 
+dikenakan atas penghasilan berupa gaji, upah, honorarium, tunjangan dan 2 
+(dua) pembayaran lain dengan bentuk n ama apa pun yang diterima atau 
+diperoleh wajib pajak orang pribadi dan negeri. Dalam PPh Pasal 21 ini pajak 
+merupakan  pajak yang ditanggung oleh karyawan sendiri.  
+Merujuk pada permasalahan di atas maka diperlukan sebuah Sistem 
+Penggajian di CV. Restu Jaya Tangerang untuk dapat mempermudah dalam 
+melakukan proses penyimpanan data dan penghitungan laporan penggajian 
+tidak perlu lagi melakukan penghitungan secara manual dari penghitungan 
+3 
+ periode -periode sebelumnya. juga dengan adanya sistem ini semoga tidak ada  
+keterlambatan penggajian karyawan.  
+B. Rumusan Masalah  
+Berdasarkan latar belakang masalah tersebut maka dapat diambil 
+pokok permasalahan yaitu sebagai berikut :  
+1. Bagaimana menghitung gaji karyawan ?  
+2. Bagaimana menghitung pph pasal 21 ?  
+3. Bagaimana membuat laporan  penggajian ?  
+4. Bagaimana mengelola absensi karyawan ?  
+C. Tujuan Penelitian  
+Berdasarkan uraian di atas, maksud dan tujuan pada penelitian  ini 
+adalah :  
+1. Dapat menghitung gaji karyawan menggunakan aplikasi  
+2. Dapat menghitung pph pasal 21 menggunakan aplikasi  
+3. Dapat m embuat laporan penggajian menggunakan aplikasi  
+4. Dapat megelola absensi karyawan menggunakan aplikasi  
+D. Manfaat  Penelitian  
+Bagi pihak perusahaan CV. Restu Jaya Tangerang , hasil dari 
+penelitian ini  dapat  memberikan kemudahan  dalam meningkatkan kualitas 
+Bagi pih ak perusahaan diharapkan sistem yang di bangun dari hasil penelitian 
+ini dapat mempermudah proses penggajian terhadap karyawan menghitung 
+pph dan menghitung jumlah hadir,sakit dan ijin selama satu bulan penuh  
+ 
+4 
+ BAB II  
+TINJAUAN PUSTAKA  
+ 
+A. Penelitian yang Relev an  
+1. Aplikasi Penggajian Karyawan Tetap dan Perhitungan PPh 21 (studi 
+kasus PT Sentra Persada Tour), aplikasi ini dapat menghitung pajak PPh 
+21 dan menghitung gaji karyawan tetapi aplikasi ini tidak dapat membuat 
+jadwal kerja karyawan, mencetak laporan peng gajian. Aplikasi 
+Kehadiran dan Penggajian Karyawan Berbasis Web dan SMS Gateway 
+(Studi Kasus pada Lembaga Pendidikan Al -Imarat Bandung), pada 
+aplikasi ini dapat menghitung seluruh gaji karyawan tetap maupun 
+karyawan tidak tetap dan mengkonfirmasi ketidak h adiran dengan sms 
+gateway namun pada aplikasi ini tidak dapat membuat jadwal kerja 
+pegawai berdasarkan keahlian yang dimiliki karyawan dan tidak 
+menghasilkan bukti potong pajak PPh 21.  
+2. Aplikasi Pengupahan dan Perhitungan PPh 21 Atas Karyawan Upah 
+Harian L epas Berbasis Web (Studi Kasus PT Malibu Lancar Abadi 
+Jakarta), aplikasi ini dapat menghitung gaji karyawan perbulan serta 
+menghitung pajak PPh 21, namun aplikasi ini tidak dapat menghasilkan 
+bukti potong.  
+3. PPh pasal 21 dan tidak dapat membuat jadwal jam ke rja pegawai. 
+Aplikasi Penggajian dan Perhitungan PPh Pasal 21 (Studi Kasus: PT Adi 
+Guna Patra Tekhnologi Jakarta) dapat menghitung gaji karyawan dan 
+menghitung pajak penghasilan 21, namun pada aplikasi ini tidak dapat 
+5 
+ menampilkan jadwal kerja pegawai. Sist em Informasi Akuntansi 
+Penggajian Untuk Pegawai Berbasis Web (Studi Kasus: PT Trijaya 
+Garment) aplikasi ini dapat menghitung gaji pegawai, mengelola presensi 
+karyawan, dan menghitung PPh 21, dan membuat laporan penggajian, 
+namun aplikasi ini tidak dapat me muat penjadwalan jam kerja 
+karyawan,mencetak bukti potong dan SPT.  
+4. Aplikasi Penggajian berbasis web ,serta perhitungan pph dengan study 
+kasus CV. Restu Jaya Tangerang  Membuat skema perancangan database 
+(basis data) untuk Sistem Informasi Penggajian, sangat  membantu bagian 
+pengembangan perangkat lunak dalam membuat Sistem Informasi 
+Penggajian dan memudahkan bagian keuangan dalam mengelola data 
+penggajian dan dengan mudah mendapat informasi yang dibutuhkan . 
+Aplikasi ini dapat mengelola kehadiran karyawan ijin ,sakit,cuti. dan 
+membuat laporan penggajian yang akan nantinya mendapatkan slip gaji 
+serta menghitung PPh 21 keunggulan dari system ini adalah tanpa harus 
+menggunakan file yang di simpan di perangkat keras admin, jadi sewaktu 
+waktu Ketika data yang diperlu kan bisa di ambil kapan saja.   
+B. Penjelasan secara teoritis masing masing variable penelitian  
+1. Sistem  Informasi   
+Secara sederhana system dapat diartikan sebagai suatu kumpulan 
+atau himpunan dari unsur,  komponen, atau variable yang terorganisasi, 
+saling berint eraksi, saling tergantung satu sama lain dan terpadu. Teori 
+system secara umum perama kali di uraikan oleh Kenneth boulding 
+6 
+ terurama menekankan pentingnya perhatian terhadap setiap bagian yang 
+membentuk sebuah system ( Penerbit ANDI ,Analisis Sistem Inform asi, 
+Tata Sutabri, 2012 )  
+2. Tunjangan  
+Tunjangan kinerja merupakan tambahan pendapatan bagi pegawai 
+berbasis pada kinerja pegawai. Tujuan diterapkan tunjangan kinerja 
+adalah untuk meningkatkan motivasi kepuasan dan kinerja karyawan 
+tersebut. Terkait tunjangan  kinerja adalah apakah sudah diterapkan 
+berbasis pada nilai – nilai keadlian artinya apakah tunjangan kinerja telah 
+di peraktikkan secara adil mendasarkan pada kinerja pegawai dengan 
+mendasarkan pada metode tertentu yang dapat mendorong pr oduktivitas. 
+(Jurnal Siasat Bisnis, Evaluasi keadilan praktik tunjangan kinerja pada 
+kepuasan dan kinerja k aryawan di kantor BPS DIY, 2015 ) 
+3. Perpajakan  
+Penerimaan perpajakan merupakan salah satu pilar utama 
+penerimaan dalam APBN yang digunakan untuk memenuhi kebutuhan 
+belan ja negara dalam rangka pembangunan nasional. Meskipun 
+demikian, penerimaan perpajakan di Indonesia masih rendah ditunjukkan 
+dengan tax ratio  Indonesia baru sekitar 12,4% terhadap produk domestic 
+Bruto (PBD) pada APBN 2010 ( El Hida, 2010 )  
+Pengamat ekonomi  Faisal Basri menyatakan berbagai masalah 
+yang menyebabkan rendahnya tax ratio ini antara lain kesadaran 
+masyarakat untuk membayar pajak yang masih rendah, pelayanan pajak 
+7 
+ 
+yang buruk, dan perilaku korupsi dari aparat pajak sendiri (Maulidin, 
+2009). Berbaga i kasus skandal pajak yang melibatkan aparat pajak 
+akhirakhir ini mungkin akan menyebabkan semakin rendahnya 
+penerimaan perpajakan. Masalah perpajakan lain di Indonesia adalah 
+rendahnya penerimaan Pajak Penghasilan (PPh) orang pribadi. Direktur 
+Jenderal (D irjen) Pajak Kementerian Keuangan Mochammad Tjiptardjo 
+menyatakan bahwa, sampai sekarang, penerimaan PPh badan mencapai 
+70% dari keseluruhan pendapatan pajak sementara PPh orang pribadi 
+hanya 30%. Kondisi ini terbalik jika dibandingkan dengan negara -negara  
+makmur seperti Eropa di mana penerimaan dari PPh orang pribadi jauh 
+diatas PPh badan.( Jurnal Model dan kepatuhan perpajakan, Nur 
+Cahyonowati , 2011 )  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+4. Basis Data  
+Basis data terdiri atas 2 kata, yaitu Basis dan Data. Basis kurang 
+lebih dapat diart ikan sebagai markas atau gudang, tempat 
+bersarang/berkumpul. Sedangkan data adalah  representasi fakta dunia 
+nyata yang mewakili suatu objek seperti manusia (pegawai, siswa, 
+8 
+ pembeli, pelanggan), barang, hewan, peristiwa, konsep, keadaan, dan 
+sebagainya, yan g direkam dalam bentuk angka, simbol, teks, gambar, 
+bunyi, atau kombinasinya.  
+5. DBMS (Database Management System)  
+Pengolahaan basis data secara fisik tidak dilakukan oleh pemakai 
+secara langsung, tetapi ditangani oleh sebuah perangkat lunak atau sistem 
+yang khusus. Perangkat lunak ini disebut DataBase Management System 
+(DBMS)  yang akan menentukan bagaimana data diorganisasi, disimpan, 
+diubah dan diambil kembali.  
+6. ERD (Entity Relationship Diagram)  
+Entity Relationship Diagram ERD  adalah pemodelan awal basis 
+data yang paling banyak digunakan. ERD  dikembangkan berdasarkan 
+teori himpunan dalam bidang matematika. ERD  digunakan untuk 
+pemodelan basis data relasional sehingga jika penyimpanan basis data 
+menggunakan OODBMS  maka perancangan basis data tidak perlu 
+menggun akan ERD.  
+7. DFD (Data Flow  Diagram)  
+Data Flow  diagram atau biasa disingkat DFD atau dalam bahasa 
+indonesia sebagai Diagram Arus Data (DAD), merupakan penggambaran 
+jaringan kerja dari suatu sistem (otomatis, Manual, atau kombinasi). 
+Penggambaran DFD terhadap  kasus yang serupa dapat berbeda 
+tergantung . 
+ 
+9 
+ 8. PHP (Hypertext Preprocessor)  
+PHP merupakan script untuk pemrograman berbasis web server -
+side. Dengan menggunakan PHP maka maintenance suatu situs web 
+menjadi lebih mudah. Proses update data dapat dilakukan deng an 
+menggunakan aplikasi yang dibuat dengan script PHP.  
+9. MySQL  
+MySQL  merupakan DBMS  yang pertama kali mulai dikembangkan 
+tahun 1994 oleh sebuah perusahaan software  bernama TcX Data Konsult 
+AB yang dikemudian hari berganti nama menjadi MySQL -AB. My pada 
+kata MySQL  sebenarnya bukan berarti MY dalam bahasa inggris, tetapi 
+konon merupakan nama putri dari Michael Widenius, pemrogram DBMS  
+tersebut. Versi lain menyebutkan My adalah kependekan dari Monty  yang 
+merupakan julukan untuk Michael Widenius.  
+10. XAMPP (Explorer Apache MySQL PHP PHPMyAdmin)  
+XAMPP merupakan paket PHP berbasis Open Source yang 
+dikembangkan oleh sebuah komunitas Open Source, yang dapat 
+digunakan sebagai tool pembantu pengembangan aplikasi berbasis PHP. 
+XAMPP mengombinasikan beberapa paket perangkat l unak berbeda ke 
+dalam satu paket.  
+  
+10 
+ BAB III  
+ANALISIS DAN PERANCANGAN SISTEM  
+ 
+A. Analisis  
+Penelitian ini dapat di katagorikan sebagai penelitian evaluasi di mana 
+peneliti mengumpulkan data menyajikan informasi yang akurat dan objektif 
+mengenai system penggajia n CV. Restu Jaya tanggerang. Berdasarkan 
+akurasi dan ojektifitas informasi yang di peroleh selanjutnya dapat 
+menentukan nilai atau tingkat keberhasilan program,  sehingga bermanfaat 
+untuk pemecahan masalah yang di hadapi serta mempertimbangkan apakah 
+progra m tersebut perlu di lanjutkan atau dimodifikasi.  
+Adapun pendekatan  yang di gunakan dalam penelitian ini dengan 
+menggunakan pendekatan  kuantitatif dan di dukung pendekatan kualitatif 
+.pendekatan kuantitatif  di gunakan untuk menangani data -data yg bersifat 
+kuatitatif (angka). Sedangkan pendekatan kualitatif di gunakan berdasarkan 
+pada pertimbangan bawa penelitian ini merupakan proses yang dilakukan 
+melalui  aktifitas para pelaku yang terlibat di dalamnya.  
+Analisis sistem merupakan tahapan yang dilakukan sebe lum 
+melakukan proses perancangan program atau perangkat lunak, dimana 
+analisis sistem dilakukan untuk mengetahui pokok permasalahan yang 
+dihadapi dan apa saja kebutuhan dari sistem tersebut. proses analisis sistem 
+sangat diperlukan agar sistem sesuai denga n kebutuhan user dan dapat 
+membantu menyelesaikan masalah.  
+11 
+ 1. Analisis Sistem Yang Sedang Berjalan  
+Berdasarkan hasil wawancara pada sistem yang sedang berjalan di 
+CV. Restu Jaya Tangerang  yaitu:  
+1. Project  manager  mengumpulkan data kehadiran karyawan untuk 
+diser ahkan ke bagian administrasi.  
+2. Bagian administrasi menghitung jumlah gaji berdasa rkan kehadiran , 
+pajak penghasilan, mencetak slip gaji dari file excel untuk karyawan 
+dan mencetak laporan gaji untuk di serahkan ke direktur.  
+3. Direktur menerima laporan penggaji an karyawan.  
+4. Karyawan menerima gaji dan slip gaji berdasarkan jumlah 
+kehadiran, lembur, tunjangan dll.  
+2. Proses Penghitungan Penggajian  
+Proses penghitungan gaji di CV.  Restu Jaya Tanggerang memiliki 4   
+komponen yaitu gaji pokok, t unjangan, transport, uang ma kan. 
+a. Gaji poko merupakan imbalan dasar dari sebuah pekerjaan yang 
+besarnya di tentukan menurut upah  yang sudah di tentukan oleh 
+perusahaan CV.  Restu Jaya Tanggerang  dan jika pegai ijin sakit atau 
+cuti gaji pokok tidak akan berkurang  
+b. Pemberin tunjangan te tap kepada pegawai didasarkan pada jabatan 
+dan kelas jabatan, serta di bayarkan dalam satu waktu yang sama 
+dalam satu waktu yang sama dengan gaji pokok .  
+12 
+ 
+c. Uang tranfortasi yang jumlahnya di hitung perhari  dan di bayarkan 
+dalam waktu yang sama dengan gaji p okok yang berdasarkan 
+kehadiran.  
+d. Uang makan jumlahnya di hitung  perhari sama seperti  uang tranfort 
+yang berdasarkan kehadiran .  
+e. Pajak pph 21 yang dihitung dari jumlaj gaji, tunjangan, uang makan, 
+uang transfort.  
+a. Diagram flowmap  
+Penggambaran prosedur dan  dokumen  yang terlibat pada 
+gambar 3. 1 dalam sistem yang sedang Diagram Flowmap 
+berikut.  Dari gambar di atas dapat di deskripsikan sebagai 
+berikut  :  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 1Diagram Flowmap Sistem Yang Sedang Berjalan  
+13 
+ Project Manager menginput data karyawan mulai dari data 
+keterlambatan tidak masuk dan lembur. Administrasi Menginput 
+data yang sudah di buat oleh Project Manager . 
+Administrasi melakukan penghitungan dan mendata 
+tunjangan dilakukan dengan manual . Administrasi Memberikan 
+Pembayaran Gaji karyawan sesuai dengan data masuk dan 
+lembur sesuai perhitungan . Administrasi membagi bagian slip 
+gaji 1 dengan fisik lalu memberikan kepada karyawan 
+administrasi membuat laporan gaji karyawan,  dilakukan dengan 
+manual administrasi memberikan dokument pelaporan  gaji 
+karyawan  direktur menerima laporan gaji karyawan dalam 
+bentuk dokumen.  
+b. Anilisis Aturan Bisnis  
+Analisis aturan bisnis ini menjelaskan tentang aturan 
+bisnis baik secara lisan ataupun  secara tertulis di CV. Restu Jaya 
+Tangerang pada saat ini dan aturan bisni s pada sistem yang akan 
+dibangun.  
+c. Aturan Bisnis Pada Sistem Yang Sedang Berjalan  
+Aturan bisnis pada sistem yang sedang berjalan 
+merupakan deskripsi mengenai aturan -aturan terhadap sistem 
+yang ada di CV. Restu Jaya Tangerang Berikut adalah aturan 
+bisnis pad a sistem yang sedang berjalan:  
+ 
+14 
+ 1. Penghitungan gaji dilakukan dengan microsoft excel.  
+2. Penghitungan gaji berdasarkan jumlah kehadiran, jabatan, 
+upah lembur dan tunjangan.  
+3. Catatan penggajian bulan sebelumnya tersimpan dalam 
+bentuk kertas print.  
+4. Penghitungan le mbur tidak dihitung perjam melainkan 
+waktu lembur telah ditentukan setiap harinya yaitu minimal 
+3 jam bekerja.  
+d. Aturan Bisnis Pada Sistem Yang Akan Dibangun  
+Analisis terhadap sistem yang akan dibangun merupakan 
+deskripsi mengenai aturan -aturan yang akan dit erapkan pada 
+sistem yang akan dibangun di CV. Restu Jaya Tangerang. 
+Aturan bisnis yang masih berjalan masih dipergunakan tetapi 
+ada beberapa aturan bisnis yang diusulkan pada sistem yaitu 
+sebagai berikut:  
+1. Penghitungan gaji dan pajak pph 21 menggunakan sist em 
+informasi berbasis website.  
+2. Catatan penggajian sebelumnya akan tersimpan didatabase 
+dan akan di cetak dalam bentuk pdf.  
+3. Semua kebutuhan penggajian sudah disesuaikan untuk 
+keperluan CV. Restu Jaya Tangerang.   
+e. Analisis Kebutuhan  Non Fungsional  
+    Analisi s kebutuhan non -fungsional dilakukan untuk 
+mengetahui spesifikasi -spesifikasi apa saja yang berhubungan 
+dengan sistem yang sedang berjalan dan sistem yang akan 
+15 
+ dibangun. Spesifikasi kebutuhan melibatkan analisis perangkat 
+keras, analisis perangkat lunak da n analisis pengguna.  
+f. Analisis Perangkat Keras  
+Ada beberapa komputer yang di pakai di kantor CV. Restu 
+Jaya Tangerang, komputer  tersebut  di pakai untuk pengolahan 
+penggajian. Adapun spesifikasi komputer pada tabel 3.1 sebagai 
+berikut:  
+Tabel 3. 1 Analisis Per angkat Keras  
+No Perangkat Keras  Spesifikasi  
+1 Processor  Core i3 2.53 Ghz  
+2 Memory  4096MB RAM  
+3 Hdd Mininal  320 GB  
+4 Monitor  LCD 15’’  
+5 VGA  Intel HD Graphic  
+6 Keyboard  Standart  
+7 Mouse  Standart  
+8 Printer  Standart  
+ 
+Dalam menjalankan aplikasi  sistem informasi penggajian  
+ini dibutuhkan sesuatu  perangkat keras yang memenuhi syarat 
+spesifikasi minimum agar dapat berjalan  dengan baik dan lancar. 
+Spesifikasi minimum yang dibutuhkan untuk menjalankan 
+aplikasi tersebut dapat dilihat pada tabel 3. 2 berikut:  
+Tabel 3. 2 Perangkat Keras yang dibutuhkan  
+No Perangkat Keras  Spesifikasi  
+1 Processor  1,7 GHz  
+2 Monitor  Monitor 17” (ol)  
+3 Memory  1 GB  
+4 Hardisk  20 GB  
+5 VGA  512 MB  
+6 Keyboard  Standar  
+7 Mouse  Standar  
+16 
+ Perangkat keras yang  telah dimiliki CV. Restu Jaya  
+Tangerang saat ini, sudah memenuhi  standar kebutuhan 
+minimum spesifikasi perangkat keras yang dibutuhkan  untuk 
+membangun Sistem Informasi Penggajian menggunakan PHP.  
+g. Analisis  Kebutuhan Fungsional  
+Analisis kebutuhan fungsional dilakukan untuk 
+memberikan ga mbaran mengenai aliran data maupun informasi 
+yang ada pada program aplikasi yang akan dibangun. Analisis 
+kebutuhan fungsional digambarkan dalam analisis terstruktur 
+yang akan dibahas sebagai berikut.  
+ 
+h. Analisis Perangkat Lunak/Software  
+Analisis perangkat  lunak dijelaskan untuk mengetahui 
+perangkat lunak yang digunakan  di CV. Restu  Jaya Tangerang 
+dan kemudian membandingkan dengan kebutuhan  minimum 
+perangkat lunak yang harus ada untuk dapat menjalankan 
+aplikasi sistem informasi yang akan dibangun. Perangkat lu nak 
+yang digunakan di CV. Restu Jaya Tangerang dapat dilihat pada 
+tabel 3. 3 berikut:  
+ 
+Tabel 3. 3 Analisis Perangkat Lunak Yang Sedang digunakan  
+No Perangkat Lunak  Spesifikasi  
+1 Sistem Operasi  Windows 10  
+2 Web Browser  Mozilla Firefox, Google Chrome  
+17 
+ Sedang kan perangkat lunak minimum yang dibutuhkan 
+untuk menjalankan aplikasi sistem informasi yang akan 
+dibangun dapat dilihat pada tabel 3. 4 berikut:  
+ 
+Tabel 3. 4 Perangkat Lunak yang dibutuhkan  
+No Perangkat Lunak  Spesifikasi  
+1 Sistem Operasi  Windows 10  
+2 Web B rowser  Mozilla Firefox, Google Chrome  
+ 
+Berdasarkan perbandingan perangkat lunak yang ada, 
+maka dapat disimpulkan bahwa perangkat lunak yang dimiliki 
+CV. Restu Jaya Tangerang sudah memenuhi syarat yang 
+dibutuhkan, maka perangkat lunak dapat digunakan untuk  
+menjalankan aplikasi sistem informasi penggajian yang 
+dibangun.  
+3. Analisis Pengguna/User  
+Analisis user dimaksudkan untuk mengetahui siapa saja user yang 
+terlibat beserta karakteristiknya sehingga  dapat diketahui tingkat 
+pengalaman dan pemahaman user terhada p komputer. user yang ada saat 
+ini yaitu karyawan bagian administrasi CV. Restu Jaya Tangerang yang 
+bertugas mengelola  data penggajian karyawan , user memiliki 
+pengalaman dalam mengoperasikan komputer sudah cukup 
+berpengalaman dalam mengoperasikan Sistem Op erasi Windows dan 
+Microsoft Office.  Untuk lebih jelasnya analisis user bagian administrasi 
+yang bertugas di CV. Restu jaya dapat dilihat pada tabel 3. 5 berikut:  
+18 
+ Tabel 3. 5 Analisis Pengguna/User di CV. Restu Jaya Tangerang  
+No Pemahaman  Pengalaman  
+1 Memaha mi sistem operasi windows  
+Administrasi Penggajian 
+selama 1 tahun  2 Memahami Web Browser  
+3 Memahami Microsoft office Office 
+Terutama Excel  
+ 
+Sedangkan analisis pengguna/user yang dibutuhkan untuk 
+menjalankan  aplikasi sistem informasi yang akan dibangun dapat dilihat 
+pada tabel 3. 6 berikut : 
+Tabel 3. 6 Analisi Pengguna/User yang dibutuhkan  
+No Pemahaman  Pengalaman  
+1 Memahami sistem operasi windows  
+Administrasi Penggajian 
+selama 1 tahun  2 Memahami Web Browser  
+3 Memahami Microsoft office Office 
+Terutama Ex cel 
+Berdasarkan perbandingan  , maka dapat disimpulkan bahwa 
+pengguna atau bagian administrasi yang bertugas di CV. Restu Jaya 
+Tangerang sudah memenuhi syarat yang dibutuhkan, maka dipastikan 
+dapat menjalankan aplikasi sistem informasi penggajian yang akan 
+dibangun.  
+B. Perancangan Sistem  
+1. Diagram  Konteks  
+Diagram konteks merupakan suatu model untuk menjelaskan 
+secara global bagaimana data digunakan dan ditransformasikan untuk 
+19 
+ proses atau menggambarkan aliran data ke dalam maupun keluar sistem. 
+Diagram konteks p ada sistem ini dapat dilihat pada gambar 3. 2 berikut :  
+ 
+Gambar 3. 2 Gambar diagram konteks CV. Restu Jaya Tangerang  
+ 
+2. DFD  Level  1 
+DFD Level 1 ini menjelaskan bahwa pengguna sistem dapat 
+melakukan   akses pada  sistem  informasi dengan memilih menu yang 
+tersed ia ke dalam sistem sebagai  Admin istrator. DFD Level 1 pada 
+sistem informasi ini dapat dilihat pada gambar 3. 3. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+20 
+  
+Gambar 3. 3 DFD Level 1 Sistem Informasi Penggajian CV. Restu Jaya  
+ 
+3. DFD Level  2 Proses 2 Pengolahan Data Master  
+Diagram  alir data pa da level 2 pengolahan data master adalah 
+proses pengolahan  data user, absensi,  departemen dan  karyawan . Proses 
+pengolahan data master dapat dilihat pada gambar 3. 4. 
+
+21 
+  
+Gambar 3. 4 DFD Level 2 Proses 2 Pengolahan Data Master  
+ 
+4. DFD  Level 3 Proses 2. 1 Pengolahan  Data User  
+Diagram  alir data level 3 pengolahan data user adalah proses 
+penambahan, pengubahan, dan penghapusan data user. Proses 
+pengolahan data user dapat dilihat pada gambar 3. 5. 
+ 
+Gambar 3. 5 DFD Level 3 Proses 2. 1 Pengolahan Data User  
+
+22 
+ 5. DFD Level  3 Prose s 2.2 Pengolahan Data absensi  
+Diagram alir data level 3 pengolahan data absensi  adalah proses 
+penambahan, pengubahan, dan penghapusan data absensi . Proses 
+pengolahan data absensi  dapat dilihat pada gambar 3. 6. 
+ 
+Gambar 3. 6 DFD Level 3 Proses 2. 2 Pengolaha n Data absensi  
+ 
+6. DFD Level 3 Proses 2.3 Pengolahan pajak  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 7 DFD Level 3 Proses 2.3 Pengolahan Pajak  
+
+23 
+ 
+7. DFD Level 3 Proses 2.4 Pengolahan Data karyawan  
+Diagram alir data level 3 pengolahan data karyawan adalah proses 
+penambahan, pengubahan, da n penghapusan data karyawan . Proses 
+pengolahan data karyawan dapat dilihat pada gambar 3. 8. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 8 DFD Level 3 Proses 2.4 Pengolahan Data karyawan  
+ 
+8. Spesifikasi Proses DFD  
+Spesifikasi  proses digunakan untuk menggambarkan semua 
+proses model aliran yang  ada pada  DFD. Spesifikasi proses dari 
+gambaran DFD pada sistem diatas dapat dilihat pada tabel 3. 7  berikut:  
+Tabel 3. 7 Spesifikasi Proses DFD  
+No Proses  Keterangan  
+1 No. Proses  1 
+ Nama Proses  Login  
+ Source (sumber)  Administrasi  
+ Input  Data l ogin Administrasi  
+ Output  Info login Administrasi  
+ Destination (tujuan)  Home Administrasi  
+24 
+ No Proses  Keterangan  
+ Logika Proses  1. Administrasi  memasukkan data login 
+berupa username dan password.  
+2. Sistem akan memverifikasi apakah 
+data yang dimasukan sudah lengkap 
+dan benar atauka h sebaliknya.  
+3. Jika username dan password yang 
+dimasukkan benar maka user akan 
+masuk ke halaman user dan 
+menampilkan info login. Sedangkan 
+jika data login salah, maka sistem 
+akan menampilkan pesan username 
+dan password yang dimasukkan salah.  
+6 No. Proses  2.1.1 
+ Nama Proses  Proses tambah data User  
+ Source (sumber)  Administrasi  
+ Input  Data User  yang akan ditambahkan  
+ Output  Info User yang telah ditambahkan  
+ Destination (tujuan)  Home Administrasi  
+Home data User  
+ Logika Proses  1. Administrasi telah masuk men u data 
+User  
+2. Administrasi memilih tombol tambah 
+data User 
+3. Administrasi memasukan data User 
+4. Sistem akan mengecek apakah ada 
+data kosong.  
+5. 5. Administrasi dapat menekan tombol 
+save untuk menyimpan atau back  
+untuk kembali.  
+8 No. Proses  2.1.2  
+ Nama Proses  Proses ubah data User  
+ Source (sumber)  Administrasi  
+ Input  Data User  yang akan diubah  
+ Output  Info User yang telah diubah  
+ Destination (tujuan)  Home Administrasi  
+Home data User  
+ Logika Proses  1. Administrasi telah masuk menu data 
+User  
+2. Administrasi memilih to mbol ubah 
+data User 
+3. Administrasi memasukan data User  
+yang ingin diubah.  
+4. Sistem akan mengecek apakah ada 
+data kosong.  
+25 
+ No Proses  Keterangan  
+5. Administrasi dapat menekan tombol 
+save untuk menyimpan atau back  
+untuk kembali.  
+7 No. Proses  2.1.3  
+ Nama Proses  Proses hapus data User  
+ Source (sumber)  Administrasi  
+ Input  Data User  yang akan dihapus  
+ Output  Info User yang telah dihapus  
+ Destination (tujuan)  Home Administrasi  
+Home data User  
+ Logika Proses  1. Administrasi telah masuk menu data 
+User  
+2. Administrasi memilih data yang ingin 
+dihapus dengan menekan tompol 
+hapus.  
+3. Sistem akan memverifikasi apakah 
+benar mau menghapus data ?  
+4. Administrator klik ya  untuk 
+menghapus data  
+8 No. Proses  2.2 
+ Nama Proses  Pengolahan Data Absensi  
+ Source (sumber)  Administrasi  
+ Input  Data Absensi yang akan d itambahkan  
+Data Absensi yang akan diubah  
+Data Absensi  yang akan dihapus  
+ Output  Info Absensi yang telah ditambahkan  
+Info Absensi yang telah diubah  
+Info Absensi yang telah dihapus  
+ Destination (tujuan)  Home Administrasi  
+Home data Absensi  
+ Logika Proses  1. Administrasi berhasil melakukan 
+login pada sistem.  
+2. Administrasi memilih menu data 
+Absensi  
+3. Administrasi dapat melakukan 
+pengolahan data Absensi sesuai 
+dengan yang diinginkan.  
+10 No. Proses  2.2.2  
+ Nama Proses  Proses ubah data Absensi  
+ Source (sumber)  Admin istrasi  
+ Input  Data Absensi yang akan diubah  
+ Output  Info Absensi yang telah diubah  
+ Destination (tujuan)  Home Administrasi  
+Home data Absensi  
+26 
+ No Proses  Keterangan  
+ Logika Proses  1. Administrasi telah masuk menu data 
+Absensi  
+2. Administrasi memilih tombol ubah 
+data Absensi  
+3. Admini strasi memasukan data 
+Absensi yang ingin diubah.  
+4. Administrasi dapat menekan tombol 
+save untuk menyimpan atau back  
+untuk kembali.  
+11 No. Proses  2.2.3  
+ Nama Proses  Proses hapus data Absensi  
+ Source (sumber)  Administrasi  
+ Input  Data Absensi yang akan diha pus 
+ Output  Info Absensi yang telah dihapus  
+ Destination (tujuan)  Home Administrasi  
+Home data Absensi  
+ Logika Proses  1. Administrasi telah masuk menu data 
+Absensi  
+2. Sistem akang memverifikasi apakah 
+benar akan menghapus data ?  
+3. Administrasi memilih data yang ingin 
+dihapus dengan menekan tombol 
+hapus.  
+ Logika Proses  1. Karyawan telah masuk menu data 
+Karyawan  
+2. Karyawan memilih tombol tambah 
+data Karyawan  
+3. Karyawan memasukan data Karyawan  
+4. Karyawan dapat menekan tombol save 
+untuk menyimpan atau back  untuk 
+kembali.  
+ 
+12 No. Proses  2.4.2  
+ Nama Proses  Proses ubah data Karyawan  
+ Source (sumber)  Administrasi  
+ Input  Data Karyawan yang akan diubah  
+ Output  Info Karyawan yang telah diubah  
+ Destination (tujuan)  Home Administrasi  
+Home data Karyawan  
+ Logika Proses  1. Karyawan t elah masuk menu data 
+Karyawan  
+2. Karyawan memilih tombol ubah data 
+Karyawan  
+3. Karyawan memasukan data Karyawan 
+27 
+ No Proses  Keterangan  
+yang ingin diubah.  
+4. Karyawan dapat menekan tombol save 
+untuk menyimpan atau back  untuk 
+kembali.  
+13 No. Proses  2.4.3  
+ Nama Proses  Proses tambah data  Karyawan  
+ Source (sumber)  Administrasi  
+ Input  Data Karyawan yang akan dihapus  
+ Output  Info Karyawan yang telah dihapus  
+ Destination (tujuan)  Home Administrasi  
+Home data Karyawan  
+ Logika Proses  1. Karyawan telah masuk menu data 
+Karyawan  
+2. Karyawan memilih data yang ingin 
+dihapus dengan menekan tombol 
+hapus.  
+ 
+9. Kamus Data DFD  
+Kamus data merupakan deskripsi mengenai seluruh elemen yang 
+mencangkup DFD. Kamus data dibuat berdasarkan arus data yang ada 
+pada DFD. Kamus data untuk diagram arus data dari sistem info rmasi 
+yang dibuat dapat dilihat pada tabel 3. 8 berikut:  
+Tabel 3. 8 Kamus Data DFD  
+No Kamus  Keterangan  
+1 Nama aliran data  Data User  
+Digunakan pada  Proses 1.1, proses 1.2  
+Deskripsi  Berisi data login user yaitu Administrasi  
+Struktur data  Username + pass word  
+Username  
+Password  {A..Z|a..z|0..9}  
+{A..Z|a..z|0..9}  
+2 Nama aliran data  Data user  
+Digunakan pada  Proses 2.1, proses 2.1.1, proses 2.1.2, 
+28 
+ No Kamus  Keterangan  
+proses 2.1.3  
+Deskripsi  Data ini berisikan data user yang 
+digunakan sebagai hak akses untuk masuk 
+ke dalam si stem  
+Struktur data  User_id + username + password + no_hp + 
+fullname + level + gambar  
+Id_user  
+Username  
+Password  
+Hak_akses  
+Id_pegawai  {0..9}  
+{A..Z|a..z|0..9}  
+{A..Z|a..z|0..9}  
+{0..9}  
+{0..9}  
+3 Nama aliran data  Data User  
+Digunakan pada  Proses 2.2, proses  2.2.1, proses 2.2.2  
+Deskripsi  Berisi data User  
+Struktur data  User_id + username + password + no_hp + 
+fullname + level + gambar  
+Id_Pegawai  
+Nama_pegawai  
+alamat  
+no_telepon  
+email  
+jabatan  {0..9}  
+{A..Z|a..z|0..9}  
+{A..Z|a..z|0..9}  
+{0..9}  
+{A..Z|a..z|0..9|@ } 
+{A..Z|a..z}  
+4 Nama aliran data  Data User  
+Digunakan pada  Proses 2.2.3  
+Deskripsi  Berisi data User  yang akan dihapus  
+Struktur data  Nik 
+Id_pegawai  {0..9}  
+5 Nama aliran data  Data Absensi  
+Digunakan pada  Proses 2.3, proses 2.3.1, proses 2.3.2  
+Struktur data  + nik + kehadiran + sakit + ijin+ cuti  
+Id_barang  {0..9}  
+29 
+ No Kamus  Keterangan  
+nama_barang  
+satuan  
+id_jenis  
+id_supplier  {A..Z|a..z|0..9}  
+{A..Z|a..z|0..9}  
+{0..9}  
+{0..9}  
+6 Nama aliran data  Data Absensi  
+Digunakan pada  Proses 2.3.3  
+Deskripsi  Berisi data Absensi  yang akan dihapus  
+Struktur data  Nik 
+Id_barang  {0..9}  
+7 Nama aliran data  Data Absensi  
+Digunakan pada  Proses 2.4, proses 2.4.1, proses 2.4.2  
+Struktur data  Kd_gaji + nik + gaji_bulan + gaji_tahun + 
+tgl_transfer + absensi + sakit + cuti + 
+no_rek + gaji + t unjangan + uang makan + 
+uang_transport + thr + total  
+ Digunakan pada  Proses 2.4.3  
+Struktur data  Kd_gaji  
+Id_jenis  {0..9}  
+ 
+10. Rancangan basis data  
+Analisis  basis data merupakan analisis kumpulan data yang 
+saling berhubungan dan disimpan dalam suatu media  penyimpanan 
+tertentu tanpa pengulangan ( redudancy ). Terdapat data -data yang akan 
+digunakan dalam proses pembuatan perangkat  lunak sistem informasi 
+penggajian di CV. Restu Jaya Tangerang. Data -data yang diperoleh 
+akan digunakan untuk mendesain basis data d isertai dengan atribut -
+atribut dari masing -masing entitas serta relasi antar  entitas -entitas 
+30 
+ tersebut. dalam merancang basis data, model data yang akan digunakan 
+adalah Entity Relationship Diagram (ERD). ERD sistem informasi 
+penggajian CV. Restu Jaya Tange rang dapat dilihat pada gambar 3. 9 
+berikut:  
+ 
+Gambar 3. 9 ERD  
+
+31 
+ a. Kamus  Data  
+Adapun  kamus data dari ERD Sistem Informasi Penggajian 
+CV. Restu Jaya Tangerang  dapat dilihat pada tabel 3. 9 berikut:  
+ 
+Tabel 3. 9 Kamus Data ERD  
+No Entitas  Atribut  
+1 User  {username, pa ssword, no_hp, level akses, 
+gambar}  
+2 Absensi  {nik, kehadian, sakit, ijin, cuti}  
+3 Karyawan  { nik, nama, alamat, no_hp, status }  
+4 Departemen  {kd_dept, nik, departemen, jabatan, 
+gaji_pokok, tunjangan}  
+5 Gajian  {kd_gaji, nik, gaji_bulan, gaji_tahun, 
+tgl_transfer, absensi, sakit, cuti, no_rekening, 
+gaji, tunjangan, uang_makan, uang_transport, 
+thr, total}  
+ 
+11. Struktur Tabel  
+Struktur tabel sistem informasi manajemen gudang bahan baku 
+di PT. Andisa Pala Putra yaitu sebagai berikut:  
+a. Tabel user 
+Tabel user akan d igunakan untuk menyimpan data user. 
+Penjelasannya dapat dilihat pada tabel 3.1 0 berikut:  
+Tabel 3. 10 Struktur Tabel User  
+Field  Tipe  Panjang  Keterangan  
+id_user  Integer   Primary Key   
+nama  Varchar  100 Untuk nama user  
+username  Char  50 Untuk username user  
+password  Char  32 Untuk password user  
+level  Enum   Untuk level user  
+32 
+ b. Tabel Karyawan  
+Tabel karyawan akan digunakan untuk menyimpan data 
+karyawan. Penjelasannya dapat dilihat pada tabel 3.1 1 berikut:  
+ 
+Tabel 3. 11 Struktur Tabel Karyawan  
+Field  Tipe  Panjang  Keterangan  
+nik Integer   Primary Key  
+id_user  Integer   Foreign key dari tabel user  
+nama  Varchar  100 Untuk nama karyawan  
+alamat  Text  Untuk alamat karyawan  
+ 
+c. Tabel Absensi  
+Tabel absensi akan digunakan untuk menyimpan data 
+absensi. Penje lasannya dapat dilihat pada tabel 3.1 2 berikut:  
+ 
+Tabel 3. 12 Struktur Tabel Absensi  
+Field  Tipe  Panjang  Keterangan  
+id_absensi  integer   Primary Key  
+nik Integer   Foreign Key dari table user  
+kehadiran  Char  10 Untuk kehadiran karyawan  
+ 
+d. Tabel Gaji   
+Tabel gaji  akan digunakan untuk menyimpan data 
+penggajian. Penjelasannya dapat dilihat pada tabel 3.1 3 berikut:  
+Tabel 3.1 3 Struktur tabel gaji 
+Field  Tipe  Panjang  Keterangan  
+nik integer   Primary Key  
+id_gaji  Integer   Untuk id gaji karyawan  
+id_jabatan  Integer   Untuk  jabatan karyawan  
+id_absensi  Integer   Untuk absensi karyawan  
+kd_gaji  Integer   Untuk kode gaji  
+no_rekening  Integer   Untuk rekening karyawan  
+id_tunjangan  Integer   Foreign key dari tabel 
+33 
+ Field  Tipe  Panjang  Keterangan  
+tunjangan  
+id_uang_makan  Integer   Foreign key dari tabel 
+uang makan  
+id_uang_transport  Integer   Foreign key dari tabel 
+transport  
+id_pajak  Integer   Untuk potong pajak 
+karyawan  
+ 
+e. Tabel Tunjangan   
+Tabel 3.1 4 Tunjangan  
+Field  Tipe  Panjang  Keterangan  
+id_tunjangan  Integer   Primary Key   
+tunjangan  Char  25 Untuk tunjangan karyaw an 
+ 
+f. Tabel Uang_makan  
+Tabel 3.1 5 uang_makan  
+Field  Tipe  Panjang  Keterangan  
+id_uang_makan  Integer   Primary Key   
+nik Integer   Foreign key dari tabel 
+karyawan  
+uang_makan  Char  25 Untuk uang makan 
+karyawan  
+ 
+ 
+g. Table Uang_trans port 
+Tabel 3. 16 uang trans port. 
+Field Tipe  Panjang  Keterangan  
+id_uang_trans port Integer   Primary Key   
+uang_trans port Char  25 Untuk uang transfort 
+karyawan  
+    
+Id_user  Integer   Untuk id user  
+ 
+ 
+ 
+34 
+ h. Tabel Pajak  
+Tabel 3. 17 Pajak . 
+Field  Tipe  Panjang  Keterangan  
+id_pajak  Integer   Primary Key   
+nik Integer   Untuk nik user  
+pajak  Char  25 Untuk pajak karyawan  
+ 
+i. Tabel Jabatan  
+Tabel jabatan akan digunakan untuk membedakan data 
+karyawan dan status karyawan. Penjelasannya dapat dilihat pada 
+tabel 3. 18 berikut:  
+Tabel 3. 18 Jabatan  
+Field  Tipe  Panjang  Keterangan  
+id_jabatan  Integer   Primary Key   
+jabatan  Char   Foreign key dari tabel 
+karyawan  
+ 
+12. Tabel Relasi  
+Tabel relasi digunakan untuk menggambarkan keterhubungan tabel 
+dalam Sistem secara terperinci atau jelas. Tabel relasi akan dijelaskan 
+pada gambar  3.10 berikut:  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+35 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 10 Gambar Tabel Relas i 
+ 
+ 
+13. Rancang Interface  
+a.  Perancangan Sistem  
+Analisis terhadap sistem yang akan dibangun merupakan 
+deskripsi mengenai aturan -aturan yang akan diterapkan pada sistem 
+yang akan dib angun di CV. Restu Jaya Tangerang. Aturan bisnis 
+yang masih berjalan masih dipergunakan tetapi ada beberapa aturan 
+bisnis yang diusulkan pada sistem yaitu sebagai berikut:  
+36 
+ 
+a. Penghitungan gaji menggunakan sistem informasi berbasis 
+website.  
+b. Catatan penggajian sebelumnya akan tersimpan didatabase dan 
+dicetak dalam bentuk pdf.  
+c. Semua kebutuhan penggajian sudah disesuaikan untuk 
+keperluan CV. Restu Jaya Tangerang.  
+b. Perancangan Antar Muka  
+Perancangan antarmuka dibuat untuk menggambarkan 
+tampilan program yang akan dig unakan o leh pengguna untuk 
+berinteraksi dengan sistem yang dibuat . Perancangan  dibuat 
+berdasarkan tampilan antarmuka baik input maupun output yang 
+akan dihasilkan saat aplikasi diimplementasikan.  
+Perancangan  Antarmuka dalam sistem informasi penggajian 
+di CV. Restu Jaya Tangerang akan dibahas sebagai berikut:  
+c. Perancangan  Antar Muka Login  
+Perancangan antarmuka login  digunakan oleh user yang akan 
+masuk ke dalam  sistem. Perancangan antarmuka login dapat dilihat 
+pada gambar 3.1 3. 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.1 1 Antar Muka L ogin 
+37 
+ 
+d. Perancangan Antar Muka Administrasi  
+Perancangan antarmuka Administrasiistrator untuk mengelola 
+data master. Perancangan  antarmuka Administrasiistrator adalah 
+sebagai berikut:  
+Perancangan Antarmuka Halaman Utama Administrasi  
+Perancangan  antarmuka hala man utama yang terdapat 
+dihalaman Administrasi dapat dilihat pada gambar 3.1 2. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 12 Halaman Utama Administrasi  
+ 
+e. Perancangan Antarmuka Halaman Utama Data Administrasi  
+Perancangan antarmuka halaman  utama yang terdapat 
+dihalaman Administrasi  dapat dilihat pada gambar 3.1 3. 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.1 3 Data Administrasi  
+38 
+ 
+f. Perancangan Antarmuka Halaman Tambah Data Administrasi  
+Perancangan antarmuka halaman utama tambah data 
+Administrasi yang terdapat dihalaman Administrasi dapat dilihat 
+pada gambar 3. 14. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 14 Tambah Data Administrasi  
+g. Perancangan Antarmuka Halaman Data Detail Administrasi  
+Perancangan antarmuka halaman data detail Administrasi 
+yang terdapat dihalaman Administrasi dapat dilihat pada gambar 
+3.15. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 15 Data Detai l Administrasi  
+39 
+ 
+h. Perancangan Antar Muka Data Karyawan  
+Perancangan Antarmuka Halaman Utama Data Kayawan  
+Perancangan antar muka halaman utama data kayawan yang 
+terdapat dihalaman Administrasi dapat dilihat pada gambar 3.1 6. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.1 6  Data Karyawan  
+i. Perancangan Antar Muka Data Karyawan  
+Perancangan Antarmuka Data Absen  
+Perancangan antar muka halaman utama data kayawan yang 
+terdapat dihalaman Administrasi dapat dilihat pada gambar 3.1 7. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.1 7  Data Absen  
+40 
+ 
+Perancangan antar muka halaman ab sen Harian karyawan yang 
+terdapat dihalaman Administrasi dapat dilihat pada gambar 3.1 7  
+Perancangan Antar Muka Data Karyawan  
+j. Perancangan Antarmuka Data Absen  
+Perancangan antar muka halaman utama data kayawan yang 
+terdapat dihalaman  Administrasi dapat di lihat pada gambar 3. 18. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 18  Data Absen Harian Karyawan  
+ 
+k. Perancangan Antarmuka Halaman  Absen  
+Perancangan antar muka halaman absen harian karyawan 
+yang terdapat dihalaman Administrasi dapat dilihat pada gambar 
+3.19 
+ 
+ 
+ 
+ 
+41 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3. 19 Tambah Karyawan  
+l. Perancangan Antarmuka Halaman  Edit Data Kayawan  
+Perancangan  antar muka halaman utama edit data kayawan 
+yang terdapat dihalaman Administrasi dapat dilihat pada gambar 
+3.20 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.2 0 Edit Data Karyawan  
+42 
+ 
+m. Perancangan Ant armuka Halaman  Detail Data Kayawan  
+Perancangan antar muka halaman utama detail data kayawan 
+yang terdapat dihalaman Administrasi dapat dilihat pada gambar 
+3.21. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+   
+Gambar 3.2 1 Detail Data Karyawan  
+ 
+14. Perancangan Antar Muka Data Penggajian  
+a. Perancan gan Antarmuka Halaman Utama Penggajian  
+Perancangan antar muka halaman penggajian yang terdapat 
+dihalaman Administrasi dapat dilihat pada gambar 3.2 2. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.2 2 Data Gaji Karyawan  
+43 
+ 
+b. Perancangan Antarmuka Halaman Detail Gaji Karyawan  
+Perancangan anta r muka halaman detail gaji Karyawan yang 
+terdapat dihalaman Administrasi dapat dilihat pada gambar 3.2 3. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.2 3 Detail Gaji Karyawan  
+ 
+c. Perancangan  Antarmuka Halaman Input Gaji Karyawan  
+Perancangan antar muka halaman Input gaji Karyawan yan g 
+terdapat dihalaman Administrasi dapat dilihat pada gambar 3.2 4. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.2 4 Input Gaji Karyawan  
+44 
+ 
+d. Perancangan  Antarmuka Halaman Edit Gaji Karyawan  
+Perancangan antar muka halaman Edit gaji Karyawan yang 
+terdapat dihalaman Administrasi dapat dilih at pada gambar 3.25.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 3.2 5 Edit Gaji Karyawan  
+  
+69 
+ 
+BAB V  
+HASIL DAN PEMBAHASAN  
+ 
+A. Hasil  
+a. Halaman Login  
+Halaman ini  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 5.1 Halaman Login  
+b. Halaman dashboard  
+Halaman ini adalah halaman dashboard administrator untuk 
+menambahkan data ka ryawan mengupdate, dan menghapus data 
+karyawan .  
+ 
+ 
+ 
+ 
+ 
+ 
+70 
+ 
+c. Halaman pajak  
+Halaman ini adalah untuk menghitung pajak pph21 ya itu dengan 
+menghitung senilai 5% jika sewaktu untuk kedepannya ada perubahan 
+yang bisa maka bisa merubah penghitungan dengan sesuai apa  yang ada 
+pada perusahaan tersebut`  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 5.2 Halaman Pajak  
+  
+d. Halaman Penggajian  
+Halaman ini adalah set gaji atau rekap dari data penggajian 
+nantinya akan berguna untuk pembukuan laporan dan diserahkan kepada 
+pemilik perusahaan oleh administrator  terdapat juga keterangan historis 
+dari absen karyawan sebagai keterangan dari penghitungan gaji tiap 
+harinya kemudian ada no rekening, gaji pokok, tunjangan, uang transport, 
+kemudian di total lalu di potong pajak maka pada kolom ada total bersih 
+dimana ak an di akumulasi total bersih dari semuanya.  
+ 
+ 
+71 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 5.3 Halaman Penggajian  
+ 
+e. Halaman Slip Gaji  
+Pada halaman ini terdapat pilihan pada halaman gaji dimana jika 
+di print maka akan tampil hasil sesuai dengan bulan.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 5.4 Halaman slip ga ji 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+72 
+ 
+f. Halaman slip absensi  
+Terdapat halaman absensi dimana sebelumnya terdapat di 
+halaman absensi karyawan jika di print maka akan tampil sesuai dengan 
+bulan nya dan rekap absensinya.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Gambar 5.5 Halaman Slip Gaji  
+ 
+ 
+B. Pembahasan  
+Pada Aplika si Penggajian berbasis web ,serta perhitungan pph dengan 
+study kasus CV. Restu Jaya Tangerang Membuat skema perancangan 
+database (basis data) untuk Sistem Informasi Penggajian,Namun pihak dari 
+CV.Restu Jaya Tangerang belum memfasilitasi karyawannya sebagai  tanda 
+bukti rekap data gaji maupun kehadiran karyawan.  
+Aplikasi  Website  ini dapat diakses oleh pihak karywan,administrator 
+dan pemilik kapanpun dan dimanapun untuk mendapatkan infromasi untuk 
+merekap sebuah data absensi maupun penggajian dari merekap tiap  tahunnya 
+73 
+ bisa dilihat . Hal tersebut menjadi nilai lebih pada website ini dalam 
+penyampaian informasi dengan efektif dan efisien.  
+Petugas admin website  ini pun juga akan dipermudah pekerjaannya 
+karena tinggal login menambahkan dan mengupdate data karyawan di CV. 
+Restu Jaya  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+74 
+ BAB VI  
+PENUTUP  
+ 
+A. Kesimpulan  
+Berdasarkan hasil penelitian, perancangan, pembangunan dan 
+pengujian website  aplikasi penggajian berbasis web serta perhitungan pph 21 
+di CV. Restu Jaya Tangerang maka dapat diambil  kesimpulan sebagai      
+berikut  : 
+Website  tersebut memang dibutuhkan  karena Dengan diterapkannya 
+sistem ini diharapkan segala kendala tentang keterlambatan dan ketidak -
+akuratan laporan -laporan yang berhubungan dengan masalah penggajian 
+pegawai dapat diata si..tetapi CV.Restu Jaya  Tangerang belum menyediakan 
+aplikasi website  tersebut.  
+Website  ini dapat memba ntu user membu at lapaoran dan 
+meminimalisir kesalahan input data  
+B. Saran  
+Berikut saran -saran untuk mengembangkan website  lebih lanjut :  
+1. Diharapkan dalam pengembangan selanjutnya website  diperbaharui agar 
+dapat menambahkan fitur untuk memfasilitasi karyawan agar bisa 
+melihat historis atau rekap dari penggajian dan kehadiran  
+2. Website  hanya menyediakan rekap gaji dan absen hanya di akses oleh  
+pemilik dan administrator saja belum tersedia untuk karyawan  
+ 
+ 
+75 
+ DAFTAR PUSTAKA  
+ 
+PHP Codeigniter (Studi Kasus di PT. Krakatau Wajatama Cilegon). Skripsi. 
+Yogyakarta: Fakultas Sains dan Teknologi Universitas Islam  Negeri 
+Sunan Kalijaga, 2013.  
+ 
+Aminudin. Sist em Informasi Penggajian Pegawai Pada Kantor Kecamatan  
+Nawangan Kabupaten Pacitan. Skripsi. Banten: Universitas Bina  
+Nusantara,2015.  
+ 
+Anhar.Panduan Menguasai PHP dan Mysql. Jakarta: Media Kita, 2010.  
+ 
+Carapedia.“Pengertian dan  Definisi Pembangunan”.Situs Re smi 
+Carapedia.carapedia.com/pengertian_definisi_pembangunan_info2042.ht
+ml (24 Mei2014).  
+ 
+Ferdiansyah.Pengembangan Sistem Informasi Penggajian Karyawan Pada  
+CV.Diva Menggunakan PHP. Skripsi.Yogyakarta: STIMIK Amikom  
+Yogyakarta,2012.  
+ 
+Handoko, Flippo dkk.Sis tem Informasi danKonsep Penggajian Karyawan. 
+Yogyakarta: Graha Ilmu,2012  
+ 
+Husnan.Konsep Perancangan Sistem Absensi dan Penggajian.Jakarta: Penerbit  
+Widya Guna, 1996.  
+ 
+Irwansyah.Sistem Informasi Penggajian Karyawan Berbasis Web Pada  Kejaksaan 
+Negeri Tangera ng. Skripsi.Tangerang: STIMIK Amikom,  2010.  
+ 
+Kadir, Abdul. Dasar Pemrograman Web Dinamis Menggunakan PHP. Cet. III;  
+Yogyakarta: Andi, 2008.  
+ 
+Kementrian Agama RI. Al -Quran dan Tafsirnya. Jakarta: Lentera Abadi,2012.  
+ 
+Komaruddin, Mardiarso dkk. Cara Perhitu ngan Pemotongan PPh Pasal 
+21.Yogyakarta: Graha Ilmu,2014.  
+ 
+Elementary School District of Pringkuku." Speed Journal Vol 10 No 2 - May 
+2013, ISSN 1979 -9330, (Accessed July 28, 2016).  
+ 
+Pt. Jasnita Telekomindo dengan Menggunakan Visual Basic.Net  2008.Skripsi, 
+Jakarta: Fakultas Sains dan Teknologi UIN SyarifHidayatullah Jakarta, 
+2011.  
+Rinawati (2014). Pengembangan Sistem Informasi Penggajian Karyawan PT.BPR 
+Bumi Asih.Skripsi, Jakarta: Fakultas Sains dan Teknologi UIN Syarif  
+Hidayatullah Jakarta, 2011.  
+76 
+ Rokmulyati , Hasibuan, dkk. Teknik Pemberian Upah dengan Pph  
+Karyawan.Bandung: Genta Press, 2010.  
+ 
+Rosa, dan M. Shalahuddin.Modul Pembelajaran Rekayasa Perangkat Lunak  
+(Terstruktur dan Berorientasi Objek). Bandung: Modula, 2011.  
+ 

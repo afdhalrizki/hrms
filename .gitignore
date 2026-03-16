@@ -1,0 +1,59 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+.idea/
+.vscode/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Tools (SDKs & Portables) - CRITICAL for this setup
+tools/
+
+# Backend (Django/Python)
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/db.sqlite3
+backend/staticfiles/
+backend/media/
+backend/.venv/
+backend/env/
+backend/venv/
+
+# Frontend (Next.js/Node)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Mobile (Flutter/Dart)
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+mobile/*.iml
+mobile/ios/Flutter/.last_build_id
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+mobile/android/key.properties
+
+# Docker
+.docker_data/

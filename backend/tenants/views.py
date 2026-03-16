@@ -1,0 +1,105 @@
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db import transaction
+from django_tenants.utils import schema_context
+from .models import RegistrationRequest, Tenant, Domain
+from .serializers import RegistrationRequestSerializer
+from users.models import User
+
+class PublicSignupViewSet(viewsets.GenericViewSet):
+    """
+    Public-facing signup API for new tenants.
+    """
+    queryset = RegistrationRequest.objects.all()
+    serializer_class = RegistrationRequestSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        registration = serializer.save()
+        
+        # Stub: Send email notification to user
+        # send_mail('Registration Received', 'We are reviewing your request.', 'noreply@hrms.com', [registration.admin_email])
+        
+        return Response({
+            'message': 'Registration request submitted successfully. Our admin will review it shortly.',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+class RegistrationApprovalViewSet(viewsets.ModelViewSet):
+    """
+    Internal API for admins to review and approve registrations.
+    """
+    queryset = RegistrationRequest.objects.all()
+    serializer_class = RegistrationRequestSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        registration = self.get_object()
+        
+        if registration.status != 'PENDING':
+            return Response({'error': 'Only pending requests can be approved.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                # 1. Create Tenant
+                # Convert prefix to a valid schema name (snake_case)
+                schema_name = registration.subdomain_prefix.replace('-', '_').lower()
+                
+                tenant = Tenant.objects.create(
+                    schema_name=schema_name,
+                    name=registration.company_name
+                )
+                
+                # 2. Create Domain
+                from django.conf import settings
+                domain_name = f"{registration.subdomain_prefix}.{settings.TENANT_DOMAIN_SUFFIX}"
+                domain = Domain.objects.create(
+                    domain=domain_name,
+                    tenant=tenant,
+                    is_primary=True
+                )
+                
+                # 3. Handle Admin User
+                # User is in SHARED_APPS, so we create it once in 'public'
+                admin_user, created = User.objects.get_or_create(
+                    email=registration.admin_email,
+                    defaults={
+                        'first_name': registration.company_name + " Admin",
+                        'is_staff': True, # Allow login to admin if needed
+                    }
+                )
+                if created:
+                    admin_user.set_password('change-me-123')
+                    admin_user.save()
+                
+                # Assign user to the new tenant
+                admin_user.tenants.add(tenant)
+
+                # 4. Update status
+                registration.status = 'APPROVED'
+                registration.save()
+                
+            # Stub: Send welcome email to admin_email with login instructions
+            # send_mail('Welcome to HRMS', f'Your schema {domain_name} is ready. Login with {registration.admin_email}.', 'noreply@hrms.com', [registration.admin_email])
+
+            return Response({
+                'message': f'Tenant {registration.company_name} approved and provisioned.',
+                'domain': domain_name,
+                'admin_email': registration.admin_email
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        registration = self.get_object()
+        if registration.status != 'PENDING':
+             return Response({'error': 'Only pending requests can be rejected.'}, status=status.HTTP_400_BAD_REQUEST)
+             
+        registration.status = 'REJECTED'
+        registration.save()
+        return Response({'message': 'Registration request rejected.'})
