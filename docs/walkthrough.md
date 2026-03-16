@@ -190,4 +190,22 @@ Implemented clear platform separation and dynamic UI filtering to enhance securi
 - **Multi-Role Test**: Confirmed that switching between an Admin and a Standard Employee account dynamically updates the available navigation options in the sidebar without requiring hard-coded redirects.
 - **Access Control Denial**: Verified that attempting to perform POST/PUT actions on protected endpoints (e.g., `/api/employees/`) results in a `403 Forbidden` response for non-admin users.
 
-**Status**: Milestone 🎉 Phase 28 (Platform Access & Dynamic UI) 100% Complete.
+**---
+
+## Phase 29: Secret Portal & Mobile Quality Hub
+
+Further refined platform security and established a robust testing foundation for the mobile ecosystem.
+
+### 1. Secret Admin Access (Frontend Hidden Portal)
+To prevent unauthorized discovery of administrative entry points, the public login form is now hidden on the main domain.
+- **Hidden Entrance**: A new "secret" route at `/login/portal-admin` has been established for Global Admins.
+- **Contextual Awareness**: The UI dynamically detects the secret route and reveals the login form with a specialized "Portal Admin Global" badge.
+- **Public Redirection**: Unauthenticated visitors to the public root are automatically redirected to the Registration/Landing page (`/signup`) to streamline onboarding.
+
+### 2. Mobile Test Orchestration (Dependency Injection)
+Significantly improved the reliability of the Flutter application through architectural refactoring and expanded test coverage.
+- **ApiService Refactor**: Implemented constructor-based Dependency Injection for `http.Client`. This allows unit tests to inject a `MockClient`, ensuring tests are fast and reliable without making real network requests.
+- **Comprehensive API Tests**: Added tests for Login flows (Success/Failure) and User Profile fetching logic.
+- **Model Integrity**: Created new unit tests for `Shift` and `Schedule` JSON parsing to prevent runtime type-errors.
+
+**Status**: Milestone 🎉 Phase 29 (Secret Portal & Mobile Quality) 100% Complete.

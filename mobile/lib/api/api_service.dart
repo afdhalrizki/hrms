@@ -8,11 +8,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiService {
   static const String baseUrl = "http://10.0.2.2:8000/api"; // Android Emulator default host ip
   final _storage = const FlutterSecureStorage();
+  final http.Client _client;
   
-  // Singleton pattern
-  static final ApiService _instance = ApiService._internal();
-  factory ApiService() => _instance;
-  ApiService._internal();
+  // Singleton pattern with internal constructor
+  static ApiService? _instance;
+  
+  factory ApiService({http.Client? client}) {
+    _instance ??= ApiService._internal(client ?? http.Client());
+    return _instance!;
+  }
+  
+  ApiService._internal(this._client);
 
   Future<String?> getTenant() async {
     final prefs = await SharedPreferences.getInstance();
@@ -39,7 +45,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> login(String email, String password, String tenant) async {
-    final response = await http.post(
+    final response = await _client.post(
       Uri.parse("$baseUrl/users/login/"), // Assuming a login endpoint exists
       headers: _headers(tenant),
       body: jsonEncode({
@@ -72,7 +78,7 @@ class ApiService {
     final token = await getToken();
     
     final url = "\$baseUrl\$endpoint";
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse(url),
       headers: _headers(tenant, token),
     );
@@ -91,7 +97,7 @@ class ApiService {
     final tenant = await getTenant();
     final token = await getToken();
     
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse("$baseUrl/users/me/"),
       headers: _headers(tenant, token),
     );
@@ -120,7 +126,7 @@ class ApiService {
       'check_in': checkInTime,
     };
 
-    final response = await http.post(
+    final response = await _client.post(
       Uri.parse("$baseUrl/attendance/"),
       headers: _headers(tenant, token),
       body: jsonEncode(payload),
@@ -137,7 +143,7 @@ class ApiService {
     final tenant = await getTenant();
     final token = await getToken();
     
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse("$baseUrl/attendance/schedule/my-schedule/"),
       headers: _headers(tenant, token),
     );

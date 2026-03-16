@@ -26,14 +26,59 @@ void main() {
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
-      apiService = ApiService();
       mockClient = MockClient();
+      // Injecting mock client via constructor
+      apiService = ApiService(client: mockClient);
     });
 
     test('Tenant storage works', () async {
       await apiService.setTenant('company1');
       final tenant = await apiService.getTenant();
       expect(tenant, 'company1');
+    });
+
+    test('login sends correct payload and saves token', () async {
+      final responseBody = jsonEncode({'token': 'fake-jwt-token'});
+      
+      when(mockClient.post(
+        any,
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+      )).thenAnswer((_) async => http.Response(responseBody, 200));
+
+      final result = await apiService.login('test@test.com', 'pass123', 'perusahaan1');
+
+      expect(result['token'], 'fake-jwt-token');
+      final savedToken = await apiService.getToken();
+      expect(savedToken, 'fake-jwt-token');
+      
+      final savedTenant = await apiService.getTenant();
+      expect(savedTenant, 'perusahaan1');
+    });
+
+    test('login throws exception on failure', () async {
+      when(mockClient.post(
+        any,
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+      )).thenAnswer((_) async => http.Response('Invalid credentials', 401));
+
+      expect(
+        () => apiService.login('bad@test.com', 'wrong', 'tenant'),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('getUserProfile returns parsed JSON on success', () async {
+      final responseBody = jsonEncode({'id': 1, 'fullname': 'Afdhal'});
+      
+      when(mockClient.get(
+        any,
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async => http.Response(responseBody, 200));
+
+      final profile = await apiService.getUserProfile();
+      expect(profile['fullname'], 'Afdhal');
     });
 
     test('User.fromJson parses flattened backend response', () {
