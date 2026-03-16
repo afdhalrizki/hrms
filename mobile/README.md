@@ -33,27 +33,36 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 ## 1. Getting Started
 
 ### Prerequisites
-- Flutter SDK 3.x
-- Android SDK / iOS Environment
+- **Flutter SDK**: 3.19 or later.
+- **Android Studio / Xcode**: For emulator or physical device testing.
+- **Backend Running**: Ensure the backend is active (e.g., run `.\up.ps1 dev` in the project root).
 
 ### Setup
-```bash
+```powershell
 cd mobile
 flutter pub get
 ```
 
 ### Running the App
-```bash
+```powershell
 flutter run
 ```
 
 ---
 
-## 2. API Integration
+## 2. API Integration & Environments
 
-The app is pre-configured for local development connectivity:
-- **Android Emulator**: Uses `http://10.0.2.2:8000`
-- **iOS Simulator**: Uses `http://localhost:8000`
+The app is designed to connect to different environments. You can adjust the `baseUrl` in `lib/api/api_service.dart`:
+
+| Target | API URL (Local Dev) | Notes |
+| :--- | :--- | :--- |
+| **Android Emulator** | `http://10.0.2.2:8000/api` | Default configuration |
+| **iOS Simulator** | `http://localhost:8000/api` | |
+| **Physical Device** | `http://<your-ip>:8000/api` | Same Wi-Fi required |
+| **Staging** | `https://harilibur.com/api` | Requires production build |
+
+> [!TIP]
+> Ensure the **Backend** is running using `.\up.ps1 dev` before starting the mobile app for local testing.
 
 ---
 
