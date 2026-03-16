@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth import login, authenticate
 from .models import User
 from .serializers import UserSerializer
 
@@ -38,3 +39,19 @@ class UserViewSet(viewsets.ModelViewSet):
             data['employee_nik'] = None
             
         return Response(data)
+
+class LoginAPIView(viewsets.GenericViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
+
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        user = authenticate(request, email=email, password=password)
+        if user:
+            login(request, user)
+            return Response(UserSerializer(user).data)
+        
+        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

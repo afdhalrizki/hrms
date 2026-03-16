@@ -5,16 +5,41 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, Briefcase, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage({ forceShowForm = false }: { forceShowForm?: boolean }) {
   const { tenantName, isPublic } = useTenant();
+  const { login } = useAuth();
+  const router = useRouter();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Determine if we should show the form: 
   // 1. Not public domain, OR
   // 2. Secret portal access (forceShowForm)
   const showForm = !isPublic || forceShowForm;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      await login(email, password);
+      
+      // Redirect based on role or home
+      router.push('/');
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -69,7 +94,12 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                   )}
                 </p>
                 {/* Form */}
-                <form className="space-y-5 pt-4" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-5 pt-4" onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium animate-in fade-in slide-in-from-top-1">
+                      {error}
+                    </div>
+                  )}
                   <div className="space-y-1.5 text-left">
                     <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
                     <div className="relative group">
@@ -108,9 +138,19 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                     <button type="button" className="text-sm font-semibold text-primary hover:underline underline-offset-4">Forgot password?</button>
                   </div>
 
-                  <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    Sign In
-                    <ArrowRight size={20} />
+                  <button 
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100"
+                  >
+                    {isLoading ? (
+                      <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Sign In
+                        <ArrowRight size={20} />
+                      </>
+                    )}
                   </button>
                 </form>
               </>

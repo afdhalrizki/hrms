@@ -19,6 +19,7 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   error: string | null;
+  login: (email: string, password: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   logout: () => void;
 }
@@ -48,6 +49,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const login = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await apiFetch('/auth/login/', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+      setUser(data);
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
@@ -63,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       loading, 
       error, 
+      login,
       refreshProfile: fetchProfile,
       logout 
     }}>

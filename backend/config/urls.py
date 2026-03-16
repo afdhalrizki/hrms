@@ -20,7 +20,7 @@ from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 # Import ViewSets
-from users.views import UserViewSet
+from users.views import UserViewSet, LoginAPIView
 from core.views import DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, AccessRoleViewSet
 from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
@@ -28,6 +28,7 @@ from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, Tena
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
+router.register(r'auth', LoginAPIView, basename='auth')
 router.register(r'departments', DepartmentViewSet)
 router.register(r'roles', RoleViewSet)
 router.register(r'golongan', GolonganViewSet)
