@@ -32,7 +32,7 @@ export default function SignupPage() {
     setError(null);
 
     try {
-      await apiFetch('/tenants/public-signup/', {
+      await apiFetch('/public/signup/', {
         method: 'POST',
         body: JSON.stringify(formData),
       });
