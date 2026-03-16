@@ -1,6 +1,6 @@
-# Enterprise Production Deployment (Kubernetes)
+# Modern Production Deployment (AWS)
 
-This guide outlines the architectural requirements and steps for deploying harikerja HRMS to support 1 Million+ users in a highly available, auto-scaling production environment using Kubernetes (EKS/GKE).
+This guide outlines the architectural requirements and steps for deploying harikerja HRMS to a modern **AWS** infrastructure (EKS/RDS) to support high-availability, auto-scaling enterprise workloads.
 
 ## Architecture Overview
 
@@ -20,16 +20,24 @@ At enterprise scale, the monolith docker-compose setup is replaced by distribute
    - Celery workers (for heavy Payroll PDF generation and bulk attendance calculations).
 
 ## Step 1: Managed Database Provisioning
-1. Provision a PostgreSQL 15 instance via RDS/Cloud SQL.
+1. Provision a PostgreSQL 15 instance via RDS.
 2. Ensure you select "Multi-AZ" for failover.
 3. Create the Database (`hrms`) and Master User.
 
-## Step 2: Kubernetes Cluster Setup
-1. Create an EKS/GKE cluster with autoscaling node groups (e.g., `m7g.large` instances).
+## Step 2: Environment Configuration
+The platform uses `environments/.env.production` as the source of truth for configuration. When deploying to AWS:
+- Use **AWS Secrets Manager** to store sensitive values from `.env.production`.
+- Key variables to configure:
+    - `TENANT_DOMAIN_SUFFIX=harikerja.com`
+    - `SECRET_KEY`: High-entropy production key.
+    - `DATABASE_URL`: Pointing to your RDS instance.
+
+## Step 3: Kubernetes Cluster Setup
+1. Create an EKS cluster with autoscaling node groups.
 2. Install necessary cluster add-ons: Ingress Controller, Cert-Manager, Metrics Server.
 
-## Step 3: Deployment Manifests
-You will need to convert the `docker-compose.yml` into Kubernetes manifests (`Deployment`, `Service`, `HPA`, `Ingress`).
+## Step 4: Deployment Manifests
+You will need to convert the `docker-compose.yml` into Kubernetes manifests. Your CI/CD pipeline should inject values from the environment configuration.
 
 *A typical Django Deployment with PgBouncer sidecar looks like this:*
 ```yaml

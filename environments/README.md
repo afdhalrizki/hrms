@@ -4,15 +4,15 @@ This directory contains template configuration files for different stages of the
 
 ## Environments Overview
 
-1.  **Development (`.env.development.example`)**: 
-    - Used for local coding on developer machines.
+1.  **Development (`.env.local`)**:
+    - Used for local coding on developer machines (Local Machine).
     - `DEBUG=True` to show detailed errors.
     - Points to local Docker PostgreSQL and Redis.
-2.  **Staging (`.env.staging.example`)**: 
-    - Used for Quality Assurance (QA) and User Acceptance Testing (UAT).
+2.  **Staging (`.env.staging`)**:
+    - Used for QA and UAT hosted on **IDCloudHost VPS**.
     - Mimics Production but with test data.
-3.  **Production (`.env.production.example`)**: 
-    - The "Live" environment for real customers.
+3.  **Production (`.env.production`)**:
+    - The live environment for enterprise customers on **Modern AWS**.
     - `DEBUG=False` for security.
 
 ## New Management Tools

@@ -6,18 +6,21 @@ Thumbs.db
 *.bak
 .idea/
 .vscode/
+*.swp
+*.swo
 
-# Build & Cache Directories (Universal)
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.coverage
-.cache/
-node_modules/
-.next/
-out/
-build/
+# Build & Cache Directories
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache/
+**/.coverage
+**/.cache/
+**/node_modules/
+**/.next/
+**/out/
+**/build/
+**/dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -30,20 +33,35 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Tools (SDKs & Portables) - CRITICAL for this setup
-tools/
+.env.*.local
+**/environments/.env.*
+!**/environments/.env.*.example
 
 # Backend (Django/Python)
 backend/db.sqlite3
+backend/db.sqlite3-journal
 backend/staticfiles/
 backend/media/
 backend/.venv/
 backend/env/
 backend/venv/
+backend/.python-version
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.coverage.*
+backend/coverage.xml
+backend/nosetests.xml
+backend/*.mo
+backend/*.pot
+backend/local_settings.py
 
 # Frontend (Next.js/Node)
 frontend/next-env.d.ts
+frontend/.vercel
+frontend/.eslintcache
+frontend/npm-debug.log*
+frontend/.next/
 
 # Mobile (Flutter/Dart)
 mobile/.dart_tool/
@@ -54,10 +72,30 @@ mobile/.pub-cache/
 mobile/.pub/
 mobile/*.iml
 mobile/ios/Flutter/.last_build_id
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/flutter_export_environment.sh
+mobile/ios/Flutter/Flutter.framework
+mobile/ios/Flutter/Flutter.podspec
+mobile/ios/Flutter/App.framework
 mobile/android/app/debug/
 mobile/android/app/profile/
 mobile/android/app/release/
 mobile/android/key.properties
+mobile/android/app/src/main/res/values/google-services.json
+mobile/ios/Runner/GoogleService-Info.plist
+mobile/doc/api/
+mobile/*.transformed.dart
+mobile/*.sync-conflict.*
 
 # Docker
 .docker_data/
+**/data/db/
+
+# Tools (SDKs & Portables) - Large Binaries
+tools/android-sdk/
+tools/android-temp/
+tools/flutter/
+tools/jdk17/
+tools/*.zip
+tools/*.7z
+tools/*.tar.gz

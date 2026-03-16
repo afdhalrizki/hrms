@@ -5,13 +5,23 @@ This directory contains the necessary documentation to deploy the HRMS platform 
 ## Environments
 
 1. **[Local Development](./local.md)**
-   Quick start guide using `docker-compose` for rapid iteration and testing.
+   Quick start guide using `docker-compose` for rapid iteration and testing on your local machine.
 
-2. **[Staging / Early Production (VPS)](./staging.md)**
-   Deployment strategy for a single Virtual Private Server (VPS) supporting up to 5,000 users, utilizing a managed PostgreSQL database and PgBouncer.
+2. **[Staging (IDCloudHost VPS)](./staging.md)**
+   Deployment strategy for a Virtual Private Server (VPS) on IDCloudHost or similar providers, ideal for testing and early-stage deployments.
 
-3. **[Enterprise Production (Kubernetes)](./production.md)**
-   Roadmap and architectural requirements for deploying to AWS/GCP to support 1 Million+ users with high availability and auto-scaling.
+3. **[Modern Production (AWS)](./production.md)**
+   Scalable, high-availability architecture on AWS (EKS/RDS) designed for enterprise-grade production workloads.
+
+## Deployment Tools
+
+The platform provides helper scripts to manage different environments easily:
+
+| Tool | Usage | OS | Purpose |
+| :--- | :--- | :--- | :--- |
+| **`up.ps1`** | `.\up.ps1 [dev\|staging\|prod]` | Windows | Orchestrates containers with correct `.env`. |
+| **`Makefile`** | `make [dev\|staging\|prod]` | Linux/Mac | Standard orchestration for VPS/Servers. |
+| **Scripts** | `python environments/scripts/switch_env.py` | Universal | Manual `.env` toggling for IDEs. |
 
 ## Core Services
 

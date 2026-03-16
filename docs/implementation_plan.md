@@ -62,16 +62,16 @@ Advanced security features and workforce management.
 - **Login Guard:** Restricting access to ensure company admins only access their respective domains.
 - **API Security:** Swagger/OpenAPI documentation for standardized integration.
 
-## Phase 4: Global Enterprise Scale (Roadmap)
-To reliably serve **1 Million+ Users**, the following architectural shifts are required:
+## Phase 4: Modern Production Scale (AWS Roadmap)
+To reliably serve **1 Million+ Users**, the following architectural shifts on **AWS** are required:
 
 ### 1. Database Sharding & Partitioning
-- **Sharding**: Distributing tenants across multiple physical database clusters.
+- **Sharding**: Distributing tenants across multiple physical database clusters using **Amazon RDS**.
 - **Partitioning**: Horizontal partitioning for high-volume logs (Attendance).
 
 ### 2. Horizontal Compute Clustering
-- **Kubernetes (K8s)**: Deploying backend pods with Auto-Scaling (HPA).
-- **Global CDN**: Serving assets via Edge networks to reduce global latency.
+- **Amazon EKS (Kubernetes)**: Deploying backend pods with Auto-Scaling (HPA) to handle traffic spikes.
+- **Amazon CloudFront**: Serving assets via Edge networks to reduce global latency.
 
 ### 3. Asynchronous Operations
 - **Celery + RabbitMQ**: Offloading bulk payroll generation to background workers to keep the main API fast.
@@ -80,11 +80,11 @@ To reliably serve **1 Million+ Users**, the following architectural shifts are r
 
 ## Phase 5: DevOps & Environment Management (Complete)
 To manage the transition between these phases, a multi-environment strategy is implemented:
-- **Development**: Local Docker setup for rapid coding.
-- **Staging**: Validation environment for UAT (Phase 3 features).
-- **Production**: High-availability cluster for Phase 4 scale.
+- **Development**: Local Docker setup for rapid coding and testing.
+- **Staging**: Validation environment for UAT and testing hosted on **IDCloudHost VPS**.
+- **Production**: Modern, high-availability architecture on **AWS** for enterprise scaling.
 
-All templates (`.env.development.example`, `.env.staging.example`, `.env.production.example`) are managed in the [environments/](file:///d:/hr/hrms/environments) directory, and [settings.py](file:///d:/hr/hrms/backend/config/settings.py) has been refactored for dynamic environment injection.
+All templates (`.env.local`, `.env.staging`, `.env.production`) are managed in the [environments/](file:///d:/hr/hrms/environments) directory, and [settings.py](file:///d:/hr/hrms/backend/config/settings.py) has been refactored for dynamic environment injection.
 
 ## Phase 6: Testing, Reliability & Security (QA Hub)
 A dedicated [qa/](file:///d:/hr/hrms/qa) hub is established for:

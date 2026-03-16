@@ -1,6 +1,6 @@
-# Staging Deployment (Single Node / VPS)
+# Staging Deployment (IDCloudHost VPS)
 
-This guide outlines the steps to deploy harikerja HRMS to a Virtual Private Server (VPS) via providers like DigitalOcean, Linode, or IDCloudHost. This setup is perfect for staging environments or small production deployments (<5,000 users).
+This guide outlines the steps to deploy the harikerja HRMS to a Virtual Private Server (VPS) via **IDCloudHost** or similar providers. This setup is perfect for staging environments, internal testing, or early-stage production workloads.
 
 ## Architecture Overview
 - **Server:** 1x VPS (Minimum 4 vCPU, 8GB RAM).
@@ -23,18 +23,24 @@ git clone <repository-url> /opt/hrms
 cd /opt/hrms
 ```
 
-Create production configuration files based on the templates in `environments/`:
-- Edit `.env.staging` to define:
-  - `TENANT_DOMAIN_SUFFIX=yourdomain.com`
-  - Secure `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY`
+The system uses environment-specific files located in the `environments/` directory. For staging:
+1.  Open `environments/.env.staging`.
+2.  Define the following critical variables:
+    - `TENANT_DOMAIN_SUFFIX=stg.yourdomain.com`
+    - `SECRET_KEY=your-secure-staging-key`
+    - `POSTGRES_PASSWORD=your-secure-db-password`
 
 ## Step 3: Frontend Build Configuration
-Update the `frontend/Dockerfile` to ensure it builds a production-ready Next.js image, pointing to the external domain (e.g., `NEXT_PUBLIC_API_URL=https://api.yourdomain.com`).
+Ensure `environments/.env.staging` has the correct `NEXT_PUBLIC_API_URL` (usually `https://stg.yourdomain.com/api`).
 
 ## Step 4: Deploy Stack
+The easiest way to deploy is using the provided `Makefile`:
+
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d --build
+make staging
 ```
+
+This command automatically pulls the correct environment variables from `environments/.env.staging`.
 
 ## Step 5: Configure Nginx & SSL
 Install Nginx and configure reverse proxy routing:

@@ -270,15 +270,16 @@ Resolved native binding issues and aligned runtime with Next.js 16 engine requir
 
 ### Environment Configuration
 The platform is designed to run across three target environments using `up.ps1` (PowerShell) or `make` shortcuts:
-| Environment | PowerShell | Make (Linux/WSL) | Domain Suffix |
+| Environment | Hosting | PowerShell | Domain Suffix |
 | :--- | :--- | :--- | :--- |
-| **Development** | `.\up.ps1 dev` | `make dev` | `localhost` |
-| **Staging** | `.\up.ps1 staging` | `make staging` | `harilibur.com` |
-| **Production** | `.\up.ps1 prod` | `make prod` | `harikerja.com` |
+| **Development** | Local Machine | `.\up.ps1 dev` | `localhost` |
+| **Staging** | **IDCloudHost VPS** | `.\up.ps1 staging` | `stg.harikerja.com` |
+| **Production** | **Modern AWS** | `.\up.ps1 prod` | `harikerja.com` |
 
 **Other Commands**:
-- Stop: `.\up.ps1 dev -down` or `make down`
-- Logs: `.\up.ps1 dev -logs` or `make logs`
+- Stop: `.\up.ps1 [env] -down` or `make down`
+- Logs: `.\up.ps1 [env] -logs` or `make logs`
+- Build: `.\up.ps1 [env] -build` (Windows only)
 
 **Note**: Standard `docker-compose up` will default to the **Development** environment.
 

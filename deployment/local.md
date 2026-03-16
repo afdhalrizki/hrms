@@ -15,12 +15,21 @@ This guide outlines the steps to run the harikerja HRMS platform locally on your
    ```
 2. Set up environment variables locally (or rely on the docker defaults). The `environments/` folder contains examples.
 
-## Step 2: Bootstrapping with Docker Compose
-The entire stack (PostgreSQL, Redis, PgBouncer, Django Backend) is containerized for easy local startup.
+## Step 2: Bootstrapping with PowerShell Script
+The easiest way to start the local environment is using the provided PowerShell script:
 
-```bash
-docker-compose up --build
+```powershell
+# Start normally
+.\up.ps1 dev
+
+# Build and start
+.\up.ps1 dev -build
+
+# Stop the specific environment
+.\up.ps1 dev -down
 ```
+
+This script automatically uses the `environments/.env.local` configuration for the `dev` command.
 *Note: The frontend is currently run separately in development to leverage Next.js hot-reloading.*
 
 ## Step 3: Database Initialization

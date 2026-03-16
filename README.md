@@ -17,23 +17,29 @@ A next-generation, multi-tenant Human Resource Management System (HRMS) built fo
 
 ---
 
-## 🚀 Quick Start (Docker)
+## 🚀 Quick Start
 
-The fastest way to get the environment running is using Docker:
+The platform provides unified scripts to manage Development, Staging, and Production environments.
 
-```bash
-docker-compose up --build
+### Windows (Local Dev)
+```powershell
+.\up.ps1 dev -build
 ```
 
-**Access Points:**
-- **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
-- **Tenant Dashboard**: [http://company1.harikerja.com:3000](http://company1.harikerja.com:3000) (Requires hosts mapping)
-- **Backend API Docs (Swagger)**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
-- **Django Admin**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
+### Linux/macOS (Staging/Production)
+```bash
+make staging
+# or
+make prod
+```
 
-> [!IMPORTANT]
-> To access tenant subdomains locally, add an entry to your `hosts` file:
-> `127.0.0.1 company1.harikerja.com`
+**Access Points (Local):**
+- **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
+- **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
+- **Backend API Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
+
+> [!NOTE]
+> For detailed deployment instructions to **IDCloudHost** (Staging) or **AWS** (Production), see the [**Deployment Guide**](./deployment/README.md).
 
 ---
 
