@@ -202,10 +202,17 @@ To prevent unauthorized discovery of administrative entry points, the public log
 - **Contextual Awareness**: The UI dynamically detects the secret route and reveals the login form with a specialized "Portal Admin Global" badge.
 - **Public Redirection**: Unauthenticated visitors to the public root are automatically redirected to the Registration/Landing page (`/signup`) to streamline onboarding.
 
-### 2. Mobile Test Orchestration (Dependency Injection)
-Significantly improved the reliability of the Flutter application through architectural refactoring and expanded test coverage.
-- **ApiService Refactor**: Implemented constructor-based Dependency Injection for `http.Client`. This allows unit tests to inject a `MockClient`, ensuring tests are fast and reliable without making real network requests.
-- **Comprehensive API Tests**: Added tests for Login flows (Success/Failure) and User Profile fetching logic.
-- **Model Integrity**: Created new unit tests for `Shift` and `Schedule` JSON parsing to prevent runtime type-errors.
+### 2. Mobile & Frontend Quality Hub (Test Orchestration)
+Significantly improved the reliability of both platforms through architectural refactoring and expanded test coverage.
 
-**Status**: Milestone 🎉 Phase 29 (Secret Portal & Mobile Quality) 100% Complete.
+#### Mobile:
+- **ApiService Refactor**: Implemented constructor-based Dependency Injection for `http.Client`, enabling reliable `MockClient` testing.
+- **Model Integrity**: Unit tests for `Shift` and `Schedule` JSON parsing to prevent runtime crashes.
+
+#### Frontend:
+- **Security Logic Tests**: Verified conditional form rendering and domain-based restrictions using Vitest.
+- **Automated Redirection**: Confirmed unauthenticated public root access redirects correctly to `/signup`.
+- **E2E Verification**: Added Playwright specifications for the new Secret Portal access flow.
+- **Accessibility**: Enhanced the login encounter with proper ARIA-compliant label associations for all inputs.
+
+**Status**: Milestone 🎉 Phase 29 (Secret Portal & Quality Hub) 100% Complete.

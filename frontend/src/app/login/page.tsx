@@ -71,10 +71,11 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                 {/* Form */}
                 <form className="space-y-5 pt-4" onSubmit={(e) => e.preventDefault()}>
                   <div className="space-y-1.5 text-left">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
+                    <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
                     <div className="relative group">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                       <input 
+                        id="email"
                         type="email" 
                         placeholder="name@company.com"
                         className="w-full pl-12 pr-4 py-3.5 bg-white/5 rounded-2xl border border-transparent focus:border-primary/30 focus:bg-white/10 focus:outline-none transition-all text-foreground"
@@ -85,10 +86,11 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                   </div>
 
                   <div className="space-y-1.5 text-left">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</label>
+                    <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</label>
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                       <input 
+                        id="password"
                         type="password" 
                         placeholder="••••••••"
                         className="w-full pl-12 pr-4 py-3.5 bg-white/5 rounded-2xl border border-transparent focus:border-primary/30 focus:bg-white/10 focus:outline-none transition-all text-foreground"

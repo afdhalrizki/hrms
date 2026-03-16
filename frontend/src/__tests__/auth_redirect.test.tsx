@@ -1,0 +1,67 @@
+import { render, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
+import Home from '@/app/page';
+import { useAuth } from '@/context/AuthContext';
+import { useTenant } from '@/context/TenantContext';
+import { useRouter } from 'next/navigation';
+
+// Mock dependencies
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: vi.fn(),
+}));
+
+vi.mock('@/context/TenantContext', () => ({
+  useTenant: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+describe('Home Page Redirection', () => {
+  const mockPush = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (useRouter as any).mockReturnValue({
+      push: mockPush,
+    });
+  });
+
+  it('redirects unauthenticated users to /signup on public domain', async () => {
+    (useAuth as any).mockReturnValue({
+      user: null,
+      loading: false,
+    });
+    (useTenant as any).mockReturnValue({
+      isPublic: true,
+      subdomain: null,
+    });
+
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/signup');
+    });
+  });
+
+  it('does not redirect on tenant subdomain', async () => {
+    (useAuth as any).mockReturnValue({
+      user: null,
+      loading: false,
+    });
+    (useTenant as any).mockReturnValue({
+      isPublic: false,
+      subdomain: 'acme',
+    });
+
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(mockPush).not.toHaveBeenCalledWith('/signup');
+    });
+  });
+});
