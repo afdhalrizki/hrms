@@ -68,7 +68,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 ## 13. Unit Testing & Quality Assurance
 - [x] Implement Backend Payroll Engine tests.
 - [x] Implement Backend Multi-tenancy isolation tests (Core & Tenants).
-- [x] Fix and expand Mobile widget & logic tests.
+- [/] Fix and expand Mobile widget & logic tests.
 - [x] Add basic Frontend component smoke tests.
 
 ## 14. Final Verification & Handover
@@ -119,7 +119,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Complete Backend Attendance Unit Tests (Geofencing, Shifts, Leave).
 - [x] Complete Backend Core HR Unit Tests (Employee, Dept, Master Data).
 - [x] Complete Backend Config Smoke Tests (Multi-tenant settings, Middleware).
-- [x] Complete Backend Tenant Unit Tests (Schema & Domain foundation).
+- [x] Complete Backend Tenant Unit Tests (Schema & Domain foundation + Registration Flow).
 - [x] Complete Backend User Unit Tests (Auth & Tenant Access Middleware).
 - [x] Complete Backend Payroll Unit Tests (Tax TER 2024, BPJS, PDF).
 - [x] Refactor [settings.py](file:///d:/hr/hrms/backend/config/settings.py) for dynamic environment management.
@@ -140,3 +140,17 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Update `bootstrap_tenants` command to use global setting.
 - [x] Refactor `tenants` test suite for dynamic domain support.
 - [x] Update `README.md` with environment variable documentation.
+
+## 19. Frontend Integration: Onboarding & Dynamic Config
+- [x] Refactor `api.ts` for dynamic host resolution.
+- [x] Update `TenantContext` to support configurable domain suffixes.
+- [x] Implement Premium Signup Page (`/signup`).
+- [x] Implement Internal Admin Registration Approval UI.
+- [x] Verify frontend-backend integration for the full registration flow.
+
+## 20. Frontend Unit Testing: Logic & Component Verification
+- [x] Implement Unit Tests for `getBaseUrl` (local/dynamic/env).
+- [x] Implement Unit Tests for `TenantContext` logic (subdomain extraction).
+- [x] Implement Component Tests for `/signup` (form state/submission).
+- [x] Implement Component Tests for `/admin/registrations` (data grid/actions).
+- [x] Verify 100% logic coverage for critical frontend helpers.

@@ -1,12 +1,18 @@
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    // For localhost development:
-    // If we are on company1.localhost:3000, we should call company1.localhost:8000
-    if (host.includes('localhost')) {
-      return `http://${host}:8000/api`;
+    const port = window.location.port;
+    
+    // In development/local setup, the backend might be on a different port (8000)
+    // while frontend is on 3000.
+    const apiPort = process.env.NEXT_PUBLIC_API_PORT || '8000';
+    
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      return `http://${host}:${apiPort}/api`;
     }
-    // For production (e.g., company.yourhr.com)
+    
+    // For production/staging, usually same host but with /api prefix
+    // or a dedicated api. subdomain
     return `https://${host}/api`;
   }
   return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';

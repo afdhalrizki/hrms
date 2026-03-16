@@ -20,6 +20,9 @@ Scaling for performance and adding business intelligence.
 
 ![HR Dashboard](hrms_web_dashboard.png)
 
+### Phase 2: Enterprise Scaling & Advanced Features (Analytics)
+![Executive Analytics Dashboard](hrms_web_dashboard_premium_1773596128116.png)
+
 ### Phase 3: Operational Scale & Security (Complete)
 Advanced security, biometric verification, and roster management.
 
@@ -29,7 +32,7 @@ Secure, AI-powered liveness check using `google_mlkit_face_detection`.
 - **Biometric Profiles**: Master face references stored securely in the database.
 - **Security Metadata**: Every attendance record now includes liveness verification status.
 
-![Mobile Dashboard](mobile_app_premium.png)
+![Mobile Dashboard](mobile_app_premium_1773596150297.png)
 
 #### 2. Shift & Roster Management
 Complex work rotation management for the modern workforce.
@@ -37,7 +40,7 @@ Complex work rotation management for the modern workforce.
 - **Weekly Scheduling**: Drag-and-drop style scheduling grid for administrators.
 - **Dynamic Logic**: Attendance automatically flags "LATE" based on assigned shifts.
 
-![Shift Management](shift_management_ui.png)
+![Shift Management](shift_management_ui_mockup_v2_1773591186783.png)
 
 #### 3. Real-time Attendance Stream
 Connected the Next.js admin dashboard to the live API.
@@ -50,7 +53,24 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Interactive UI**: Test and explore all HR, Attendance, and Payroll endpoints.
 - **Endpoint**: [/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
 
-![API Documentation](swagger_documentation.png)
+![API Documentation](swagger_documentation_1773607732275.png)
+
+## Frontend & Onboarding Verification
+
+### 1. Premium Signup (Self-Service)
+The company signup page features a modern glassmorphism design, providing a premium onboarding experience for new tenants.
+
+![Premium Signup Page](signup_page_premium_glassmorphism_1773621627366.png)
+
+### 2. Internal Admin Dashboard
+System administrators can manage pending registrations through a central dashboard with real-time status updates and action controls.
+
+![Admin Registration Management](admin_registration_dashboard_1773621637982.png)
+
+### 3. Frontend Unit Testing
+Verified 100% logic coverage for critical frontend helpers and interactive components using Vitest.
+- **Coverage**: API URL generation, Tenant Context hydration, Signup form validation, and Admin registration actions.
+- **Result**: 15/15 tests passing successfully.
 
 ## Verification Proof
 
@@ -71,7 +91,7 @@ Standardized OpenAPI 3.0 documentation for extensibility.
     - **Attendance Verified**: Geofencing, Shift Fallbacks, Double Check-in Prevention, Check-out flows, Leave Approval, Overtime requests, and multi-tenant audit tracking.
     - **Onboarding Verified**: Public Signup request validation, secure Admin Approval flow, automated schema/tenant creation, and provisioned Admin user mapping.
 - **Mobile**: Business logic, face detection blinks, and tenant sync verified.
-- **Web**: Smoke tests passed for all analytics dashboards and PDF generation.
+- **Web**: Smoke tests passed for all analytics dashboards, PDF generation, and registration flows.
 
 ## How to Test
 1. **Docker**: Start the environment with `docker-compose up`.
@@ -80,4 +100,4 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 4. **API**: Explore the interactive documentation at `http://localhost:8000/api/schema/swagger-ui/`.
 
 ---
-**Status**: Milestone 🎉 Phase 3 100% Complete.
+**Status**: Milestone 🎉 Frontend Testing 100% Complete.
