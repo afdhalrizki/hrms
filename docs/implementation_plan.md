@@ -154,7 +154,7 @@ Enable multi-tenant testing on local developer machines using `.localhost`.
 - [x] **Docker Config**: Set domain suffix to `localhost`.
 
 ## Phase 32: Build Resilience & Tailwind 4 Support (Complete)
-Address native binding issues and engine mismatches for Alpine Linux.
-- [x] **Runtime Upgrade**: Promote to Node.js 22-alpine (LTS).
-- [x] **Native Bindings**: Explicitly install `@tailwindcss/oxide-linux-x64-musl`.
-- [x] **Dev Server**: Stabilize Turbopack compilation in containerized environments.
+Address native binding issues and engine mismatches by switching to a Debian-based runtime.
+- [x] **Platform Migration**: Switch from Alpine to `node:22-bookworm-slim` for better binary compatibility.
+- [x] **Native Stability**: Resolve Tailwind Oxide issues via `glibc` base.
+- [x] **Cleanup Strategy**: Implement "Nuclear Cleanup" (volume pruning) for environment parity.

@@ -1,10 +1,9 @@
-FROM node:22-alpine
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install && \
-    npm install @tailwindcss/oxide-linux-x64-musl
+RUN npm install
 
 COPY . .
 

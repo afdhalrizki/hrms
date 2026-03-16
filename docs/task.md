@@ -216,6 +216,6 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Verification**: Test access via `company1.localhost:3000`.
 
 ## Phase 32: Build Resilience & Tailwind 4 Support
-- [x] **Dockerfile**: Upgrade to `node:22-alpine`.
-- [x] **Alpine Fix**: Explicitly install `@tailwindcss/oxide-linux-x64-musl`.
+- [x] **Dockerfile**: Switch to `node:22-bookworm-slim`.
+- [x] **Cleanup**: Document `docker-compose down -v` recovery steps.
 - [x] **Docs**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.

@@ -245,13 +245,22 @@ Enabled seamless local development across tenant subdomains (e.g., `company1.loc
 
 ## Phase 32: Build Resilience & Tailwind 4 Support
 
-Resolved native binding issues and aligned runtime with Next.js 16 engine requirements.
-- **Node.js LTS Upgrade**: Upgraded the frontend runtime to `node:22-alpine` to satisfy `^22.12.0` engine requirements.
-- **Native Binding Fix**: Explicitly integrated `@tailwindcss/oxide-linux-x64-musl` to resolve the "Cannot find native binding" error in Alpine/musl environments.
-- **Build Reliability**: Stabilized the Turbopack dev server by ensuring all optional native dependencies are correctly resolved during container build.
+Resolved native binding issues and aligned runtime with Next.js 16 engine requirements via a platform switch.
+- **Debian Switch**: Migrated from Alpine to `node:22-bookworm-slim`. This switch to a `glibc`-based environment provides native compatibility for Rust-based extensions like `@tailwindcss/oxide`.
+- **Node.js LTS Upgrade**: Maintained Node 22 to satisfy modern Next.js engine requirements.
+- **Build Reliability**: Simplified the `Dockerfile` by removing architecture-specific hacks, relying on Debian's robust binary resolution.
 
-### Verification
-- **Container Start-up**: Confirmed that `company1.localhost:3000` loads without "Error evaluating Node.js code" or "Cannot find native binding" screens.
-- **Styling Persistence**: Verified that Tailwind CSS 4 features are correctly compiled and rendered in the browser.
+### Verification & Recovery
+- **Nuclear Cleanup**: If stale volumes or caches persist, use the following sequence for a guaranteed fresh start:
+  ```powershell
+  docker-compose down -v
+  docker-compose build --no-cache frontend
+  docker-compose up -d
+  ```
+- **Database Re-initialization**: After a volume prune, rebuild the state using:
+  ```powershell
+  docker-compose run --rm backend python manage.py migrate_schemas --shared
+  docker-compose run --rm backend python manage.py bootstrap_tenants
+  ```
 
 **Status**: Milestone 🎉 Phase 32 (Build Resilience & Tailwind 4 Support) 100% Complete.
