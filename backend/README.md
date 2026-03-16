@@ -6,6 +6,7 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 
 - **Multi-Tenant Foundation**: Complete data isolation using `django-tenants` and PostgreSQL schemas.
 - **Auto-Onboarding Flow**: Public registration request system with an internal admin approval workflow that auto-provisions tenants.
+- **Admin Provisioning**: Dynamic Employee and Global User creation logic with RBAC capabilities via `EmployeeViewSet`.
 - **Unified Identity (Admin-Employee)**: Integrated user profile API (`/api/users/me/`) that links Django users with their HR employee records.
 - **Indonesian Payroll Engine**: Full compliance with **TER 2024 PPh 21** regulations, BPJS calculations, and dynamic PDF payslip generation.
 - **Biometric Attendance**: Geofencing-validated clock-in/out with face reference tracking and liveness check metadata.

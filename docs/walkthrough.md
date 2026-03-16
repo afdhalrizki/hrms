@@ -140,3 +140,17 @@ _Automated verification of the Settings view, demonstrating the responsive React
 
 ---
 **Status**: Milestone 🎉 Phase 24 (Tenant Customization) 100% Complete. Rebranded to **harikerja** on March 16, 2026.
+
+## Admin Provisioning System (Phase 25)
+
+Implemented the unified capability for Tenant Administrators to provision new employees and automatically grant them system login capabilities (and subsequently, Admin privileges) all from a single interface. 
+- Integrated the frontend `/employees` view with the live API, breaking away from mock data.
+- Added a robust UI modal for `Employee` creation. 
+- The Django Backend `EmployeeViewSet` now intercepts `create_user` and `is_admin` payload flags. Using atomic transactions, it automatically invokes `get_or_create` on the shared `User` schema and subsequently binds the user to the active tenant.
+
+**Preview of the Interface**:
+![Add Admin Employee Modal](./assets/add_employee_modal_before_submit_1773638661925.png)
+_The complete employee creation modal showcasing the Access Provisioning toggles._
+
+---
+**Status**: Milestone 🎉 Phase 25 (Admin Provisioning System) 100% Complete.
