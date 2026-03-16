@@ -264,8 +264,20 @@ Resolved native binding issues and aligned runtime with Next.js 16 engine requir
   docker-compose run --rm backend python manage.py seed_demo
   ```
 
+### Production Readiness
+- **Production Domain**: `harikerja.com` is now handled as the production domain.
+- **Session Persistence**: Configured cross-origin session cookies to support tenant subdomains in both local dev (`.localhost`) and production (`.harikerja.com`).
+
+### Environment Configuration
+The platform is designed to run across three target environments:
+| Environment | Domain Suffix | Protocol | Session Domain |
+| :--- | :--- | :--- | :--- |
+| **Development** | `localhost` | `http` | `.localhost` |
+| **Staging** | `harilibur.com` | `https` | `.harilibur.com` |
+| **Production** | `harikerja.com` | `https` | `.harikerja.com` |
+
 ### Demo Credentials
 - **Global Admin**: `admin@harikerja.com` / `admin123` (Access via `localhost:8000/admin/`)
 - **Tenant Admin**: `admin@company1.localhost` / `admin123` (Access via `company1.localhost:3000/login`)
 
-**Status**: Milestone 🎉 Phase 32 (Build Resilience & Tailwind 4 Support) 100% Complete.
+**Status**: Milestone 🎉 Phase 33 (Production Domain Readiness & System Recovery) 100% Complete.

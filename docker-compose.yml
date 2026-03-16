@@ -23,9 +23,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-    environment:
-      - DATABASE_URL=postgres://hrms_user:hrms_password@pgbouncer:6432/hrms
-      - TENANT_DOMAIN_SUFFIX=localhost
+    env_file:
+      - ./environments/.env.local # Default for straight docker-compose up, overridden by --env-file
     depends_on:
       - db
       - redis
@@ -68,9 +67,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-      - NEXT_PUBLIC_DOMAIN_SUFFIX=localhost
+    env_file:
+      - ./environments/.env.local
     depends_on:
       - backend
     restart: unless-stopped

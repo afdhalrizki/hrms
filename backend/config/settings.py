@@ -28,7 +28,13 @@ SECRET_KEY = 'django-insecure-36j!$@9l*+wxxzyvejfc*@zb-%so!3h2p3%u(!%kcc!5xhpk3p
 DEBUG = True
 
 TENANT_DOMAIN_SUFFIX = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
-ALLOWED_HOSTS = ['*'] # In production, restrict this to specific domains and wildcards
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1', 
+    '.localhost', 
+    '.harilibur.com', 
+    '.harikerja.com'
+]
 
 
 # Application definition
@@ -174,7 +180,21 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://.*\.localhost:3000$",
     r"^http://localhost:3000$",
 ]
-CORS_ALLOW_CREDENTIALS = True
+# Session and CSRF Cookie Settings for Multi-tenant support
+# Mapping: Dev (.localhost), Staging (.harilibur.com), Prod (.harikerja.com)
+SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', '.localhost')
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://*.localhost:3000",
+    "https://harilibur.com",
+    "https://*.harilibur.com",
+    "https://harikerja.com",
+    "https://*.harikerja.com",
+]
 
 # REST Framework Settings
 REST_FRAMEWORK = {
