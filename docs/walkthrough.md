@@ -269,12 +269,18 @@ Resolved native binding issues and aligned runtime with Next.js 16 engine requir
 - **Session Persistence**: Configured cross-origin session cookies to support tenant subdomains in both local dev (`.localhost`) and production (`.harikerja.com`).
 
 ### Environment Configuration
-The platform is designed to run across three target environments:
-| Environment | Domain Suffix | Protocol | Session Domain |
+The platform is designed to run across three target environments using `up.ps1` (PowerShell) or `make` shortcuts:
+| Environment | PowerShell | Make (Linux/WSL) | Domain Suffix |
 | :--- | :--- | :--- | :--- |
-| **Development** | `localhost` | `http` | `.localhost` |
-| **Staging** | `harilibur.com` | `https` | `.harilibur.com` |
-| **Production** | `harikerja.com` | `https` | `.harikerja.com` |
+| **Development** | `.\up.ps1 dev` | `make dev` | `localhost` |
+| **Staging** | `.\up.ps1 staging` | `make staging` | `harilibur.com` |
+| **Production** | `.\up.ps1 prod` | `make prod` | `harikerja.com` |
+
+**Other Commands**:
+- Stop: `.\up.ps1 dev -down` or `make down`
+- Logs: `.\up.ps1 dev -logs` or `make logs`
+
+**Note**: Standard `docker-compose up` will default to the **Development** environment.
 
 ### Demo Credentials
 - **Global Admin**: `admin@harikerja.com` / `admin123` (Access via `localhost:8000/admin/`)
