@@ -4,6 +4,11 @@ from django_tenants.models import TenantMixin, DomainMixin
 class Tenant(TenantMixin):
     name = models.CharField(max_length=100)
     created_on = models.DateField(auto_now_add=True)
+    
+    # Customization Fields
+    logo = models.ImageField(upload_to='tenant_logos/', null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    phone = models.CharField(max_length=50, null=True, blank=True)
 
     # default true, schema will be automatically created and synced when it is saved
     auto_create_schema = True

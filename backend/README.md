@@ -9,6 +9,7 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - **Unified Identity (Admin-Employee)**: Integrated user profile API (`/api/users/me/`) that links Django users with their HR employee records.
 - **Indonesian Payroll Engine**: Full compliance with **TER 2024 PPh 21** regulations, BPJS calculations, and dynamic PDF payslip generation.
 - **Biometric Attendance**: Geofencing-validated clock-in/out with face reference tracking and liveness check metadata.
+- **Tenant Customization**: Admins can securely upload company logos and contact details via the `/api/tenant/settings/` endpoint.
 - **Enterprise Ready**: Request caching with Redis and connection pooling with PgBouncer.
 
 ## 📁 Core Modules

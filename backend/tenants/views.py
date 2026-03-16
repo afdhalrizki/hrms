@@ -1,10 +1,10 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django_tenants.utils import schema_context
 from .models import RegistrationRequest, Tenant, Domain
-from .serializers import RegistrationRequestSerializer
+from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer
 from users.models import User
 from core.models import Department, Role, Golongan, Employee
 
@@ -141,3 +141,20 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
         registration.status = 'REJECTED'
         registration.save()
         return Response({'message': 'Registration request rejected.'})
+
+class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
+    """
+    API for retrieving and updating the current tenant's profile (Logo, Address, Phone).
+    GET is public (so login pages can show the logo).
+    PUT/PATCH requires Admin authentication.
+    """
+    serializer_class = TenantSettingsSerializer
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+    def get_object(self):
+        # request.tenant is injected by TenantMainMiddleware
+        return self.request.tenant

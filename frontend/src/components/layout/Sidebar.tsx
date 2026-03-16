@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
+import { getBaseUrl } from '@/lib/api';
 
 const menuItems = [
   { name: 'Overview',   icon: LayoutDashboard, href: '/' },
@@ -29,7 +30,7 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { tenantName } = useTenant();
+  const { tenantName, logo } = useTenant();
   const { user, loading } = useAuth();
 
   const getInitials = (name: string | null) => {
@@ -42,14 +43,26 @@ export function Sidebar() {
       <div className="flex flex-col h-full">
         {/* Logo Section */}
         <div className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-              <Briefcase size={22} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">HRMS</h1>
-              <span className="text-xs font-medium text-muted-foreground opacity-70">
-                {tenantName} Portal
+          <div className="flex items-center gap-3 overflow-hidden">
+            {logo ? (
+              <div className="h-10 w-10 shrink-0 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-black/5 overflow-hidden">
+                <img 
+                  src={logo.startsWith('http') ? logo : `${getBaseUrl().replace('/api', '')}${logo}`} 
+                  alt={`${tenantName} Logo`} 
+                  className="h-full w-full object-contain p-1" 
+                />
+              </div>
+            ) : (
+              <div className="h-10 w-10 shrink-0 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <Briefcase size={22} />
+              </div>
+            )}
+            <div className="overflow-hidden">
+              <h1 className="text-xl font-bold tracking-tight truncate">
+                {tenantName === 'Public' ? 'harikerja' : tenantName}
+              </h1>
+              <span className="text-xs font-medium text-muted-foreground opacity-70 block truncate">
+                {tenantName === 'Public' ? 'Public Portal' : 'Workspace Portal'}
               </span>
             </div>
           </div>

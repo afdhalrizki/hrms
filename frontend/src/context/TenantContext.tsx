@@ -1,11 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 interface TenantContextType {
   tenantName: string;
   subdomain: string;
   isPublic: boolean;
+  logo?: string;
+  address?: string;
+  phone?: string;
+  isLoading: boolean;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -15,6 +20,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     tenantName: 'Public',
     subdomain: '',
     isPublic: true,
+    isLoading: true,
   });
 
   useEffect(() => {
@@ -30,6 +36,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           tenantName: 'Public',
           subdomain: '',
           isPublic: true,
+          isLoading: false,
         });
         return;
       }
@@ -38,11 +45,33 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       if (hostname.endsWith(`.${domainSuffix}`)) {
         const subdomain = hostname.replace(`.${domainSuffix}`, '');
         if (subdomain && subdomain !== 'www' && subdomain !== 'public') {
-          setTenant({
-            tenantName: subdomain.charAt(0).toUpperCase() + subdomain.slice(1),
+          const initialName = subdomain.charAt(0).toUpperCase() + subdomain.slice(1);
+          
+          // Set initial fallback from URL
+          setTenant(prev => ({
+            ...prev,
+            tenantName: initialName,
             subdomain: subdomain,
             isPublic: false,
-          });
+            isLoading: true,
+          }));
+
+          // Fetch true tenant profile including logo
+          apiFetch('/tenant/settings/')
+            .then((data) => {
+              setTenant(prev => ({
+                ...prev,
+                tenantName: data.name || prev.tenantName,
+                logo: data.logo,
+                address: data.address,
+                phone: data.phone,
+                isLoading: false,
+              }));
+            })
+            .catch((err) => {
+              console.error('Failed to fetch tenant settings:', err);
+              setTenant(prev => ({ ...prev, isLoading: false }));
+            });
         }
       }
     }

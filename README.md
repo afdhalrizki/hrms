@@ -51,6 +51,7 @@ docker-compose up --build
 ## 💎 Premium Features
 
 - **Multi-Tenant Foundation**: Complete data isolation using PostgreSQL schemas per customer.
+- **Tenant Customization**: Administrators can securely upload custom company logos and contact details dynamically mapped across the UI.
 - **Biometric Security**: AI-powered Face ID with liveness check using Google ML Kit.
 - **Payroll Engine**: Fully compliant Indonesian PPh 21 (TER 2024) and BPJS calculation engine.
 - **Auto-Onboarding**: Commercial-ready self-service registration and provisioning workflow.
@@ -64,4 +65,4 @@ docker-compose up --build
 - **Infrastructure**: PostgreSQL, Redis, PgBouncer, Docker Compose.
 
 ---
-**Status**: Milestone 🎉 Phase 3 100% Complete. Rebranded to **harikerja** on March 16, 2026.
+**Status**: Milestone 🎉 Phase 24 (Tenant Customization) 100% Complete. Rebranded to **harikerja** on March 16, 2026.

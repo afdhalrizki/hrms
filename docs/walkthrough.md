@@ -127,4 +127,16 @@ flutter test
 ```
 
 ---
-**Status**: Milestone 🎉 Phase 3 100% Complete.
+
+## Tenant Customization & Branding (Phase 24)
+
+To give companies true ownership over their HRMS portal, administrators can now fully customize their workspace profile. By accessing the **Settings** hub, admins can define their company name, contact details, and most importantly, upload a **custom company logo** that dynamically replaces the default branding across the entire UI.
+
+![Company Settings Form](./assets/company_settings_form_1773630472562.png)
+_The intuitive glassmorphic form where administrators upload their custom identity._
+
+![Settings Validation Recording](./assets/tenant_settings_ui_validation_1773630453833.webp)
+_Automated verification of the Settings view, demonstrating the responsive React layout._
+
+---
+**Status**: Milestone 🎉 Phase 24 (Tenant Customization) 100% Complete. Rebranded to **harikerja** on March 16, 2026.

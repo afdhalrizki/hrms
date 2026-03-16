@@ -24,7 +24,7 @@ from users.views import UserViewSet
 from core.views import DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet
 from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
-from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet
+from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -47,8 +47,15 @@ router.register(r'internal/registrations', RegistrationApprovalViewSet, basename
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/tenant/settings/', TenantSettingsAPIView.as_view(), name='tenant-settings'),
     # API Schema & Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -146,6 +146,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Media files (Logos, Uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Redis Caching for High-Frequency Traffic
 CACHES = {
     "default": {
