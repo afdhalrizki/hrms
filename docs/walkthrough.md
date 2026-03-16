@@ -176,3 +176,18 @@ Implemented a hybrid RBAC system that provides default roles while allowing tena
 
 ---
 **Status**: Milestone 🎉 Phase 27 (Hybrid RBAC) 100% Complete. Rebranded to **harikerja** on March 16, 2026.
+
+## Phase 28: Platform Access & Dynamic UI
+
+Implemented clear platform separation and dynamic UI filtering to enhance security and user experience.
+- **Platform Separation**: Established Web (Dashboard) for Administrative focus and Mobile (Flutter) for Employee operational focus.
+- **Dynamic Sidebar**: Integrated role-based logic in the frontend to hide administrative menus (Employees, Payroll, Analytics, Settings) from standard employees.
+- **Security Reinforcement**: Validated that backend RBAC (`HasRBACPermission`) strictly blocks unauthorized edit/write operations. 
+    - **Read-Only Profile**: Standard employees can view their data but cannot modify their own NIK, Department, or Salary (requires `manage_hr` permission).
+    - **Transaction Isolation**: Employees are restricted to "Self-Service" inputs (Clock In/Out, Leave Requests) primarily via the Mobile platform; all administrative data remains immutable to them.
+
+### Verification Result
+- **Multi-Role Test**: Confirmed that switching between an Admin and a Standard Employee account dynamically updates the available navigation options in the sidebar without requiring hard-coded redirects.
+- **Access Control Denial**: Verified that attempting to perform POST/PUT actions on protected endpoints (e.g., `/api/employees/`) results in a `403 Forbidden` response for non-admin users.
+
+**Status**: Milestone 🎉 Phase 28 (Platform Access & Dynamic UI) 100% Complete.

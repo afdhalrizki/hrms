@@ -21,11 +21,11 @@ import { getBaseUrl } from '@/lib/api';
 
 const menuItems = [
   { name: 'Overview',   icon: LayoutDashboard, href: '/' },
-  { name: 'Employees', icon: Users,            href: '/employees' },
+  { name: 'Employees', icon: Users,            href: '/employees', isAdminOnly: true },
   { name: 'Attendance',icon: Calendar,         href: '/attendance' },
-  { name: 'Payroll',   icon: CreditCard,       href: '/payroll' },
-  { name: 'Analytics', icon: BarChart2,        href: '/analytics' },
-  { name: 'Settings',  icon: Settings,         href: '/settings' },
+  { name: 'Payroll',   icon: CreditCard,       href: '/payroll',   isAdminOnly: true },
+  { name: 'Analytics', icon: BarChart2,        href: '/analytics', isAdminOnly: true },
+  { name: 'Settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
 ];
 
 export function Sidebar() {
@@ -70,7 +70,12 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-1 mt-4">
-          {menuItems.map((item) => {
+          {menuItems.filter(item => {
+            if (item.isAdminOnly && !user?.is_staff && !user?.is_global_admin) {
+              return false;
+            }
+            return true;
+          }).map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
