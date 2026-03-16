@@ -27,13 +27,13 @@ docker-compose up --build
 
 **Access Points:**
 - **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
-- **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000) (Requires hosts mapping)
+- **Tenant Dashboard**: [http://company1.harikerja.com:3000](http://company1.harikerja.com:3000) (Requires hosts mapping)
 - **Backend API Docs (Swagger)**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
 - **Django Admin**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
 > [!IMPORTANT]
 > To access tenant subdomains locally, add an entry to your `hosts` file:
-> `127.0.0.1 company1.localhost`
+> `127.0.0.1 company1.harikerja.com`
 
 ---
 

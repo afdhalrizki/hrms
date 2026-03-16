@@ -39,7 +39,7 @@ void main() {
     test('User.fromJson parses flattened backend response', () {
       final json = {
         "id": 1,
-        "email": "admin@company1.localhost",
+        "email": "admin@company1.harikerja.com",
         "is_staff": true,
         "employee_id": 1,
         "employee_nik": "EMP-001",

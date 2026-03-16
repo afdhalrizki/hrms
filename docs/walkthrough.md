@@ -59,7 +59,7 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Security**: Strict tenant schema isolation confirmed via server-side logic tests.
 - **Reports**: Formal PDF Payslip generation (ReportLab) verified in both Web and Mobile.
 - **Onboarding**: Self-service Tenant Registration flow with internal admin approval and auto-provisioning.
-- **Flexibility**: Centralized `TENANT_DOMAIN_SUFFIX` allowing easy switch between `.localhost`, `.stg.hrms.com`, or `.hrms.com`.
+- **Flexibility**: Centralized `TENANT_DOMAIN_SUFFIX` allowing easy switch between `.harikerja.com`, `.stg.hrms.com`, or `.hrms.com`.
 
 ### Testing Status
 - **Backend**: 100% logic coverage for Attendance, Payroll, HR, Config, Tenants, and Users (41+ Integration Scenarios).
@@ -78,7 +78,7 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 ### 1. Premium Signup (Self-Service)
 The company signup page features a modern glassmorphism design, providing a premium onboarding experience for new tenants.
 
-![Premium Signup Page](./assets/signup_preview.png)
+![Premium Signup Page](./assets/signup_page_premium_harikerja.png)
 
 ### 2. Internal Admin Dashboard
 System administrators can manage pending registrations through a central dashboard with real-time status updates and action controls.
@@ -109,7 +109,7 @@ Secured the core integration logic with robust automated tests and optimized dat
 ## How to Test
 1. **Docker**: Start the environment with `docker-compose up`.
 2. **Access Admin**: Use `http://localhost:8000/admin/` for public management.
-3. **Tenant Portal**: Access `http://company1.localhost:8000/admin/` (ensure hosts file mapping).
+3. **Tenant Portal**: Access `http://company1.harikerja.com:8000/admin/` (ensure hosts file mapping).
 4. **API**: Explore the interactive documentation at `http://localhost:8000/api/schema/swagger-ui/`.
 
 ### Phase 14: Mobile Identity Alignment & Unit Tests

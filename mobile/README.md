@@ -13,7 +13,7 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 ## 🖼 UI Previews
 
 ### Employee Dashboard
-![Mobile Dashboard](../docs/assets/mobile_dashboard.png)
+![Mobile Dashboard](../docs/assets/mobile_preview.png)
 *Premium glassmorphism dashboard with real-time shift and attendance tracking.*
 
 ### Face ID Attendance

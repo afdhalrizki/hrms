@@ -45,7 +45,7 @@ pip install -r requirements.txt
 
 ### Environment Config
 Map your environment variables in a `.env` file or local settings:
-- `TENANT_DOMAIN_SUFFIX`: The suffix for tenant domains (default: `localhost`).
+- `TENANT_DOMAIN_SUFFIX`: The suffix for tenant domains (default: `harikerja.com`).
 - `DATABASE_URL`: Your PostgreSQL connection string.
 
 ---

@@ -35,7 +35,7 @@ describe('TenantContext', () => {
   });
 
   it('extracts subdomain correctly from default localhost suffix', async () => {
-    vi.stubGlobal('location', { hostname: 'acme.localhost' });
+    vi.stubGlobal('location', { hostname: 'acme.harikerja.com' });
 
     const { getByTestId } = render(
       <TenantProvider>
@@ -67,7 +67,7 @@ describe('TenantContext', () => {
   });
 
   it('handles www as public even if suffixed', async () => {
-    vi.stubGlobal('location', { hostname: 'www.localhost' });
+    vi.stubGlobal('location', { hostname: 'www.harikerja.com' });
 
     const { getByTestId } = render(
       <TenantProvider>

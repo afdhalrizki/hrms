@@ -17,7 +17,7 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 *Modern, glassmorphism-based dashboard with real-time analytics indicators.*
 
 ### Premium Signup
-![Signup Preview](../docs/assets/signup_preview.png)
+![Signup Preview](../docs/assets/signup_page_premium_harikerja.png)
 *Seamless tenant onboarding with instant domain validation.*
 
 ## 🛠 Tech Stack
@@ -57,9 +57,9 @@ Open [http://localhost:3000](http://localhost:3000) for the public portal.
 
 To test tenant-specific dashboards (e.g., `company1`), update your local `hosts` file:
 ```text
-127.0.0.1 company1.localhost
+127.0.0.1 company1.harikerja.com
 ```
-Then access [http://company1.localhost:3000](http://company1.localhost:3000).
+Then access [http://company1.harikerja.com:3000](http://company1.harikerja.com:3000).
 
 ---
 

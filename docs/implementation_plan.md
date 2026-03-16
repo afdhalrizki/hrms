@@ -104,7 +104,7 @@ To enable self-service registration while maintaining control over new schemas.
 
 ## Phase 8: Dynamic Host Management & Global Configuration (Complete)
 Centralizing system-wide constants for high-availability scaling.
-- [x] **TENANT_DOMAIN_SUFFIX**: Migration from hardcoded `.localhost` to an environment-injected variable.
+- [x] **TENANT_DOMAIN_SUFFIX**: Migration from hardcoded `.harikerja.com` to an environment-injected variable.
 - [x] **Dynamic Base Discovery**: Implementation of `settings.TENANT_DOMAIN_SUFFIX` in `RegistrationApprovalViewSet` and `bootstrap_tenants`.
 - [x] **Agnostic Testing**: Refactored the `tenants` test suite to support dynamic host environments.
 - [x] **Documentation**: Updated README with multi-environment domain configuration guides.

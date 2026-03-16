@@ -30,7 +30,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 ## 5. Migrations & Initialization
 - [x] Run `makemigrations` for all apps (`core`, `tenants`, `attendance`, `payroll`).
 - [x] Run `migrate_schemas --shared` to create public schema tables.
-- [x] Create the `public` tenant (domain: `localhost`) and `company1` tenant (domain: `company1.localhost`).
+- [x] Create the `public` tenant (domain: `harikerja.com`) and `company1` tenant (domain: `company1.harikerja.com`).
 - [x] Run `migrate_schemas --tenant` to create tenant-specific tables.
 
 ## 7. Backend API Development

@@ -190,7 +190,7 @@ export default function SignupPage() {
                       className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-32 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-white/20"
                     />
                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                      <span className="text-sm font-bold text-muted-foreground">.localhost</span>
+                      <span className="text-sm font-bold text-muted-foreground">.harikerja.com</span>
                     </div>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 # MANUAL TESTING CHECKLIST - HRMS SAAS
 
 ## 1. Multi-Tenancy
-- [ ] Ensure `company1.localhost` cannot see data from `company2.localhost`.
+- [ ] Ensure `company1.harikerja.com` cannot see data from `company2.harikerja.com`.
 - [ ] Verify login redirection to correct tenant domain.
 
 ## 2. Attendance & Biometrics

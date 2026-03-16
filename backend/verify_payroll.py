@@ -25,7 +25,7 @@ def test_payroll():
             nik="EMP001",
             defaults={
                 'fullname': "John Doe",
-                'email': "john@company1.localhost",
+                'email': "john@company1.harikerja.com",
                 'department': dept,
                 'role': role,
                 'golongan': golongan,
