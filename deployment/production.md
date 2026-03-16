@@ -39,6 +39,12 @@ The platform uses `environments/.env.production` as the source of truth for conf
 ## Step 4: Deployment Manifests
 You will need to convert the `docker-compose.yml` into Kubernetes manifests. Your CI/CD pipeline should inject values from the environment configuration.
 
+However, for local testing or manual AWS EC2/VPS production-style setups:
+
+**Windows:** `.\up.ps1 prod`
+**Linux:** `make prod`
+
+
 *A typical Django Deployment with PgBouncer sidecar looks like this:*
 ```yaml
 apiVersion: apps/v1

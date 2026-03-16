@@ -19,18 +19,23 @@ A next-generation, multi-tenant Human Resource Management System (HRMS) built fo
 
 ## 🚀 Quick Start
 
-The platform provides unified scripts to manage Development, Staging, and Production environments.
+Unified scripts to manage **Development**, **Staging**, and **Production** environments seamlessly.
 
-### Windows (Local Dev)
+### Windows (PowerShell)
 ```powershell
-.\up.ps1 dev -build
+# Format: .\up.ps1 [dev|staging|prod] [flags]
+.\up.ps1 dev -build    # Start local dev
+.\up.ps1 staging       # Start staging
+.\up.ps1 prod -logs    # Start production and tail logs
+.\up.ps1 dev -down     # Stop local dev
 ```
 
-### Linux/macOS (Staging/Production)
+### Linux/macOS (Make)
 ```bash
-make staging
-# or
-make prod
+make dev               # Start local dev
+make staging           # Start staging
+make prod              # Start production
+make down              # Stop containers
 ```
 
 **Access Points (Local):**
@@ -64,12 +69,24 @@ make prod
 - **Auto-Onboarding**: Commercial-ready self-service registration and provisioning workflow.
 - **Analytics**: High-performance executive dashboards with real-time HR metrics.
 
+## 🌐 Deployment Environments
+
+The platform is architected for seamless transition from dev to enterprise scale:
+
+| Environment | Hosting Platform | Purpose |
+| :--- | :--- | :--- |
+| **Development** | Local Docker | Rapid prototyping & local testing. |
+| **Staging** | **IDCloudHost VPS** | UAT, QA, and early-stage production. |
+| **Production** | **Modern AWS** | High-availability, auto-scaling enterprise workloads. |
+
+---
+
 ## 🛠 Tech Stack
 
 - **Backend**: Python 3.12, Django 5.0, Django-Tenants, DRF Spectacular.
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Framer Motion, Vitest.
 - **Mobile**: Flutter 3.19+, Dart, Google ML Kit, Secure Storage.
-- **Infrastructure**: PostgreSQL, Redis, PgBouncer, Docker Compose.
+- **Infrastructure**: PostgreSQL, Redis, PgBouncer, Docker Compose (Local), AWS EKS/RDS (Prod).
 
 ---
-**Status**: Milestone 🎉 Phase 25 (Admin Provisioning System) 100% Complete. Rebranded to **harikerja** on March 16, 2026.
+**Status**: Milestone 🎉 Phase 33 (Production Domain Readiness & System Recovery) 100% Complete. Rebranded to **harikerja** on March 16, 2026.

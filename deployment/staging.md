@@ -26,21 +26,27 @@ cd /opt/hrms
 The system uses environment-specific files located in the `environments/` directory. For staging:
 1.  Open `environments/.env.staging`.
 2.  Define the following critical variables:
-    - `TENANT_DOMAIN_SUFFIX=stg.yourdomain.com`
+    - `TENANT_DOMAIN_SUFFIX=harilibur.com`
     - `SECRET_KEY=your-secure-staging-key`
     - `POSTGRES_PASSWORD=your-secure-db-password`
 
 ## Step 3: Frontend Build Configuration
-Ensure `environments/.env.staging` has the correct `NEXT_PUBLIC_API_URL` (usually `https://stg.yourdomain.com/api`).
+Ensure `environments/.env.staging` has the correct `NEXT_PUBLIC_API_URL` (usually `https://harilibur.com/api`).
 
 ## Step 4: Deploy Stack
-The easiest way to deploy is using the provided `Makefile`:
+The easiest way to deploy is using the provided tools:
 
+**Windows (PowerShell):**
+```powershell
+.\up.ps1 staging -build
+```
+
+**Linux/VPS (Make/Docker):**
 ```bash
 make staging
 ```
 
-This command automatically pulls the correct environment variables from `environments/.env.staging`.
+These commands automatically pull the correct environment variables from `environments/.env.staging`.
 
 ## Step 5: Configure Nginx & SSL
 Install Nginx and configure reverse proxy routing:
@@ -53,17 +59,20 @@ Map subdomains correctly in Nginx to support Multi-Tenancy (Wildcard SSL is heav
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com *.yourdomain.com;
+    server_name harilibur.com *.harilibur.com;
 
     location /api/ {
         proxy_pass http://localhost:8000/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     location / {
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 }
 ```
@@ -71,7 +80,7 @@ server {
 Enable the site and install SSL using Certbot:
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d yourdomain.com -d *.yourdomain.com
+sudo certbot --nginx -d harilibur.com -d *.harilibur.com
 ```
 
 ## Step 6: Initial Database Setup
