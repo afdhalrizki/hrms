@@ -6,6 +6,7 @@ from django_tenants.utils import schema_context
 from .models import RegistrationRequest, Tenant, Domain
 from .serializers import RegistrationRequestSerializer
 from users.models import User
+from core.models import Department, Role, Golongan, Employee
 
 class PublicSignupViewSet(viewsets.GenericViewSet):
     """
@@ -79,7 +80,44 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                 # Assign user to the new tenant
                 admin_user.tenants.add(tenant)
 
-                # 4. Update status
+                # 4. Auto-provision HR Master Data for the new tenant
+                with schema_context(tenant.schema_name):
+                    # Create Default Department
+                    dept = Department.objects.create(
+                        name="Management",
+                        description="Default department for administrative staff"
+                    )
+                    
+                    # Create Default Role (Jabatan)
+                    role = Role.objects.create(
+                        name="Company Admin",
+                        department=dept,
+                        description="Top-level administrative role"
+                    )
+                    
+                    # Create Default Golongan (for payroll stub)
+                    gol = Golongan.objects.create(
+                        name="G1",
+                        base_salary=10000000,
+                        meal_allowance=50000,
+                        transport_allowance=30000
+                    )
+
+                    # Create Employee record for the admin
+                    from datetime import date
+                    Employee.objects.create(
+                        nik="ADMIN-001",
+                        fullname=registration.company_name + " Admin",
+                        email=registration.admin_email,
+                        department=dept,
+                        role=role,
+                        golongan=gol,
+                        status='PERMANENT',
+                        join_date=date.today(),
+                        ktp_number=f"ADM-{registration.id}" # Unique placeholder
+                    )
+
+                # 5. Update status
                 registration.status = 'APPROVED'
                 registration.save()
                 
@@ -87,7 +125,7 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
             # send_mail('Welcome to HRMS', f'Your schema {domain_name} is ready. Login with {registration.admin_email}.', 'noreply@hrms.com', [registration.admin_email])
 
             return Response({
-                'message': f'Tenant {registration.company_name} approved and provisioned.',
+                'message': f'Tenant {registration.company_name} approved and provisioned as Admin-Employee.',
                 'domain': domain_name,
                 'admin_email': registration.admin_email
             })

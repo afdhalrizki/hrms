@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
+import { useAuth } from '@/context/AuthContext';
 
 const menuItems = [
   { name: 'Overview',   icon: LayoutDashboard, href: '/' },
@@ -29,6 +30,12 @@ const menuItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const { tenantName } = useTenant();
+  const { user, loading } = useAuth();
+
+  const getInitials = (name: string | null) => {
+    if (!name) return '??';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 glass-card border-r transition-transform">
@@ -78,15 +85,19 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* User Profile Hook (Placeholder) */}
+        {/* User Profile Section */}
         <div className="p-4 mt-auto">
-          <div className="glass-card rounded-2xl p-4 border flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center text-white font-bold">
-              AD
+          <div className="glass-card rounded-2xl p-4 border flex items-center gap-3 overflow-hidden">
+            <div className="h-10 w-10 shrink-0 rounded-full bg-accent flex items-center justify-center text-white font-bold">
+              {loading ? '...' : getInitials(user?.fullname || user?.email || 'Admin')}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-semibold truncate">Admin User</p>
-              <p className="text-xs text-muted-foreground truncate">admin@hrms.com</p>
+              <p className="text-sm font-semibold truncate">
+                {loading ? 'Loading...' : (user?.fullname || 'Admin User')}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email || 'admin@hrms.com'}
+              </p>
             </div>
           </div>
         </div>

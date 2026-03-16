@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getBaseUrl } from '@/lib/api';
+import { getBaseUrl, apiFetch } from '@/lib/api';
 
 describe('getBaseUrl', () => {
   const originalEnv = process.env;
@@ -34,5 +34,58 @@ describe('getBaseUrl', () => {
     vi.stubGlobal('window', undefined);
     process.env.NEXT_PUBLIC_API_URL = 'https://api.test.com/api';
     expect(getBaseUrl()).toBe('https://api.test.com/api');
+  });
+});
+
+describe('apiFetch', () => {
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
+    mockFetch.mockReset();
+    vi.stubGlobal('location', { hostname: 'localhost', port: '3000' });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('calls fetch with correct URL and headers', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    const data = await apiFetch('/test-endpoint');
+    
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:8000/api/test-endpoint',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+        }),
+      })
+    );
+    expect(data).toEqual({ success: true });
+  });
+
+  it('throws error when response is not ok', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      statusText: 'Not Found',
+      json: async () => ({ detail: 'Custom error message' }),
+    });
+
+    await expect(apiFetch('/fail')).rejects.toThrow('Custom error message');
+  });
+
+  it('falls back to statusText if json error detail is missing', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      statusText: 'Internal Server Error',
+      json: async () => { throw new Error('No JSON'); },
+    });
+
+    await expect(apiFetch('/fail')).rejects.toThrow('API Error: Internal Server Error');
   });
 });

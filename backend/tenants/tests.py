@@ -64,6 +64,8 @@ from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from tenants.models import RegistrationRequest, Tenant, Domain
+from core.models import Department, Role, Golongan, Employee
+from django_tenants.utils import schema_context
 
 User = get_user_model()
 
@@ -154,6 +156,18 @@ class RegistrationFlowTestCase(TenantTestCase):
         # - Admin user created/provisioned
         new_admin = User.objects.get(email='admin@approved.com')
         self.assertTrue(new_admin.tenants.filter(id=tenant.id).exists())
+
+        # - HR Master Data provisioned within the new schema
+        with schema_context(tenant.schema_name):
+            self.assertTrue(Department.objects.filter(name="Management").exists())
+            self.assertTrue(Role.objects.filter(name="Company Admin").exists())
+            self.assertTrue(Golongan.objects.filter(name="G1").exists())
+            
+            # - Admin linked as Employee
+            self.assertTrue(Employee.objects.filter(
+                email='admin@approved.com', 
+                nik="ADMIN-001"
+            ).exists())
 
     def test_admin_rejection_process(self):
         """Verify that an admin can reject a request."""

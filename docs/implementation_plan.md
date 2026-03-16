@@ -42,7 +42,7 @@ Infrastructure and sophisticated logic for business scaling.
 ### 3. Executive Analytics (Next.js)
 - **Cost Dashboard**: Dedicated analytics for real-time HR costs, overtime expenses, and department efficiency.
 
-![Executive Analytics](hrms_web_dashboard.png)
+![Executive Analytics](./assets/hrms_web_dashboard_premium_1773596128116.png)
 
 ## Phase 3: Operational Scale & Security (Complete)
 Advanced security features and workforce management.
@@ -56,7 +56,7 @@ Advanced security features and workforce management.
 - **Scheduling:** Grid-based assignment of shifts to employees by date.
 - **Dynamic Logic:** Automated "Late" flagging based on specific shift start times.
 
-![Shift Management UI](shift_management_ui.png)
+![Shift Management UI](./assets/shift_management_ui_mockup_v2_1773591186783.png)
 
 ### 3. Tenant-Specific Security
 - **Login Guard:** Restricting access to ensure company admins only access their respective domains.
@@ -76,7 +76,7 @@ To reliably serve **1 Million+ Users**, the following architectural shifts are r
 ### 3. Asynchronous Operations
 - **Celery + RabbitMQ**: Offloading bulk payroll generation to background workers to keep the main API fast.
 
-![Global Scaling Architecture](dashboard_overview_v1.png)
+![Global Scaling Architecture](./assets/hrms_dashboard_top_1773568424860.png)
 
 ## Phase 5: DevOps & Environment Management (Complete)
 To manage the transition between these phases, a multi-environment strategy is implemented:
@@ -109,12 +109,6 @@ Centralizing system-wide constants for high-availability scaling.
 - [x] **Agnostic Testing**: Refactored the `tenants` test suite to support dynamic host environments.
 - [x] **Documentation**: Updated README with multi-environment domain configuration guides.
 
-## Phase 9: Frontend Integration: Onboarding & Dynamic Config (Complete)
-Modernizing the user interface for self-service scale.
-- [x] **Dynamic Context**: Updated `TenantContext` and `api.ts` to support configurable domain suffixes.
-- [x] **Signup UI**: Implemented a premium glassmorphism registration page at `/signup`.
-- [x] **Approval Dashboard**: Created a registration management interface for internal admins at `/admin/registrations`.
-
 ## Phase 10: Frontend Unit Testing & Logic Verification (Complete)
 Standardizing verification for high-impact frontend logic.
 - [x] **API Logic**: Unit tests for `getBaseUrl` in `api.ts` covering local, staging, and production scenarios.
@@ -122,5 +116,26 @@ Standardizing verification for high-impact frontend logic.
 - [x] **Component Logic**: Testing form states and validation in `/signup` and `/admin/registrations`.
 - [x] **Mocking**: Implementation of `vitest` mocks for `fetch` to simulate backend responses.
 
+## Phase 11: Admin-Employee Mobile Integration (Complete)
+Seamlessly connecting administrative accounts with operational employee profiles for mobile usability.
+- [x] **Provisioning**: Update `RegistrationApprovalViewSet` to create default `Department`, `Role`, and `Employee` for the admin email.
+- [x] **Identity Link**: Implement `/api/users/me/` to aggregate cross-app data (User model from `users` + Employee model from `core`).
+- [x] **Mobile Sync**: Refactor Flutter `HomeScreen` and `ApiService` to hydrate UI from the central identity endpoint.
+- [x] **Verification**: Ensure geofenced check-in works for the auto-created admin-employee profile.
+
+## Phase 12: Backend Unit Test Updates (Complete)
+Expanding test coverage for the Admin-Employee integration and profile endpoints.
+- [x] **Registration Verification**: Update `tenants/tests.py` to assert that `Department`, `Role`, and `Employee` records are created upon tenant approval.
+- [x] **Identity Endpoint Verification**: Update `users/tests.py` to test the `/api/users/me/` endpoint, ensuring it returns aggregated data from both the User and Employee models.
+- [x] **Cross-Tenant Isolation**: Ensure the `me` endpoint respects schema isolation and only returns the employee profile for the current tenant.
+
+## Phase 13: Frontend Identity Integration & Test Updates (Complete)
+Hydrating the UI from the real backend identity endpoint and verifying with automated tests.
+- [x] **AuthContext**: Implement central user state management in `src/context/AuthContext.tsx`.
+- [x] **UI Hydration**: Updates `Sidebar`, `DashboardLayout`, and `Home` to display real user profile data (email, fullname, nik).
+- [x] **API Tests**: Expand `api.test.ts` to cover `apiFetch` with mock responses.
+- [x] **Component Tests**: Update `Sidebar.test.tsx` and others to verify data display from `AuthContext`.
+- [x] **Integration Test**: Verify that the "Welcome, Admin" header dynamically updates based on the logged-in user.
+
 ---
-**Status**: Milestone 🎉 Frontend Testing 100% Complete. All Logic Verified.
+**Status**: Milestone 🎉 Phase 3 100% Complete. Environment & QA Infrastructure Established. Attendance Logic Fully Verified.

@@ -5,44 +5,90 @@ import 'payslip_screen.dart';
 import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Map<String, dynamic>? _userData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      final api = ApiService();
+      final data = await api.getUserProfile();
+      setState(() {
+        _userData = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading profile: $e')),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0F172A),
+        body: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+      );
+    }
+
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
+    final employee = _userData?['employee'];
+    final fullName = employee?['fullname'] ?? _userData?['first_name'] ?? 'User';
+    final roleName = employee?['role_name'] ?? 'Staff';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _buildWeatherDate(dateStr),
-                const SizedBox(height: 32),
-                _buildAttendanceCard(context),
-                const SizedBox(height: 32),
-                _buildSectionHeader("Quick Access"),
-                const SizedBox(height: 16),
-                _buildQuickAccessGrid(context),
-                const SizedBox(height: 32),
-                _buildSectionHeader("Recent Activities"),
-                const SizedBox(height: 16),
-                _buildRecentActivity(),
-              ]),
+      body: RefreshIndicator(
+        onRefresh: _loadProfile,
+        color: Colors.blueAccent,
+        child: CustomScrollView(
+          slivers: [
+            _buildAppBar(context, fullName, roleName),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  _buildWeatherDate(dateStr),
+                  const SizedBox(height: 32),
+                  _buildAttendanceCard(context, employee?['id']),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader("Quick Access"),
+                  const SizedBox(height: 16),
+                  _buildQuickAccessGrid(context),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader("Recent Activities"),
+                  const SizedBox(height: 16),
+                  _buildRecentActivity(),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavigation(context),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, String name, String role) {
     return SliverAppBar(
       expandedHeight: 120,
       backgroundColor: Colors.transparent,
@@ -57,11 +103,11 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Good Morning,',
+                    'Welcome back,',
                     style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 14),
                   ),
                   Text(
-                    'Jessica Doe',
+                    name,
                     style: GoogleFonts.plusJakartaSans(
                       color: Colors.white,
                       fontSize: 24,
@@ -95,7 +141,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAttendanceCard(BuildContext context) {
+  Widget _buildAttendanceCard(BuildContext context, int? employeeId) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -170,9 +216,31 @@ class HomeScreen extends StatelessWidget {
                 ),
               );
               if (result is Map && result['verified'] == true) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Clock out successful! (${result['method']})')),
-                );
+                try {
+                  final now = DateTime.now();
+                  final timeStr = DateFormat('HH:mm:ss').format(now);
+                  
+                  final api = ApiService();
+                  await api.submitAttendance(
+                    employeeId: employeeId!,
+                    latitude: -6.2088, // Mocking center of office for dev
+                    longitude: 106.8456,
+                    checkInTime: timeStr,
+                  );
+                  
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Clock in/out successful! (${result['method']})')),
+                    );
+                    _loadProfile(); // Refresh UI
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to record attendance: $e')),
+                    );
+                  }
+                }
               }
             },
             style: ElevatedButton.styleFrom(

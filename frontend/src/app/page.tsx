@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 const stats = [
   { 
@@ -50,6 +51,8 @@ const stats = [
 ];
 
 export default function Home() {
+  const { user, loading } = useAuth();
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -60,10 +63,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-bold tracking-tight"
           >
-            Welcome back, Admin 👋
+            {loading ? 'Welcome back...' : `Welcome back, ${user?.fullname || 'Admin'} 👋`}
           </motion.h1>
           <p className="text-muted-foreground">
-            Here's what's happening in your company today.
+            {loading ? 'Fetching your dashboard...' : "Here's what's happening in your company today."}
           </p>
         </div>
 

@@ -154,3 +154,21 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Implement Component Tests for `/signup` (form state/submission).
 - [x] Implement Component Tests for `/admin/registrations` (data grid/actions).
 - [x] Verify 100% logic coverage for critical frontend helpers.
+
+## 21. Admin-Employee Mobile Integration
+- [x] Auto-provision Default Department & Role for new tenants.
+- [x] Auto-provision Admin as the first `Employee` on approval.
+- [x] Implement `/api/users/me/` endpoint (linking User + Employee).
+- [x] Refactor Mobile app to use real profile data (remove mocks).
+- [x] Verify Attendance check-in with auto-created admin-employee.
+
+## 22. Backend Test Expansion: Admin-Employee Integration
+- [x] Update `tenants/tests.py` with HR provisioning assertions.
+- [x] Update `users/tests.py` with unified `/api/users/me/` verification.
+- [x] Verify cross-tenant isolation for aggregated profile data.
+
+## 23. Frontend Identity Integration & Test Updates
+- [x] Implement `AuthContext` for user state.
+- [x] Hydrate Sidebar and Home with real identity data.
+- [x] Expand `api.test.ts` with fetch mocking.
+- [x] Create `Sidebar.test.tsx` to verify dynamic profile display.

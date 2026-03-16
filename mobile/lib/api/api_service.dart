@@ -87,6 +87,52 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> getUserProfile() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    
+    final response = await http.get(
+      Uri.parse("$baseUrl/users/me/"),
+      headers: _headers(tenant, token),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to fetch user profile: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> submitAttendance({
+    required int employeeId,
+    required double latitude,
+    required double longitude,
+    required String checkInTime,
+    bool isClockIn = true,
+  }) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    
+    final payload = {
+      'employee': employeeId,
+      'latitude_in': latitude,
+      'longitude_in': longitude,
+      'check_in': checkInTime,
+    };
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/attendance/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to submit attendance: ${response.body}');
+    }
+  }
+
   Future<List<Schedule>> getMySchedules() async {
     final tenant = await getTenant();
     final token = await getToken();

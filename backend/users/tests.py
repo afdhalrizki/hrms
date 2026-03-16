@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 from users.models import User
 from users.middleware import TenantAccessMiddleware
 from tenants.models import Tenant, Domain
+from core.models import Department, Role, Golongan, Employee
 
 class UserModuleTestCase(TenantTestCase):
     def setUp(self):
@@ -37,6 +38,67 @@ class UserModuleTestCase(TenantTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Filters to own profile
         self.assertEqual(len(response.data), 1)
+
+    def test_user_me_endpoint(self):
+        """Verify that /api/users/me/ returns aggregated User + Employee data."""
+        # 1. Setup HR data for this user in self.tenant
+        dept = Department.objects.create(name="Engineering")
+        role = Role.objects.create(name="Developer", department=dept)
+        gol = Golongan.objects.create(name="G2", base_salary=15000000)
+        
+        employee = Employee.objects.create(
+            nik="DEV-001",
+            fullname="Tenant User",
+            email=self.tenant_user.email,
+            department=dept,
+            role=role,
+            golongan=gol,
+            join_date="2024-01-01",
+            ktp_number="123456789"
+        )
+        
+        url = reverse('user-me')
+        self.client.force_login(self.tenant_user)
+        response = self.client.get(url, SERVER_NAME=self.domain)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # 2. Check User fields
+        self.assertEqual(response.data['email'], self.tenant_user.email)
+        
+        # 3. Check Employee fields (aggregated)
+        self.assertEqual(response.data['employee_nik'], "DEV-001")
+        self.assertEqual(response.data['role_name'], "Developer")
+        self.assertEqual(response.data['department_name'], "Engineering")
+
+    def test_user_me_isolation(self):
+        """Verify that the me endpoint doesn't return employee data from other tenants."""
+        # This user belongs to self.tenant but NOT other_tenant
+        with schema_context('public'):
+            other_tenant = Tenant.objects.create(schema_name='iso_test', name='Isolation Co')
+            other_domain = Domain.objects.create(domain=f'iso.{settings.TENANT_DOMAIN_SUFFIX}', tenant=other_tenant)
+            
+        # Create an employee in the OTHER tenant with the SAME email
+        with schema_context('iso_test'):
+            dept = Department.objects.create(name="Other Dept")
+            Employee.objects.create(
+                nik="OTHER-001",
+                fullname="Imposter",
+                email=self.tenant_user.email,
+                department=dept,
+                join_date="2024-01-01",
+                ktp_number="999999"
+            )
+
+        url = reverse('user-me')
+        self.client.force_login(self.tenant_user)
+        
+        # Requesting from self.tenant (where they HAVE NO employee record yet)
+        response = self.client.get(url, SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should NOT have employee data from the other schema
+        self.assertIsNone(response.data.get('employee_nik'))
+        self.assertEqual(response.data['email'], self.tenant_user.email)
 
 class MiddlewareTestCase(TenantTestCase):
     def setUp(self):
