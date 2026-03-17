@@ -59,7 +59,7 @@ The app is designed to connect to different environments. You can adjust the `ba
 | **Android Emulator** | `http://10.0.2.2:8000/api` | Default configuration |
 | **iOS Simulator** | `http://localhost:8000/api` | |
 | **Physical Device** | `http://<your-ip>:8000/api` | Same Wi-Fi required |
-| **Staging** | `https://harilibur.com/api` | Requires production build |
+| **Staging** | `https://harikerja.web.id/api` | Requires production build |
 
 > [!TIP]
 > Ensure the **Backend** is running using `.\up.ps1 dev` before starting the mobile app for local testing.

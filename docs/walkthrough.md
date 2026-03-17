@@ -273,7 +273,7 @@ The platform is designed to run across three target environments using `up.ps1` 
 | Environment | Hosting | PowerShell | Domain Suffix |
 | :--- | :--- | :--- | :--- |
 | **Development** | Local Machine | `.\up.ps1 dev` | `localhost` |
-| **Staging** | **IDCloudHost VPS** | `.\up.ps1 staging` | `harilibur.com` |
+| **Staging** | **IDCloudHost VPS** | `.\up.ps1 staging` | `harikerja.web.id` |
 | **Production** | **Modern AWS** | `.\up.ps1 prod` | `harikerja.com` |
 
 **Other Commands**:

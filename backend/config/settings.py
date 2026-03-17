@@ -175,7 +175,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:3000$",
 ]
 # Session and CSRF Cookie Settings for Multi-tenant support
-# Mapping: Dev (.localhost), Staging (.harilibur.com), Prod (.harikerja.com)
+# Mapping: Dev (.localhost), Staging (.harikerja.web.id), Prod (.harikerja.com)
 SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', '.localhost')
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
@@ -184,8 +184,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://*.localhost:3000",
-    "https://harilibur.com",
-    "https://*.harilibur.com",
+    "https://harikerja.web.id",
+    "https://*.harikerja.web.id",
     "https://harikerja.com",
     "https://*.harikerja.com",
 ]

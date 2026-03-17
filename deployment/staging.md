@@ -26,12 +26,12 @@ cd /opt/hrms
 The system uses environment-specific files located in the `environments/` directory. For staging:
 1.  Open `environments/.env.staging`.
 2.  Define the following critical variables:
-    - `TENANT_DOMAIN_SUFFIX=harilibur.com`
+    - `TENANT_DOMAIN_SUFFIX=harikerja.web.id`
     - `SECRET_KEY=your-secure-staging-key`
     - `POSTGRES_PASSWORD=your-secure-db-password`
 
 ## Step 3: Frontend Build Configuration
-Ensure `environments/.env.staging` has the correct `NEXT_PUBLIC_API_URL` (usually `https://harilibur.com/api`).
+Ensure `environments/.env.staging` has the correct `NEXT_PUBLIC_API_URL` (usually `https://harikerja.web.id/api`).
 
 ## Step 4: Deploy Stack
 The easiest way to deploy is using the provided tools:
@@ -59,7 +59,7 @@ Map subdomains correctly in Nginx to support Multi-Tenancy (Wildcard SSL is heav
 ```nginx
 server {
     listen 80;
-    server_name harilibur.com *.harilibur.com;
+    server_name harikerja.web.id *.harikerja.web.id;
 
     location /api/ {
         proxy_pass http://localhost:8000/api/;
@@ -80,7 +80,7 @@ server {
 Enable the site and install SSL using Certbot:
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d harilibur.com -d *.harilibur.com
+sudo certbot --nginx -d harikerja.web.id -d *.harikerja.web.id
 ```
 
 ## Step 6: Initial Database Setup
