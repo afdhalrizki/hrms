@@ -23,6 +23,13 @@ class Tenant(TenantMixin):
     leave_approval_level = models.CharField(max_length=15, choices=APPROVAL_LEVEL_CHOICES, default='BOTH')
     overtime_approval_level = models.CharField(max_length=15, choices=APPROVAL_LEVEL_CHOICES, default='BOTH')
 
+    from django.core.validators import MinValueValidator, MaxValueValidator
+    max_admins = models.IntegerField(
+        default=5, 
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        help_text="Batas maksimal jumlah administrator untuk tenant ini (1-100)"
+    )
+
     # default true, schema will be automatically created and synced when it is saved
     auto_create_schema = True
 

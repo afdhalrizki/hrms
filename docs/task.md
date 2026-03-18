@@ -250,3 +250,13 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Add independent status tracking (`supervisor_status`, `hr_status`).
 - [x] Refactor ViewSets for role-aware multi-stage transitions (Default: `BOTH`).
 - [x] Update documentation and validation for all new workflows.
+
+## Phase 39: Tenant Admin Access & Public Security
+- [x] Add `django.contrib.admin` and `django.contrib.messages` to `TENANT_APPS`.
+- [x] Hardened `TenantAccessMiddleware` to restrict the public admin portal to internal accounts.
+- [x] Verified role-based redirection and logout for unauthorized admin access.
+
+## Phase 40: Tenant Admin Limits (Quota Management)
+- [x] Add `max_admins` field to the `Tenant` model (Default: 5, Max: 100).
+- [x] Implement `prevent_admin_overflow` signal checks for user promotion and M2M changes.
+- [x] Expose `max_admins` quota in the Tenant Settings API.

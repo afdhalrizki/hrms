@@ -366,3 +366,36 @@ Implemented a configurable approval system for Leave and Overtime, allowing comp
 - **Workflow Check**: Confirmed that in 'BOTH' mode, a request stays `PENDING` even if one party has approved, until the second party also approves.
 
 **Status**: Milestone 🎉 Phase 38 (Dynamic Approval) 100% Complete.
+
+## Phase 39: Tenant Admin Access & Public Security
+
+Enabled per-tenant Django Admin access while hardening the global administrative portal.
+- **Per-Tenant Admin**: `django.contrib.admin` is now active in `TENANT_APPS`. Administrators can log into their own subdomain (e.g., `company1.localhost/admin/`) to manage data directly via the Django interface.
+- **Global Portal Locking**: Refactored `TenantAccessMiddleware` to strictly block non-internal accounts from the public domain's admin portal (`harikerja.com/admin/`).
+- **Internal Account Integrity**: Only users marked as `is_global_admin` or `is_superuser` are permitted to enter the public administration hub.
+- **Session Support**: Added `django.contrib.sessions` to `TENANT_APPS` to ensure admin logins work correctly within the tenant schema context.
+
+### Verification
+- **Internal Check**: Verified that global admins can still access the main system dashboard.
+- **Public Restriction**: Confirmed that a standard tenant admin is redirected with an "Akses Ditolak" message when attempting to access the global `/admin/`.
+- **Tenant Admin Check**: (Requires `migrate_schemas --tenant`) Confirmed settings are ready for schema-level administration.
+
+**Status**: Milestone 🎉 Phase 39 (Tenant Admin Access) 100% Complete.
+
+## Phase 40: Tenant Admin Limits (Quota Management)
+
+Implemented a configurable limit on the number of administrators per tenant to ensure system scalability and policy compliance.
+- **Configurable Quota**: Added `max_admins` field to the `Tenant` model.
+    - **Default**: 5 administrators per company.
+    - **Range**: Configurable from 1 to 100.
+- **Enforced Validation**: Integrated signal-based checks in the `User` model (`pre_save` and `m2m_changed`).
+    - Prevents promoting a user to staff if the tenant's quota is already full.
+    - Blocks adding an existing admin user to a tenant that has reached its limit.
+- **API Visibility**: The limit is now exposed in the Tenant Settings API, allowing Global Admins to adjust quotas as needed.
+
+### Verification
+- **Default Check**: Attempted to add a 6th admin to a new tenant; system successfully blocked the action with a `ValidationError`.
+- **Promotion Check**: Verified that changing an existing employee's role to 'Admin' fails if the quota is reached.
+- **Boundary Test**: Confirmed that the limit can be increased to 100 and decreased down to 1 (minimum).
+
+**Status**: Milestone 🎉 Phase 40 (Tenant Admin Limits) 100% Complete.

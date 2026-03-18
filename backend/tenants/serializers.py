@@ -10,5 +10,5 @@ class RegistrationRequestSerializer(serializers.ModelSerializer):
 class TenantSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
-        fields = ['id', 'name', 'schema_name', 'logo', 'address', 'phone', 'overtime_rate', 'payroll_overtime_divisor', 'leave_approval_level', 'overtime_approval_level']
+        fields = ['id', 'name', 'schema_name', 'logo', 'address', 'phone', 'overtime_rate', 'payroll_overtime_divisor', 'leave_approval_level', 'overtime_approval_level', 'max_admins']
         read_only_fields = ['id', 'schema_name']

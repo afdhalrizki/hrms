@@ -116,3 +116,44 @@ def prevent_last_admin_demotion(sender, instance, **kwargs):
                 raise ValidationError(
                     f"Cannot demote or deactivate user. The tenant '{tenant.name}' must have at least one active administrator."
                 )
+
+@receiver(pre_save, sender=User)
+def prevent_admin_overflow(sender, instance, **kwargs):
+    """
+    Prevents promoting a user to staff if it exceeds the tenant's max_admins.
+    """
+    if not instance.pk:
+        return
+    try:
+        original = User.objects.get(pk=instance.pk)
+    except User.DoesNotExist:
+        return
+
+    if not original.is_staff and instance.is_staff and instance.is_active:
+        for tenant in instance.tenants.all():
+            current_admins = User.objects.filter(tenants=tenant, is_staff=True, is_active=True).count()
+            if current_admins >= tenant.max_admins:
+                raise ValidationError(f"Batas maksimal administrator untuk '{tenant.name}' adalah {tenant.max_admins}. Saat ini sudah mencapai batas.")
+
+@receiver(m2m_changed, sender=User.tenants.through)
+def prevent_admin_overflow_m2m(sender, instance, action, reverse, model, pk_set, **kwargs):
+    """
+    Prevents adding an admin user to a tenant if it exceeds the limit.
+    """
+    if action == "pre_add":
+        if not reverse:
+            # instance is User, pk_set is tenant IDs
+            if instance.is_staff and instance.is_active:
+                from tenants.models import Tenant
+                for tenant_id in pk_set:
+                    tenant = Tenant.objects.get(id=tenant_id)
+                    current_admins = User.objects.filter(tenants=tenant, is_staff=True, is_active=True).count()
+                    if current_admins >= tenant.max_admins:
+                        raise ValidationError(f"Batas maksimal administrator untuk '{tenant.name}' adalah {tenant.max_admins}. Saat ini sudah mencapai batas.")
+        else:
+            # instance is Tenant, pk_set is user IDs
+            tenant = instance
+            new_staff_count = User.objects.filter(pk__in=pk_set, is_staff=True, is_active=True).count()
+            current_admins = User.objects.filter(tenants=tenant, is_staff=True, is_active=True).count()
+            if current_admins + new_staff_count > tenant.max_admins:
+                 raise ValidationError(f"Batas maksimal administrator untuk '{tenant.name}' adalah {tenant.max_admins}. Penambahan ini akan melebihi batas (Total Jadi: {current_admins + new_staff_count}).")

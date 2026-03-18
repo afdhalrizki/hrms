@@ -64,8 +64,9 @@ make down              # Stop containers
 - **Multi-Tenant Foundation**: Complete data isolation using PostgreSQL schemas per customer.
 - **Tenant Customization**: Administrators can securely upload custom company logos and contact details dynamically mapped across the UI.
 - **Biometric Security**: AI-powered Face ID with liveness check using Google ML Kit.
-- **Admin Provisioning**: Centralized creation logic mapping employees instantly to global User accounts with optional Tenant Admin rights via RBAC.
-- **Payroll Engine**: Fully compliant Indonesian PPh 21 (TER 2024) and BPJS calculation engine.
+- **Admin Provisioning**: Centralized creation logic mapping employees instantly to global User accounts with optional Tenant Admin rights (Limited to 5 per company by default).
+- **Dynamic Approvals**: Multi-stage approval workflows for Leave and Overtime, allowing per-tenant customization (Supervisor, HR, or Both).
+- **Payroll Engine**: Fully compliant Indonesian PPh 21 (TER 2024), BPJS calculation engine, and automated overtime compensation integration.
 - **Auto-Onboarding**: Commercial-ready self-service registration and provisioning workflow.
 - **Analytics**: High-performance executive dashboards with real-time HR metrics.
 
@@ -89,4 +90,4 @@ The platform is architected for seamless transition from dev to enterprise scale
 - **Infrastructure**: PostgreSQL, Redis, PgBouncer, Docker Compose (Local), AWS EKS/RDS (Prod).
 
 ---
-**Status**: Milestone 🎉 Phase 37 (Reporting Hierarchy) 100% Complete. Rebranded to **harikerja** on March 18, 2026.
+**Status**: Milestone 🎉 Phase 40 (Tenant Admin Limits) 100% Complete. Rebranded to **harikerja** on March 18, 2026.
