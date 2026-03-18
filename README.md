@@ -89,4 +89,4 @@ The platform is architected for seamless transition from dev to enterprise scale
 - **Infrastructure**: PostgreSQL, Redis, PgBouncer, Docker Compose (Local), AWS EKS/RDS (Prod).
 
 ---
-**Status**: Milestone 🎉 Phase 35 (Leave Balance Tracking) 100% Complete. Rebranded to **harikerja** on March 18, 2026.
+**Status**: Milestone 🎉 Phase 36 (Overtime Compensation) 100% Complete. Rebranded to **harikerja** on March 18, 2026.

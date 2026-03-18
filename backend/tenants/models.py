@@ -9,6 +9,10 @@ class Tenant(TenantMixin):
     logo = models.ImageField(upload_to='tenant_logos/', null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     phone = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Payroll Settings
+    overtime_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Tarif lembur per jam global (0 = gunakan formula)")
+    payroll_overtime_divisor = models.IntegerField(default=173, help_text="Standard pembagi upah lembur (default Indonesia: 173)")
 
     # default true, schema will be automatically created and synced when it is saved
     auto_create_schema = True

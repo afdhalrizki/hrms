@@ -122,14 +122,47 @@ class PayrollCalculator:
         self.total_deductions += tax
         self.details.append({'description': 'PPh 21 (TER)', 'amount': tax, 'is_deduction': True})
 
-        # 4. Net Salary
+        # 4. Overtime Calculation (Approved)
+        from attendance.models import Overtime
+        approved_overtimes = Overtime.objects.filter(
+            employee=self.employee,
+            date__range=(self.period.start_date, self.period.end_date),
+            status='APPROVED'
+        )
+        total_overtime_hours = sum(ot.hours for ot in approved_overtimes)
+        
+        if total_overtime_hours > 0:
+            # Precedence: Grade Rate > Tenant Rate > Divisor Formula
+            from django.db import connection
+            tenant = connection.tenant
+            
+            if self.employee.golongan and self.employee.golongan.overtime_rate > 0:
+                hourly_rate = self.employee.golongan.overtime_rate
+            elif getattr(tenant, 'overtime_rate', 0) > 0:
+                hourly_rate = tenant.overtime_rate
+            else:
+                divisor = Decimal(str(getattr(tenant, 'payroll_overtime_divisor', 173)))
+                hourly_rate = basic / divisor
+            
+            overtime_pay = (hourly_rate * Decimal(str(total_overtime_hours))).quantize(Decimal('1'))
+            self.gross_pay += overtime_pay
+            self.details.append({
+                'description': f'Lembur ({total_overtime_hours} jam)',
+                'amount': overtime_pay,
+                'is_deduction': False
+            })
+        else:
+            overtime_pay = Decimal('0')
+
+        # 5. Net Salary
         self.net_pay = self.gross_pay - self.total_deductions
 
-        # 5. Commit to DB
+        # 6. Commit to DB
         payslip = Payslip.objects.create(
             employee=self.employee,
             period=self.period,
             basic_salary=basic,
+            overtime_pay=overtime_pay,
             pph21_tax=tax,
             net_pay=self.net_pay
         )

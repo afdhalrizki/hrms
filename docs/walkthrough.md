@@ -319,3 +319,19 @@ Implemented an automated system to track and manage employee annual leave quotas
 - **Deduction Test**: Confirmed that approving a 3-day leave request correctly updates the `used_days` and `remaining_days` in the `LeaveBalance` record.
 
 **Status**: Milestone 🎉 Phase 35 (Leave Balance Tracking) 100% Complete.
+
+## Phase 36: Overtime Compensation (Payroll Integration)
+
+Integrated approved overtime hours directly into the monthly payroll calculation engine with a dual-system configuration.
+- **Automated Calculation**: `PayrollCalculator` now automatically scans for `APPROVED` overtime records within the payroll period.
+- **Precedence Logic (Hierarki Tarif)**: 
+    1.  **Golongan Rate**: Prioritas utama jika diisi di level Grade/Golongan.
+    2.  **Global Rate**: Prioritas kedua jika diisi di level Tenant/Perusahaan.
+    3.  **Divisor Formula**: Menggunakan `(Gaji / Divisor)` jika tidak ada tarif tetap. Divisor juga kini dapat dikonfigurasi per Tenant (default 173).
+- **Payslip Transparency**: Overtime compensation is now listed as a distinct line item in the digital and PDF payslips.
+
+### Verification
+- **Calculation Test**: Verified that an employee with a 10,000,000 IDR base salary and 10 hours of approved overtime receives exactly 578,034 IDR in additional compensation (10,000,000 / 173 * 10).
+- **Status Integration**: Confirmed that `PENDING` or `REJECTED` overtime records are correctly ignored by the payroll engine.
+
+**Status**: Milestone 🎉 Phase 36 (Overtime Compensation) 100% Complete.

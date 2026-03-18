@@ -42,6 +42,7 @@ class Golongan(AuditModel):
     base_salary = models.DecimalField(max_digits=12, decimal_places=2, help_text="Gaji Pokok")
     meal_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Tunjangan Makan Harian")
     transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Tunjangan Transport Harian")
+    overtime_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Tarif lembur per jam (0 = gunakan formula standar)")
 
     def __str__(self):
         return self.name
