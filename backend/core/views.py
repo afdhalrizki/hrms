@@ -45,11 +45,22 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_hr'
 
     def get_queryset(self):
-        queryset = Employee.objects.all()
-        dept_id = self.request.query_params.get('department')
-        if dept_id:
-            queryset = queryset.filter(department_id=dept_id)
-        return queryset
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+
+        # Managers/HR see everyone
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_hr')):
+            queryset = Employee.objects.all()
+            dept_id = self.request.query_params.get('department')
+            if dept_id:
+                queryset = queryset.filter(department_id=dept_id)
+            return queryset
+            
+        # Employees can only see themselves
+        if employee:
+            return Employee.objects.filter(id=employee.id)
+            
+        return Employee.objects.none()
 
     def create(self, request, *args, **kwargs):
         """

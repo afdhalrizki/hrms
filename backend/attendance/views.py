@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from django.core.cache import cache
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission
+# Using absolute import from core
+from core.models import Employee
 from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule
 from .serializers import (
     AttendanceSerializer, LeaveRequestSerializer, OvertimeSerializer,
@@ -36,11 +38,34 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_attendance'
 
     def get_queryset(self):
-        queryset = Attendance.objects.all()
-        employee_id = self.request.query_params.get('employee_id')
-        if employee_id:
-            queryset = queryset.filter(employee_id=employee_id)
-        return queryset
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        # Managers and Staff see everything
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+            queryset = Attendance.objects.all()
+            employee_id = self.request.query_params.get('employee_id')
+            if employee_id:
+                queryset = queryset.filter(employee_id=employee_id)
+            return queryset
+            
+        # Regular employees only see their own records
+        if employee:
+            return Attendance.objects.filter(employee=employee)
+        return Attendance.objects.none()
+
+    def perform_create(self, serializer):
+        """Automatically assign the employee to the current folder user if not manager."""
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        # If user is not a manager, they can only create attendance for themselves
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        
+        if not is_manager and employee:
+            serializer.save(employee=employee)
+        else:
+            serializer.save()
 
     def create(self, request, *args, **kwargs):
         """Override create to enforce geofencing and automatic shift-based status."""
@@ -76,6 +101,11 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
         # ── Automatic Status Determination based on Shift ──
         employee_id = request.data.get('employee')
+        # If employee_id is not provided, use the currently logged in employee
+        if not employee_id:
+            employee = Employee.objects.filter(email=request.user.email).first()
+            employee_id = employee.id if employee else None
+
         check_in_str = request.data.get('check_in')
         
         if employee_id and check_in_str:
@@ -114,12 +144,54 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_attendance'
 
+    def get_queryset(self):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+            return LeaveRequest.objects.all()
+            
+        if employee:
+            return LeaveRequest.objects.filter(employee=employee)
+        return LeaveRequest.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        
+        if not is_manager and employee:
+            serializer.save(employee=employee)
+        else:
+            serializer.save()
+
 
 class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Overtime.objects.all()
     serializer_class = OvertimeSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_attendance'
+
+    def get_queryset(self):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+            return Overtime.objects.all()
+            
+        if employee:
+            return Overtime.objects.filter(employee=employee)
+        return Overtime.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        
+        if not is_manager and employee:
+            serializer.save(employee=employee)
+        else:
+            serializer.save()
 
 
 class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -136,10 +208,21 @@ class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_attendance'
 
     def get_queryset(self):
-        queryset = Schedule.objects.all()
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        # Managers see all schedules
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+            queryset = Schedule.objects.all()
+        elif employee:
+            # Employees only see their own schedules
+            queryset = Schedule.objects.filter(employee=employee)
+        else:
+            return Schedule.objects.none()
+
         employee_id = self.request.query_params.get('employee_id')
         date_param = self.request.query_params.get('date')
-        if employee_id:
+        if employee_id and (user.is_staff or employee.access_role.permissions.get('manage_attendance')):
             queryset = queryset.filter(employee_id=employee_id)
         if date_param:
             queryset = queryset.filter(date=date_param)

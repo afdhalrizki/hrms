@@ -59,11 +59,21 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
         })
 
     def get_queryset(self):
-        queryset = Payslip.objects.all()
-        period_id = self.request.query_params.get('period_id')
-        if period_id:
-            queryset = queryset.filter(period_id=period_id)
-        return queryset
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        # Managers see all payslips
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_payroll')):
+            queryset = Payslip.objects.all()
+            period_id = self.request.query_params.get('period_id')
+            if period_id:
+                queryset = queryset.filter(period_id=period_id)
+            return queryset
+            
+        # Employees only see their own
+        if employee:
+            return Payslip.objects.filter(employee=employee)
+        return Payslip.objects.none()
 
     @action(detail=True, methods=['get'])
     def download_pdf(self, request, pk=None):
@@ -79,7 +89,19 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
 
-class PayslipDetailViewSet(viewsets.ModelViewSet):
+class PayslipDetailViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayslipDetail.objects.all()
     serializer_class = PayslipDetailSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_payroll'
+
+    def get_queryset(self):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_payroll')):
+            return PayslipDetail.objects.all()
+            
+        if employee:
+            return PayslipDetail.objects.filter(payslip__employee=employee)
+        return PayslipDetail.objects.none()

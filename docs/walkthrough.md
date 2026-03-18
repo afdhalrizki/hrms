@@ -273,7 +273,7 @@ The platform is designed to run across three target environments using `up.ps1` 
 | Environment | Hosting | PowerShell | Domain Suffix |
 | :--- | :--- | :--- | :--- |
 | **Development** | Local Machine | `.\up.ps1 dev` | `localhost` |
-| **Staging** | **IDCloudHost VPS** | `.\up.ps1 staging` | `harikerja.web.id` |
+| **Staging** | **IDCloudHost VPS** | `.\up.ps1 staging` | **`harikerja.web.id`** |
 | **Production** | **Modern AWS** | `.\up.ps1 prod` | `harikerja.com` |
 
 **Other Commands**:
@@ -288,3 +288,20 @@ The platform is designed to run across three target environments using `up.ps1` 
 - **Tenant Admin**: `admin@company1.localhost` / `admin123` (Access via `company1.localhost:3000/login`)
 
 **Status**: Milestone 🎉 Phase 33 (Production Domain Readiness & System Recovery) 100% Complete.
+
+## Phase 34: Universal Data Ownership & Security Isolation
+
+Implemented a project-wide data isolation model to ensure employee privacy and prevent unauthorized data access across all core modules.
+- **Ownership-Based Filtering**: Refactored `get_queryset` across Attendance, Payroll, and Core modules. Employees can now only see their own records (Self-Service), while HR/Admins maintain global visibility via RBAC.
+- **Secure Provisioning**: Automated the assignment of new records (Attendance, Leave, Overtime) to the authenticated user's ID, blocking cross-user spoofing.
+- **Granular RBAC Refinement**: Enhanced the `HasRBACPermission` class to support object-level ownership checks, allowing "Safe" self-service actions (GET/POST) while strictly gating administrative actions (PUT/PATCH/DELETE).
+- **Module Coverage**: 
+    - **Attendance**: Clock-in/out and Leave requests isolation.
+    - **Payroll**: Payslip and PDF download privacy.
+    - **Core**: Employee profile isolation (employees can only view their own detailed data).
+
+### Verification
+- **Privacy Test**: Confirmed that standard employees receive empty lists or 403 errors when attempting to access other employees' IDs or sensitive management lists.
+- **Self-Service Flow**: Verified that employees can still successfully perform daily tasks (Clock-in, View Payslip) without administrative permissions.
+
+**Status**: Milestone 🎉 Phase 34 (Universal Data Ownership & Security) 100% Complete. Rebranded to **harikerja** on March 18, 2026.
