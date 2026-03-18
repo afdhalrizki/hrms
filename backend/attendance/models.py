@@ -53,6 +53,10 @@ class LeaveRequest(AuditModel):
     leave_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     reason = models.TextField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    
+    # Multi-stage approval
+    supervisor_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    hr_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     # Proof of sick leave etc.
     attachment = models.FileField(upload_to='leave_attachments/', blank=True, null=True)
@@ -73,6 +77,10 @@ class Overtime(AuditModel):
     hours = models.DecimalField(max_digits=4, decimal_places=2, help_text="Jumlah jam lembur")
     reason = models.TextField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    
+    # Multi-stage approval
+    supervisor_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    hr_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     def __str__(self):
         return f"{self.employee.fullname} - {self.date} ({self.hours} hours)"

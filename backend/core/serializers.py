@@ -28,6 +28,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     role_name = serializers.ReadOnlyField(source='role.name')
     golongan_name = serializers.ReadOnlyField(source='golongan.name')
     access_role_name = serializers.ReadOnlyField(source='access_role.name')
+    supervisor_name = serializers.ReadOnlyField(source='supervisor.fullname')
     
     class Meta:
         model = Employee

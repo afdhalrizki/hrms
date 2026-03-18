@@ -219,3 +219,34 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Dockerfile**: Switch to `node:22-bookworm-slim`.
 - [x] **Cleanup**: Document `docker-compose down -v` recovery steps.
 - [x] **Docs**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.
+
+## Phase 33: Production Domain Readiness & System Recovery
+- [x] Configure production domain `harikerja.com` in settings.
+- [x] Implement system recovery and cleanup scripts (`up.ps1 -down`).
+- [x] Define multi-environment deployment strategy (dev, staging, prod).
+
+## Phase 34: Universal Data Ownership & Security
+- [x] Implement ownership-based filtering in `get_queryset`.
+- [x] Restrict Employees to their own records (Self-Service).
+- [x] Refine RBAC for object-level privacy.
+
+## Phase 35: Leave Balance Tracking (Quotas)
+- [x] Add `LeaveBalance` model to track per-employee quotas.
+- [x] Automate leave deduction upon approval.
+- [x] Add validation to prevent exceeding remaining balance.
+
+## Phase 36: Overtime Compensation (Payroll Integration)
+- [x] Add dual configuration (Fixed Rate & Divisor) for overtime.
+- [x] Prioritize Golongan/Grade rates over Tenant-wide settings.
+- [x] Integrate approved Hours directly into `PayrollCalculator`.
+
+## Phase 37: Reporting Hierarchy (Supervisor)
+- [x] Add `supervisor` field to the `Employee` model.
+- [x] Update `EmployeeSerializer` to expose supervisor identification.
+- [x] Verify self-referential organizational authority.
+
+## Phase 38: Dynamic & Multi-Stage Approval Workflow
+- [x] Add configurable approval levels to `Tenant` (Supervisor, HR, BOTH).
+- [x] Add independent status tracking (`supervisor_status`, `hr_status`).
+- [x] Refactor ViewSets for role-aware multi-stage transitions (Default: `BOTH`).
+- [x] Update documentation and validation for all new workflows.

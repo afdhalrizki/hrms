@@ -335,3 +335,34 @@ Integrated approved overtime hours directly into the monthly payroll calculation
 - **Status Integration**: Confirmed that `PENDING` or `REJECTED` overtime records are correctly ignored by the payroll engine.
 
 **Status**: Milestone 🎉 Phase 36 (Overtime Compensation) 100% Complete.
+
+## Phase 37: Reporting Hierarchy (Organizational Tree)
+
+Implemented a self-referential reporting structure to define the flow of authority and organizational relationships.
+- **Supervisor Field**: Added a self-referential ForeignKey to the `Employee` model, allowing each employee to be assigned one supervisor.
+- **Org Tree Support**: The backend now supports building hierarchical structures (Subordinates -> Supervisor).
+- **API Visibility**: The `EmployeeSerializer` now exposes `supervisor_name` for easy identification of reporting lines in the UI.
+
+### Verification
+- **Model Check**: Confirmed that an employee record can be saved with another employee as its supervisor.
+- **Serializer Check**: Verified that fetching an employee's details correctly returns both the supervisor's ID and full name.
+
+**Status**: Milestone 🎉 Phase 37 (Reporting Hierarchy) 100% Complete.
+
+## Phase 38: Dynamic & Multi-Stage Approval Workflow
+
+Implemented a configurable approval system for Leave and Overtime, allowing companies to define their own internal workflows.
+- **Tenant-Level Configuration**: Admin can now choose approval modes: `SUPERVISOR` only, `HR` only, or `BOTH`. **Default: `BOTH` (Atasan & HR) for both workflows.**
+- **Granular Tracking**: `LeaveRequest` and `Overtime` now track `supervisor_status` and `hr_status` independently.
+- **Role-Aware Logic**: 
+    - Atasan (Supervisor) hanya bisa menyetujui request dari bawahan langsungnya.
+    - HR/Admin memiliki akses persetujuan global.
+- **Final Approval Pipeline**: Status utama (`status`) hanya berpindah ke `APPROVED` jika semua syarat pihak (berdasarkan setting) terpenuhi.
+- **Atomic Side Effects**: Leave balance deductions and payroll inclusions only trigger upon the **final** approval stage.
+
+### Verification
+- **Settings Check**: Confirmed that changing the `Tenant` setting correctly alters how many approvals are required.
+- **Access Check**: Verified that a supervisor can see and approve a subordinate's request, but not a peer's.
+- **Workflow Check**: Confirmed that in 'BOTH' mode, a request stays `PENDING` even if one party has approved, until the second party also approves.
+
+**Status**: Milestone 🎉 Phase 38 (Dynamic Approval) 100% Complete.

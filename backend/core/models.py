@@ -78,6 +78,9 @@ class Employee(AuditModel):
     # RBAC mapping
     access_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
 
+    # Hierarchy
+    supervisor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates')
+
     status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='PROBATION')
     join_date = models.DateField()
 

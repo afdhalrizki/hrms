@@ -149,12 +149,17 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
+        # Admin/HR can see everything
         if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
             return LeaveRequest.objects.all()
             
+        # Supervisors can see their own + subordinates
         if employee:
-            return LeaveRequest.objects.filter(employee=employee)
+            from django.db.models import Q
+            return LeaveRequest.objects.filter(Q(employee=employee) | Q(employee__supervisor=employee))
+            
         return LeaveRequest.objects.none()
+
     def perform_create(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
@@ -184,12 +189,52 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
             serializer.save()
 
     def perform_update(self, serializer):
+        from django.db import connection
         instance = self.get_object()
-        old_status = instance.status
-        new_status = serializer.validated_data.get('status', old_status)
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        tenant = connection.tenant
         
-        # Deduction Logic: When status moves to APPROVED
-        if old_status != 'APPROVED' and new_status == 'APPROVED' and instance.leave_type == 'CUTI':
+        new_supervisor_status = instance.supervisor_status
+        new_hr_status = instance.hr_status
+        user_choice = self.request.data.get('status')
+        
+        if not user_choice:
+            serializer.save()
+            return
+
+        # Determine if user is acting as Supervisor or HR
+        is_hr = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_supervisor = employee and instance.employee.supervisor == employee
+        
+        # If user is both, prioritize HR for global changes, or handle specifically
+        if is_supervisor and user_choice in ['APPROVED', 'REJECTED']:
+            new_supervisor_status = user_choice
+        
+        if is_hr and user_choice in ['APPROVED', 'REJECTED']:
+            new_hr_status = user_choice
+
+        # Logic for final status
+        final_status = 'PENDING'
+        level = getattr(tenant, 'leave_approval_level', 'HR')
+        
+        if user_choice == 'REJECTED':
+            final_status = 'REJECTED'
+        else:
+            if level == 'SUPERVISOR':
+                final_status = new_supervisor_status
+            elif level == 'HR':
+                final_status = new_hr_status
+            elif level == 'BOTH':
+                if new_supervisor_status == 'APPROVED' and new_hr_status == 'APPROVED':
+                    final_status = 'APPROVED'
+                elif new_supervisor_status == 'REJECTED' or new_hr_status == 'REJECTED':
+                    final_status = 'REJECTED'
+                else:
+                    final_status = 'PENDING'
+
+        # Deduction Logic: When FINAL status moves to APPROVED
+        if instance.status != 'APPROVED' and final_status == 'APPROVED' and instance.leave_type == 'CUTI':
             duration = (instance.end_date - instance.start_date).days + 1
             balance, _ = LeaveBalance.objects.get_or_create(
                 employee=instance.employee, 
@@ -198,7 +243,11 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
             balance.used_days += Decimal(str(duration))
             balance.save()
         
-        serializer.save()
+        serializer.save(
+            status=final_status,
+            supervisor_status=new_supervisor_status,
+            hr_status=new_hr_status
+        )
 
 
 class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -215,7 +264,8 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
             return Overtime.objects.all()
             
         if employee:
-            return Overtime.objects.filter(employee=employee)
+            from django.db.models import Q
+            return Overtime.objects.filter(Q(employee=employee) | Q(employee__supervisor=employee))
         return Overtime.objects.none()
 
     def perform_create(self, serializer):
@@ -227,6 +277,55 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
             serializer.save(employee=employee)
         else:
             serializer.save()
+
+    def perform_update(self, serializer):
+        from django.db import connection
+        instance = self.get_object()
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        tenant = connection.tenant
+        
+        new_supervisor_status = instance.supervisor_status
+        new_hr_status = instance.hr_status
+        user_choice = self.request.data.get('status')
+        
+        if not user_choice:
+            serializer.save()
+            return
+
+        is_hr = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_supervisor = employee and instance.employee.supervisor == employee
+        
+        if is_supervisor and user_choice in ['APPROVED', 'REJECTED']:
+            new_supervisor_status = user_choice
+        
+        if is_hr and user_choice in ['APPROVED', 'REJECTED']:
+            new_hr_status = user_choice
+
+        # Logic for final status
+        final_status = 'PENDING'
+        level = getattr(tenant, 'overtime_approval_level', 'BOTH')
+        
+        if user_choice == 'REJECTED':
+            final_status = 'REJECTED'
+        else:
+            if level == 'SUPERVISOR':
+                final_status = new_supervisor_status
+            elif level == 'HR':
+                final_status = new_hr_status
+            elif level == 'BOTH':
+                if new_supervisor_status == 'APPROVED' and new_hr_status == 'APPROVED':
+                    final_status = 'APPROVED'
+                elif new_supervisor_status == 'REJECTED' or new_hr_status == 'REJECTED':
+                    final_status = 'REJECTED'
+                else:
+                    final_status = 'PENDING'
+        
+        serializer.save(
+            status=final_status,
+            supervisor_status=new_supervisor_status,
+            hr_status=new_hr_status
+        )
 
 
 class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):

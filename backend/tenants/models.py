@@ -13,6 +13,15 @@ class Tenant(TenantMixin):
     # Payroll Settings
     overtime_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Tarif lembur per jam global (0 = gunakan formula)")
     payroll_overtime_divisor = models.IntegerField(default=173, help_text="Standard pembagi upah lembur (default Indonesia: 173)")
+    
+    # Approval Settings
+    APPROVAL_LEVEL_CHOICES = [
+        ('SUPERVISOR', 'Hanya Atasan'),
+        ('HR', 'Hanya HR/Admin'),
+        ('BOTH', 'Keduanya (Atasan & HR)'),
+    ]
+    leave_approval_level = models.CharField(max_length=15, choices=APPROVAL_LEVEL_CHOICES, default='BOTH')
+    overtime_approval_level = models.CharField(max_length=15, choices=APPROVAL_LEVEL_CHOICES, default='BOTH')
 
     # default true, schema will be automatically created and synced when it is saved
     auto_create_schema = True
