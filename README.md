@@ -10,10 +10,10 @@ A next-generation, multi-tenant Human Resource Management System (HRMS) built fo
 
 ### Secure Mobile Attendance
 <p align="center">
-  <img src="./docs/assets/mobile_dashboard.png" width="45%" />
+  <img src="./docs/assets/mobile_preview.png" width="45%" />
   <img src="./docs/assets/mobile_face_id.png" width="45%" />
 </p>
-*Biometric face verification and real-time shift management for employees.*
+*Biometric face verification and real-time ESS (Employee Self-Service) for modern workforces.*
 
 ---
 
@@ -65,9 +65,11 @@ make down              # Stop containers
 - **Tenant Customization**: Administrators can securely upload custom company logos and contact details dynamically mapped across the UI.
 - **Biometric Security**: AI-powered Face ID with liveness check using Google ML Kit.
 - **Admin Provisioning**: Centralized creation logic mapping employees instantly to global User accounts with optional Tenant Admin rights (Limited to 5 per company by default).
-- **Dynamic Approvals**: Multi-stage approval workflows for Leave and Overtime, allowing per-tenant customization (Supervisor, HR, or Both).
+- **Dynamic Approvals**: Multi-stage approval workflows for Leave, Overtime, and **Reimbursements**, allowing per-tenant customization (Supervisor, HR, or Both).
+- **Expense Claim Management**: Automated reimbursement system with digital receipt tracking and direct integration into monthly payroll processing.
+- **SaaS Tiering & Quotas**: Graduated feature access (Basic, Professional, Enterprise) with resource-based quotas (e.g., max employees, max admins).
 - **Payroll Engine**: Fully compliant Indonesian PPh 21 (TER 2024), BPJS calculation engine, and automated overtime compensation integration.
-- **Auto-Onboarding**: Commercial-ready self-service registration and provisioning workflow.
+- **Auto-Onboarding**: Commercial-ready self-service registration and schema provisioning workflow.
 - **Analytics**: High-performance executive dashboards with real-time HR metrics.
 
 ## 🌐 Deployment Environments
@@ -84,10 +86,10 @@ The platform is architected for seamless transition from dev to enterprise scale
 
 ## 🛠 Tech Stack
 
-- **Backend**: Python 3.12, Django 5.0, Django-Tenants, DRF Spectacular.
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Framer Motion, Vitest.
-- **Mobile**: Flutter 3.19+, Dart, Google ML Kit, Secure Storage.
-- **Infrastructure**: PostgreSQL, Redis, PgBouncer, Docker Compose (Local), AWS EKS/RDS (Prod).
+- **Backend**: Python 3.12+, Django 5.0, Django-Tenants (Schema-based Multi-tenancy), Django REST Framework, DRF Spectacular (OpenAPI 3.1).
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion (Animations), Vitest.
+- **Mobile**: Flutter 3.19+, Dart, Google ML Kit (Face Biometrics), Flutter Secure Storage.
+- **Infrastructure**: PostgreSQL 15, Redis 7 (Caching & Async), PgBouncer (Connection Pooling), Docker Compose (Local & Staging), AWS (Production).
 
 ---
-**Status**: Milestone 🎉 Phase 40 (Tenant Admin Limits) 100% Complete. Rebranded to **harikerja** on March 18, 2026.
+**Status**: Milestone 🎉 Phase 41 (Reimbursement & Expense Claim) 100% Complete. Integrated with **TER 2024 Payroll Engine** and **SaaS Tiering Logic**. Rebranded to **harikerja** on March 19, 2026.
