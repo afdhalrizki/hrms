@@ -305,3 +305,17 @@ Implemented a project-wide data isolation model to ensure employee privacy and p
 - **Self-Service Flow**: Verified that employees can still successfully perform daily tasks (Clock-in, View Payslip) without administrative permissions.
 
 **Status**: Milestone 🎉 Phase 34 (Universal Data Ownership & Security) 100% Complete. Rebranded to **harikerja** on March 18, 2026.
+
+## Phase 35: Leave Balance Tracking (Quotas)
+
+Implemented an automated system to track and manage employee annual leave quotas.
+- **LeaveBalance Model**: Tracks annual leave days per employee and year (default 12 days).
+- **Automated Deduction**: Approved leave requests (`CUTI` type) now automatically deduct the duration from the employee's `LeaveBalance`.
+- **Preload Validation**: Mencegah pengajuan cuti jika durasi yang diminta melebihi sisa kuota yang tersedia.
+- **Self-Service Visibility**: Employees can now view their remaining leave balances via the API and a dedicated ViewSet.
+
+### Verification
+- **Validation Test**: Verified that attempting to request 15 days of leave with a 12-day balance results in a validation error.
+- **Deduction Test**: Confirmed that approving a 3-day leave request correctly updates the `used_days` and `remaining_days` in the `LeaveBalance` record.
+
+**Status**: Milestone 🎉 Phase 35 (Leave Balance Tracking) 100% Complete.

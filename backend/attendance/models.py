@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from core.models import Employee
 from core.audit import AuditModel
@@ -97,3 +98,18 @@ class Schedule(AuditModel):
 
     def __str__(self):
         return f"{self.employee.fullname} - {self.shift.name} ({self.date})"
+class LeaveBalance(AuditModel):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='leave_balances')
+    year = models.IntegerField(default=date.today().year)
+    total_days = models.IntegerField(default=12, help_text="Total jatah cuti tahunan")
+    used_days = models.DecimalField(max_digits=4, decimal_places=1, default=0, help_text="Jumlah hari cuti yang sudah digunakan")
+
+    class Meta:
+        unique_together = ('employee', 'year')
+
+    @property
+    def remaining_days(self):
+        return self.total_days - float(self.used_days)
+
+    def __str__(self):
+        return f"{self.employee.fullname} - {self.year} (Remaining: {self.remaining_days})"

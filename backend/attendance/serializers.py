@@ -1,11 +1,18 @@
 from rest_framework import serializers
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
 
 class AttendanceSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
     
     class Meta:
         model = Attendance
+        fields = '__all__'
+
+class LeaveBalanceSerializer(serializers.ModelSerializer):
+    remaining_days = serializers.ReadOnlyField()
+
+    class Meta:
+        model = LeaveBalance
         fields = '__all__'
 
 class LeaveRequestSerializer(serializers.ModelSerializer):

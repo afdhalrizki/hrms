@@ -1,16 +1,17 @@
 import math
+from decimal import Decimal
 from datetime import date, datetime
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.response import Response
 from django.core.cache import cache
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission
 # Using absolute import from core
 from core.models import Employee
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
 from .serializers import (
     AttendanceSerializer, LeaveRequestSerializer, OvertimeSerializer,
-    ShiftSerializer, ScheduleSerializer
+    ShiftSerializer, ScheduleSerializer, LeaveBalanceSerializer
 )
 
 
@@ -154,16 +155,50 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if employee:
             return LeaveRequest.objects.filter(employee=employee)
         return LeaveRequest.objects.none()
-
     def perform_create(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
         
+        target_employee = employee
+        if is_manager and self.request.data.get('employee'):
+            target_employee = Employee.objects.get(id=self.request.data.get('employee'))
+
+        if target_employee and serializer.validated_data.get('leave_type') == 'CUTI':
+            # Basic validation for annual leave
+            start_date = serializer.validated_data.get('start_date')
+            end_date = serializer.validated_data.get('end_date')
+            duration = (end_date - start_date).days + 1
+            
+            balance, _ = LeaveBalance.objects.get_or_create(
+                employee=target_employee, 
+                year=start_date.year
+            )
+            
+            if balance.remaining_days < duration:
+                raise serializers.ValidationError({"error": f"Insufficient leave balance. Remaining: {balance.remaining_days} days."})
+
         if not is_manager and employee:
             serializer.save(employee=employee)
         else:
             serializer.save()
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        old_status = instance.status
+        new_status = serializer.validated_data.get('status', old_status)
+        
+        # Deduction Logic: When status moves to APPROVED
+        if old_status != 'APPROVED' and new_status == 'APPROVED' and instance.leave_type == 'CUTI':
+            duration = (instance.end_date - instance.start_date).days + 1
+            balance, _ = LeaveBalance.objects.get_or_create(
+                employee=instance.employee, 
+                year=instance.start_date.year
+            )
+            balance.used_days += Decimal(str(duration))
+            balance.save()
+        
+        serializer.save()
 
 
 class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -227,3 +262,19 @@ class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if date_param:
             queryset = queryset.filter(date=date_param)
         return queryset
+class LeaveBalanceViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = LeaveBalance.objects.all()
+    serializer_class = LeaveBalanceSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_attendance'
+
+    def get_queryset(self):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+            return LeaveBalance.objects.all()
+            
+        if employee:
+            return LeaveBalance.objects.filter(employee=employee)
+        return LeaveBalance.objects.none()
