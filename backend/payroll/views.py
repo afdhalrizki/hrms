@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission
+from core.permissions import HasRBACPermission, FeatureRequiredPermission
 from .models import SalaryComponent, PayrollPeriod, Payslip, PayslipDetail
 from .serializers import (
     SalaryComponentSerializer,
@@ -12,14 +12,16 @@ from .serializers import (
 class SalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = SalaryComponent.objects.all()
     serializer_class = SalaryComponentSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
+    required_feature = 'payroll'
 
 class PayrollPeriodViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayrollPeriod.objects.all()
     serializer_class = PayrollPeriodSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
+    required_feature = 'payroll'
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -29,11 +31,20 @@ from core.models import Employee
 class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Payslip.objects.all()
     serializer_class = PayslipSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
+    required_feature = 'payroll'
 
     @action(detail=False, methods=['post'])
     def generate(self, request):
+        from django.db import connection
+        tenant = connection.tenant
+        if not tenant.is_subscription_active:
+            return Response({
+                'error': 'Subscription expired or suspended. Payroll generation is disabled.',
+                'code': 'SUBSCRIPTION_INACTIVE'
+            }, status=402)
+
         period_id = request.data.get('period_id')
         employee_ids = request.data.get('employee_ids', [])
         
@@ -92,8 +103,9 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
 class PayslipDetailViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayslipDetail.objects.all()
     serializer_class = PayslipDetailSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
+    required_feature = 'payroll'
 
     def get_queryset(self):
         user = self.request.user

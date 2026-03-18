@@ -57,10 +57,34 @@ class HasRBACPermission(permissions.BasePermission):
         # Note: We assume the object has an 'employee' field
         is_owner = hasattr(obj, 'employee') and obj.employee == employee
         
+        # Check if user is the supervisor of the owner
+        is_supervisor = hasattr(obj, 'employee') and obj.employee and obj.employee.supervisor == employee
+
         # Check if user is manager
         required_perm = getattr(view, 'required_rbac_permission', None)
         has_mgmt = False
         if required_perm and employee.access_role:
             has_mgmt = employee.access_role.permissions.get(required_perm, False)
             
-        return is_owner or has_mgmt
+        return is_owner or is_supervisor or has_mgmt
+
+
+class FeatureRequiredPermission(permissions.BasePermission):
+    """
+    Checks if the tenant has a specific module/feature enabled.
+    The view must define 'required_feature'.
+    """
+    def has_permission(self, request, view):
+        if not hasattr(request, 'tenant'):
+            return False
+            
+        required_feature = getattr(view, 'required_feature', None)
+        if not required_feature:
+            return True
+            
+        # Enterprise tenants have all features
+        if getattr(request.tenant, 'plan_type', 'BASIC') == 'ENTERPRISE':
+            return True
+            
+        enabled_modules = getattr(request.tenant, 'enabled_modules', [])
+        return required_feature in enabled_modules

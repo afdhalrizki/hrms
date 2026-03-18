@@ -5,7 +5,7 @@ from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.response import Response
 from django.core.cache import cache
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission
+from core.permissions import HasRBACPermission, FeatureRequiredPermission
 # Using absolute import from core
 from core.models import Employee
 from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
@@ -35,8 +35,9 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
+    required_feature = 'attendance'
 
     def get_queryset(self):
         user = self.request.user
@@ -142,8 +143,9 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
 class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = LeaveRequest.objects.all()
     serializer_class = LeaveRequestSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
+    required_feature = 'attendance'
 
     def get_queryset(self):
         user = self.request.user
@@ -253,8 +255,9 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
 class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Overtime.objects.all()
     serializer_class = OvertimeSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
+    required_feature = 'attendance'
 
     def get_queryset(self):
         user = self.request.user
@@ -331,15 +334,17 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
 class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_settings'
+    required_feature = 'attendance'
 
 
 class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
+    required_feature = 'attendance'
 
     def get_queryset(self):
         user = self.request.user
@@ -364,8 +369,9 @@ class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
 class LeaveBalanceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = LeaveBalance.objects.all()
     serializer_class = LeaveBalanceSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
+    required_feature = 'attendance'
 
     def get_queryset(self):
         user = self.request.user

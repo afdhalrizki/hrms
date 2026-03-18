@@ -44,6 +44,12 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
+    def get_serializer_class(self):
+        if self.request.query_params.get('lite') == 'true':
+            from .serializers import EmployeeLiteSerializer
+            return EmployeeLiteSerializer
+        return super().get_serializer_class()
+
     def get_queryset(self):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
@@ -72,6 +78,15 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # Quota Enforcement: Check max employees
+        if hasattr(request, 'tenant') and request.tenant:
+            current_count = Employee.objects.count()
+            if current_count >= request.tenant.max_employees:
+                return Response({
+                    'error': f'Employee quota exceeded for your {request.tenant.plan_type} plan (Max: {request.tenant.max_employees}).',
+                    'code': 'QUOTA_EXCEEDED'
+                }, status=status.HTTP_403_FORBIDDEN)
 
         from django.db import transaction
         from users.models import User

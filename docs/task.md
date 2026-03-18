@@ -260,3 +260,56 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Add `max_admins` field to the `Tenant` model (Default: 5, Max: 100).
 - [x] Implement `prevent_admin_overflow` signal checks for user promotion and M2M changes.
 - [x] Expose `max_admins` quota in the Tenant Settings API.
+
+## Phase 41: Advanced Operational - Reimbursement & Expense Claim
+- [x] **Model**: Create `Reimbursement` and `ReimbursementCategory` models.
+- [x] **Workflow**: Implement multi-stage approval (Supervisor -> Finance/HR).
+- [x] **Attachments**: Support for receipt image uploads with storage limits.
+- [x] **Reporting**: Export claim summaries and integrated with Payroll engine.
+
+## Phase 42: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core
+- [ ] **Payroll Engine**: Update formulas to support TER 2024 (Monthly & Yearly).
+- [ ] **BPJS**: Implement precise calculation for BPJS Kesehatan & Ketenagakerjaan (JKK, JKM, JHT, JP).
+- [ ] **Tax Forms**: Add initial support for generating 1721-VIII (Monthly) and 1721-A1 (Yearly) previews.
+
+## Phase 43: Organizational Complexity - Multi-Branch & Flexible Routing
+- [ ] **Structure**: Add `Branch` (Cabang) with timezone and location fencing.
+- [ ] **Shifts**: Implement Shift Rotation/Patterns (Pola Kerja) for 24/7 operations.
+- [ ] **Approval Builder**: Create logic for dynamic N-level approval routing.
+
+## Phase 44: Strategic HR - Performance & KPI (MVP)
+- [ ] **KPIs**: Define organizational and individual KPI targets.
+- [ ] **Reviews**: Implement basic Appraisal workflow (Self-Review & Manager Review).
+- [ ] **Dashboard**: Add Performance Analytics for Executive views.
+
+## Phase 45: Infrastructure - API & Quota Control
+- [ ] **API**: Develop Public API keys for third-party integrations (ERP/Bank).
+- [ ] **Quota**: Implement enforcement for Document Storage (MB/GB per Tenant).
+- [ ] **Audit**: Enhanced Audit Logs for security compliance (Full Object History).
+
+## Phase 46: SaaS Subscription Expiry & Data Lifecycle Management
+- [x] **Subscription Model**: Add `expiry_date`, `subscription_status` (ACTIVE, EXPIRED, GRACE_PERIOD), and `grace_period_days` to `Tenant` model.
+- [x] **Access Guard (Middleware)**:
+    - [x] **Level 1: Read-Only Mode**: Block POST/PUT/DELETE for core HR, attendance, and payroll modules.
+    - [x] **Level 2: suspension Mode**: Redirect all tenant requests to a "Subscription Expired" billing portal.
+- [x] **Automated Deactivation**:
+    - [x] **Payroll Engine**: Block generation of new payroll periods if subscription is expired.
+    - [x] **Automation Services**: Pause automated emails (payslips, notifications) and background jobs.
+    - [x] **API Access**: Invalidate public API keys for expired tenants.
+- [x] **Data Retention & Portability**:
+    - [x] **Bulk Export Tool**: Create a "Data Recovery" dashboard allowing EXCEL/CSV export of all master data even after expiry.
+    - [x] **Lifecycle Management**: Implement `cleanup_expired_tenants` (process_subscriptions) command to handle transitions.
+- [x] **Alert System**:
+    - [x] Implement multi-channel notifications (Email, In-App) placeholders in `process_subscriptions`.
+
+## Phase 47: Modular Tiering & Feature Access Control
+- [x] **Tiering Model**: Add `plan_type` (BASIC, PROFESSIONAL, ENTERPRISE) and `enabled_modules` (JSONField) to `Tenant`.
+- [x] **Feature Guards**:
+    - [x] Implement `FeatureRequiredPermission` permission for ViewSets.
+    - [x] **Basic Access**: Restricted to `core` (Employee DB) and `attendance`.
+    - [x] **Professional Access**: Unlocks `payroll` and `reimbursement`.
+    - [x] **Enterprise Access**: Unlocks `audit_trail`, `multi_branch`, and `advanced_analytics`.
+- [x] **Quota Enforcement**:
+    - [x] **Freemium Logic**: Limit `Employee` count for BASIC/FREE plans.
+    - [x] **Add-on Logic**: System to enable specific modules (e.g., BASIC + Payroll) via `enabled_modules`.
+- [x] **Mobile-First Optimization**: Implement `EmployeeLiteSerializer` and `?lite=true` mode for low-end devices.

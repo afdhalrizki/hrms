@@ -399,3 +399,71 @@ Implemented a configurable limit on the number of administrators per tenant to e
 - **Boundary Test**: Confirmed that the limit can be increased to 100 and decreased down to 1 (minimum).
 
 **Status**: Milestone 🎉 Phase 40 (Tenant Admin Limits) 100% Complete.
+
+## Phase 41: Advanced Operational - Reimbursement & Expense Claim
+
+Implemented a comprehensive reimbursement system with multi-stage approval and direct integration with the monthly payroll engine.
+
+### 1. Claims Workflow & UI
+![Reimbursement UI Mockup](./assets/reimbursement_ui.png)
+
+- **Flexible Categories**: Support for Transport, Medical, Meals, and custom categories.
+- **Evidence Tracking**: Direct attachment of receipt images/files for audit compliance.
+- **Smart Quotas**: Optional `max_amount` per category to alert employees during submission.
+
+### 2. Multi-Stage Approval
+1. **Manager/Supervisor**: First-line verification of the expense necessity.
+2. **Finance/HR**: Final audit and "Approved Amount" adjustment before payment.
+3. **Automated Status**: Final status becomes `APPROVED` only when both levels are cleared.
+
+### 3. Payroll Integration
+- **Auto-Sync**: The `PayrollCalculator` now automatically scans for approved reimbursements within the pay period.
+- **Payslip Visibility**: Reimbursements appear as non-taxable additions to the Gross Pay on the digital payslip.
+- **CSV Export**: A dedicated API endpoint `/api/reimbursements/export_csv/` provides bulk reports for external accounting.
+
+---
+
+## Phase 46: SaaS Subscription Lifecycle Management
+
+Implemented a graduated enforcement system to handle trial/paid period expiry, ensuring business continuity while encouraging renewals.
+
+### 1. Lifecycle States & Access Mode
+![Subscription Expired Mockup](./assets/subscription_expired_ui.png)
+
+| State | Condition | Access Mode |
+|-------|-----------|-------------|
+| **ACTIVE** | `expiry_date >= today` | **Full Access**: All features enabled. |
+| **EXPIRED** | `expiry_date < today <= grace_period` | **Read-Only**: No data modification allowed. |
+| **SUSPENDED** | `today > grace_period` | **Blocked**: Locked out; redirect to billing. |
+
+### 2. Access Enforcement & Safeguards
+- **Middleware Guard**: `SubscriptionMiddleware` intercepts every request to verify status.
+- **Defensive Safeguards**: Critical engines (Payroll Processing) explicitly block operations for inactive tenants.
+- **Emergency Data Export**: A tool `export_tenant_data` allows bulk CSV exports even for suspended tenants, ensuring legal/tax compliance for HR.
+
+---
+
+## Phase 47: Modular Tiering & Feature Access Control
+
+Supported by a granular feature-toggling system, the platform now enforces pricing tiers and "Add-on" capabilities.
+
+### 1. Pricing Tiers & Quotas
+![Pricing Tiers Mockup](./assets/pricing_tiers_ui.png)
+
+| Tier | Key Modules | Quotas |
+|------|-------------|--------|
+| **BASIC (Digital Presence)** | Core, Attendance | Max 50 Employees |
+| **PROFESSIONAL (Ops Efficiency)** | + Payroll, Reimbursement | Max 250 Employees |
+| **ENTERPRISE (Strategic Capital)** | All Modules + Audit Trail | Unlimited |
+
+### 2. Technical Enforcement
+- **FeatureRequiredPermission**: DRF ViewSets are bound to specific modules (e.g., `attendance`, `payroll`).
+- **Quota Logic**: Real-time enforcement during employee creation prevents exceeding plan limits.
+- **Mobile-First (Lite API)**: A `?lite=true` mode on Employee list API reduces payload by ~60% for low-end mobile devices.
+
+### 3. Verification & Testing
+- **Backend Tests**: Verified state transitions and quota enforcement in `tenants/tests_subscription.py` and `tenants/tests_tiering.py`.
+- **Logic Integrity**: All 45+ integration scenarios remain passing (OK).
+
+---
+**Status**: Milestone 🎉 Phase 47 (Tiering & Access Control) 100% Complete.

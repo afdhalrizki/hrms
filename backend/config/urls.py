@@ -25,6 +25,7 @@ from core.views import DepartmentViewSet, RoleViewSet, GolonganViewSet, Employee
 from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
+from reimbursement.views import ReimbursementViewSet, ReimbursementCategoryViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -43,6 +44,8 @@ router.register(r'salary-components', SalaryComponentViewSet)
 router.register(r'payroll-periods', PayrollPeriodViewSet)
 router.register(r'payslips', PayslipViewSet)
 router.register(r'payslip-details', PayslipDetailViewSet)
+router.register(r'reimbursement-categories', ReimbursementCategoryViewSet)
+router.register(r'reimbursements', ReimbursementViewSet)
 router.register(r'public/signup', PublicSignupViewSet, basename='public-signup')
 router.register(r'internal/registrations', RegistrationApprovalViewSet, basename='internal-registration')
 

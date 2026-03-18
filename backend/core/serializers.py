@@ -33,3 +33,13 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
+
+
+class EmployeeLiteSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for mobile employee list."""
+    department_name = serializers.ReadOnlyField(source='department.name')
+    role_name = serializers.ReadOnlyField(source='role.name')
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'fullname', 'nik', 'department_name', 'role_name', 'photo', 'join_date']

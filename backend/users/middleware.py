@@ -40,3 +40,59 @@ class TenantAccessMiddleware:
                     return redirect(f"{login_url}?next={request.path}")
 
         return self.get_response(request)
+
+
+class SubscriptionMiddleware:
+    """
+    Ensures that tenants with expired or suspended subscriptions 
+    have restricted access to the HRMS modules.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        current_tenant = getattr(request, 'tenant', None)
+        
+        # Don't block public schema or global admins
+        if not current_tenant or getattr(current_tenant, 'schema_name', 'public') == 'public':
+            return self.get_response(request)
+            
+        if request.user.is_authenticated and (request.user.is_superuser or getattr(request.user, 'is_global_admin', False)):
+            return self.get_response(request)
+
+        # 1. Total Suspension Check
+        # If explicitly set to SUSPENDED or grace period has passed
+        is_subscription_active = getattr(current_tenant, 'is_subscription_active', True)
+        is_grace_period = getattr(current_tenant, 'is_grace_period', False)
+        subscription_status = getattr(current_tenant, 'subscription_status', 'ACTIVE')
+
+        is_suspended = (subscription_status == 'SUSPENDED' or 
+                        (not is_subscription_active and not is_grace_period))
+        
+        if is_suspended:
+            # Allow logout and billing (placeholder)
+            if any(request.path.startswith(p) for p in ['/api/auth/logout/', '/api/billing/']):
+                return self.get_response(request)
+            
+            # For other requests, return a 402 or block
+            from django.http import JsonResponse
+            return JsonResponse({
+                "detail": "Subscription suspended. Please contact support or renew your plan.",
+                "code": "SUBSCRIPTION_SUSPENDED"
+            }, status=402)
+
+        # 2. Read-Only Check for EXPIRED (Grace Period)
+        is_expired = (subscription_status == 'EXPIRED' or not is_subscription_active)
+        
+        if is_expired and request.method not in ['GET', 'HEAD', 'OPTIONS']:
+            # Allow logout and specific renewal actions
+            if any(request.path.startswith(p) for p in ['/api/auth/logout/', '/api/billing/']):
+                return self.get_response(request)
+                
+            from django.http import JsonResponse
+            return JsonResponse({
+                "detail": "Subscription expired. System is in Read-Only mode.",
+                "code": "SUBSCRIPTION_EXPIRED_READ_ONLY"
+            }, status=402)
+
+        return self.get_response(request)

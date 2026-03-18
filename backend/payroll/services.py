@@ -154,7 +154,24 @@ class PayrollCalculator:
         else:
             overtime_pay = Decimal('0')
 
-        # 5. Net Salary
+        # 5. Reimbursement Calculation (Approved)
+        from reimbursement.models import Reimbursement
+        approved_reimbursements = Reimbursement.objects.filter(
+            employee=self.employee,
+            date__range=(self.period.start_date, self.period.end_date),
+            status='APPROVED'
+        )
+        total_reimbursement = sum(r.approved_amount or r.amount for r in approved_reimbursements)
+        
+        if total_reimbursement > 0:
+            self.gross_pay += total_reimbursement
+            self.details.append({
+                'description': f'Reimbursement ({len(approved_reimbursements)} klaim)',
+                'amount': total_reimbursement,
+                'is_deduction': False
+            })
+        
+        # 6. Net Salary
         self.net_pay = self.gross_pay - self.total_deductions
 
         # 6. Commit to DB

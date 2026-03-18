@@ -57,6 +57,7 @@ TENANT_APPS = [
     'core',  # Per-tenant: HR Master Data
     'attendance',  # Per-tenant: Attendance
     'payroll',  # Per-tenant: Payroll
+    'reimbursement',  # Per-tenant: Reimbursement & Expense Claim
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
@@ -70,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'users.middleware.TenantAccessMiddleware',
+    'users.middleware.SubscriptionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
