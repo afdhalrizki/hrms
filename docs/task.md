@@ -33,23 +33,19 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Create the `public` tenant (domain: `harikerja.com`) and `company1` tenant (domain: `company1.harikerja.com`).
 - [x] Run `migrate_schemas --tenant` to create tenant-specific tables.
 
-## 7. Backend API Development
+## 6. Backend API Development
 - [x] Create Serializers for all models (`users`, `core`, `attendance`, `payroll`).
 - [x] Implement ViewSets and register URLs.
 - [x] Verify API endpoints with `public` and `company1` schemas.
 
-## 8. Frontend Integration (Next.js)
+## 7. Frontend Integration (Next.js)
 - [x] Configure API Client with Tenant Header handling.
 - [x] Implement Main Dashboard Layout (Sidebar + Navigation).
 - [x] Create HR Department/Employee Management Pages.
 - [x] Create Attendance Tracking Dashboard.
 - [x] Create Payroll & Payslip View.
 
-## 9. Polish & Aesthetics
-- [x] Implement Dark Mode and Glassmorphism UI.
-- [x] Add smooth transitions and micro-animations.
-
-## 10. Mobile App Development (Flutter)
+## 8. Mobile App Development (Flutter)
 - [x] Initialize Flutter project in `mobile/`.
 - [x] Rename project to `mobile` and update all platform identifiers.
 - [x] Implement Tenant-aware Login screen.
@@ -57,263 +53,113 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Implement Geolocation-based Attendance (Check-in/out).
 - [x] Create Mobile Payslip Viewer.
 
-## 12. Payroll Engine & Indonesian Tax (Pro Phase)
+## 9. Payroll Engine & Indonesian Tax
 - [x] Implement `PTKP_TER_MAPPING` constants in [payroll/services.py](file:///d:/hr/hrms/backend/payroll/services.py).
 - [x] Implement `BPJS` calculation engine.
 - [x] Implement `TER` Monthly PPh 21 logic (2024 Regs).
 - [x] Create `Generate Payslip` action in [PayslipViewSet](file:///d:/hr/hrms/backend/payroll/views.py).
-- [x] Implement [PDFGenerator](file:///d:/hr/hrms/backend/payroll/pdf_generator.py) service with ReportLab for Payslip downlaods.
-- [x] Add PDF Download button integration to Frontend and Mobile (with `dart:html` workaround for Windows Dev Mode restrictions).
+- [x] Implement [PDFGenerator](file:///d:/hr/hrms/backend/payroll/pdf_generator.py) service with ReportLab for Payslip downloads.
 
-## 13. Unit Testing & Quality Assurance
-- [x] Implement Backend Payroll Engine tests.
-- [x] Implement Backend Multi-tenancy isolation tests (Core & Tenants).
-- [x] Fix and expand Mobile widget & logic tests.
-- [x] Add basic Frontend component smoke tests.
-
-## 14. Final Verification & Handover
-- [x] Run full cross-platform test suite.
-
-## Phase 2: Enterprise Infrastructure & Advanced MVP
-- [x] Add `redis` to [docker-compose.yml](file:///d:/hr/hrms/docker-compose.yml) for request caching.
-- [x] Add `pgbouncer` to [docker-compose.yml](file:///d:/hr/hrms/docker-compose.yml) for connection pooling.
-- [x] Implement Geofencing radius validation logic in Django [AttendanceViewSet](file:///d:/hr/hrms/backend/attendance/views.py).
-- [x] Research/Integrate Face Recognition checks for mobile Check-In.
-- [x] Create Executive Analytics Cost Dashboard in Next.js.
-- [x] Implement Audit Trail (created_by/updated_by) across all models.
-- [x] Final documentation update (Backend, Frontend, Mobile).
-- [x] Relocate documentation files to `docs/` folder.
-
-## Phase 3: Operational Scale & Security (Advanced HR)
-- [x] Create [Shift](file:///d:/hr/hrms/backend/attendance/models.py) and [Schedule](file:///d:/hr/hrms/backend/attendance/models.py) models in Backend.
-- [x] Implement Shift Assignment UI in Next.js Admin.
-- [x] Update Attendance logic to validate against assigned shifts.
-- [x] **Face Recognition / Biometric Flow (Mobile)**:
-    - [x] Add `face_reference` to [Employee](file:///d:/hr/hrms/backend/core/models.py) model (Backend).
-    - [x] Integrate `google_mlkit_face_detection` (Mobile).
-    - [x] Implement camera flow with liveness check.
-- [x] Create ESS (Employee Self-Service) Shift Viewer in Mobile.
-- [x] Implement Tenant-Specific Admin Access (restrict user login by domain).
-- [x] Update walkthrough.md with images located in `docs/` folder.
-- [x] **API Documentation (Swagger/OpenAPI)**: Install and configure `drf-spectacular`.
-- [x] **Attendance Dashboard Sync**: Connected Next.js dashboard to real-time API with liveness & GPS metadata.
-
-## Phase 4: Global Enterprise Scale (Roadmap)
-- [ ] **Horizontal App Scaling**: Migrate to Kubernetes (K8s) with HPA (Horizontal Pod Autoscaler).
-- [ ] **Database Sharding**: Distribute heavy tenants across multiple PostgreSQL physical clusters.
-- [ ] **Read Replicas**: Implement DB Read Replicas for Analytics/Reporting to offload the Write primary.
-- [ ] **Background Job Engine**: Integrate Celery + RabbitMQ for asynchronous bulk operations (1M+ Payslips).
-- [ ] **Global CDN**: Serve frontend and static assets via Edge locations.
-
-## 15. DevOps & Environment Management
+## 10. DevOps, QA & Onboarding
 - [x] Create dedicated [environments/](file:///d:/hr/hrms/environments) structure.
-- [x] [v] Define `.env.development.example` for local coding.
-- [x] [v] Define `.env.staging.example` for pre-production testing.
-- [x] [v] Define `.env.production.example` for live deployment.
-- [ ] Implement CI/CD pipeline to automate deployment between environments.
-
-## 16. Quality Assurance (QA) & Reliability
-- [x] Create centralized [qa/](file:///d:/hr/hrms/qa) hub.
-- [x] Implement [Performance](file:///d:/hr/hrms/qa/performance/locustfile.py) testing boilerplate (Locust).
 - [x] Define [Manual Testing](file:///d:/hr/hrms/qa/manual/checklist.md) checklists.
-- [x] Complete Backend Attendance Unit Tests (Geofencing, Shifts, Leave).
-- [x] Complete Backend Core HR Unit Tests (Employee, Dept, Master Data).
-- [x] Complete Backend Config Smoke Tests (Multi-tenant settings, Middleware).
-- [x] Complete Backend Tenant Unit Tests (Schema & Domain foundation + Registration Flow).
-- [x] Complete Backend User Unit Tests (Auth & Tenant Access Middleware).
-- [x] Complete Backend Payroll Unit Tests (Tax TER 2024, BPJS, PDF).
-- [x] Refactor [settings.py](file:///d:/hr/hrms/backend/config/settings.py) for dynamic environment management.
+- [x] Implement `RegistrationRequest` flow for Tenant Onboarding.
 - [x] Implement automated E2E tests for core flows (Playwright).
-    - [x] Install Playwright dependencies and browsers.
-    - [x] Configure `playwright.config.ts`.
-    - [x] Create `onboarding.spec.ts`.
-    - [x] Verify full registration flow via E2E test.
-- [ ] Conduct security audit for multi-tenant isolation.
+- [x] **Phase 14**: Document Deployment Strategy (Local, Staging, Prod).
 
-## 17. Tenant Onboarding & Approval Flow
-- [x] Implement `RegistrationRequest` model in `tenants` app.
-- [x] Create `PublicSignupViewSet` for unauthenticated registration.
-- [x] Implement internal admin approval action (triggers tenant creation).
-- [x] Implement automated Admin User creation for new tenants.
-- [x] Add email notification stubs for onboarding status.
-- [x] Verify Tenant Onboarding & Approval Flow with integration tests (RegistrationFlowTestCase).
-
-## 18. Global Domain Suffix Refactor
-- [x] Define `TENANT_DOMAIN_SUFFIX` in `settings.py`.
-- [x] Implement dynamic domain resolution in `RegistrationApprovalViewSet`.
-- [x] Update `bootstrap_tenants` command to use global setting.
-- [x] Refactor `tenants` test suite for dynamic domain support.
-- [x] Update `README.md` with environment variable documentation.
-
-## 19. Frontend Integration: Onboarding & Dynamic Config
-- [x] Refactor `api.ts` for dynamic host resolution.
-- [x] Update `TenantContext` to support configurable domain suffixes.
-- [x] Implement Premium Signup Page (`/signup`).
-- [x] Implement Internal Admin Registration Approval UI.
-- [x] Verify frontend-backend integration for the full registration flow.
-
-## 20. Frontend Unit Testing: Logic & Component Verification
-- [x] Implement Unit Tests for `getBaseUrl` (local/dynamic/env).
-- [x] Implement Unit Tests for `TenantContext` logic (subdomain extraction).
-- [x] Implement Component Tests for `/signup` (form state/submission).
-- [x] Implement Component Tests for `/admin/registrations` (data grid/actions).
-- [x] Verify 100% logic coverage for critical frontend helpers.
-
-## 21. Admin-Employee Mobile Integration
-- [x] Auto-provision Default Department & Role for new tenants.
-- [x] Auto-provision Admin as the first `Employee` on approval.
-- [x] Implement `/api/users/me/` endpoint (linking User + Employee).
-- [x] Refactor Mobile app to use real profile data (remove mocks).
-- [x] Verify Attendance check-in with auto-created admin-employee.
-
-## 22. Backend Test Expansion: Admin-Employee Integration
-- [x] Update `tenants/tests.py` with HR provisioning assertions.
-- [x] Update `users/tests.py` with unified `/api/users/me/` verification.
-- [x] Verify cross-tenant isolation for aggregated profile data.
-
-## 23. Frontend Identity Integration & Test Updates
-- [x] Implement `AuthContext` for user state.
-- [x] Hydrate Sidebar and Home with real identity data.
-- [x] Create `Sidebar.test.tsx` to verify dynamic profile display.
-
-## Phase 14: Deployment Strategy & Documentation (New)
-- [x] Create `deployment/` directory for environment guides.
-- [x] Document Local Development deployment steps.
-- [x] Document Staging (VPS/Single Node) deployment steps.
-- [x] Document Production (Kubernetes/Hyperscaler) deployment steps.
-
-## Phase 24: Tenant Customization (Company Profile Hub)
+## Phase 24: Tenant Customization
 - [x] **Backend**: Update `Tenant` model with `logo`, `address`, `phone`.
-- [x] **Backend**: Configure `MEDIA_ROOT` and `MEDIA_URL` for file uploads.
-- [x] **Backend**: Run `makemigrations` and `migrate_schemas --shared`.
-- [x] **Backend**: Create API endpoint (`/api/tenant/settings/`) for updates.
-- [x] **Frontend**: Update `TenantContext` to fetch and store full profile data.
-- [x] **Frontend**: Create `src/app/settings/page.tsx` with logo upload form.
-- [x] **Frontend**: Update `Sidebar.tsx` to dynamically render the uploaded logo.
+- [x] **Frontend**: Create company settings page with logo upload.
 
-## Phase 25: Admin & Employee Provisioning (RBAC Foundation)
-- [x] **Backend**: Update `EmployeeViewSet.create()` to handle `create_user` and `is_admin` flags.
-- [x] **Frontend**: Connect `EmployeesPage` (`/employees`) to the live API.
-- [x] **Frontend**: Build 'Add Employee' form modal with user account toggles.
-- [x] **Frontend**: Test dynamic list updating after creation.
+## Phase 25: Admin & Employee Provisioning
+- [x] **Backend**: Handle `create_user` and `is_admin` flags in `EmployeeViewSet`.
+- [x] **Frontend**: Build 'Add Employee' modal with provisioning toggles.
 
 ## Phase 26: Admin Access Safeguard & Protections
-- [x] **Backend**: Define `pre_save` signal on `User` to prevent demoting `is_staff` or `is_active` for the last tenant admin.
-- [x] **Backend**: Define `pre_delete` signal on `User` to prevent account termination of the last tenant admin.
-- [x] **Backend**: Define `m2m_changed` signal on `User.tenants.through` to prevent stripping the tenant M2M relationship.
-- [x] **Backend**: Create script to verify the safeguards logic locally.
+- [x] **Backend**: Prevent last admin deletion/demotion via signals.
+
+## Phase 27: Hybrid RBAC
+- [x] **Backend**: Created `AccessRole` with JSON permissions and `HasRBACPermission` guard.
+- [x] **Frontend**: Roles management UI and role selection in provisioning.
 
 ## Phase 30: Frontend Runtime Infrastructure
 - [x] **Dockerfile**: Update base image to `node:20.18-alpine`.
-- [x] **Verification**: Confirm Node version >= 20.9.0 inside the container.
-- [x] **Build Strategy**: Use `--no-cache` to ensure clean environment refresh.
-- [x] **Documentation**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.
-
-## Phase 51: Core Master Data & Audit Expansion [COMPLETED]
-- [x] **Master Data**: Verify `Branch` CRUD and geofencing configuration.
-- [x] **RBAC**: Verify `AccessRole` management and protection for default system roles.
-- [x] **Infrastructure**: Verify `SystemNotification` lifecycle and `APIKey` management.
-- [x] **Auditing**: Verify `AuditLog` generation for master data changes via `AuditModelMixin`.
-- [x] **Verification**: Ensure all 115 tests pass including new core master data scenarios.
+- [x] **Build Strategy**: Use `--no-cache` for clean environment refresh.
 
 ## Phase 31: Local Multi-tenant Access Fix (.localhost)
 - [x] **Backend**: Update `CORS_ALLOWED_ORIGIN_REGEXES` for localhost.
-- [x] **Frontend**: Refactor `getBaseUrl` in `lib/api.ts`.
-- [x] **Infra**: Add domain variables to `docker-compose.yml`.
-- [x] **Verification**: Test access via `company1.localhost:3000`.
+- [x] **Frontend**: Refactor `getBaseUrl` for dynamic subdomain discovery.
 
 ## Phase 32: Build Resilience & Tailwind 4 Support
-- [x] **Dockerfile**: Switch to `node:22-bookworm-slim`.
-- [x] **Cleanup**: Document `docker-compose down -v` recovery steps.
-- [x] **Docs**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.
+- [x] **Dockerfile**: Switch to `node:22-bookworm-slim` for Debian/glibc compatibility.
 
 ## Phase 33: Production Domain Readiness & System Recovery
 - [x] Configure production domain `harikerja.com` in settings.
-- [x] Implement system recovery and cleanup scripts (`up.ps1 -down`).
-- [x] Define multi-environment deployment strategy (dev, staging, prod).
+- [x] Implement system recovery and cleanup scripts (`up.ps1`).
 
 ## Phase 34: Universal Data Ownership & Security
-- [x] Implement ownership-based filtering in `get_queryset`.
+- [x] Implement ownership-based filtering across all core modules.
 - [x] Restrict Employees to their own records (Self-Service).
-- [x] Refine RBAC for object-level privacy.
 
 ## Phase 35: Leave Balance Tracking (Quotas)
-- [x] Add `LeaveBalance` model to track per-employee quotas.
-- [x] Automate leave deduction upon approval.
-- [x] Add validation to prevent exceeding remaining balance.
+- [x] Add `LeaveBalance` model to track and automate leave deductions.
 
 ## Phase 36: Overtime Compensation (Payroll Integration)
-- [x] Add dual configuration (Fixed Rate & Divisor) for overtime.
-- [x] Prioritize Golongan/Grade rates over Tenant-wide settings.
-- [x] Integrate approved Hours directly into `PayrollCalculator`.
+- [x] Integrate approved Hours into `PayrollCalculator` with hierarchical rates.
 
 ## Phase 37: Reporting Hierarchy (Supervisor)
-- [x] Add `supervisor` field to the `Employee` model.
-- [x] Update `EmployeeSerializer` to expose supervisor identification.
-- [x] Verify self-referential organizational authority.
+- [x] Add `supervisor` field to the `Employee` model for organizational tree support.
 
 ## Phase 38: Dynamic & Multi-Stage Approval Workflow
-- [x] Add configurable approval levels to `Tenant` (Supervisor, HR, BOTH).
-- [x] Add independent status tracking (`supervisor_status`, `hr_status`).
-- [x] Refactor ViewSets for role-aware multi-stage transitions (Default: `BOTH`).
-- [x] Update documentation and validation for all new workflows.
+- [x] Add configurable approval levels (Supervisor, HR, BOTH) to `Tenant`.
 
 ## Phase 39: Tenant Admin Access & Public Security
-- [x] Add `django.contrib.admin` and `django.contrib.messages` to `TENANT_APPS`.
-- [x] Hardened `TenantAccessMiddleware` to restrict the public admin portal to internal accounts.
-- [x] Verified role-based redirection and logout for unauthorized admin access.
+- [x] Enabled Django Admin in `TENANT_APPS` and hardened global portal access.
 
 ## Phase 40: Tenant Admin Limits (Quota Management)
-- [x] Add `max_admins` field to the `Tenant` model (Default: 5, Max: 100).
-- [x] Implement `prevent_admin_overflow` signal checks for user promotion and M2M changes.
-- [x] Expose `max_admins` quota in the Tenant Settings API.
+- [x] Add `max_admins` field (Default: 5) and enforce via signals.
 
-## Phase 41: Advanced Operational - Reimbursement & Expense Claim [COMPLETED]
-- [x] **Model**: Create `Reimbursement` and `ReimbursementCategory` models.
-- [x] **Workflow**: Implement multi-stage approval (Supervisor -> Finance/HR).
-- [x] **Attachments**: Support for receipt image uploads with storage limits.
-- [x] **Reporting**: Export claim summaries and integrated with Payroll engine.
+## Phase 41: Advanced Operational - Reimbursement & Expense Claim
+- [x] Implement Reimbursement models, multi-stage approval, and Payroll integration.
 
-## Phase 42: Advanced Operational - Internationalization (i18n) [COMPLETED]
-- [x] **Backend**: Setup Django LocaleMiddleware and translation files (.po).
-- [x] **Frontend**: Implement `next-intl` for bilingual UI (ID/EN).
-- [x] **Mobile**: Multi-language support using `flutter_localizations`.
+## Phase 42: Advanced Operational - Internationalization (i18n)
+- [x] Setup Django, Next.js, and Mobile bilingual support (ID/EN).
 
-## Phase 43: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core [COMPLETED]
-- [x] **Payroll Engine**: Update formulas to support TER 2024 (Monthly & Yearly).
-- [x] **BPJS**: Implement precise calculation for BPJS Kesehatan & Ketenagakerjaan (JKK, JKM, JHT, JP).
-- [x] **Tax Forms**: Add initial support for generating 1721-VIII (Monthly) and 1721-A1 (Yearly) previews.
+## Phase 43: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core
+- [x] Update Payroll engine for TER 2024 compliance and precise BPJS calculations.
 
-## Phase 44: Organizational Complexity - Multi-Branch & Flexible Routing [COMPLETED]
-- [x] **Structure**: Add `Branch` (Cabang) with timezone and location fencing.
-- [x] **Shifts**: Implement Shift Rotation/Patterns (Pola Kerja) for 24/7 operations.
-- [x] **Approval Builder**: Create logic for dynamic N-level approval routing.
+## Phase 44: Organizational Complexity - Multi-Branch & Flexible Routing
+- [x] Add `Branch` geofencing, Flexible Shifts, and Dynamic N-Level Approvals.
 
-## Phase 45: Strategic HR - Performance & KPI (MVP) [COMPLETED]
-- [x] **KPIs**: Define organizational and individual KPI targets.
-- [x] **Reviews**: Implement basic Appraisal workflow (Self-Review & Manager Review).
-- [x] **Dashboard**: Add Performance Analytics for Executive views.
+## Phase 45: Strategic HR - Performance & KPI (MVP)
+- [x] Define KPI targets and implement Appraisal workflow (Self & Manager Review).
 
-## Phase 46: Infrastructure - API & Quota Control [COMPLETED]
-- [x] **API**: Develop Public API keys for third-party integrations (ERP/Bank).
-- [x] **Quota**: Implement enforcement for Document Storage (MB/GB per Tenant).
-- [x] **Audit**: Enhanced Audit Logs for security compliance (Full Object History).
+## Phase 46: Infrastructure - API & Quota Control
+- [x] Implement Public API keys and Tenant-specific Storage Quota enforcement.
 
-## Phase 47: SaaS Subscription Expiry & Data Lifecycle [COMPLETED]
-- [x] **Subscription Model**: Add `expiry_date`, `subscription_status`, and `grace_period_days`.
-- [x] **Access Guard**: Middleware for Read-only (Expired) and Locked (Suspended) modes.
-- [x] **Data Safety**: Emergency Bulk Export for suspended tenants and cleanup logic.
-- [x] **Alert System**: Bilingual UI banners and locker overlays with system notifications.
+## Phase 47: SaaS Subscription Expiry & Data Lifecycle
+- [x] Access guards for Read-only (Expired) and Locked (Suspended) modes.
 
-## Phase 48: Modular Tiering & Feature Access Control [COMPLETED]
-- [x] **Tiering Model**: Add `plan_type` and `enabled_modules` (JSONField) to `Tenant`.
-- [x] **Feature Guards**: `FeatureRequiredPermission` for selective module access (Core, Payroll, etc).
-- [x] **Quota Enforcement**: Employee count limits for BASIC/FREE plans.
-- [x] **Optimization**: Mobile `?lite=true` mode for low-end device data reduction.
+## Phase 48: Modular Tiering & Feature Access Control
+- [x] Implement plan-based module gating (BASIC/PRO/ENTERPRISE).
 
-## Phase 49: Backend Test Coverage & RBAC Hardening [COMPLETED]
-- [x] **Performance**: Implement 33 comprehensive unit tests for KPI, Appraisal, and Appraisal Reviews.
-- [x] **Attendance**: Expand 11 scenarios covering flexible shifts, multi-branch geofencing, and leave conflicts.
-- [x] **RBAC**: Harden `HasRBACPermission` and `perform_update` logic to restrict sensitive field modifications.
-- [x] **Security**: Verify `max_admins` enforcement and `create_user` provisioning logic.
-- [x] **Verification**: 100% Success Rate (**104/104 tests passing**).
+## Phase 49: Backend Test Coverage & RBAC Hardening
+- [x] Implement 33 unit tests for Performance and 11 for Attendance.
+- [x] Verify 100% Success Rate (**104/104 tests passing**).
+
+## Phase 50: Config Module & Infrastructure Test Expansion
+- [x] Verify `SubscriptionMiddleware`, `LocaleMiddleware`, and Cache connectivity.
+- [x] Ensure all 109 tests pass including new infrastructure scenarios.
+
+## Phase 51: Core Master Data & Audit Expansion
+- [x] Verify `Branch` CRUD, `AccessRole` protection, and `AuditLog` generation.
+- [x] Ensure all 115 tests pass including new core master data scenarios.
+
+## Phase 52: Users Module Test Expansion
+- [x] Verify `LoginAPIView`, email normalization, and multi-tenant admin safeguards.
+- [x] Ensure all 121 tests pass including new user scenarios.
+
+## Phase 4: Global Enterprise Scale (Roadmap)
+- [ ] **Horizontal App Scaling**: Migrate to Kubernetes (K8s).
+- [ ] **Database Sharding**: Distribute heavy tenants across clusters.
+- [ ] **Background Job Engine**: Integrate Celery + RabbitMQ for bulk operations.

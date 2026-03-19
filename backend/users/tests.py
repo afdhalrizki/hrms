@@ -215,3 +215,88 @@ class AdminSafeguardTestCase(TenantTestCase):
         
         with self.assertRaisesMessage(ValidationError, "Batas maksimal administrator"):
             other_tenant_admin.tenants.add(self.tenant)
+
+class UserAuthenticationTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.user_password = 'secure_password'
+        self.user = User.objects.create_user(email='auth_test@test.com', password=self.user_password)
+        self.user.tenants.add(self.tenant)
+        self.domain = self.tenant.domains.first().domain
+
+    def test_login_success(self):
+        """Verify authenticating via /api/users/login/."""
+        url = reverse('user-login-login')
+        payload = {'email': self.user.email, 'password': self.user_password}
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['email'], self.user.email)
+
+    def test_login_failure(self):
+        """Verify 401 for wrong credentials."""
+        url = reverse('user-login-login')
+        payload = {'email': self.user.email, 'password': 'wrong_password'}
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class UserManagementTestCase(TenantTestCase):
+    def test_email_normalization(self):
+        """Verify UserManager normalizes email addresses."""
+        user = User.objects.create_user(email='UPPERCASE@TEST.COM', password='password')
+        self.assertEqual(user.email, 'uppercase@test.com')
+
+    def test_staff_list_access(self):
+        """Verify staff can see all users while regular users only see themselves."""
+        client = APIClient()
+        domain = self.tenant.domains.first().domain
+        
+        staff = User.objects.create_user(email='staff_access@test.com', password='password', is_staff=True)
+        staff.tenants.add(self.tenant)
+        
+        regular = User.objects.create_user(email='regular_access@test.com', password='password')
+        regular.tenants.add(self.tenant)
+        
+        url = reverse('user-list')
+        
+        # 1. Staff sees all (including self.tenant's default admin if any)
+        client.force_login(staff)
+        response_staff = client.get(url, SERVER_NAME=domain)
+        self.assertGreaterEqual(len(response_staff.data), 2)
+        
+        # 2. Regular sees only themselves
+        client.force_login(regular)
+        response_reg = client.get(url, SERVER_NAME=domain)
+        self.assertEqual(len(response_reg.data), 1)
+        self.assertEqual(response_reg.data[0]['email'], regular.email)
+
+class AdminSafeguardExpansionTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        with schema_context('public'):
+            self.other_tenant = Tenant.objects.create(schema_name='other_safeguard', name='Other Safeguard Co')
+            Domain.objects.create(domain=f'other.{settings.TENANT_DOMAIN_SUFFIX}', tenant=self.other_tenant)
+            
+        self.multi_admin = User.objects.create_user(email='multi_admin@test.com', password='password', is_staff=True)
+        self.multi_admin.tenants.add(self.tenant, self.other_tenant)
+
+    def test_prevent_last_admin_deletion_multitenant(self):
+        """Verify a user who is the last admin in one tenant cannot be deleted."""
+        # They are the last admin of self.tenant, but maybe not other_tenant
+        # Deletion should still be blocked
+        with self.assertRaisesMessage(ValidationError, "The tenant"):
+            self.multi_admin.delete()
+
+    def test_max_admins_reverse_m2m(self):
+        """Verify tenant.users.add() enforces max_admins limit."""
+        self.tenant.max_admins = 1
+        self.tenant.save()
+        
+        # One admin already exists? Wait, TenantTestCase might create one? 
+        # No, but I added multi_admin in setUp.
+        
+        new_staff = User.objects.create_user(email='new_staff@test.com', password='password', is_staff=True)
+        
+        # Adding via reverse relationship
+        with self.assertRaisesMessage(ValidationError, "Penambahan ini akan melebihi batas"):
+            self.tenant.users.add(new_staff)
