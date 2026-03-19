@@ -1,0 +1,33 @@
+{
+  "Dashboard": {
+    "title": "Dashboard Admin Profesional",
+    "subtitle": "Inilah yang terjadi di perusahaan Anda hari ini.",
+    "welcome": "Selamat datang kembali",
+    "fetching": "Mengambil data dashboard...",
+    "stats": {
+      "total_employees": "Total Karyawan",
+      "today_attendance": "Kehadiran Hari Ini",
+      "pending_leaves": "Izin Tertunda",
+      "new_hires": "Karyawan Baru (Bulan Ini)"
+    },
+    "attendance_trends": "Tren Kehadiran",
+    "recent_hires": "Karyawan Terbaru",
+    "realtime": "REALTIME"
+  },
+  "Navigation": {
+    "overview": "Ikhtisar",
+    "employees": "Karyawan",
+    "attendance": "Kehadiran",
+    "reimbursement": "Reimbursement",
+    "payroll": "Payroll",
+    "analytics": "Analitik",
+    "settings": "Pengaturan"
+  },
+  "Common": {
+    "submit": "Kirim",
+    "cancel": "Batal",
+    "save": "Simpan Perubahan",
+    "loading": "Memuat...",
+    "joined_days_ago": "Bergabung {days} hari yang lalu"
+  }
+}

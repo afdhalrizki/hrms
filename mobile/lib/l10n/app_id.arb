@@ -1,0 +1,13 @@
+{
+  "login": "Masuk",
+  "email": "Alamat Email",
+  "password": "Kata Sandi",
+  "welcome": "Selamat Datang",
+  "attendance": "Kehadiran",
+  "clockIn": "Absen Masuk",
+  "clockOut": "Absen Pulang",
+  "profile": "Profil",
+  "settings": "Pengaturan",
+  "reimbursement": "Reimbursement",
+  "history": "Riwayat"
+}

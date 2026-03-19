@@ -15,12 +15,13 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 const stats = [
   { 
-    name: 'Total Employees', 
+    nameKey: 'total_employees', 
     value: '1,284', 
     change: '+12%', 
     trend: 'up', 
@@ -28,7 +29,7 @@ const stats = [
     color: 'bg-blue-500/10 text-blue-500'
   },
   { 
-    name: 'Today Attendance', 
+    nameKey: 'today_attendance', 
     value: '954', 
     change: '92%', 
     trend: 'up', 
@@ -36,7 +37,7 @@ const stats = [
     color: 'bg-emerald-500/10 text-emerald-500'
   },
   { 
-    name: 'Pending Leaves', 
+    nameKey: 'pending_leaves', 
     value: '12', 
     change: '-2', 
     trend: 'down', 
@@ -44,7 +45,7 @@ const stats = [
     color: 'bg-orange-500/10 text-orange-500'
   },
   { 
-    name: 'New Hires (Month)', 
+    nameKey: 'new_hires', 
     value: '24', 
     change: '+3', 
     trend: 'up', 
@@ -54,6 +55,9 @@ const stats = [
 ];
 
 export default function Home() {
+  const t = useTranslations('Dashboard');
+  const tNav = useTranslations('Navigation');
+  const tCommon = useTranslations('Common');
   const { user, loading } = useAuth();
   const { isPublic } = useTenant();
   const router = useRouter();
@@ -87,10 +91,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-bold tracking-tight"
           >
-            {loading ? 'Welcome back...' : `Welcome back, ${user?.fullname || 'Admin'} 👋`}
+            {loading ? tCommon('loading') : `${t('welcome')}, ${user?.fullname || 'Admin'} 👋`}
           </motion.h1>
           <p className="text-muted-foreground">
-            {loading ? 'Fetching your dashboard...' : "Here's what's happening in your company today."}
+            {loading ? t('fetching') : t('subtitle')}
           </p>
         </div>
 
@@ -98,7 +102,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <motion.div
-              key={stat.name}
+              key={stat.nameKey}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -117,7 +121,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
+                <p className="text-sm font-medium text-muted-foreground">{t(`stats.${stat.nameKey}`)}</p>
                 <p className="text-4xl font-bold tracking-tighter group-hover:scale-105 transition-transform origin-left">
                   {stat.value}
                 </p>

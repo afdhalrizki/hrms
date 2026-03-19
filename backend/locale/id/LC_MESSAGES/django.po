@@ -1,0 +1,208 @@
+# harikerja HRMS Indonesian Translation
+# Copyright (C) 2026 harikerja
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: harikerja 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-19 01:08+0700\n"
+"PO-Revision-Date: 2026-03-19 01:10+0700\n"
+"Last-Translator: Antigravity AI\n"
+"Language-Team: Indonesian\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "English"
+msgstr "Inggris"
+
+msgid "Indonesian"
+msgstr "Indonesia"
+
+msgid "name"
+msgstr "nama"
+
+msgid "description"
+msgstr "deskripsi"
+
+msgid "permissions"
+msgstr "hak akses"
+
+msgid "is default"
+msgstr "default"
+
+msgid "access role"
+msgstr "peran akses"
+
+msgid "access roles"
+msgstr "peran akses"
+
+msgid "department"
+msgstr "departemen"
+
+msgid "departments"
+msgstr "departemen"
+
+msgid "role"
+msgstr "jabatan"
+
+msgid "roles"
+msgstr "jabatan"
+
+msgid "base salary"
+msgstr "gaji pokok"
+
+msgid "Gaji Pokok"
+msgstr "Gaji Pokok"
+
+msgid "meal allowance"
+msgstr "tunjangan makan"
+
+msgid "Tunjangan Makan Harian"
+msgstr "Tunjangan Makan Harian"
+
+msgid "transport allowance"
+msgstr "tunjangan transport"
+
+msgid "Tunjangan Transport Harian"
+msgstr "Tunjangan Transport Harian"
+
+msgid "overtime rate"
+msgstr "tarif lembur"
+
+msgid "Tarif lembur per jam (0 = gunakan formula standar)"
+msgstr "Tarif lembur per jam (0 = gunakan formula standar)"
+
+msgid "golongan"
+msgstr "golongan"
+
+msgid "TK/0: Single, No dependents"
+msgstr "TK/0: Tidak Kawin, Tanpa Tanggungan"
+
+msgid "TK/1: Single, 1 dependent"
+msgstr "TK/1: Tidak Kawin, 1 Tanggungan"
+
+msgid "TK/2: Single, 2 dependents"
+msgstr "TK/2: Tidak Kawin, 2 Tanggungan"
+
+msgid "TK/3: Single, 3 dependents"
+msgstr "TK/3: Tidak Kawin, 3 Tanggungan"
+
+msgid "K/0: Married, No dependents"
+msgstr "K/0: Kawin, Tanpa Tanggungan"
+
+msgid "K/1: Married, 1 dependent"
+msgstr "K/1: Kawin, 1 Tanggungan"
+
+msgid "K/2: Married, 2 dependents"
+msgstr "K/2: Kawin, 2 Tanggungan"
+
+msgid "K/3: Married, 3 dependents"
+msgstr "K/3: Kawin, 3 Tanggungan"
+
+msgid "Permanent"
+msgstr "Tetap"
+
+msgid "Contract"
+msgstr "Kontrak"
+
+msgid "Probation"
+msgstr "Probasi"
+
+msgid "NIK"
+msgstr "NIK"
+
+msgid "Nomor Induk Karyawan"
+msgstr "Nomor Induk Karyawan"
+
+msgid "full name"
+msgstr "nama lengkap"
+
+msgid "email"
+msgstr "email"
+
+msgid "phone number"
+msgstr "nomor telepon"
+
+msgid "supervisor"
+msgstr "atasan"
+
+msgid "status"
+msgstr "status"
+
+msgid "join date"
+msgstr "tanggal bergabung"
+
+msgid "KTP number"
+msgstr "nomor KTP"
+
+msgid "NPWP number"
+msgstr "nomor NPWP"
+
+msgid "PTKP status"
+msgstr "status PTKP"
+
+msgid "face reference"
+msgstr "referensi wajah"
+
+msgid "Master photo for face recognition"
+msgstr "Foto master untuk pengenalan wajah"
+
+msgid "employee"
+msgstr "karyawan"
+
+msgid "employees"
+msgstr "karyawan"
+
+msgid "maximum amount"
+msgstr "jumlah maksimal"
+
+msgid "reimbursement category"
+msgstr "kategori reimbursement"
+
+msgid "reimbursement categories"
+msgstr "kategori reimbursement"
+
+msgid "Pending"
+msgstr "Menunggu"
+
+msgid "Approved"
+msgstr "Disetujui"
+
+msgid "Rejected"
+msgstr "Ditolak"
+
+msgid "category"
+msgstr "kategori"
+
+msgid "date"
+msgstr "tanggal"
+
+msgid "amount"
+msgstr "jumlah"
+
+msgid "receipt number"
+msgstr "nomor kuitansi"
+
+msgid "attachment"
+msgstr "lampiran"
+
+msgid "supervisor status"
+msgstr "status atasan"
+
+msgid "finance status"
+msgstr "status keuangan"
+
+msgid "approved amount"
+msgstr "jumlah yang disetujui"
+
+msgid "notes"
+msgstr "catatan"
+
+msgid "reimbursement"
+msgstr "reimbursement"
+
+msgid "reimbursements"
+msgstr "reimbursement"

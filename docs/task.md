@@ -267,27 +267,32 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Attachments**: Support for receipt image uploads with storage limits.
 - [x] **Reporting**: Export claim summaries and integrated with Payroll engine.
 
-## Phase 42: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core
+## Phase 42: Advanced Operational - Internationalization (i18n) [COMPLETED]
+- [x] **Backend**: Setup Django LocaleMiddleware and translation files (.po).
+- [x] **Frontend**: Implement `next-intl` for bilingual UI (ID/EN).
+- [x] **Mobile**: Multi-language support using `flutter_localizations`.
+
+## Phase 43: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core
 - [ ] **Payroll Engine**: Update formulas to support TER 2024 (Monthly & Yearly).
 - [ ] **BPJS**: Implement precise calculation for BPJS Kesehatan & Ketenagakerjaan (JKK, JKM, JHT, JP).
 - [ ] **Tax Forms**: Add initial support for generating 1721-VIII (Monthly) and 1721-A1 (Yearly) previews.
 
-## Phase 43: Organizational Complexity - Multi-Branch & Flexible Routing
+## Phase 44: Organizational Complexity - Multi-Branch & Flexible Routing
 - [ ] **Structure**: Add `Branch` (Cabang) with timezone and location fencing.
 - [ ] **Shifts**: Implement Shift Rotation/Patterns (Pola Kerja) for 24/7 operations.
 - [ ] **Approval Builder**: Create logic for dynamic N-level approval routing.
 
-## Phase 44: Strategic HR - Performance & KPI (MVP)
+## Phase 45: Strategic HR - Performance & KPI (MVP)
 - [ ] **KPIs**: Define organizational and individual KPI targets.
 - [ ] **Reviews**: Implement basic Appraisal workflow (Self-Review & Manager Review).
 - [ ] **Dashboard**: Add Performance Analytics for Executive views.
 
-## Phase 45: Infrastructure - API & Quota Control
+## Phase 46: Infrastructure - API & Quota Control
 - [ ] **API**: Develop Public API keys for third-party integrations (ERP/Bank).
 - [ ] **Quota**: Implement enforcement for Document Storage (MB/GB per Tenant).
 - [ ] **Audit**: Enhanced Audit Logs for security compliance (Full Object History).
 
-## Phase 46: SaaS Subscription Expiry & Data Lifecycle Management
+## Phase 47: SaaS Subscription Expiry & Data Lifecycle Management [COMPLETED]
 - [x] **Subscription Model**: Add `expiry_date`, `subscription_status` (ACTIVE, EXPIRED, GRACE_PERIOD), and `grace_period_days` to `Tenant` model.
 - [x] **Access Guard (Middleware)**:
     - [x] **Level 1: Read-Only Mode**: Block POST/PUT/DELETE for core HR, attendance, and payroll modules.

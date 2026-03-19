@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/login_screen.dart';
 
@@ -12,16 +14,27 @@ class HRMSApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'HRMS Mobile',
+      title: 'harikerja Mobile',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
+        primaryColor: const Color(0xFF2563EB),
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
         useMaterial3: true,
         textTheme: GoogleFonts.plusJakartaSansTextTheme(
           ThemeData.dark().textTheme,
         ),
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('id'), // Indonesian
+      ],
       home: const LoginScreen(),
     );
   }

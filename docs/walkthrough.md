@@ -421,6 +421,24 @@ Implemented a comprehensive reimbursement system with multi-stage approval and d
 - **Payslip Visibility**: Reimbursements appear as non-taxable additions to the Gross Pay on the digital payslip.
 - **CSV Export**: A dedicated API endpoint `/api/reimbursements/export_csv/` provides bulk reports for external accounting.
 
+## Phase 42: Advanced Operational - Internationalization (i18n)
+
+Enabled full bilingual support (English and Indonesian) across the entire platform ecosystem.
+
+### 1. Backend (Django) Localization
+- **Gettext Integration**: All models (`Reimbursement`, `Employee`, etc.) now use `gettext_lazy` for field labels and choices.
+- **Locale Middleware**: Automatic language detection based on `Accept-Language` headers and user session.
+- **Translation Catalogs**: Compiled `.po` and `.mo` files for Indonesian (`id`) provide 100% coverage for system-generated strings.
+
+### 2. Frontend (Next.js) Dynamic Routing
+- **next-intl**: Implemented localized routing with `[locale]` dynamic segments (e.g., `/en/dashboard`, `/id/dashboard`).
+- **Language Switcher**: A premium glassmorphism toggle component in the Sidebar allows instant switching between EN and ID.
+- **Client-Side Translation**: Used `useTranslations` hook for real-time reactivity without page reloads.
+
+### 3. Mobile (Flutter) i18n
+- **flutter_localizations**: Integrated the official localization package with ARB (Application Resource Bundle) files.
+- **Bilingual Bundles**: `app_en.arb` and `app_id.arb` manage all UI strings for the mobile experience.
+
 ---
 
 ## Phase 46: SaaS Subscription Lifecycle Management
@@ -466,4 +484,4 @@ Supported by a granular feature-toggling system, the platform now enforces prici
 - **Logic Integrity**: All 45+ integration scenarios remain passing (OK).
 
 ---
-**Status**: Milestone 🎉 Phase 47 (Tiering & Access Control) 100% Complete.
+**Status**: Milestone 🎉 Phase 47 (Tiering & Access Control) & Phase 42 (Internationalization) 100% Complete.

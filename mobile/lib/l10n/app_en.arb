@@ -1,0 +1,13 @@
+{
+  "login": "Login",
+  "email": "Email Address",
+  "password": "Password",
+  "welcome": "Welcome back",
+  "attendance": "Attendance",
+  "clockIn": "Clock In",
+  "clockOut": "Clock Out",
+  "profile": "Profile",
+  "settings": "Settings",
+  "reimbursement": "Reimbursement",
+  "history": "History"
+}

@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { 
   Users, 
   Calendar, 
@@ -12,23 +13,28 @@ import {
   Settings, 
   ChevronRight,
   Briefcase,
-  BarChart2
+  BarChart2,
+  Receipt
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
 import { getBaseUrl } from '@/lib/api';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 const menuItems = [
-  { name: 'Overview',   icon: LayoutDashboard, href: '/' },
-  { name: 'Employees', icon: Users,            href: '/employees', isAdminOnly: true },
-  { name: 'Attendance',icon: Calendar,         href: '/attendance' },
-  { name: 'Payroll',   icon: CreditCard,       href: '/payroll',   isAdminOnly: true },
-  { name: 'Analytics', icon: BarChart2,        href: '/analytics', isAdminOnly: true },
-  { name: 'Settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
+  { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
+  { nameKey: 'employees', icon: Users,            href: '/employees', isAdminOnly: true },
+  { nameKey: 'attendance',icon: Calendar,         href: '/attendance' },
+  { nameKey: 'reimbursement', icon: Receipt,       href: '/reimbursement' },
+  { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   isAdminOnly: true },
+  { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', isAdminOnly: true },
+  { nameKey: 'settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
 ];
 
 export function Sidebar() {
+  const t = useTranslations('Navigation');
+  const tCommon = useTranslations('Common');
   const pathname = usePathname();
   const { tenantName, logo } = useTenant();
   const { user, loading } = useAuth();
@@ -66,6 +72,9 @@ export function Sidebar() {
               </span>
             </div>
           </div>
+          <div className="mt-6">
+            <LanguageSwitcher />
+          </div>
         </div>
 
         {/* Navigation */}
@@ -96,7 +105,7 @@ export function Sidebar() {
                   />
                 )}
                 <item.icon className={cn("transition-transform group-hover:scale-110", isActive ? "text-primary" : "")} size={20} />
-                <span className="flex-1">{item.name}</span>
+                <span className="flex-1">{t(item.nameKey)}</span>
                 <ChevronRight className={cn("ml-auto opacity-0 transition-all", isActive ? "opacity-40" : "group-hover:translate-x-1 group-hover:opacity-40")} size={14} />
               </Link>
             );
@@ -111,7 +120,7 @@ export function Sidebar() {
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-semibold truncate">
-                {loading ? 'Loading...' : (user?.fullname || 'Admin User')}
+                {loading ? tCommon('loading') : (user?.fullname || 'Admin User')}
               </p>
               <p className="text-xs text-muted-foreground truncate">
                 {user?.email || 'admin@hrms.com'}

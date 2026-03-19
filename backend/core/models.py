@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from core.audit import AuditModel
 
 
@@ -6,43 +7,59 @@ class AccessRole(AuditModel):
     """
     Defines the RBAC permissions for a user within a specific tenant.
     """
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(_("name"), max_length=255)
+    description = models.TextField(_("description"), blank=True, null=True)
     
     # Store dynamic permissions as a JSON dictionary
     # e.g. {"manage_hr": True, "manage_payroll": False}
-    permissions = models.JSONField(default=dict, blank=True)
+    permissions = models.JSONField(_("permissions"), default=dict, blank=True)
     
     # If True, this is a system-generated default role that shouldn't be deleted
-    is_default = models.BooleanField(default=False)
+    is_default = models.BooleanField(_("is default"), default=False)
+
+    class Meta:
+        verbose_name = _("access role")
+        verbose_name_plural = _("access roles")
 
     def __str__(self):
         return self.name
 
 
 class Department(AuditModel):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(_("name"), max_length=255)
+    description = models.TextField(_("description"), blank=True, null=True)
+
+    class Meta:
+        verbose_name = _("department")
+        verbose_name_plural = _("departments")
 
     def __str__(self):
         return self.name
 
 
 class Role(AuditModel):
-    name = models.CharField(max_length=255)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='roles')
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(_("name"), max_length=255)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='roles', verbose_name=_("department"))
+    description = models.TextField(_("description"), blank=True, null=True)
+
+    class Meta:
+        verbose_name = _("role")
+        verbose_name_plural = _("roles")
 
     def __str__(self):
         return f"{self.name} - {self.department.name}"
 
 
 class Golongan(AuditModel):
-    name = models.CharField(max_length=50, unique=True)
-    base_salary = models.DecimalField(max_digits=12, decimal_places=2, help_text="Gaji Pokok")
-    meal_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Tunjangan Makan Harian")
-    transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Tunjangan Transport Harian")
-    overtime_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Tarif lembur per jam (0 = gunakan formula standar)")
+    name = models.CharField(_("name"), max_length=50, unique=True)
+    base_salary = models.DecimalField(_("base salary"), max_digits=12, decimal_places=2, help_text=_("Gaji Pokok"))
+    meal_allowance = models.DecimalField(_("meal allowance"), max_digits=10, decimal_places=2, default=0, help_text=_("Tunjangan Makan Harian"))
+    transport_allowance = models.DecimalField(_("transport allowance"), max_digits=10, decimal_places=2, default=0, help_text=_("Tunjangan Transport Harian"))
+    overtime_rate = models.DecimalField(_("overtime rate"), max_digits=12, decimal_places=2, default=0, help_text=_("Tarif lembur per jam (0 = gunakan formula standar)"))
+
+    class Meta:
+        verbose_name = _("golongan")
+        verbose_name_plural = _("golongan")
 
     def __str__(self):
         return self.name
@@ -50,47 +67,51 @@ class Golongan(AuditModel):
 
 class Employee(AuditModel):
     MARITAL_STATUS_CHOICES = [
-        ('TK/0', 'Tidak Kawin Tanpa Tanggungan'),
-        ('TK/1', 'Tidak Kawin 1 Tanggungan'),
-        ('TK/2', 'Tidak Kawin 2 Tanggungan'),
-        ('TK/3', 'Tidak Kawin 3 Tanggungan'),
-        ('K/0', 'Kawin Tanpa Tanggungan'),
-        ('K/1', 'Kawin 1 Tanggungan'),
-        ('K/2', 'Kawin 2 Tanggungan'),
-        ('K/3', 'Kawin 3 Tanggungan'),
+        ('TK/0', _('TK/0: Single, No dependents')),
+        ('TK/1', _('TK/1: Single, 1 dependent')),
+        ('TK/2', _('TK/2: Single, 2 dependents')),
+        ('TK/3', _('TK/3: Single, 3 dependents')),
+        ('K/0', _('K/0: Married, No dependents')),
+        ('K/1', _('K/1: Married, 1 dependent')),
+        ('K/2', _('K/2: Married, 2 dependents')),
+        ('K/3', _('K/3: Married, 3 dependents')),
     ]
 
     EMPLOYMENT_STATUS_CHOICES = [
-        ('PERMANENT', 'Permanent (Tetap)'),
-        ('CONTRACT', 'Contract (PKWT)'),
-        ('PROBATION', 'Probation (Masa Percobaan)'),
+        ('PERMANENT', _('Permanent')),
+        ('CONTRACT', _('Contract')),
+        ('PROBATION', _('Probation')),
     ]
 
-    nik = models.CharField(max_length=50, unique=True, help_text="Nomor Induk Karyawan")
-    fullname = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True, null=True)
+    nik = models.CharField(_("NIK"), max_length=50, unique=True, help_text=_("Nomor Induk Karyawan"))
+    fullname = models.CharField(_("full name"), max_length=255)
+    email = models.EmailField(_("email"), unique=True)
+    phone = models.CharField(_("phone number"), max_length=20, blank=True, null=True)
 
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='employees')
-    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='employees')
-    golongan = models.ForeignKey(Golongan, on_delete=models.SET_NULL, null=True, related_name='employees')
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("department"))
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("role"))
+    golongan = models.ForeignKey(Golongan, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("golongan"))
     
     # RBAC mapping
-    access_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
+    access_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees', verbose_name=_("access role"))
 
     # Hierarchy
-    supervisor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates')
+    supervisor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates', verbose_name=_("supervisor"))
 
-    status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='PROBATION')
-    join_date = models.DateField()
+    status = models.CharField(_("status"), max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='PROBATION')
+    join_date = models.DateField(_("join date"))
 
     # PTKP / PPh 21 Requirements
-    ktp_number = models.CharField(max_length=20, unique=True)
-    npwp_number = models.CharField(max_length=30, blank=True, null=True)
-    ptkp_status = models.CharField(max_length=5, choices=MARITAL_STATUS_CHOICES, default='TK/0')
+    ktp_number = models.CharField(_("KTP number"), max_length=20, unique=True)
+    npwp_number = models.CharField(_("NPWP number"), max_length=30, blank=True, null=True)
+    ptkp_status = models.CharField(_("PTKP status"), max_length=5, choices=MARITAL_STATUS_CHOICES, default='TK/0')
 
     # Face Recognition Reference
-    face_reference = models.ImageField(upload_to='face_references/', blank=True, null=True, help_text="Master photo for face recognition")
+    face_reference = models.ImageField(_("face reference"), upload_to='face_references/', blank=True, null=True, help_text=_("Master photo for face recognition"))
+
+    class Meta:
+        verbose_name = _("employee")
+        verbose_name_plural = _("employees")
 
     def __str__(self):
         return f"{self.nik} - {self.fullname}"

@@ -1,0 +1,33 @@
+{
+  "Dashboard": {
+    "title": "Professional Admin Dashboard",
+    "subtitle": "Here's what's happening in your company today.",
+    "welcome": "Welcome back",
+    "fetching": "Fetching your dashboard...",
+    "stats": {
+      "total_employees": "Total Employees",
+      "today_attendance": "Today Attendance",
+      "pending_leaves": "Pending Leaves",
+      "new_hires": "New Hires (Month)"
+    },
+    "attendance_trends": "Attendance Trends",
+    "recent_hires": "Recent Hires",
+    "realtime": "REALTIME"
+  },
+  "Navigation": {
+    "overview": "Overview",
+    "employees": "Employees",
+    "attendance": "Attendance",
+    "reimbursement": "Reimbursement",
+    "payroll": "Payroll",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "Common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "loading": "Loading...",
+    "joined_days_ago": "Joined {days} days ago"
+  }
+}
