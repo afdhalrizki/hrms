@@ -16,7 +16,8 @@ import {
   BarChart2,
   Receipt,
   MapPin,
-  GitMerge
+  GitMerge,
+  TrendingUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -27,6 +28,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
   { nameKey: 'employees', icon: Users,            href: '/employees', isAdminOnly: true },
+  { nameKey: 'performance', icon: TrendingUp,     href: '/performance' },
   { nameKey: 'branches',  icon: MapPin,           href: '/branches',  isAdminOnly: true },
   { nameKey: 'attendance',icon: Calendar,         href: '/attendance' },
   { nameKey: 'reimbursement', icon: Receipt,       href: '/reimbursement' },

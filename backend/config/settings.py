@@ -58,6 +58,7 @@ TENANT_APPS = [
     'attendance',  # Per-tenant: Attendance
     'payroll',  # Per-tenant: Payroll
     'reimbursement',  # Per-tenant: Reimbursement & Expense Claim
+    'performance',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]

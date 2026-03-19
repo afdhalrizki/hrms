@@ -30,6 +30,7 @@ from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeVie
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
 from reimbursement.views import ReimbursementViewSet, ReimbursementCategoryViewSet
+from performance.views import KPIViewSet, KPITargetViewSet, AppraisalViewSet, AppraisalReviewViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -54,6 +55,10 @@ router.register(r'branches', BranchViewSet)
 router.register(r'workflow-configs', WorkflowConfigViewSet)
 router.register(r'workflow-stages', WorkflowStageViewSet)
 router.register(r'workflow-actions', WorkflowActionViewSet)
+router.register(r'kpis', KPIViewSet)
+router.register(r'kpi-targets', KPITargetViewSet)
+router.register(r'appraisals', AppraisalViewSet)
+router.register(r'appraisal-reviews', AppraisalReviewViewSet)
 router.register(r'public/signup', PublicSignupViewSet, basename='public-signup')
 router.register(r'internal/registrations', RegistrationApprovalViewSet, basename='internal-registration')
 

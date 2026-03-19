@@ -516,4 +516,22 @@ The platform now supports large-scale organizational structures with physical lo
 - **Role-Based Routing**: Approvals can be routed to specific roles (e.g., "Any Finance Manager") or specific individuals.
 
 ---
-**Status**: Milestone 🎉 Phase 43 (Advanced Compliance), Phase 44 (Org Complexity), Phase 47 (Subscription), and Phase 42 (i18n) 100% Complete.
+
+## Phase 45: Strategic HR - Performance & KPI (MVP)
+
+The platform now includes a sophisticated performance management layer, allowing data-driven workforce optimization.
+
+### 1. KPI Strategy & Tracking
+- **Flexible Indicators**: Support for Percentage, Currency, and Unit-based KPIs (e.g., Sales Volume, Accuracy Rate).
+- **Attainment Progress**: Real-time calculation of target vs. actual attainment percentages.
+- **Visual Dashboards**: Premium progress indicators and performance trend summaries for every employee.
+
+### 2. Digital Appraisal Workflow
+- **Balanced Reviews**: Support for Self-Reviews and Manager Reviews.
+- **Qualitative & Quantitative**: Hybrid feedback system using JSON-based ratings and rich text comments.
+- **Privacy Gated**: Reviews are strictly isolated based on roles and completion status to ensure unbiased evaluation.
+
+![Performance Dashboard](./assets/performance_preview.png)
+
+---
+**Status**: Milestone 🎉 Phase 45 (Strategic HR) 100% Complete.
