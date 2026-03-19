@@ -534,4 +534,25 @@ The platform now includes a sophisticated performance management layer, allowing
 ![Performance Dashboard](./assets/performance_preview.png)
 
 ---
-**Status**: Milestone 🎉 Phase 45 (Strategic HR) 100% Complete.
+
+## Phase 46: Infrastructure - API & Quota Control
+
+The platform's core infrastructure has been upgraded to support massive-scale enterprise integrations and strict resource management.
+
+### 1. Public API Engine
+- **Third-Party Integration**: Tenants can now generate secure API Keys for external services (Zapier, ERP, Custom Scripts).
+- **Prefix-Based Security**: Only the first 8 characters are visible; the secret is hashed using SHA-256 for maximum security.
+- **Machine Authentication**: Dedicated `APIKeyAuthentication` layer allows non-user accounts to safely interact with HR data.
+
+### 2. Storage Quota Enforcement
+- **Dynamic Capacity**: Storage limits are automatically enforced based on the tenant's plan (100MB to 10GB+).
+- **Automated Tracking**: Real-time signals (`post_save`/`post_delete`) update disk usage whenever an employee photo or reimbursement receipt is uploaded.
+- **Quota Guards**: Custom `validate_storage_quota` prevents data bloat by blocking uploads before the limit is breached.
+
+### 3. Forensic Audit Trail
+- **Deep Diffing**: The new `AuditLog` system doesn't just record *who* changed a record, but *exactly what* fields were modified (Old vs. New values).
+- **Action Coverage**: Automated tracking of CREATE, UPDATE, and DELETE operations across all business models.
+- **Security Compliance**: Logs include IP addresses and actor metadata for forensic audits.
+
+---
+**Status**: Milestone 🎉 Phase 46 (Infrastructure) 100% Complete.

@@ -1,8 +1,46 @@
 from rest_framework import serializers
 from .models import (
     Department, Role, Golongan, Employee, AccessRole, 
-    Branch, WorkflowConfig, WorkflowStage, WorkflowAction
+    Branch, WorkflowConfig, WorkflowStage, WorkflowAction,
+    APIKey, AuditLog
 )
+
+class APIKeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIKey
+        fields = ['id', 'label', 'key_prefix', 'expires_at', 'last_used_at', 'is_active', 'created_at']
+        read_only_fields = ['key_prefix', 'last_used_at', 'created_at']
+
+    def create(self, validated_data):
+        import secrets
+        import hashlib
+        
+        # Generate secret (only shown once)
+        secret = secrets.token_urlsafe(32)
+        prefix = secrets.token_hex(4) # 8 chars
+        
+        validated_data['key_prefix'] = prefix
+        validated_data['key_hash'] = hashlib.sha256(secret.encode()).hexdigest()
+        
+        instance = super().create(validated_data)
+        
+        # Attach raw secret for the response (not saved to DB)
+        instance.raw_key = f"{prefix}.{secret}"
+        return instance
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if hasattr(instance, 'raw_key'):
+            ret['secret_key'] = instance.raw_key
+        return ret
+
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    actor_name = serializers.ReadOnlyField(source='actor.fullname')
+
+    class Meta:
+        model = AuditLog
+        fields = '__all__'
 
 class BranchSerializer(serializers.ModelSerializer):
     class Meta:

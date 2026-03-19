@@ -5,14 +5,38 @@ from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission
 from .models import (
     Department, Role, Golongan, Employee, AccessRole,
-    Branch, WorkflowConfig, WorkflowStage, WorkflowAction
+    Branch, WorkflowConfig, WorkflowStage, WorkflowAction,
+    APIKey, AuditLog
 )
 from .serializers import (
     DepartmentSerializer, RoleSerializer, GolonganSerializer, 
     EmployeeSerializer, AccessRoleSerializer,
     BranchSerializer, WorkflowConfigSerializer, 
-    WorkflowStageSerializer, WorkflowActionSerializer
+    WorkflowStageSerializer, WorkflowActionSerializer,
+    APIKeySerializer, AuditLogSerializer
 )
+
+class APIKeyViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = APIKey.objects.all()
+    serializer_class = APIKeySerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_settings'
+
+    def get_queryset(self):
+        # Tenant isolation is handled by connection.tenant, but we filter for safety
+        from django.db import connection
+        return APIKey.objects.filter(tenant=connection.tenant)
+
+    def perform_create(self, serializer):
+        from django.db import connection
+        serializer.save(tenant=connection.tenant)
+
+
+class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = AuditLog.objects.all()
+    serializer_class = AuditLogSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_settings'
 
 
 class BranchViewSet(AuditModelMixin, viewsets.ModelViewSet):

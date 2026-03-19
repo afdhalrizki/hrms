@@ -48,6 +48,8 @@ class Tenant(TenantMixin):
     plan_type = models.CharField(max_length=20, choices=PLAN_CHOICES, default='ENTERPRISE')
     enabled_modules = models.JSONField(default=list, blank=True, help_text="List of enabled modules (e.g. ['payroll', 'attendance'])")
     max_employees = models.PositiveIntegerField(default=1000, help_text="Maximum number of employees allowed for this tenant")
+    storage_limit_mb = models.PositiveIntegerField(default=100, help_text="Maximum storage allowed for this tenant in MB")
+    storage_used_bytes = models.PositiveBigIntegerField(default=0, help_text="Current storage usage in bytes")
 
     from django.core.validators import MinValueValidator, MaxValueValidator
     max_admins = models.IntegerField(
@@ -71,12 +73,15 @@ class Tenant(TenantMixin):
             if self.plan_type == 'BASIC':
                 self.enabled_modules = ['core', 'attendance']
                 self.max_employees = 50
+                self.storage_limit_mb = 100
             elif self.plan_type == 'PROFESSIONAL':
                 self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement']
                 self.max_employees = 250
+                self.storage_limit_mb = 1000
             elif self.plan_type == 'ENTERPRISE':
-                self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit']
+                self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
                 self.max_employees = 10000
+                self.storage_limit_mb = 10000
         super().save(*args, **kwargs)
 
     @property

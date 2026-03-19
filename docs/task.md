@@ -287,10 +287,10 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Reviews**: Implement basic Appraisal workflow (Self-Review & Manager Review).
 - [x] **Dashboard**: Add Performance Analytics for Executive views.
 
-## Phase 46: Infrastructure - API & Quota Control
-- [ ] **API**: Develop Public API keys for third-party integrations (ERP/Bank).
-- [ ] **Quota**: Implement enforcement for Document Storage (MB/GB per Tenant).
-- [ ] **Audit**: Enhanced Audit Logs for security compliance (Full Object History).
+## Phase 46: Infrastructure - API & Quota Control [COMPLETED]
+- [x] **API**: Develop Public API keys for third-party integrations (ERP/Bank).
+- [x] **Quota**: Implement enforcement for Document Storage (MB/GB per Tenant).
+- [x] **Audit**: Enhanced Audit Logs for security compliance (Full Object History).
 
 ## Phase 47: SaaS Subscription Expiry & Data Lifecycle [COMPLETED]
 - [x] **Subscription Model**: Add `expiry_date`, `subscription_status`, and `grace_period_days`.

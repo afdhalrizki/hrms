@@ -1,5 +1,21 @@
 from django.contrib import admin
-from .models import Department, Role, Golongan, Employee, Branch, WorkflowConfig, WorkflowStage, WorkflowAction
+from .models import (
+    Department, Role, Golongan, Employee, Branch, 
+    WorkflowConfig, WorkflowStage, WorkflowAction,
+    APIKey, AuditLog
+)
+
+@admin.register(APIKey)
+class APIKeyAdmin(admin.ModelAdmin):
+    list_display = ('label', 'tenant', 'key_prefix', 'is_active', 'expires_at', 'last_used_at')
+    list_filter = ('is_active', 'tenant')
+    readonly_fields = ('key_prefix', 'key_hash', 'last_used_at', 'created_at', 'updated_at')
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ('timestamp', 'action_type', 'model_name', 'object_id', 'actor', 'ip_address')
+    list_filter = ('action_type', 'model_name')
+    readonly_fields = ('timestamp', 'action_type', 'model_name', 'object_id', 'changed_fields', 'actor', 'ip_address')
 
 class WorkflowStageInline(admin.TabularInline):
     model = WorkflowStage

@@ -1,90 +1,58 @@
-"""
-core/audit.py
-─────────────
-Abstract base model that provides four standard audit fields:
+from django.forms.models import model_to_dict
+from .models import AuditLog
 
-    created_at   – when the record was first saved
-    updated_at   – when the record was last changed
-    created_by   – the User who created the record
-    updated_by   – the User who last updated the record
-
-Usage:
-    from core.audit import AuditModel
-
-    class MyModel(AuditModel):
-        name = models.CharField(max_length=255)
-        # created_at, updated_at, created_by, updated_by are inherited automatically
-
-How it auto-fills created_by / updated_by:
-    Call  instance.save(user=request.user)  from your ViewSet's perform_create /
-    perform_update, OR use the AuditModelMixin for DRF ViewSets (see below).
-"""
-
-from django.conf import settings
-from django.db import models
-
-
-class AuditModel(models.Model):
-    """Abstract base class adding audit trail fields to any Django model."""
-
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Dibuat pada")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Diperbarui pada")
-
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="%(app_label)s_%(class)s_created",
-        verbose_name="Dibuat oleh",
-    )
-    updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="%(app_label)s_%(class)s_updated",
-        verbose_name="Diperbarui oleh",
-    )
-
-    class Meta:
-        abstract = True
-
-    def __init__(self, *args, **kwargs):
-        # Pop user from kwargs to avoid "unexpected keyword argument" in model init
-        self._audit_user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
+class AuditLogger:
+    @staticmethod
+    def log_change(action_type, instance, actor=None, ip_address=None):
         """
-        Override save() to auto-populate created_by / updated_by.
-        Supports both:
-          1. instance.save(user=request.user)
-          2. instance.save() (if user was passed to __init__ via serializer.save(user=user))
+        Logs a CREATE, UPDATE, or DELETE action with a diff of changes.
         """
-        user = kwargs.pop('user', self._audit_user)
-        if user is not None:
-            if self.pk is None:           # new record
-                self.created_by = user
-            self.updated_by = user        # always update on every save
-        super().save(*args, **kwargs)
+        model_name = instance.__class__.__name__
+        object_id = str(instance.pk)
+        
+        changed_fields = {}
+        
+        if action_type == 'UPDATE' and hasattr(instance, '_old_values'):
+            # Calculate diff
+            new_values = model_to_dict(instance)
+            for field, old_val in instance._old_values.items():
+                new_val = new_values.get(field)
+                if old_val != new_val:
+                    changed_fields[field] = {
+                        'old': str(old_val),
+                        'new': str(new_val)
+                    }
+        elif action_type == 'CREATE':
+            changed_fields = model_to_dict(instance)
+            # Convert all values to string for JSON storage if needed
+            changed_fields = {k: str(v) for k, v in changed_fields.items()}
 
-
-# ────────────────────────────────────────────────────────────────────────────
-# DRF ViewSet mixin — drop this into any ModelViewSet to auto-pass the user
-# ────────────────────────────────────────────────────────────────────────────
+        if action_type == 'DELETE' or changed_fields:
+            AuditLog.objects.create(
+                action_type=action_type,
+                model_name=model_name,
+                object_id=object_id,
+                changed_fields=changed_fields,
+                actor=actor,
+                ip_address=ip_address
+            )
 
 class AuditModelMixin:
     """
-    DRF ModelViewSet mixin that automatically populates created_by / updated_by.
-
-    Usage:
-        class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
-            ...
+    Mixin for ViewSets to automatically log actions.
     """
-
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        instance = serializer.save()
+        AuditLogger.log_change('CREATE', instance, actor=self.request.user)
 
     def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
+        # Store old values before update
+        instance = self.get_object()
+        instance._old_values = model_to_dict(instance)
+        
+        updated_instance = serializer.save()
+        AuditLogger.log_change('UPDATE', updated_instance, actor=self.request.user)
+
+    def perform_destroy(self, instance):
+        AuditLogger.log_change('DELETE', instance, actor=self.request.user)
+        instance.delete()

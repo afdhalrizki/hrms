@@ -9,6 +9,7 @@ from .serializers import (
     AppraisalReviewSerializer
 )
 from core.models import Employee
+from django.db.models import Q
 
 class KPIViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPI.objects.all()
@@ -55,8 +56,6 @@ class AppraisalViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if employee:
             return Appraisal.objects.filter(employee=employee)
         return Appraisal.objects.none()
-
-from django.db.models import Q
 
 class AppraisalReviewViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = AppraisalReview.objects.all()

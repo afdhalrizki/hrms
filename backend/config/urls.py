@@ -24,7 +24,7 @@ from users.views import UserViewSet, LoginAPIView
 from core.views import (
     DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, 
     AccessRoleViewSet, BranchViewSet, WorkflowConfigViewSet, 
-    WorkflowStageViewSet, WorkflowActionViewSet
+    WorkflowStageViewSet, WorkflowActionViewSet, APIKeyViewSet, AuditLogViewSet
 )
 from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
@@ -55,6 +55,8 @@ router.register(r'branches', BranchViewSet)
 router.register(r'workflow-configs', WorkflowConfigViewSet)
 router.register(r'workflow-stages', WorkflowStageViewSet)
 router.register(r'workflow-actions', WorkflowActionViewSet)
+router.register(r'api-keys', APIKeyViewSet)
+router.register(r'audit-logs', AuditLogViewSet)
 router.register(r'kpis', KPIViewSet)
 router.register(r'kpi-targets', KPITargetViewSet)
 router.register(r'appraisals', AppraisalViewSet)

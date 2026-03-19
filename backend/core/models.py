@@ -243,3 +243,55 @@ class WorkflowAction(AuditModel):
     class Meta:
         verbose_name = _("workflow action")
         verbose_name_plural = _("workflow actions")
+
+
+class APIKey(AuditModel):
+    """
+    Stores credentials for third-party API access.
+    """
+    tenant = models.ForeignKey('tenants.Tenant', on_delete=models.CASCADE, related_name='api_keys')
+    label = models.CharField(_("label"), max_length=100, help_text=_("e.g. Zapier, ERP Sync"))
+    key_prefix = models.CharField(max_length=8, unique=True)
+    key_hash = models.CharField(max_length=128) # Hashed secret
+    
+    expires_at = models.DateTimeField(null=True, blank=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _("API key")
+        verbose_name_plural = _("API keys")
+
+    def __str__(self):
+        return f"{self.label} ({self.key_prefix}...)"
+
+
+class AuditLog(models.Model):
+    """
+    Detailed history of changes to specific objects (CREATE, UPDATE, DELETE).
+    """
+    ACTION_CHOICES = [
+        ('CREATE', _('Create')),
+        ('UPDATE', _('Update')),
+        ('DELETE', _('Delete')),
+    ]
+
+    action_type = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    model_name = models.CharField(max_length=100)
+    object_id = models.CharField(max_length=100)
+    
+    # Store the changes as a JSON diff
+    # e.g. {"salary": {"old": 5000, "new": 6000}}
+    changed_fields = models.JSONField(default=dict)
+    
+    actor = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("audit log")
+        verbose_name_plural = _("audit logs")
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.action_type} on {self.model_name}:{self.object_id} at {self.timestamp}"
