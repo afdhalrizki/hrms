@@ -152,6 +152,120 @@ class CoreModuleTestCase(TenantTestCase):
         self.assertEqual(response.data['nik'], 'EMP001')
         self.assertEqual(response.data['ptkp_status'], 'TK/0')
 
+class BranchTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(email='admin_branch@test.com', password='password', is_staff=True)
+        self.user.tenants.add(self.tenant)
+        self.domain = self.tenant.domains.first().domain
+
+    def test_branch_geofencing_defaults(self):
+        """Verify branch creation and geofencing defaults."""
+        from core.models import Branch
+        branch = Branch.objects.create(
+            name="Bandung Office",
+            latitude=-6.9175,
+            longitude=107.6191
+        )
+        self.assertEqual(branch.radius_meters, 100) # Default
+        self.assertEqual(str(branch), "Bandung Office")
+
+class RBACManagementTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        from core.models import AccessRole
+        self.user = User.objects.create_user(email='rbac_admin@test.com', password='password', is_staff=True)
+        self.user.tenants.add(self.tenant)
+        self.domain = self.tenant.domains.first().domain
+        self.role = AccessRole.objects.create(name="HR Specialist", permissions={"manage_hr": True}, is_default=True)
+
+    def test_default_role_protection(self):
+        """Verify that system default roles cannot be easily deleted if implemented (at least check the flag)."""
+        self.assertTrue(self.role.is_default)
+        self.assertEqual(str(self.role), "HR Specialist")
+
+class InfrastructureTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(email='infra_admin@test.com', password='password', is_staff=True)
+        self.user.tenants.add(self.tenant)
+        self.domain = self.tenant.domains.first().domain
+
+    def test_api_key_lifecycle(self):
+        """Verify APIKey model fields."""
+        from core.models import APIKey
+        import uuid
+        prefix = str(uuid.uuid4())[:8]
+        key = APIKey.objects.create(
+            label="Zapier Integration",
+            key_prefix=prefix,
+            key_hash="hashed_secret"
+        )
+        self.assertTrue(key.is_active)
+        self.assertIn("Zapier", str(key))
+
+    def test_system_notification_filtering(self):
+        """Verify notification creation and filtering."""
+        from core.models import SystemNotification
+        SystemNotification.objects.create(title="Global Update", message="Upgrade soon", level='INFO')
+        SystemNotification.objects.create(title="Private Alert", message="Check your salary", target_user=self.user)
+        
+        self.assertEqual(SystemNotification.objects.count(), 2)
+        # Filter global only (no target_user)
+        self.assertEqual(SystemNotification.objects.filter(target_user__isnull=True).count(), 1)
+
+class AuditIntegrationTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.user = User.objects.create_user(email='audit_admin@test.com', password='password', is_staff=True)
+        self.user.tenants.add(self.tenant)
+        self.domain = self.tenant.domains.first().domain
+
+    def test_audit_log_generation(self):
+        """Verify that AuditModelMixin correctly generates logs for Master Data changes."""
+        from core.models import AuditLog, Golongan
+        self.client.force_login(self.user)
+        url = reverse('golongan-list')
+        
+        # 1. CREATE should trigger log
+        payload = {'name': 'AuditGrade', 'base_salary': '1000.00'}
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        gol_id = response.data['id']
+        self.assertTrue(AuditLog.objects.filter(model_name='Golongan', action_type='CREATE', object_id=str(gol_id)).exists())
+        
+        # 2. UPDATE should trigger log with diff
+        url_detail = reverse('golongan-detail', kwargs={'pk': gol_id})
+        # Note: DecimalField might be stringified in the payload. 
+        # AuditLogger compares model_to_dict values.
+        payload_update = {'name': 'AuditGradeUpdated', 'base_salary': '2000.00'}
+        response_patch = self.client.patch(url_detail, payload_update, format='json', SERVER_NAME=self.domain)
+        self.assertEqual(response_patch.status_code, status.HTTP_200_OK)
+        
+        # Check AuditLog
+        update_log = AuditLog.objects.filter(model_name='Golongan', action_type='UPDATE', object_id=str(gol_id)).first()
+        self.assertIsNotNone(update_log, "AuditLog for UPDATE should exist")
+        self.assertIn('name', update_log.changed_fields)
+        self.assertEqual(update_log.changed_fields['name']['new'], 'AuditGradeUpdated')
+
+class DataConstraintTestCase(TenantTestCase):
+    def test_employee_ptkp_validation(self):
+        """Verify PTKP status choices in Employee model."""
+        from core.models import Employee, Department, Role, Golongan
+        dept = Department.objects.create(name="D1")
+        role = Role.objects.create(name="R1", department=dept)
+        gol = Golongan.objects.create(name="G1", base_salary=1000)
+        
+        emp = Employee.objects.create(
+            nik="VAL-001", fullname="Val Test", email="val@test.com",
+            department=dept, role=role, golongan=gol,
+            join_date=date.today(), ktp_number="VALKTP001",
+            ptkp_status="K/2" # Valid Choice
+        )
+        self.assertEqual(emp.ptkp_status, "K/2")
+
 class MultiTenancyIsolationTestCase(TenantTestCase):
     def test_schema_isolation(self):
         """Verify that data created in one tenant is not visible in another."""

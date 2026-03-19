@@ -46,7 +46,7 @@ class AuditLogger:
             new_values = model_to_dict(instance)
             for field, old_val in instance._old_values.items():
                 new_val = new_values.get(field)
-                if old_val != new_val:
+                if str(old_val) != str(new_val): # Stringify for safer comparison
                     changed_fields[field] = {
                         'old': str(old_val),
                         'new': str(new_val)
@@ -63,7 +63,7 @@ class AuditLogger:
                 model_name=model_name,
                 object_id=object_id,
                 changed_fields=changed_fields,
-                actor=actor,
+                actor=actor if actor and actor.is_authenticated else None,
                 ip_address=ip_address
             )
 
@@ -76,12 +76,15 @@ class AuditModelMixin:
         AuditLogger.log_change('CREATE', instance, actor=self.request.user)
 
     def perform_update(self, serializer):
-        # Store old values before update
-        instance = self.get_object()
+        # Store old values from the instance attached to the serializer
+        instance = serializer.instance
         instance._old_values = model_to_dict(instance)
         
-        updated_instance = serializer.save()
-        AuditLogger.log_change('UPDATE', updated_instance, actor=self.request.user)
+        # Save the update
+        serializer.save()
+        
+        # Log the change
+        AuditLogger.log_change('UPDATE', instance, actor=self.request.user)
 
     def perform_destroy(self, instance):
         AuditLogger.log_change('DELETE', instance, actor=self.request.user)
