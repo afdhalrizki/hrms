@@ -421,6 +421,22 @@ Implemented a comprehensive reimbursement system with multi-stage approval and d
 - **Payslip Visibility**: Reimbursements appear as non-taxable additions to the Gross Pay on the digital payslip.
 - **CSV Export**: A dedicated API endpoint `/api/reimbursements/export_csv/` provides bulk reports for external accounting.
 
+## Phase 43: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core
+
+The system now supports full Indonesian payroll compliance for 2024, enabling professional-grade tax and social security processing.
+
+### 1. PPh 21 TER 2024 Engine
+- **TER Categories (A, B, C)**: Automated mapping based on `ptkp_status`.
+- **Comprehensive Lookups**: Full implementation of monthly TER tables as per PMK 168/2023.
+- **Precision**: Calculations are rounded (quantized) to the nearest Rupiah for legal reporting.
+
+### 2. BPJS 2024 Standards
+- **Wage Caps**: Enforced maximum wage limits for BPJS Kesehatan (12M) and BPJS JP (10.04M).
+- **Tenant Risk Customization**: Companies can now set their specific **JKK (Jaminan Kecelakaan Kerja)** rates (0.24% - 1.74%) in Tenant Settings.
+- **Portions**: Automatic split between Employee (deduction) and Employer (company cost).
+
+---
+
 ## Phase 42: Advanced Operational - Internationalization (i18n)
 
 Enabled full bilingual support (English and Indonesian) across the entire platform ecosystem.

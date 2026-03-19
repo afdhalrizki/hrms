@@ -13,6 +13,7 @@ class Tenant(TenantMixin):
     # Payroll Settings
     overtime_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Tarif lembur per jam global (0 = gunakan formula)")
     payroll_overtime_divisor = models.IntegerField(default=173, help_text="Standard pembagi upah lembur (default Indonesia: 173)")
+    jkk_rate = models.DecimalField(max_digits=5, decimal_places=4, default=0.0024, help_text="Tarif JKK (Jaminan Kecelakaan Kerja) sesuai tingkat risiko (0.24% - 1.74%)")
     
     # Approval Settings
     APPROVAL_LEVEL_CHOICES = [

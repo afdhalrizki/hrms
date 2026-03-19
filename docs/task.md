@@ -272,10 +272,10 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Frontend**: Implement `next-intl` for bilingual UI (ID/EN).
 - [x] **Mobile**: Multi-language support using `flutter_localizations`.
 
-## Phase 43: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core
-- [ ] **Payroll Engine**: Update formulas to support TER 2024 (Monthly & Yearly).
-- [ ] **BPJS**: Implement precise calculation for BPJS Kesehatan & Ketenagakerjaan (JKK, JKM, JHT, JP).
-- [ ] **Tax Forms**: Add initial support for generating 1721-VIII (Monthly) and 1721-A1 (Yearly) previews.
+## Phase 43: Advanced Compliance - PPh 21 (TER 2024) & BPJS Core [COMPLETED]
+- [x] **Payroll Engine**: Update formulas to support TER 2024 (Monthly & Yearly).
+- [x] **BPJS**: Implement precise calculation for BPJS Kesehatan & Ketenagakerjaan (JKK, JKM, JHT, JP).
+- [x] **Tax Forms**: Add initial support for generating 1721-VIII (Monthly) and 1721-A1 (Yearly) previews.
 
 ## Phase 44: Organizational Complexity - Multi-Branch & Flexible Routing
 - [ ] **Structure**: Add `Branch` (Cabang) with timezone and location fencing.

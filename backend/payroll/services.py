@@ -7,13 +7,11 @@ class BPJSManager:
     """
     Handles BPJS Kesehatan and Ketenagakerjaan calculations (2024 standards).
     """
-    # Max Caps 2024
-    KESEHATAN_MAX_WAGE = Decimal('12000000') # Estimated for 2024
-    KETENAGAKERJAAN_JP_MAX_WAGE = Decimal('10042300') # PP 37/2021 adjusted
+    KESEHATAN_MAX_WAGE = Decimal('12000000') 
+    KETENAGAKERJAAN_JP_MAX_WAGE = Decimal('10042300') 
 
     @staticmethod
     def calculate_health(wage: Decimal) -> Dict[str, Decimal]:
-        """BPJS Kesehatan: 4% Company, 1% Employee"""
         cap_wage = min(wage, BPJSManager.KESEHATAN_MAX_WAGE)
         return {
             'company': (cap_wage * Decimal('0.04')).quantize(Decimal('1')),
@@ -21,13 +19,10 @@ class BPJSManager:
         }
 
     @staticmethod
-    def calculate_employment(wage: Decimal) -> Dict[str, Dict[str, Decimal]]:
-        """BPJS Ketenagakerjaan: JKK, JKM, JHT, JP"""
-        # JP: 2% Company, 1% Employee
+    def calculate_employment(wage: Decimal, jkk_rate: Decimal = Decimal('0.0024')) -> Dict[str, Dict[str, Decimal]]:
         jp_wage = min(wage, BPJSManager.KETENAGAKERJAAN_JP_MAX_WAGE)
-        
         return {
-            'jkk': {'company': (wage * Decimal('0.0024')).quantize(Decimal('1')), 'employee': Decimal('0')}, # Typical low risk
+            'jkk': {'company': (wage * jkk_rate).quantize(Decimal('1')), 'employee': Decimal('0')},
             'jkm': {'company': (wage * Decimal('0.003')).quantize(Decimal('1')), 'employee': Decimal('0')},
             'jht': {'company': (wage * Decimal('0.037')).quantize(Decimal('1')), 'employee': (wage * Decimal('0.02')).quantize(Decimal('1'))},
             'jp': {'company': (jp_wage * Decimal('0.02')).quantize(Decimal('1')), 'employee': (jp_wage * Decimal('0.01')).quantize(Decimal('1'))}
@@ -37,11 +32,6 @@ class TaxEngine:
     """
     Indonesian PPh 21 Engine implementing TER (Tarif Efektif Rata-rata) 2024.
     """
-    
-    # Category A: TK/0 (54m), TK/1 (58.5m), K/0 (58.5m)
-    # Category B: TK/2 (63m), TK/3 (67.5m), K/1 (63m), K/2 (67.5m)
-    # Category C: K/3 (72m)
-    
     CATEGORY_MAPPING = {
         'TK/0': 'A', 'TK/1': 'A', 'K/0': 'A',
         'TK/2': 'B', 'TK/3': 'B', 'K/1': 'B', 'K/2': 'B',
@@ -50,10 +40,6 @@ class TaxEngine:
 
     @staticmethod
     def get_ter_rate(category: str, gross_monthly: Decimal) -> Decimal:
-        """
-        Simplified TER 2024 Lookup logic.
-        In production, this would be a full table lookup in the DB.
-        """
         if category == 'A':
             if gross_monthly <= 5400000: return Decimal('0')
             if gross_monthly <= 5650000: return Decimal('0.0025')
@@ -63,16 +49,35 @@ class TaxEngine:
             if gross_monthly <= 7500000: return Decimal('0.0125')
             if gross_monthly <= 8550000: return Decimal('0.015')
             if gross_monthly <= 9650000: return Decimal('0.0175')
-            if gross_monthly <= 20000000: return Decimal('0.02') # Simplified for demo
+            if gross_monthly <= 10650000: return Decimal('0.02')
+            if gross_monthly <= 12250000: return Decimal('0.0225')
+            if gross_monthly <= 14000000: return Decimal('0.025')
+            if gross_monthly <= 16000000: return Decimal('0.03')
+            # Add more tiers as needed or move to DB
+            if gross_monthly <= 20000000: return Decimal('0.05')
+            return Decimal('0.10')
         elif category == 'B':
             if gross_monthly <= 6200000: return Decimal('0')
             if gross_monthly <= 6500000: return Decimal('0.0025')
-            if gross_monthly <= 20000000: return Decimal('0.015') # Simplified
+            if gross_monthly <= 6900000: return Decimal('0.005')
+            if gross_monthly <= 7300000: return Decimal('0.0075')
+            if gross_monthly <= 7800000: return Decimal('0.01')
+            if gross_monthly <= 8850000: return Decimal('0.0125')
+            if gross_monthly <= 9850000: return Decimal('0.015')
+            if gross_monthly <= 10900000: return Decimal('0.0175')
+            if gross_monthly <= 20000000: return Decimal('0.03')
+            return Decimal('0.09')
         elif category == 'C':
             if gross_monthly <= 6600000: return Decimal('0')
-            if gross_monthly <= 20000000: return Decimal('0.01') # Simplified
-            
-        return Decimal('0.05') # Fallback high
+            if gross_monthly <= 6950000: return Decimal('0.0025')
+            if gross_monthly <= 7350000: return Decimal('0.005')
+            if gross_monthly <= 7800000: return Decimal('0.0075')
+            if gross_monthly <= 8350000: return Decimal('0.01')
+            if gross_monthly <= 9450000: return Decimal('0.0125')
+            if gross_monthly <= 10350000: return Decimal('0.015')
+            if gross_monthly <= 20000000: return Decimal('0.02')
+            return Decimal('0.08')
+        return Decimal('0')
 
     @staticmethod
     def calculate_monthly_pph21(employee: Employee, gross_salary: Decimal) -> Decimal:
@@ -103,8 +108,11 @@ class PayrollCalculator:
         })
 
         # 2. BPJS Calculations
+        from django.db import connection
+        tenant = connection.tenant
+        
         health = BPJSManager.calculate_health(basic)
-        employment = BPJSManager.calculate_employment(basic)
+        employment = BPJSManager.calculate_employment(basic, jkk_rate=getattr(tenant, 'jkk_rate', Decimal('0.0024')))
 
         # Deductions (Employee Portions)
         ee_health = health['employee']

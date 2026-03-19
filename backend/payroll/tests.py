@@ -48,13 +48,16 @@ class PayrollExtendedTestCase(TenantTestCase):
         self.api_user = User.objects.create_user(email='admin@tenant.com', password='password', is_staff=True)
 
     def test_bpjs_ketenagakerjaan_calculation(self):
-        """Verify JKK, JKM, JHT, and JP (capped) portions."""
+        """Verify JKK, JKM, JHT, and JP (capped) portions with custom tenant risk."""
+        self.tenant.jkk_rate = Decimal('0.0174') # High risk example
+        self.tenant.save()
+        
         # Wage 15m (above JP cap of ~10m)
         wage = Decimal('15000000')
-        res = BPJSManager.calculate_employment(wage)
+        res = BPJSManager.calculate_employment(wage, jkk_rate=self.tenant.jkk_rate)
         
-        # JKK (0.24% company)
-        self.assertEqual(res['jkk']['company'], Decimal('36000'))
+        # JKK (1.74% company)
+        self.assertEqual(res['jkk']['company'], Decimal('261000'))
         # JKM (0.3% company)
         self.assertEqual(res['jkm']['company'], Decimal('45000'))
         # JHT (3.7% comp, 2% ee)
@@ -65,13 +68,13 @@ class PayrollExtendedTestCase(TenantTestCase):
         self.assertEqual(res['jp']['employee'], Decimal('100423')) # 10,042,300 * 0.01
 
     def test_tax_engine_categories(self):
-        """Verify TER rate lookups for different categories."""
-        # Cat A (TK/0)
+        """Verify TER rate lookups for different categories per PMK 168/2023."""
+        # Cat A (TK/0) @ 6m -> 0.75%
         self.assertEqual(TaxEngine.get_ter_rate('A', Decimal('6000000')), Decimal('0.0075'))
-        # Cat B (K/1)
-        self.assertEqual(TaxEngine.get_ter_rate('B', Decimal('10000000')), Decimal('0.015'))
-        # Cat C (K/3)
-        self.assertEqual(TaxEngine.get_ter_rate('C', Decimal('10000000')), Decimal('0.01'))
+        # Cat B (K/1) @ 10m -> 1.75%
+        self.assertEqual(TaxEngine.get_ter_rate('B', Decimal('10000000')), Decimal('0.0175'))
+        # Cat C (K/3) @ 10m -> 1.5%
+        self.assertEqual(TaxEngine.get_ter_rate('C', Decimal('10000000')), Decimal('0.015'))
 
     def test_payroll_calculator_run(self):
         """Verify full integration of calculations into Payslip model."""
@@ -83,12 +86,12 @@ class PayrollExtendedTestCase(TenantTestCase):
         # Health: 120,000 (Capped at 12m)
         # JHT: 300,000 (2% of 15m)
         # JP: 100,423 (1% of 10.04m)
-        # Tax (Cat B, 1.5% of 15m): 225,000
-        # Total Deductions: 745,423
-        # Net: 14,254,577
+        # Tax (Cat B, 3% of 15m per new table): 450,000
+        # Total Deductions: 970,423
+        # Net: 14,029,577
         
-        self.assertEqual(payslip.net_pay, Decimal('14254577'))
-        self.assertEqual(payslip.pph21_tax, Decimal('225000'))
+        self.assertEqual(payslip.net_pay, Decimal('14029577'))
+        self.assertEqual(payslip.pph21_tax, Decimal('450000'))
         
     def test_api_generate_payslips(self):
         """Verify API bulk generation."""
