@@ -445,19 +445,15 @@ Enabled full bilingual support (English and Indonesian) across the entire platfo
 
 Implemented a graduated enforcement system to handle trial/paid period expiry, ensuring business continuity while encouraging renewals.
 
-### 1. Lifecycle States & Access Mode
-![Subscription Expired Mockup](./assets/subscription_expired_ui.png)
+### 1. Lifecycle States & UI Feedback
+- **ACTIVE**: Full access to all modules.
+- **EXPIRED (Read-Only)**: A **SubscriptionBanner** appears. Users can view data but not modify it (POST/PUT/DELETE blocked by middleware).
+- **SUSPENDED (Locked)**: A **SuspendedOverlay** locks the UI. Redirects or full-screen overlays prevent use until renewal.
 
-| State | Condition | Access Mode |
-|-------|-----------|-------------|
-| **ACTIVE** | `expiry_date >= today` | **Full Access**: All features enabled. |
-| **EXPIRED** | `expiry_date < today <= grace_period` | **Read-Only**: No data modification allowed. |
-| **SUSPENDED** | `today > grace_period` | **Blocked**: Locked out; redirect to billing. |
-
-### 2. Access Enforcement & Safeguards
-- **Middleware Guard**: `SubscriptionMiddleware` intercepts every request to verify status.
-- **Defensive Safeguards**: Critical engines (Payroll Processing) explicitly block operations for inactive tenants.
-- **Emergency Data Export**: A tool `export_tenant_data` allows bulk CSV exports even for suspended tenants, ensuring legal/tax compliance for HR.
+### 2. Operational Safeguards
+- **Emergency Data Export**: Built-in specialized export command and UI button for suspended tenants to retrieve their data for compliance.
+- **Automated Cleanup**: `cleanup_tenants` management command handles permanent deletion of orphaned/suspended data after the 90-day retention period.
+- **System Notifications**: Automated in-app alerts created upon status changes to keep admins informed.
 
 ---
 
@@ -484,4 +480,4 @@ Supported by a granular feature-toggling system, the platform now enforces prici
 - **Logic Integrity**: All 45+ integration scenarios remain passing (OK).
 
 ---
-**Status**: Milestone 🎉 Phase 47 (Tiering & Access Control) & Phase 42 (Internationalization) 100% Complete.
+**Status**: Milestone 🎉 Phase 47 (Tiering & Access Control), Phase 46 (Subscription Lifecycle), and Phase 42 (i18n) 100% Complete.

@@ -29,5 +29,13 @@
     "save": "Save Changes",
     "loading": "Loading...",
     "joined_days_ago": "Joined {days} days ago"
+  },
+  "Subscription": {
+    "readOnlyMessage": "Subscription expired on {date}. The system is now in Read-Only mode.",
+    "renewNow": "Renew Now",
+    "suspendedTitle": "Access Suspended",
+    "suspendedMessage": "Access to {name} has been blocked due to an expired subscription. Please renew to regain access.",
+    "emergencyExport": "Emergency Export",
+    "logout": "Log Out"
   }
 }

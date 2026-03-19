@@ -115,3 +115,33 @@ class Employee(AuditModel):
 
     def __str__(self):
         return f"{self.nik} - {self.fullname}"
+
+
+class SystemNotification(AuditModel):
+    """
+    Stores system-wide or per-tenant notifications for admins and employees.
+    Used for subscription alerts, system maintenance, etc.
+    """
+    LEVEL_CHOICES = [
+        ('INFO', _('Info')),
+        ('WARNING', _('Warning')),
+        ('CRITICAL', _('Critical')),
+        ('SUCCESS', _('Success')),
+    ]
+
+    title = models.CharField(_("title"), max_length=255)
+    message = models.TextField(_("message"))
+    level = models.CharField(_("level"), max_length=10, choices=LEVEL_CHOICES, default='INFO')
+    is_active = models.BooleanField(_("is active"), default=True)
+    expires_at = models.DateTimeField(_("expires at"), null=True, blank=True)
+    
+    # Optional target: if null, it's global for the tenant
+    target_user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True, related_name='notifications', verbose_name=_("target user"))
+
+    class Meta:
+        verbose_name = _("system notification")
+        verbose_name_plural = _("system notifications")
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.level}] {self.title}"

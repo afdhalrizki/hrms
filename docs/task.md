@@ -261,7 +261,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Implement `prevent_admin_overflow` signal checks for user promotion and M2M changes.
 - [x] Expose `max_admins` quota in the Tenant Settings API.
 
-## Phase 41: Advanced Operational - Reimbursement & Expense Claim
+## Phase 41: Advanced Operational - Reimbursement & Expense Claim [COMPLETED]
 - [x] **Model**: Create `Reimbursement` and `ReimbursementCategory` models.
 - [x] **Workflow**: Implement multi-stage approval (Supervisor -> Finance/HR).
 - [x] **Attachments**: Support for receipt image uploads with storage limits.
@@ -292,29 +292,14 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [ ] **Quota**: Implement enforcement for Document Storage (MB/GB per Tenant).
 - [ ] **Audit**: Enhanced Audit Logs for security compliance (Full Object History).
 
-## Phase 47: SaaS Subscription Expiry & Data Lifecycle Management [COMPLETED]
-- [x] **Subscription Model**: Add `expiry_date`, `subscription_status` (ACTIVE, EXPIRED, GRACE_PERIOD), and `grace_period_days` to `Tenant` model.
-- [x] **Access Guard (Middleware)**:
-    - [x] **Level 1: Read-Only Mode**: Block POST/PUT/DELETE for core HR, attendance, and payroll modules.
-    - [x] **Level 2: suspension Mode**: Redirect all tenant requests to a "Subscription Expired" billing portal.
-- [x] **Automated Deactivation**:
-    - [x] **Payroll Engine**: Block generation of new payroll periods if subscription is expired.
-    - [x] **Automation Services**: Pause automated emails (payslips, notifications) and background jobs.
-    - [x] **API Access**: Invalidate public API keys for expired tenants.
-- [x] **Data Retention & Portability**:
-    - [x] **Bulk Export Tool**: Create a "Data Recovery" dashboard allowing EXCEL/CSV export of all master data even after expiry.
-    - [x] **Lifecycle Management**: Implement `cleanup_expired_tenants` (process_subscriptions) command to handle transitions.
-- [x] **Alert System**:
-    - [x] Implement multi-channel notifications (Email, In-App) placeholders in `process_subscriptions`.
+## Phase 47: SaaS Subscription Expiry & Data Lifecycle [COMPLETED]
+- [x] **Subscription Model**: Add `expiry_date`, `subscription_status`, and `grace_period_days`.
+- [x] **Access Guard**: Middleware for Read-only (Expired) and Locked (Suspended) modes.
+- [x] **Data Safety**: Emergency Bulk Export for suspended tenants and cleanup logic.
+- [x] **Alert System**: Bilingual UI banners and locker overlays with system notifications.
 
-## Phase 47: Modular Tiering & Feature Access Control
-- [x] **Tiering Model**: Add `plan_type` (BASIC, PROFESSIONAL, ENTERPRISE) and `enabled_modules` (JSONField) to `Tenant`.
-- [x] **Feature Guards**:
-    - [x] Implement `FeatureRequiredPermission` permission for ViewSets.
-    - [x] **Basic Access**: Restricted to `core` (Employee DB) and `attendance`.
-    - [x] **Professional Access**: Unlocks `payroll` and `reimbursement`.
-    - [x] **Enterprise Access**: Unlocks `audit_trail`, `multi_branch`, and `advanced_analytics`.
-- [x] **Quota Enforcement**:
-    - [x] **Freemium Logic**: Limit `Employee` count for BASIC/FREE plans.
-    - [x] **Add-on Logic**: System to enable specific modules (e.g., BASIC + Payroll) via `enabled_modules`.
-- [x] **Mobile-First Optimization**: Implement `EmployeeLiteSerializer` and `?lite=true` mode for low-end devices.
+## Phase 48: Modular Tiering & Feature Access Control [COMPLETED]
+- [x] **Tiering Model**: Add `plan_type` and `enabled_modules` (JSONField) to `Tenant`.
+- [x] **Feature Guards**: `FeatureRequiredPermission` for selective module access (Core, Payroll, etc).
+- [x] **Quota Enforcement**: Employee count limits for BASIC/FREE plans.
+- [x] **Optimization**: Mobile `?lite=true` mode for low-end device data reduction.

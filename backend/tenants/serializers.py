@@ -8,7 +8,16 @@ class RegistrationRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'status', 'created_at']
 
 class TenantSettingsSerializer(serializers.ModelSerializer):
+    is_grace_period = serializers.BooleanField(read_only=True)
+    is_subscription_active = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = Tenant
-        fields = ['id', 'name', 'schema_name', 'logo', 'address', 'phone', 'overtime_rate', 'payroll_overtime_divisor', 'leave_approval_level', 'overtime_approval_level', 'max_admins']
-        read_only_fields = ['id', 'schema_name']
+        fields = [
+            'id', 'name', 'schema_name', 'logo', 'address', 'phone', 
+            'overtime_rate', 'payroll_overtime_divisor', 'leave_approval_level', 
+            'overtime_approval_level', 'max_admins',
+            'subscription_status', 'expiry_date', 'plan_type', 
+            'is_grace_period', 'is_subscription_active'
+        ]
+        read_only_fields = ['id', 'schema_name', 'subscription_status', 'expiry_date', 'plan_type', 'is_grace_period', 'is_subscription_active']

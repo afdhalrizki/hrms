@@ -29,5 +29,13 @@
     "save": "Simpan Perubahan",
     "loading": "Memuat...",
     "joined_days_ago": "Bergabung {days} hari yang lalu"
+  },
+  "Subscription": {
+    "readOnlyMessage": "Langganan berakhir pada {date}. Sistem sekarang dalam mode Baca-Saja.",
+    "renewNow": "Perbarui Sekarang",
+    "suspendedTitle": "Akses Ditangguhkan",
+    "suspendedMessage": "Akses ke {name} telah diblokir karena langganan berakhir. Silakan perbarui untuk memulihkan akses.",
+    "emergencyExport": "Ekspor Darurat",
+    "logout": "Keluar"
   }
 }

@@ -3,14 +3,18 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { useTenant } from '@/context/TenantContext';
+import { SubscriptionBanner } from './SubscriptionBanner';
+import { SuspendedOverlay } from './SuspendedOverlay';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { tenantName } = useTenant();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SuspendedOverlay />
       <Sidebar />
-      <main className="pl-64 min-h-screen">
+      <main className="pl-64 min-h-screen flex flex-col">
+        <SubscriptionBanner />
         {/* Top Navbar */}
         <header className="h-16 glass-nav flex items-center justify-between px-8 sticky top-0 z-30">
           <div className="flex items-center gap-2">

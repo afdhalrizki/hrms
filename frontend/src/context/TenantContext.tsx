@@ -11,6 +11,10 @@ interface TenantContextType {
   address?: string;
   phone?: string;
   isLoading: boolean;
+  subscriptionStatus?: 'ACTIVE' | 'EXPIRED' | 'SUSPENDED';
+  expiryDate?: string;
+  planType?: string;
+  isSubscriptionActive?: boolean;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -65,6 +69,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 logo: data.logo,
                 address: data.address,
                 phone: data.phone,
+                subscriptionStatus: data.subscription_status,
+                expiryDate: data.expiry_date,
+                planType: data.plan_type,
+                isSubscriptionActive: data.is_subscription_active,
                 isLoading: false,
               }));
             })
