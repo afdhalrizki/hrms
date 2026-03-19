@@ -62,10 +62,11 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Flexibility**: Centralized `TENANT_DOMAIN_SUFFIX` allowing easy switch between `.harikerja.com`, `.stg.hrms.com`, or `.hrms.com`.
 
 ### Testing Status
-- **Backend**: 100% logic coverage for Attendance, Payroll, HR, Config, Tenants, Performance, and Users (**104+ Integration Scenarios**).
+- **Backend**: 100% logic coverage for Attendance, Payroll, HR, Config, Tenants, Performance, and Users (**109+ Integration Scenarios**).
     - **Payroll Verified**: TER 2024 (Categories A, B, C), BPJS Health/Employment caps, automated bulk payslip generation, and PDF generation compliance.
     - **Performance Verified**: KPI strategy tracking, Appraisal lifecycle, and Review visibility with 33 dedicated tests.
     - **Attendance & RBAC Verified**: Geofencing, Flexible Shifts, Leave Conflict Blocking, and restricted employee field modification (Hardened Security).
+    - **Config & Infrastructure Verified**: Subscription lifecycle (Active/Expired/Suspended), CORS regex validation, i18n middleware, and cache connectivity.
     - **Subscription Verified**: Full lifecycle enforcement (Active, Expired, Suspended) with Read-Only and Blocked modes.
     - **Tiering Verified**: Tier-based module access (Basic/Professional/Enterprise) and employee count quotas.
     - **Users Verified**: Custom User Manager (Master), API profile isolation, and TenantAccessMiddleware (unauthorized redirect and global admin bypass).

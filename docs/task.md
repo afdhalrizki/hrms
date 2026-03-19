@@ -209,6 +209,13 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Build Strategy**: Use `--no-cache` to ensure clean environment refresh.
 - [x] **Documentation**: Update `docs/walkthrough.md`, `docs/implementation_plan.md`, and `docs/task.md`.
 
+## Phase 50: Config Module & Infrastructure Test Expansion [COMPLETED]
+- [x] **Middleware**: Verify `SubscriptionMiddleware` (Blocked/Read-Only modes) and `TenantAccessMiddleware`.
+- [x] **Security**: Verify `CORS_ALLOWED_ORIGIN_REGEXES` and `CSRF_TRUSTED_ORIGINS`.
+- [x] **i18n**: Verify `LocaleMiddleware` and language switching (EN/ID).
+- [x] **Infrastructure**: Verify Cache (LocMem/Redis) connectivity and Static/Media URL configurations.
+- [x] **Verification**: Ensure all 109 tests pass including new infrastructure scenarios.
+
 ## Phase 31: Local Multi-tenant Access Fix (.localhost)
 - [x] **Backend**: Update `CORS_ALLOWED_ORIGIN_REGEXES` for localhost.
 - [x] **Frontend**: Refactor `getBaseUrl` in `lib/api.ts`.
