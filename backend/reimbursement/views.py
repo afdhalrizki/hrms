@@ -21,6 +21,7 @@ class ReimbursementViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_reimbursement'
     required_feature = 'reimbursement'
+    allow_self_service = True
 
     def get_queryset(self):
         user = self.request.user
@@ -45,7 +46,7 @@ class ReimbursementViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         employee = Employee.objects.filter(email=self.request.user.email).first()
-        serializer.save(employee=employee, user=self.request.user)
+        serializer.save(employee=employee)
 
     @action(detail=True, methods=['post'])
     def approve_supervisor(self, request, pk=None):

@@ -20,6 +20,7 @@ class BPJSManager:
 
     @staticmethod
     def calculate_employment(wage: Decimal, jkk_rate: Decimal = Decimal('0.0024')) -> Dict[str, Dict[str, Decimal]]:
+        jkk_rate = Decimal(str(jkk_rate))  # Ensure Decimal even if a float is passed
         jp_wage = min(wage, BPJSManager.KETENAGAKERJAAN_JP_MAX_WAGE)
         return {
             'jkk': {'company': (wage * jkk_rate).quantize(Decimal('1')), 'employee': Decimal('0')},
@@ -112,7 +113,7 @@ class PayrollCalculator:
         tenant = connection.tenant
         
         health = BPJSManager.calculate_health(basic)
-        employment = BPJSManager.calculate_employment(basic, jkk_rate=getattr(tenant, 'jkk_rate', Decimal('0.0024')))
+        employment = BPJSManager.calculate_employment(basic, jkk_rate=Decimal(str(getattr(tenant, 'jkk_rate', '0.0024'))))
 
         # Deductions (Employee Portions)
         ee_health = health['employee']
@@ -145,9 +146,9 @@ class PayrollCalculator:
             tenant = connection.tenant
             
             if self.employee.golongan and self.employee.golongan.overtime_rate > 0:
-                hourly_rate = self.employee.golongan.overtime_rate
+                hourly_rate = Decimal(str(self.employee.golongan.overtime_rate))
             elif getattr(tenant, 'overtime_rate', 0) > 0:
-                hourly_rate = tenant.overtime_rate
+                hourly_rate = Decimal(str(tenant.overtime_rate))
             else:
                 divisor = Decimal(str(getattr(tenant, 'payroll_overtime_divisor', 173)))
                 hourly_rate = basic / divisor

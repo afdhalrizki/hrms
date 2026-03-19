@@ -22,15 +22,6 @@ class APIKeyViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_settings'
 
-    def get_queryset(self):
-        # Tenant isolation is handled by connection.tenant, but we filter for safety
-        from django.db import connection
-        return APIKey.objects.filter(tenant=connection.tenant)
-
-    def perform_create(self, serializer):
-        from django.db import connection
-        serializer.save(tenant=connection.tenant)
-
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
@@ -133,10 +124,7 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
         create_user_flag = str(request.data.get('create_user', 'false')).lower() == 'true'
         is_admin_flag = str(request.data.get('is_admin', 'false')).lower() == 'true'
 
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # Quota Enforcement: Check max employees
+        # Quota Enforcement: Check max employees BEFORE validation
         if hasattr(request, 'tenant') and request.tenant:
             current_count = Employee.objects.count()
             if current_count >= request.tenant.max_employees:
@@ -144,6 +132,9 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
                     'error': f'Employee quota exceeded for your {request.tenant.plan_type} plan (Max: {request.tenant.max_employees}).',
                     'code': 'QUOTA_EXCEEDED'
                 }, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         from django.db import transaction
         from users.models import User

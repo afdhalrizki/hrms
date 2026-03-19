@@ -24,6 +24,7 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
+    allow_self_service = True
 
     def get_queryset(self):
         user = self.request.user
@@ -51,9 +52,12 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
         
         if not is_manager and employee:
-            serializer.save(employee=employee)
+            instance = serializer.save(employee=employee, created_by=user, updated_by=user)
         else:
-            serializer.save()
+            instance = serializer.save(created_by=user, updated_by=user)
+            
+        from core.audit import AuditLogger
+        AuditLogger.log_change('CREATE', instance, actor=user)
 
     def create(self, request, *args, **kwargs):
         """Override create to use AttendanceService for geofencing and status."""
@@ -63,9 +67,68 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if not employee:
             return Response({'error': 'No employee profile found for this user.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Allow managers to specify target employee
+        target_employee = employee
+        if request.data.get('employee'):
+            is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+            if is_manager:
+                target_employee_id = request.data.get('employee')
+                if isinstance(target_employee_id, dict):
+                    target_employee_id = target_employee_id.get('id')
+                target_employee = Employee.objects.get(id=target_employee_id)
+
         lat = request.data.get('latitude_in')
         lng = request.data.get('longitude_in')
+        photo = request.data.get('photo_in')
+
+        if lat and lng:
+            check_in_str = request.data.get('check_in')
+            date_str = request.data.get('date')
+            
+            check_in_time = None
+            if check_in_str:
+                 check_in_time = datetime.strptime(check_in_str, '%H:%M:%S').time()
+            
+            check_date = None
+            if date_str:
+                 check_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+            attendance = AttendanceService.process_clock_in(
+                employee=target_employee,
+                latitude=lat,
+                longitude=lng,
+                photo=photo,
+                check_in_time=check_in_time,
+                date=check_date
+            )
+            # Perform manual audit tracing since we bypassed DRF Serializer
+            if attendance.created_by is None:
+                attendance.created_by = user
+            attendance.updated_by = user
+            attendance.save(update_fields=['created_by', 'updated_by'])
+            
+            serializer = self.get_serializer(attendance)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return super().create(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+
+        if not is_manager:
+            # Restricted fields for regular employees
+            restricted_fields = ['status', 'date', 'employee', 'is_out_of_bounds', 'distance_from_branch']
+            for field in restricted_fields:
+                if field in self.request.data:
+                    # Ignore the change or could raise ValidationError. 
+                    # Ignoring is safer for 'partial' updates where the frontend might send the whole object.
+                    serializer.validated_data.pop(field, None)
+
+        instance = serializer.save(updated_by=user)
+        from core.audit import AuditLogger
+        AuditLogger.log_change('UPDATE', instance, actor=user)
 
 
 from core.services import WorkflowService
@@ -76,6 +139,7 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
+    allow_self_service = True
 
     def get_queryset(self):
         user = self.request.user
@@ -153,6 +217,7 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
+    allow_self_service = True
 
     def get_queryset(self):
         user = self.request.user

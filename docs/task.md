@@ -303,3 +303,10 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Feature Guards**: `FeatureRequiredPermission` for selective module access (Core, Payroll, etc).
 - [x] **Quota Enforcement**: Employee count limits for BASIC/FREE plans.
 - [x] **Optimization**: Mobile `?lite=true` mode for low-end device data reduction.
+
+## Phase 49: Backend Test Coverage & RBAC Hardening [COMPLETED]
+- [x] **Performance**: Implement 33 comprehensive unit tests for KPI, Appraisal, and Appraisal Reviews.
+- [x] **Attendance**: Expand 11 scenarios covering flexible shifts, multi-branch geofencing, and leave conflicts.
+- [x] **RBAC**: Harden `HasRBACPermission` and `perform_update` logic to restrict sensitive field modifications.
+- [x] **Security**: Verify `max_admins` enforcement and `create_user` provisioning logic.
+- [x] **Verification**: 100% Success Rate (**104/104 tests passing**).

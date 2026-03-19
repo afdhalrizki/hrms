@@ -24,7 +24,7 @@ class CoreModuleTestCase(TenantTestCase):
             )
             
             # 2. Setup User & Employee
-            self.user = User.objects.create_user(email='admin@company.com', password='password')
+            self.user = User.objects.create_user(email='admin@company.com', password='password', is_staff=True)
             self.user.tenants.add(self.tenant)
             
             self.employee = Employee.objects.create(
@@ -111,6 +111,36 @@ class CoreModuleTestCase(TenantTestCase):
         # Test Duplicate NIK
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_employee_provisioning_user(self):
+        """Test that creating an employee with create_user=True provisions a User account."""
+        self.client.force_login(self.user)
+        url = reverse('employee-list')
+        
+        payload = {
+            'nik': 'EMP003',
+            'fullname': 'Provisioned User',
+            'email': 'provisioned@company.com',
+            'department': self.dept.id,
+            'role': self.role.id,
+            'golongan': self.golongan.id,
+            'join_date': str(date.today()),
+            'ktp_number': '1111111111111111',
+            'ptkp_status': 'K/0',
+            'create_user': True,
+            'is_admin': True
+        }
+        
+        from users.models import User as HRUser
+        self.assertFalse(HRUser.objects.filter(email='provisioned@company.com').exists())
+        
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Verify User created
+        new_user = HRUser.objects.get(email='provisioned@company.com')
+        self.assertTrue(new_user.is_staff)
+        self.assertTrue(new_user.tenants.filter(id=self.tenant.id).exists())
 
     def test_employee_detail_fields(self):
         """Ensure all fields are correctly saved and retrieved."""

@@ -7,8 +7,8 @@ from .models import (
 
 @admin.register(APIKey)
 class APIKeyAdmin(admin.ModelAdmin):
-    list_display = ('label', 'tenant', 'key_prefix', 'is_active', 'expires_at', 'last_used_at')
-    list_filter = ('is_active', 'tenant')
+    list_display = ('label', 'key_prefix', 'is_active', 'expires_at', 'last_used_at')
+    list_filter = ('is_active',)
     readonly_fields = ('key_prefix', 'key_hash', 'last_used_at', 'created_at', 'updated_at')
 
 @admin.register(AuditLog)

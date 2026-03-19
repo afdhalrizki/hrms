@@ -191,3 +191,27 @@ class AdminSafeguardTestCase(TenantTestCase):
         # Verify it actually saved
         self.admin.refresh_from_db()
         self.assertFalse(self.admin.is_staff)
+
+    def test_max_admins_enforcement(self):
+        """Verify that a user cannot be promoted to staff if max_admins is reached."""
+        self.tenant.max_admins = 1
+        self.tenant.save()
+        
+        # self.admin is already staff in self.tenant
+        new_user = User.objects.create_user(email='new_admin@test.com', password='password')
+        new_user.tenants.add(self.tenant)
+        
+        new_user.is_staff = True
+        with self.assertRaisesMessage(ValidationError, "Batas maksimal administrator"):
+            new_user.save()
+
+    def test_max_admins_m2m_enforcement(self):
+        """Verify that an admin user cannot be added to a tenant if max_admins is reached."""
+        self.tenant.max_admins = 1
+        self.tenant.save()
+        
+        # self.admin is already staff in self.tenant
+        other_tenant_admin = User.objects.create_user(email='other_admin@test.com', password='password', is_staff=True)
+        
+        with self.assertRaisesMessage(ValidationError, "Batas maksimal administrator"):
+            other_tenant_admin.tenants.add(self.tenant)

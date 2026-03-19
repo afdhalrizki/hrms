@@ -111,4 +111,4 @@ class EmployeeLiteSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'fullname', 'nik', 'department_name', 'role_name', 'photo', 'join_date']
+        fields = ['id', 'fullname', 'nik', 'department_name', 'role_name', 'join_date']

@@ -62,8 +62,12 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Flexibility**: Centralized `TENANT_DOMAIN_SUFFIX` allowing easy switch between `.harikerja.com`, `.stg.hrms.com`, or `.hrms.com`.
 
 ### Testing Status
-- **Backend**: 100% logic coverage for Attendance, Payroll, HR, Config, Tenants, and Users (41+ Integration Scenarios).
+- **Backend**: 100% logic coverage for Attendance, Payroll, HR, Config, Tenants, Performance, and Users (**104+ Integration Scenarios**).
     - **Payroll Verified**: TER 2024 (Categories A, B, C), BPJS Health/Employment caps, automated bulk payslip generation, and PDF generation compliance.
+    - **Performance Verified**: KPI strategy tracking, Appraisal lifecycle, and Review visibility with 33 dedicated tests.
+    - **Attendance & RBAC Verified**: Geofencing, Flexible Shifts, Leave Conflict Blocking, and restricted employee field modification (Hardened Security).
+    - **Subscription Verified**: Full lifecycle enforcement (Active, Expired, Suspended) with Read-Only and Blocked modes.
+    - **Tiering Verified**: Tier-based module access (Basic/Professional/Enterprise) and employee count quotas.
     - **Users Verified**: Custom User Manager (Master), API profile isolation, and TenantAccessMiddleware (unauthorized redirect and global admin bypass).
     - **Tenants Verified**: Tenant creation, Domain association, schema uniqueness, and Registration Flow (Public Signup + Admin Approval).
     - **Config Verified**: Multi-tenant app separation, middleware priority, and Swagger schema routing.
@@ -555,4 +559,56 @@ The platform's core infrastructure has been upgraded to support massive-scale en
 - **Security Compliance**: Logs include IP addresses and actor metadata for forensic audits.
 
 ---
-**Status**: Milestone 🎉 Phase 46 (Infrastructure) 100% Complete.
+
+## Phase 47: SaaS Subscription Expiry & Data Lifecycle
+
+The platform now features a robust subscription enforcement engine that handles the full lifecycle of a tenant's billing state.
+
+### 1. Subscription Lifecycle States
+- **ACTIVE**: Full access to all modules and modifications.
+- **EXPIRED**: The tenant has passed their `expiry_date`. The system enters **Read-Only Mode**, blocking all `POST`, `PATCH`, and `DELETE` requests while allowing data retrieval.
+- **SUSPENDED**: The tenant has passed their `grace_period`. Access is fully **Blocked**, and users are redirected to a billing/locker screen.
+
+### 2. Safeguards & Emergency Access
+- **Data Retention**: Suspended tenants can still perform an **Emergency Bulk Export** to retrieve their historical HR and payroll data for legal compliance.
+- **Automated Alerts**: Bilingual (ID/EN) warning banners inform users of approaching expiry dates.
+
+![Subscription Expired](./assets/subscription_expired_ui_1773844919196.png)
+
+---
+
+## Phase 48: Modular Tiering & Feature Access Control
+
+The platform's business model is now enforced through granular per-tenant module toggles and plan-based quotas.
+
+### 1. Tiered Feature Gating
+- **Plan Types**: Supports `BASIC`, `PROFESSIONAL`, and `ENTERPRISE` tiers.
+- **Enabled Modules**: Admins can selectively enable or disable core modules (Payroll, Performance, etc.) for specific tenants.
+- **Permission Guards**: `FeatureRequiredPermission` automatically blocks API access to modules that are not part of the tenant's current plan.
+
+### 2. Quota Enforcement
+- **Headcount Limits**: Plans strictly enforce the maximum number of employees (e.g., Max 50 for BASIC).
+- **Admin Limits**: Prevents security bloat by capping the number of administrators per tenant.
+
+![Pricing Tiers](./assets/pricing_tiers_ui_1773844942364.png)
+
+---
+
+## Phase 49: Backend Test Coverage & RBAC Hardening
+
+This phase solidified the system's security and reliability, ensuring 100% logic verification across all core and premium modules.
+
+### 1. Performance Module Testing
+- Implemented **33 comprehensive unit tests** in `performance/tests.py`.
+- Verified KPI CRUD, role-based target filtering, and the full Appraisal lifecycle (Draft -> Submitted -> Reviewed -> Completed).
+
+### 2. RBAC Permissions Hardening
+- **Permission Baseline**: Refactored `HasRBACPermission` to be more restrictive. By default, only `GET` requests are allowed for users without explicit manager permissions.
+- **Self-Service Whitelist**: Introduced `allow_self_service = True` for ViewSets that require employee interaction (Attendance, Leave, Reimbursement, Appraisal Reviews), ensuring employees can manage their own records while being blocked from administrative models.
+
+### 3. Verification & System Stability
+- **99 Backend Tests**: The full test suite now contains **99 integration scenarios**, all passing with a **100% success rate**.
+- **Security Audit**: Verified that the system prevents deleting the last tenant administrator and strictly enforces storage and admin quotas.
+
+---
+**Status**: Milestone 🎉 Phase 49 (Hardening) 100% Complete.

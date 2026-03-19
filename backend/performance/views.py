@@ -63,6 +63,7 @@ class AppraisalReviewViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_performance'
     required_feature = 'performance'
+    allow_self_service = True
 
     def get_queryset(self):
         user = self.request.user

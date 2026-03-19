@@ -1,5 +1,34 @@
 from django.forms.models import model_to_dict
-from .models import AuditLog
+from django.db import models
+from django.conf import settings
+
+class AuditModel(models.Model):
+    """Abstract base model that provides standard audit fields."""
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        null=True, blank=True, 
+        on_delete=models.SET_NULL, 
+        related_name="%(app_label)s_%(class)s_created"
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        null=True, blank=True, 
+        on_delete=models.SET_NULL, 
+        related_name="%(app_label)s_%(class)s_updated"
+    )
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('user', getattr(self, '_audit_user', None))
+        if user is not None and user.is_authenticated:
+            if self.pk is None:
+                self.created_by = user
+            self.updated_by = user
+        super().save(*args, **kwargs)
 
 class AuditLogger:
     @staticmethod
@@ -28,6 +57,7 @@ class AuditLogger:
             changed_fields = {k: str(v) for k, v in changed_fields.items()}
 
         if action_type == 'DELETE' or changed_fields:
+            from .models import AuditLog
             AuditLog.objects.create(
                 action_type=action_type,
                 model_name=model_name,

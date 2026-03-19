@@ -45,10 +45,13 @@ class SubscriptionLogicTestCase(TestCase):
         self.assertFalse(self.tenant.is_subscription_active)
         self.assertFalse(self.tenant.is_grace_period)
 
+from rest_framework.test import APIClient
+
 class SubscriptionMiddlewareTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
-        self.client = Client()
+        self.client = APIClient()
+        self.domain_name = self.tenant.domains.first().domain
         
         # Setup tenant
         self.tenant.name = 'Access Test Corp'
@@ -67,7 +70,7 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         """Active tenant can perform POST requests."""
         with schema_context(self.tenant.schema_name):
             url = '/api/core/departments/' # Assuming this exists
-            response = self.client.post(url, {'name': 'New Dept'})
+            response = self.client.post(url, {'name': 'New Dept'}, format='json', SERVER_NAME=self.domain_name)
             # We don't care about success, just that it's not blocked by subscription
             self.assertNotEqual(response.status_code, 402)
 
@@ -79,12 +82,12 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             url = '/api/core/departments/'
             # POST should be blocked
-            response = self.client.post(url, {'name': 'Blocked Dept'})
+            response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=self.domain_name)
             self.assertEqual(response.status_code, 402)
             self.assertEqual(response.json()['code'], 'SUBSCRIPTION_EXPIRED_READ_ONLY')
             
             # GET should be allowed
-            response = self.client.get(url)
+            response = self.client.get(url, SERVER_NAME=self.domain_name)
             self.assertNotEqual(response.status_code, 402)
 
     def test_suspended_tenant_blocked(self):
@@ -96,9 +99,9 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             url = '/api/core/departments/'
             # Both GET and POST should be blocked
-            response = self.client.get(url)
+            response = self.client.get(url, SERVER_NAME=self.domain_name)
             self.assertEqual(response.status_code, 402)
             self.assertEqual(response.json()['code'], 'SUBSCRIPTION_SUSPENDED')
             
-            response = self.client.post(url, {'name': 'Blocked Dept'})
+            response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=self.domain_name)
             self.assertEqual(response.status_code, 402)

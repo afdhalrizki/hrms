@@ -1,26 +1,36 @@
-from django.test import TestCase
+from django_tenants.test.cases import TenantTestCase
+from django_tenants.utils import schema_context
 from core.models import Branch, WorkflowConfig, WorkflowStage, WorkflowAction, Employee
 from core.services import WorkflowService
 from attendance.models import LeaveRequest
 from datetime import date
 
-class WorkflowIntegrationTest(TestCase):
+class WorkflowIntegrationTest(TenantTestCase):
     def setUp(self):
-        self.branch = Branch.objects.create(
-            name="Test Branch",
-            latitude=0, longitude=0, radius_meters=100
-        )
-        self.emp = Employee.objects.create(
-            fullname="Test Employee",
-            email="test@example.com",
-            branch=self.branch
-        )
-        self.supervisor = Employee.objects.create(
-            fullname="Supervisor",
-            email="sup@example.com"
-        )
-        self.emp.supervisor = self.supervisor
-        self.emp.save()
+        super().setUp()
+        with schema_context(self.tenant.schema_name):
+            self.branch = Branch.objects.create(
+                name="Test Branch",
+                latitude=0, longitude=0, radius_meters=100
+            )
+            self.emp = Employee.objects.create(
+                fullname="Test Employee",
+                email="test@example.com",
+                branch=self.branch,
+                nik="EMP-WF-001",
+                join_date=date(2024, 1, 1),
+                ktp_number="1111111111"
+            )
+            self.supervisor = Employee.objects.create(
+                fullname="Supervisor",
+                email="sup@example.com",
+                nik="SUP-WF-001",
+                join_date=date(2024, 1, 1),
+                ktp_number="2222222222"
+            )
+            self.emp.supervisor = self.supervisor
+            self.emp.save()
+
 
         # Create Workflow: 1. Supervisor -> 2. HR (Auto-approve for test)
         self.config = WorkflowConfig.objects.create(
@@ -41,44 +51,47 @@ class WorkflowIntegrationTest(TestCase):
         )
 
     def test_workflow_lifecycle(self):
-        # 1. Create Leave request
-        leave = LeaveRequest.objects.create(
-            employee=self.emp,
-            leave_type='CUTI',
-            start_date=date(2026, 1, 1),
-            end_date=date(2026, 1, 1),
-            reason="Vacation"
-        )
-        
-        # Initialize
-        WorkflowService.initialize_workflow(leave)
-        self.assertEqual(leave.current_stage, self.s1)
-        self.assertEqual(leave.status, 'PENDING')
+        with schema_context(self.tenant.schema_name):
+            # 1. Create Leave request
+            leave = LeaveRequest.objects.create(
+                employee=self.emp,
+                leave_type='CUTI',
+                start_date=date(2026, 1, 1),
+                end_date=date(2026, 1, 1),
+                reason="Vacation"
+            )
+            
+            # Initialize
+            WorkflowService.initialize_workflow(leave)
+            self.assertEqual(leave.current_stage, self.s1)
+            self.assertEqual(leave.status, 'PENDING')
 
-        # 2. Supervisor approves
-        WorkflowService.process_action(leave, self.supervisor, 'APPROVED', "Looks good")
-        leave.refresh_from_db()
-        self.assertEqual(leave.current_stage, self.s2)
-        self.assertEqual(leave.status, 'PENDING')
+            # 2. Supervisor approves
+            WorkflowService.process_action(leave, self.supervisor, 'APPROVED', "Looks good")
+            leave.refresh_from_db()
+            self.assertEqual(leave.current_stage, self.s2)
+            self.assertEqual(leave.status, 'PENDING')
 
-        # 3. Final approval
-        WorkflowService.process_action(leave, self.supervisor, 'APPROVED', "Final check")
-        leave.refresh_from_db()
-        self.assertEqual(leave.status, 'APPROVED')
-        self.assertIsNone(WorkflowStage.objects.filter(workflow=self.config, sequence__gt=leave.current_stage.sequence).first())
+            # 3. Final approval
+            WorkflowService.process_action(leave, self.supervisor, 'APPROVED', "Final check")
+            leave.refresh_from_db()
+            self.assertEqual(leave.status, 'APPROVED')
+            self.assertIsNone(WorkflowStage.objects.filter(workflow=self.config, sequence__gt=leave.current_stage.sequence).first())
 
     def test_workflow_rejection(self):
-        leave = LeaveRequest.objects.create(
-            employee=self.emp,
-            leave_type='CUTI',
-            start_date=date(2026, 1, 1),
-            end_date=date(2026, 1, 1),
-            reason="Vacation"
-        )
-        WorkflowService.initialize_workflow(leave)
-        
-        # Reject at stage 1
-        WorkflowService.process_action(leave, self.supervisor, 'REJECTED', "No.")
-        leave.refresh_from_db()
-        self.assertEqual(leave.status, 'REJECTED')
-        self.assertEqual(leave.current_stage, self.s1) # Stays at failed stage
+        with schema_context(self.tenant.schema_name):
+            leave = LeaveRequest.objects.create(
+                employee=self.emp,
+                leave_type='CUTI',
+                start_date=date(2026, 1, 1),
+                end_date=date(2026, 1, 1),
+                reason="Vacation"
+            )
+            WorkflowService.initialize_workflow(leave)
+            
+            # Reject at stage 1
+            WorkflowService.process_action(leave, self.supervisor, 'REJECTED', "No.")
+            leave.refresh_from_db()
+            self.assertEqual(leave.status, 'REJECTED')
+            self.assertEqual(leave.current_stage, self.s1) # Stays at failed stage
+

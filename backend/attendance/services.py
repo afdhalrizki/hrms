@@ -40,12 +40,12 @@ class AttendanceService:
         return is_in_bounds, distance
 
     @staticmethod
-    def process_clock_in(employee, latitude, longitude, photo=None):
+    def process_clock_in(employee, latitude, longitude, photo=None, check_in_time=None, date=None):
         """
         Handles the clock-in logic including geofencing and shift mapping.
         """
-        today = timezone.now().date()
-        now_time = timezone.now().time()
+        today = date if date else timezone.now().date()
+        now_time = check_in_time if check_in_time else timezone.now().time()
         
         is_in_bounds, distance = AttendanceService.validate_location(employee, latitude, longitude)
         
@@ -54,7 +54,6 @@ class AttendanceService:
         if not is_in_bounds:
             status = 'OFF_SITE'
             
-        # TODO: Shift/Schedule Check
         # Find schedule for today
         schedule = Schedule.objects.filter(employee=employee, date=today).first()
         if schedule:
@@ -63,19 +62,39 @@ class AttendanceService:
             if not shift.is_flexible:
                 if now_time > shift.start_time:
                     status = 'LATE' if is_in_bounds else 'OFF_SITE'
+        else:
+            from datetime import time
+            default_start = time(8, 0)
+            if now_time > default_start:
+                status = 'LATE' if is_in_bounds else 'OFF_SITE'
 
-        attendance, created = Attendance.objects.update_or_create(
+        if Attendance.objects.filter(employee=employee, date=today).exists():
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': 'Attendance already recorded for this date.'})
+
+        # Check for approved leave conflict
+        from .models import LeaveRequest
+        leave_exists = LeaveRequest.objects.filter(
+            employee=employee, 
+            status='APPROVED',
+            start_date__lte=today,
+            end_date__gte=today
+        ).exists()
+
+        if leave_exists:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': f'Cannot record attendance. Employee is on an APPROVED leave for {today}.'})
+
+        attendance = Attendance.objects.create(
             employee=employee,
             date=today,
-            defaults={
-                'branch': employee.branch,
-                'check_in': now_time,
-                'latitude_in': latitude,
-                'longitude_in': longitude,
-                'photo_in': photo,
-                'status': status,
-                'is_out_of_bounds': not is_in_bounds,
-                'distance_from_branch': distance
-            }
+            branch=employee.branch,
+            check_in=now_time,
+            latitude_in=latitude,
+            longitude_in=longitude,
+            photo_in=photo,
+            status=status,
+            is_out_of_bounds=not is_in_bounds,
+            distance_from_branch=distance
         )
         return attendance

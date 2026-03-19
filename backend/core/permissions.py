@@ -32,9 +32,14 @@ class HasRBACPermission(permissions.BasePermission):
         if employee.access_role and employee.access_role.permissions.get(required_perm, False):
             return True
             
-        # For non-managers, we allow GET (view self) and POST (create self) for these views
-        # We rely on ViewSet.get_queryset and has_object_permission to isolate data.
-        if request.method in ['GET', 'POST']:
+        # For non-managers (no direct permission), we only allow GET by default.
+        # Data isolation for GET should be handled by the view's get_queryset.
+        if request.method == 'GET':
+            return True
+            
+        # For POST, PATCH, PUT, allow only if the view explicitly enables self-service.
+        # This is for things like Attendance, Leave Requests, Reimbursements, etc.
+        if getattr(view, 'allow_self_service', False) and request.method in ['POST', 'PATCH']:
             return True
             
         return False

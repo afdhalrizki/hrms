@@ -249,7 +249,6 @@ class APIKey(AuditModel):
     """
     Stores credentials for third-party API access.
     """
-    tenant = models.ForeignKey('tenants.Tenant', on_delete=models.CASCADE, related_name='api_keys')
     label = models.CharField(_("label"), max_length=100, help_text=_("e.g. Zapier, ERP Sync"))
     key_prefix = models.CharField(max_length=8, unique=True)
     key_hash = models.CharField(max_length=128) # Hashed secret
