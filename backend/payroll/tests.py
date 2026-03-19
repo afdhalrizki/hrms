@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import Employee, Department, Role, Golongan
-from .models import PayrollPeriod, Payslip, SalaryComponent
+from .models import PayrollPeriod, Payslip, SalaryComponent, PayslipDetail
 from .services import PayrollCalculator, BPJSManager, TaxEngine
 
 class PayrollExtendedTestCase(TenantTestCase):
@@ -114,6 +114,111 @@ class PayrollExtendedTestCase(TenantTestCase):
         url = reverse('payslip-download-pdf', kwargs={'pk': payslip.id})
         response = self.client.get(url, SERVER_NAME=self.tenant.domains.first().domain)
         
-        # This will likely fail currently due to bugs in pdf_generator.py (missing fields)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response['Content-Type'], 'application/pdf')
+
+    def test_overtime_precedence_logic(self):
+        """Verify precedence: Golongan Rate > Tenant Rate > Divisor."""
+        from attendance.models import Overtime
+        Overtime.objects.create(
+            employee=self.employee, date="2026-03-05", hours=10, status='APPROVED'
+        )
+        
+        # 1. Fallback to Divisor (15,000,000 / 173 * 10 = 867,052)
+        calc = PayrollCalculator(self.employee, self.period)
+        payslip = calc.run()
+        self.assertEqual(payslip.overtime_pay, Decimal('867052'))
+        payslip.delete()
+        
+        # 2. Tenant Rate (100,000 * 10 = 1,000,000)
+        self.tenant.overtime_rate = Decimal('100000')
+        self.tenant.save()
+        
+        # Explicitly update connection.tenant to ensure Calculator sees it
+        from django.db import connection
+        connection.tenant = self.tenant
+        
+        calc = PayrollCalculator(self.employee, self.period)
+        payslip = calc.run()
+        self.assertEqual(payslip.overtime_pay, Decimal('1000000'))
+        payslip.delete()
+        
+        # 3. Golongan Rate (200,000 * 10 = 2,000,000)
+        self.gol.overtime_rate = 200000
+        self.gol.save()
+        calc = PayrollCalculator(self.employee, self.period)
+        payslip = calc.run()
+        self.assertEqual(payslip.overtime_pay, Decimal('2000000'))
+        
+    def test_reimbursement_integration(self):
+        """Verify approved reimbursements are added to gross pay."""
+        from reimbursement.models import Reimbursement, ReimbursementCategory
+        cat = ReimbursementCategory.objects.create(name="Business Trip")
+        Reimbursement.objects.create(
+            employee=self.employee, category=cat, date="2026-03-10", 
+            amount=500000, approved_amount=450000, status='APPROVED'
+        )
+        
+        calc = PayrollCalculator(self.employee, self.period)
+        payslip = calc.run()
+        
+        # Gross = Basic(15m) + Overtime(0) + Reimbursement(450k) = 15,450,000
+        # Tax engine will use this Gross.
+        # But for net pay, we check if details include reimbursement
+        details = PayslipDetail.objects.filter(payslip=payslip, description__icontains='Reimbursement')
+        self.assertTrue(details.exists())
+        self.assertEqual(details.first().amount, Decimal('450000'))
+
+    def test_bpjs_wage_caps(self):
+        """Verify ceiling for Health (12m) and Employment JP (10.04m)."""
+        # Huge salary to trigger all caps
+        self.gol.base_salary = Decimal('50000000')
+        self.gol.save()
+        
+        calc = PayrollCalculator(self.employee, self.period)
+        payslip = calc.run()
+        
+        # Health 1% of 12m = 120,000
+        # JHT 2% of 50m = 1,000,000 (No cap)
+        # JP 1% of 10.04m = 100,423
+        
+        health_detail = PayslipDetail.objects.get(payslip=payslip, description__icontains='Kesehatan')
+        self.assertEqual(health_detail.amount, Decimal('120000'))
+        
+        jp_detail = PayslipDetail.objects.get(payslip=payslip, description__icontains='BPJS JP')
+        self.assertEqual(jp_detail.amount, Decimal('100423'))
+
+    def test_payslip_self_service_filter(self):
+        """Standard employees should only see their own payslips."""
+        # Create another employee and their payslip
+        emp2 = Employee.objects.create(
+            nik="EMP002", fullname="User Two", email="user2@comp.com",
+            department=self.dept, role=self.role, golongan=self.gol, join_date="2024-01-01"
+        )
+        calc = PayrollCalculator(emp2, self.period)
+        calc.run()
+        
+        calc1 = PayrollCalculator(self.employee, self.period)
+        calc1.run()
+        
+        # Authenticate as emp2 (standard user)
+        from users.models import User
+        user2 = User.objects.create_user(email='user2@comp.com', password='password')
+        self.client.force_authenticate(user=user2)
+        
+        url = reverse('payslip-list')
+        response = self.client.get(url, SERVER_NAME=self.tenant.domains.first().domain)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see 1 payslip (their own)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['employee_name'], "User Two")
+
+    def test_payslip_duplicate_prevention(self):
+        """Unique constraint (employee, period) should prevent duplicates."""
+        calc = PayrollCalculator(self.employee, self.period)
+        calc.run()
+        
+        from django.db import IntegrityError
+        with self.assertRaises(IntegrityError):
+            calc.run()

@@ -227,7 +227,7 @@ class UserAuthenticationTestCase(TenantTestCase):
 
     def test_login_success(self):
         """Verify authenticating via /api/users/login/."""
-        url = reverse('user-login-login')
+        url = reverse('auth-login')
         payload = {'email': self.user.email, 'password': self.user_password}
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -235,7 +235,7 @@ class UserAuthenticationTestCase(TenantTestCase):
 
     def test_login_failure(self):
         """Verify 401 for wrong credentials."""
-        url = reverse('user-login-login')
+        url = reverse('auth-login')
         payload = {'email': self.user.email, 'password': 'wrong_password'}
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

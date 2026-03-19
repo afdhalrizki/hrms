@@ -60,46 +60,63 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Create `Generate Payslip` action in [PayslipViewSet](file:///d:/hr/hrms/backend/payroll/views.py).
 - [x] Implement [PDFGenerator](file:///d:/hr/hrms/backend/payroll/pdf_generator.py) service with ReportLab for Payslip downloads.
 
-## 10. DevOps, QA & Onboarding
-- [x] Create dedicated [environments/](file:///d:/hr/hrms/environments) structure.
-- [x] Define [Manual Testing](file:///d:/hr/hrms/qa/manual/checklist.md) checklists.
-- [x] Implement `RegistrationRequest` flow for Tenant Onboarding.
-- [x] Implement automated E2E tests for core flows (Playwright).
-- [x] **Phase 14**: Document Deployment Strategy (Local, Staging, Prod).
+## 10. DevOps, QA & Onboarding Baseline
+- [x] [Phase 10] Create dedicated [environments/](file:///d:/hr/hrms/environments) structure.
+- [x] [Phase 11] Define [Manual Testing](file:///d:/hr/hrms/qa/manual/checklist.md) checklists.
+- [x] [Phase 12] Implement Registration Flow (Public Signup & Admin Approval).
+- [x] [Phase 13] Implement automated E2E tests for core flows (Playwright).
 
-## Phase 24: Tenant Customization
-- [x] **Backend**: Update `Tenant` model with `logo`, `address`, `phone`.
-- [x] **Frontend**: Create company settings page with logo upload.
+## Phase 14: Deployment Strategy & Documentation
+- [x] Create `deployment/` directory for environment guides.
+- [x] Document Local, Staging (VPS), and Production (K8s) deployment steps.
+
+## Phase 15-23: Onboarding & Identity Integration
+- [x] **Phase 15**: Implement `RegistrationRequest` model.
+- [x] **Phase 16**: Create `PublicSignupViewSet`.
+- [x] **Phase 17**: Implement Internal Admin Approval action.
+- [x] **Phase 18**: Global Domain Suffix (`harikerja.com`) Refactor.
+- [x] **Phase 19**: Frontend Premium Signup Page Implementation.
+- [x] **Phase 20**: Internal Admin Registration Approval UI.
+- [x] **Phase 21**: Auto-provision Default Dept/Role/Admin on approval.
+- [x] **Phase 22**: Unified `/api/users/me/` endpoint for mobile-web sync.
+- [x] **Phase 23**: AuthContext & Frontend Identity Hydration.
+
+## Phase 24: Tenant Customization (Branding)
+- [x] Update `Tenant` model with `logo`, `address`, `phone`.
+- [x] Create company settings page with logo upload form in Next.js.
+- [x] Update Sidebar to dynamically render the uploaded logo.
 
 ## Phase 25: Admin & Employee Provisioning
-- [x] **Backend**: Handle `create_user` and `is_admin` flags in `EmployeeViewSet`.
-- [x] **Frontend**: Build 'Add Employee' modal with provisioning toggles.
+- [x] Update `EmployeeViewSet.create()` to handle `create_user` and `is_admin` flags.
+- [x] Build 'Add Employee' modal with provisioning toggles.
 
 ## Phase 26: Admin Access Safeguard & Protections
-- [x] **Backend**: Prevent last admin deletion/demotion via signals.
+- [x] Prevent demoting `is_staff` or deleting the last admin via Django signals.
 
-## Phase 27: Hybrid RBAC
-- [x] **Backend**: Created `AccessRole` with JSON permissions and `HasRBACPermission` guard.
-- [x] **Frontend**: Roles management UI and role selection in provisioning.
+## Phase 27: Hybrid RBAC Implementation
+- [x] Create `AccessRole` with JSON permissions and `HasRBACPermission` guard.
+- [x] Add roles management UI and role selection in provisioning.
+
+## Phase 28: Platform Access & Dynamic UI
+- [x] Implement dynamic sidebar menu visibility based on user roles.
+
+## Phase 29: Secret Admin Portal
+- [x] Create a hidden login route at `/login/portal-admin` for global admins.
 
 ## Phase 30: Frontend Runtime Infrastructure
-- [x] **Dockerfile**: Update base image to `node:20.18-alpine`.
-- [x] **Build Strategy**: Use `--no-cache` for clean environment refresh.
+- [x] Update Docker image to `node:20.18-alpine` for Node version compliance.
 
 ## Phase 31: Local Multi-tenant Access Fix (.localhost)
-- [x] **Backend**: Update `CORS_ALLOWED_ORIGIN_REGEXES` for localhost.
-- [x] **Frontend**: Refactor `getBaseUrl` for dynamic subdomain discovery.
+- [x] Update `CORS_ALLOWED_ORIGIN_REGEXES` and `getBaseUrl` for local development.
 
 ## Phase 32: Build Resilience & Tailwind 4 Support
-- [x] **Dockerfile**: Switch to `node:22-bookworm-slim` for Debian/glibc compatibility.
+- [x] Switch to `node:22-bookworm-slim` for Debian/glibc compatibility.
 
 ## Phase 33: Production Domain Readiness & System Recovery
-- [x] Configure production domain `harikerja.com` in settings.
-- [x] Implement system recovery and cleanup scripts (`up.ps1`).
+- [x] Configure production domain `harikerja.com` and implement cleanup scripts.
 
 ## Phase 34: Universal Data Ownership & Security
-- [x] Implement ownership-based filtering across all core modules.
-- [x] Restrict Employees to their own records (Self-Service).
+- [x] Implement ownership-based filtering in `get_queryset` (Self-Service).
 
 ## Phase 35: Leave Balance Tracking (Quotas)
 - [x] Add `LeaveBalance` model to track and automate leave deductions.
@@ -108,7 +125,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Integrate approved Hours into `PayrollCalculator` with hierarchical rates.
 
 ## Phase 37: Reporting Hierarchy (Supervisor)
-- [x] Add `supervisor` field to the `Employee` model for organizational tree support.
+- [x] Add self-referential `supervisor` field for organizational tree support.
 
 ## Phase 38: Dynamic & Multi-Stage Approval Workflow
 - [x] Add configurable approval levels (Supervisor, HR, BOTH) to `Tenant`.
@@ -120,7 +137,9 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] Add `max_admins` field (Default: 5) and enforce via signals.
 
 ## Phase 41: Advanced Operational - Reimbursement & Expense Claim
-- [x] Implement Reimbursement models, multi-stage approval, and Payroll integration.
+- [x] **Model**: Create `Reimbursement` and `ReimbursementCategory` models.
+- [x] **Workflow**: Implement multi-stage approval (Supervisor -> Finance/HR).
+- [x] **Reporting**: Export claim summaries and integrated with Payroll engine.
 
 ## Phase 42: Advanced Operational - Internationalization (i18n)
 - [x] Setup Django, Next.js, and Mobile bilingual support (ID/EN).
@@ -143,23 +162,42 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 ## Phase 48: Modular Tiering & Feature Access Control
 - [x] Implement plan-based module gating (BASIC/PRO/ENTERPRISE).
 
-## Phase 49: Backend Test Coverage & RBAC Hardening
-- [x] Implement 33 unit tests for Performance and 11 for Attendance.
-- [x] Verify 100% Success Rate (**104/104 tests passing**).
+## Phase 49: Backend Test Coverage & RBAC Hardening [COMPLETED]
+- [x] **Performance**: Implement 33 comprehensive unit tests for KPI, Appraisal, and Appraisal Reviews.
+- [x] **Attendance**: Expand 11 scenarios covering flexible shifts, multi-branch geofencing, and leave conflicts.
+- [x] **RBAC**: Harden `HasRBACPermission` and `perform_update` logic to restrict sensitive field modifications.
+- [x] **Security**: Verify `max_admins` enforcement and `create_user` provisioning logic.
+- [x] **Verification**: 100% Success Rate (**104/104 tests passing**).
 
-## Phase 50: Config Module & Infrastructure Test Expansion
-- [x] Verify `SubscriptionMiddleware`, `LocaleMiddleware`, and Cache connectivity.
-- [x] Ensure all 109 tests pass including new infrastructure scenarios.
+## Phase 50: Config Module & Infrastructure Test Expansion [COMPLETED]
+- [x] **Middleware**: Verify `SubscriptionMiddleware` (Blocked/Read-Only modes) and `TenantAccessMiddleware`.
+- [x] **Security**: Verify `CORS_ALLOWED_ORIGIN_REGEXES` and `CSRF_TRUSTED_ORIGINS`.
+- [x] **i18n**: Verify `LocaleMiddleware` and language switching (EN/ID).
+- [x] **Infrastructure**: Verify Cache (LocMem/Redis) connectivity and Static/Media URL configurations.
+- [x] **Verification**: Ensure all 109 tests pass including new infrastructure scenarios.
 
-## Phase 51: Core Master Data & Audit Expansion
-- [x] Verify `Branch` CRUD, `AccessRole` protection, and `AuditLog` generation.
-- [x] Ensure all 115 tests pass including new core master data scenarios.
+## Phase 51: Core Master Data & Audit Expansion [COMPLETED]
+- [x] **Master Data**: Verify `Branch` CRUD and geofencing configuration.
+- [x] **RBAC**: Verify `AccessRole` management and protection for default system roles.
+- [x] **Infrastructure**: Verify `SystemNotification` lifecycle and `APIKey` management.
+- [x] **Auditing**: Verify `AuditLog` generation for master data changes via `AuditModelMixin`.
+- [x] **Verification**: Ensure all 115 tests pass including new core master data scenarios.
 
-## Phase 52: Users Module Test Expansion
-- [x] Verify `LoginAPIView`, email normalization, and multi-tenant admin safeguards.
-- [x] Ensure all 121 tests pass including new user scenarios.
+## Phase 52: Users Module Test Expansion [COMPLETED]
+- [x] **Authentication**: Verify `LoginAPIView` success and failure flows (auth-login).
+- [x] **Identity**: Verify CASE-INSENSITIVE `UserManager` email normalization and `is_staff` filtering.
+- [x] **Safeguards**: Verify multi-tenant admin deletion prevention and reverse M2M `max_admins` enforcement.
+- [x] **Verification**: Ensure all 129 tests pass including new user scenarios and fixes.
 
-## Phase 4: Global Enterprise Scale (Roadmap)
-- [ ] **Horizontal App Scaling**: Migrate to Kubernetes (K8s).
-- [ ] **Database Sharding**: Distribute heavy tenants across clusters.
-- [ ] **Background Job Engine**: Integrate Celery + RabbitMQ for bulk operations.
+## Phase 53: Payroll Module Test Expansion [COMPLETED]
+- [x] **Overtime**: Verify precedence logic (Golongan > Tenant > Divisor) and exclusion of non-approved records.
+- [x] **Reimbursement**: Verify addition of approved claims to gross pay.
+- [x] **BPJS**: Explicitly verify wage caps for Health (12m) and JP (10.04m).
+- [x] **RBAC**: Verify self-service filtering for payslips and details (employees only see own).
+- [x] **Uniqueness**: Verify duplicate payslip prevention via (employee, period) constraint.
+- [x] **Verification**: 100% Success Rate (**129/129 tests passing**).
+
+## Future Roadmap
+- [ ] **Phase 54**: Horizontal App Scaling (Kubernetes).
+- [ ] **Phase 55**: Database Sharding for Heavy Tenants.
+- [ ] **Phase 56**: Background Job Engine (Celery/RabbitMQ).
