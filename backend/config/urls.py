@@ -21,7 +21,11 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 # Import ViewSets
 from users.views import UserViewSet, LoginAPIView
-from core.views import DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, AccessRoleViewSet
+from core.views import (
+    DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, 
+    AccessRoleViewSet, BranchViewSet, WorkflowConfigViewSet, 
+    WorkflowStageViewSet, WorkflowActionViewSet
+)
 from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
@@ -46,6 +50,10 @@ router.register(r'payslips', PayslipViewSet)
 router.register(r'payslip-details', PayslipDetailViewSet)
 router.register(r'reimbursement-categories', ReimbursementCategoryViewSet)
 router.register(r'reimbursements', ReimbursementViewSet)
+router.register(r'branches', BranchViewSet)
+router.register(r'workflow-configs', WorkflowConfigViewSet)
+router.register(r'workflow-stages', WorkflowStageViewSet)
+router.register(r'workflow-actions', WorkflowActionViewSet)
 router.register(r'public/signup', PublicSignupViewSet, basename='public-signup')
 router.register(r'internal/registrations', RegistrationApprovalViewSet, basename='internal-registration')
 

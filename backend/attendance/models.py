@@ -9,9 +9,11 @@ class Attendance(AuditModel):
         ('PRESENT', 'Hadir'),
         ('LATE', 'Terlambat'),
         ('ABSENT', 'Alpa'),
+        ('OFF_SITE', 'Luar Lokasi'),
     ]
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
+    branch = models.ForeignKey('core.Branch', on_delete=models.SET_NULL, null=True, blank=True, related_name='attendances')
     date = models.DateField()
     check_in = models.TimeField(blank=True, null=True)
     check_out = models.TimeField(blank=True, null=True)
@@ -20,6 +22,7 @@ class Attendance(AuditModel):
     # GPS & Photo for Mobile Clock-In
     latitude_in = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude_in = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    # ... previous fields ...
     photo_in = models.ImageField(upload_to='attendance_photos/', blank=True, null=True)
     liveness_verified = models.BooleanField(default=False)
     verification_method = models.CharField(max_length=20, default='MANUAL', choices=[
@@ -27,6 +30,9 @@ class Attendance(AuditModel):
         ('FACE', 'Face Match'),
         ('LIVENESS', 'Face + Liveness'),
     ])
+    
+    is_out_of_bounds = models.BooleanField(default=False)
+    distance_from_branch = models.FloatField(null=True, blank=True, help_text="Distance in meters when clock-in")
 
     class Meta:
         unique_together = ('employee', 'date')
@@ -36,6 +42,7 @@ class Attendance(AuditModel):
 
 
 class LeaveRequest(AuditModel):
+    # ... existing LeaveRequest code ...
     TYPE_CHOICES = [
         ('CUTI', 'Cuti'),
         ('IZIN', 'Izin'),
@@ -54,7 +61,10 @@ class LeaveRequest(AuditModel):
     reason = models.TextField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     
-    # Multi-stage approval
+    # Workflow Integration
+    current_stage = models.ForeignKey('core.WorkflowStage', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="current stage")
+    
+    # Backward compatibility / simple flow
     supervisor_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     hr_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
@@ -78,7 +88,10 @@ class Overtime(AuditModel):
     reason = models.TextField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     
-    # Multi-stage approval
+    # Workflow Integration
+    current_stage = models.ForeignKey('core.WorkflowStage', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="current stage")
+    
+    # Backward compatibility / simple flow
     supervisor_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     hr_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
@@ -91,6 +104,9 @@ class Shift(AuditModel):
     start_time = models.TimeField()
     end_time = models.TimeField()
     break_duration_mins = models.IntegerField(default=60)
+    
+    is_flexible = models.BooleanField(default=False, help_text="If true, start/end times are used for duration calculation only, not late checks.")
+    work_days = models.JSONField(default=list, help_text="List of days (0=Mon, 6=Sun) this shift applies to. e.g. [0,1,2,3,4]")
 
     def __str__(self):
         return f"{self.name} ({self.start_time} - {self.end_time})"

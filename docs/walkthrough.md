@@ -496,4 +496,24 @@ Supported by a granular feature-toggling system, the platform now enforces prici
 - **Logic Integrity**: All 45+ integration scenarios remain passing (OK).
 
 ---
-**Status**: Milestone 🎉 Phase 47 (Tiering & Access Control), Phase 46 (Subscription Lifecycle), and Phase 42 (i18n) 100% Complete.
+
+## Phase 44: Organizational Complexity - Multi-Branch & Flexible Routing
+
+The platform now supports large-scale organizational structures with physical location enforcement and dynamic workflow orchestration.
+
+### 1. Multi-Branch & GPS Geofencing
+- **Branch Model**: Admins can define physical locations with specific GPS coordinates and a valid radius (e.g., 100m).
+- **Real-time Validation**: The `AttendanceService` calculates Haversine distances for every mobile clock-in. 
+- **Off-site Tracking**: Clock-ins outside the assigned branch are flagged as `OFF_SITE` with precise distance-from-branch metadata.
+
+### 2. Flexible Shifts & 24/7 Operations
+- **Shift Rotation**: Added support for flexible shifts where late/early checks are bypassed, ideal for creative or security roles.
+- **Work Days**: JSON-based work day configuration allows for complex weekly rotations (e.g., 4-on/2-off patterns).
+
+### 3. Dynamic N-Level Approval Builder
+- **WorkflowConfig**: Replaced hardcoded approval chains with a modular "Builder" system.
+- **Unlimited Stages**: Tenants can define nested approval steps (e.g., Supervisor -> Dept Head -> Finance -> HR).
+- **Role-Based Routing**: Approvals can be routed to specific roles (e.g., "Any Finance Manager") or specific individuals.
+
+---
+**Status**: Milestone 🎉 Phase 43 (Advanced Compliance), Phase 44 (Org Complexity), Phase 47 (Subscription), and Phase 42 (i18n) 100% Complete.

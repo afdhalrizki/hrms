@@ -3,11 +3,44 @@ from rest_framework.response import Response
 from django.db import transaction
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission
-from .models import Department, Role, Golongan, Employee, AccessRole
+from .models import (
+    Department, Role, Golongan, Employee, AccessRole,
+    Branch, WorkflowConfig, WorkflowStage, WorkflowAction
+)
 from .serializers import (
     DepartmentSerializer, RoleSerializer, GolonganSerializer, 
-    EmployeeSerializer, AccessRoleSerializer
+    EmployeeSerializer, AccessRoleSerializer,
+    BranchSerializer, WorkflowConfigSerializer, 
+    WorkflowStageSerializer, WorkflowActionSerializer
 )
+
+
+class BranchViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = Branch.objects.all()
+    serializer_class = BranchSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_hr'
+
+
+class WorkflowConfigViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = WorkflowConfig.objects.all()
+    serializer_class = WorkflowConfigSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_settings'
+
+
+class WorkflowStageViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = WorkflowStage.objects.all()
+    serializer_class = WorkflowStageSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_settings'
+
+
+class WorkflowActionViewSet(AuditModelMixin, viewsets.ReadOnlyModelViewSet):
+    queryset = WorkflowAction.objects.all()
+    serializer_class = WorkflowActionSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_attendance' # Actors need this to see history
 
 
 class DepartmentViewSet(AuditModelMixin, viewsets.ModelViewSet):

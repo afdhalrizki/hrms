@@ -4,8 +4,9 @@ from django_tenants.test.cases import TenantTestCase
 from django_tenants.utils import schema_context
 from rest_framework import status
 from rest_framework.test import APIClient
-from core.models import Employee, Department
+from core.models import Employee, Department, Branch
 from attendance.models import Attendance, Shift, Schedule, LeaveRequest, Overtime
+from attendance.services import AttendanceService
 from users.models import User
 
 class AttendanceIntegrationTestCase(TenantTestCase):
@@ -15,6 +16,14 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         
         # Consistent data setup within tenant context
         with schema_context(self.tenant.schema_name):
+            # 0. Setup Branch
+            self.branch_jakarta = Branch.objects.create(
+                name='Jakarta Office',
+                latitude=Decimal('-6.2088'),
+                longitude=Decimal('106.8456'),
+                radius_meters=100
+            )
+
             # 1. Setup Master Data
             self.dept = Department.objects.create(name='IT')
             
@@ -33,6 +42,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
                 fullname='Test User',
                 email='test@example.com',
                 department=self.dept,
+                branch=self.branch_jakarta,
                 phone='12345',
                 nik='K001',
                 join_date=date.today(),
@@ -52,25 +62,23 @@ class AttendanceIntegrationTestCase(TenantTestCase):
 
     def test_haversine_distance_math(self):
         """Verify the distance calculation helper."""
-        from attendance.views import haversine_distance
-        dist = haversine_distance(-6.2088, 106.8456, -6.2444, 106.8000)
+        dist = AttendanceService.calculate_distance(-6.2088, 106.8456, -6.2444, 106.8000)
         assert 6000 < dist < 7000
 
     def test_geofence_violation(self):
-        """Attempting to clock in from a far location should fail."""
+        """Attempting to clock in from a far location (Bandung) should result in OFF_SITE status."""
         self.client.force_login(self.user)
         
         url = reverse('attendance-list')
         payload = {
-            'employee': self.employee.id,
-            'date': str(self.today),
             'check_in': '08:00:00',
             'latitude_in': -6.9147,  # Bandung
             'longitude_in': 107.6098,
         }
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('Geofencing violation', response.data['error'])
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['status'], 'OFF_SITE')
+        self.assertTrue(response.data['is_out_of_bounds'])
 
     def test_successful_check_in_and_check_out(self):
         """Standard flow: Check-in (PRESENT) then Check-out."""

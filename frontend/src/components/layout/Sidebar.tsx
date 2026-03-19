@@ -14,7 +14,9 @@ import {
   ChevronRight,
   Briefcase,
   BarChart2,
-  Receipt
+  Receipt,
+  MapPin,
+  GitMerge
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -25,9 +27,11 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
   { nameKey: 'employees', icon: Users,            href: '/employees', isAdminOnly: true },
+  { nameKey: 'branches',  icon: MapPin,           href: '/branches',  isAdminOnly: true },
   { nameKey: 'attendance',icon: Calendar,         href: '/attendance' },
   { nameKey: 'reimbursement', icon: Receipt,       href: '/reimbursement' },
   { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   isAdminOnly: true },
+  { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', isAdminOnly: true },
   { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', isAdminOnly: true },
   { nameKey: 'settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
 ];

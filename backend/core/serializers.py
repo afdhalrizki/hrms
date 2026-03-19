@@ -1,5 +1,36 @@
 from rest_framework import serializers
-from .models import Department, Role, Golongan, Employee, AccessRole
+from .models import (
+    Department, Role, Golongan, Employee, AccessRole, 
+    Branch, WorkflowConfig, WorkflowStage, WorkflowAction
+)
+
+class BranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = '__all__'
+
+class WorkflowStageSerializer(serializers.ModelSerializer):
+    approver_role_name = serializers.ReadOnlyField(source='approver_role.name')
+    approver_employee_name = serializers.ReadOnlyField(source='approver_employee.fullname')
+
+    class Meta:
+        model = WorkflowStage
+        fields = '__all__'
+
+class WorkflowConfigSerializer(serializers.ModelSerializer):
+    stages = WorkflowStageSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = WorkflowConfig
+        fields = '__all__'
+
+class WorkflowActionSerializer(serializers.ModelSerializer):
+    actor_name = serializers.ReadOnlyField(source='actor.fullname')
+    stage_name = serializers.ReadOnlyField(source='stage.name')
+
+    class Meta:
+        model = WorkflowAction
+        fields = '__all__'
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:

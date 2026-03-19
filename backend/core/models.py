@@ -65,6 +65,28 @@ class Golongan(AuditModel):
         return self.name
 
 
+class Branch(AuditModel):
+    """
+    Physical office or outlet location with geofencing support.
+    """
+    name = models.CharField(_("name"), max_length=255)
+    address = models.TextField(_("address"), blank=True, null=True)
+    
+    # Geofencing
+    latitude = models.DecimalField(_("latitude"), max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(_("longitude"), max_digits=9, decimal_places=6)
+    radius_meters = models.IntegerField(_("radius in meters"), default=100, help_text=_("Allow clock-in within this radius"))
+    
+    timezone = models.CharField(_("timezone"), max_length=100, default='Asia/Jakarta')
+
+    class Meta:
+        verbose_name = _("branch")
+        verbose_name_plural = _("branches")
+
+    def __str__(self):
+        return self.name
+
+
 class Employee(AuditModel):
     MARITAL_STATUS_CHOICES = [
         ('TK/0', _('TK/0: Single, No dependents')),
@@ -94,6 +116,7 @@ class Employee(AuditModel):
     
     # RBAC mapping
     access_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees', verbose_name=_("access role"))
+    branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees', verbose_name=_("branch"))
 
     # Hierarchy
     supervisor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates', verbose_name=_("supervisor"))
@@ -145,3 +168,78 @@ class SystemNotification(AuditModel):
 
     def __str__(self):
         return f"[{self.level}] {self.title}"
+class WorkflowConfig(AuditModel):
+    """
+    Defines which model (e.g. LeaveRequest) uses which approval workflow.
+    """
+    MODEL_TYPE_CHOICES = [
+        ('LEAVE', _('Leave Request')),
+        ('OVERTIME', _('Overtime Request')),
+        ('REIMBURSEMENT', _('Reimbursement')),
+        ('TRANSFER', _('Employee Transfer')),
+    ]
+    
+    name = models.CharField(_("workflow name"), max_length=255)
+    model_type = models.CharField(_("model type"), max_length=50, choices=MODEL_TYPE_CHOICES)
+    is_active = models.BooleanField(_("is active"), default=True)
+
+    class Meta:
+        verbose_name = _("workflow config")
+        verbose_name_plural = _("workflow configs")
+        unique_together = ('model_type',)
+
+    def __str__(self):
+        return f"{self.name} ({self.model_type})"
+
+
+class WorkflowStage(AuditModel):
+    """
+    A single step in an N-level approval workflow.
+    """
+    APPROVER_TYPE_CHOICES = [
+        ('SUPERVISOR', _('Direct Supervisor')),
+        ('ROLE', _('Specific Access Role')),
+        ('EMPLOYEE', _('Specific Employee')),
+    ]
+
+    workflow = models.ForeignKey(WorkflowConfig, on_delete=models.CASCADE, related_name='stages', verbose_name=_("workflow"))
+    name = models.CharField(_("stage name"), max_length=255)
+    sequence = models.PositiveIntegerField(_("sequence"), default=1, help_text=_("Order of approval (1, 2, 3...)"))
+    
+    approver_type = models.CharField(_("approver type"), max_length=20, choices=APPROVER_TYPE_CHOICES, default='SUPERVISOR')
+    approver_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("approver role"))
+    approver_employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("approver employee"))
+
+    class Meta:
+        verbose_name = _("workflow stage")
+        verbose_name_plural = _("workflow stages")
+        ordering = ['sequence']
+
+    def __str__(self):
+        return f"{self.workflow.name} - Stage {self.sequence}: {self.name}"
+
+
+class WorkflowAction(AuditModel):
+    """
+    History of approvals/rejections for a specific object instance.
+    """
+    ACTION_CHOICES = [
+        ('APPROVED', _('Approved')),
+        ('REJECTED', _('Rejected')),
+        ('RETURNED', _('Returned/Revised')),
+    ]
+
+    # Generic Foreign Key would be better, but for now we link to specific models
+    # or use a generic field if possible. 
+    # To keep it simple, we'll use a JSON field or just track string IDs.
+    target_model = models.CharField(max_length=100)
+    target_id = models.PositiveIntegerField()
+    
+    stage = models.ForeignKey(WorkflowStage, on_delete=models.CASCADE, verbose_name=_("stage"))
+    actor = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_("actor"))
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    comment = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = _("workflow action")
+        verbose_name_plural = _("workflow actions")

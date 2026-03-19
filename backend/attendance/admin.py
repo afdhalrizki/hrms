@@ -20,7 +20,7 @@ class OvertimeAdmin(admin.ModelAdmin):
     list_filter = ('status',)
 @admin.register(Shift)
 class ShiftAdmin(admin.ModelAdmin):
-    list_display = ('name', 'start_time', 'end_time', 'break_duration_mins')
+    list_display = ('name', 'start_time', 'end_time', 'break_duration_mins', 'is_flexible')
     search_fields = ('name',)
 
 @admin.register(Schedule)

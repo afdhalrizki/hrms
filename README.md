@@ -92,4 +92,4 @@ The platform is architected for seamless transition from dev to enterprise scale
 - **Infrastructure**: PostgreSQL 15, Redis 7 (Caching & Async), PgBouncer (Connection Pooling), Docker Compose (Local & Staging), AWS (Production).
 
 ---
-**Status**: Milestone 🎉 Phase 41 (Reimbursement & Expense Claim) 100% Complete. Integrated with **TER 2024 Payroll Engine** and **SaaS Tiering Logic**. Rebranded to **harikerja** on March 19, 2026.
+**Status**: Milestone 🎉 Phase 43 (Advanced Compliance - PPh 21 TER 2024), Phase 47 (Subscription Lifecycle), and Phase 42 (i18n) 100% Complete. Rebranded to **harikerja** on March 19, 2026.

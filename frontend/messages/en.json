@@ -17,9 +17,11 @@
   "Navigation": {
     "overview": "Overview",
     "employees": "Employees",
+    "branches": "Branches",
     "attendance": "Attendance",
     "reimbursement": "Reimbursement",
     "payroll": "Payroll",
+    "workflows": "Workflows",
     "analytics": "Analytics",
     "settings": "Settings"
   },

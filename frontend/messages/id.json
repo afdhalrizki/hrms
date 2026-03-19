@@ -17,9 +17,11 @@
   "Navigation": {
     "overview": "Ikhtisar",
     "employees": "Karyawan",
+    "branches": "Cabang",
     "attendance": "Kehadiran",
     "reimbursement": "Reimbursement",
     "payroll": "Payroll",
+    "workflows": "Alur Kerja",
     "analytics": "Analitik",
     "settings": "Pengaturan"
   },
