@@ -215,6 +215,12 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Performance**: Verify appraisal reviewer permissions and KPI target uniqueness.
 - [x] **Core**: Verify employee lifecycle (termination) and AccessRole schema.
 - [x] **Verification**: 100% Success Rate (**144/144 tests passing**).
+## Phase 57: Pytest Migration & Test Modernization
+- [x] Add `pytest` and `pytest-django` to `requirements.txt`
+- [x] Migrate all monolithic verification scripts to granular Pytest tests
+- [x] Implement modern functional test using `tenant_client` in `users/tests.py`
+- [/] Verify 100% pass rate for the full Pytest suite (149 tests)
+- [x] Update documentation (`docs/walkthrough.md`) with Pytest instructions
 
 ## Future Roadmap
 - [ ] **Phase 57**: Horizontal App Scaling (Kubernetes).

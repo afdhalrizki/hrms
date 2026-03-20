@@ -122,4 +122,11 @@ Implemented the unified capability for Tenant Administrators to provision new em
 - **Phase 55**: Reimbursement Module Test Expansion (Validation/RBAC/Workflow - 141 cases).
 - **Phase 56**: Comprehensive Backend Test Hardening (Final Phase - 144 cases).
 
+### Phase 57: Pytest Migration & Test Modernization (Complete)
+The testing infrastructure has been modernized to use `pytest`, providing a much better developer experience and more granular reporting.
+- **Modern Suite**: Transitioned from standard Django `TestCase` to `pytest` for faster execution and advanced features like fixtures and parametrization.
+- **Granular Verification (149+ Scenarios)**: Broken down large compliance scripts into 149+ modular tests to ensure precise verification of Indonesian tax and BPJS logic.
+- **Improved DX**: Added `pytest.ini` and `conftest.py` with session-scoped multi-tenant schema bootstrap support.
+- **Test Instructions**: Tests are now executed simply by running `pytest` in the `backend/` directory.
+
 **Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 20, 2026)**

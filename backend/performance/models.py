@@ -14,6 +14,11 @@ class KPI(AuditModel):
     category = models.CharField(_('Category'), max_length=50, blank=True)
     unit = models.CharField(_('Unit'), max_length=20, choices=Unit.choices, default=Unit.PERCENTAGE)
 
+    class Meta:
+        db_table = 'perf_kpi'
+        verbose_name = _('KPI')
+        verbose_name_plural = _('KPIs')
+
     def __str__(self):
         return self.name
 
@@ -25,6 +30,7 @@ class KPITarget(AuditModel):
     period = models.DateField(_('Target Period (First day of month)'))
     
     class Meta:
+        db_table = 'perf_kpi_target'
         unique_together = ('employee', 'kpi', 'period')
         verbose_name = _('KPI target')
         verbose_name_plural = _('KPI targets')
@@ -44,7 +50,11 @@ class Appraisal(AuditModel):
     status = models.CharField(_('Status'), max_length=20, choices=Status.choices, default=Status.DRAFT)
     start_date = models.DateField()
     end_date = models.DateField()
-    
+    class Meta:
+        db_table = 'perf_appraisal'
+        verbose_name = _('Appraisal')
+        verbose_name_plural = _('Appraisals')
+
     def __str__(self):
         return f"Appraisal: {self.employee.fullname} - {self.period_name}"
 
@@ -59,6 +69,10 @@ class AppraisalReview(AuditModel):
     reviewer_type = models.CharField(_('Reviewer Type'), max_length=20, choices=ReviewerType.choices)
     ratings = models.JSONField(_('Ratings Data'), default=dict)
     comments = models.TextField(_('Comments'), blank=True)
-    
+    class Meta:
+        db_table = 'perf_appraisal_review'
+        verbose_name = _('Appraisal Review')
+        verbose_name_plural = _('Appraisal Reviews')
+
     def __str__(self):
         return f"{self.reviewer_type} by {self.reviewer.fullname} for {self.appraisal.employee.fullname}"

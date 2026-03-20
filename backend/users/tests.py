@@ -71,6 +71,13 @@ class UserModuleTestCase(TenantTestCase):
         self.assertEqual(response.data['role_name'], "Developer")
         self.assertEqual(response.data['department_name'], "Engineering")
 
+    def test_user_me_unauthenticated(self):
+        """Verify that /api/users/me/ returns 401/403 for unauthenticated users."""
+        self.client.logout()
+        url = reverse('user-me')
+        response = self.client.get(url, SERVER_NAME=self.domain)
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
     def test_user_me_isolation(self):
         """Verify that the me endpoint doesn't return employee data from other tenants."""
         # This user belongs to self.tenant but NOT other_tenant
@@ -159,25 +166,29 @@ class AdminSafeguardTestCase(TenantTestCase):
         
     def test_prevent_last_admin_demotion(self):
         """Verify the last admin cannot have is_staff set to False."""
-        self.admin.is_staff = False
-        with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
-            self.admin.save()
+        with schema_context(self.tenant.schema_name):
+            self.admin.is_staff = False
+            with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
+                self.admin.save()
             
     def test_prevent_last_admin_deactivation(self):
         """Verify the last admin cannot be deactivated."""
-        self.admin.is_active = False
-        with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
-            self.admin.save()
+        with schema_context(self.tenant.schema_name):
+            self.admin.is_active = False
+            with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
+                self.admin.save()
             
     def test_prevent_last_admin_deletion(self):
         """Verify the last admin cannot be deleted."""
-        with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
-            self.admin.delete()
+        with schema_context(self.tenant.schema_name):
+            with self.assertRaisesMessage(ValidationError, "must have at least one active administrator"):
+                self.admin.delete()
             
     def test_prevent_last_admin_m2m_removal(self):
         """Verify the last admin cannot be removed from their tenant mapping."""
-        with self.assertRaisesMessage(ValidationError, "They are the last active administrator"):
-            self.admin.tenants.remove(self.tenant)
+        with schema_context(self.tenant.schema_name):
+            with self.assertRaisesMessage(ValidationError, "They are the last active administrator"):
+                self.admin.tenants.remove(self.tenant)
             
     def test_allow_demotion_if_other_admin_exists(self):
         """Verify an admin can be demoted if there is another active admin in the tenant."""
@@ -284,8 +295,9 @@ class AdminSafeguardExpansionTestCase(TenantTestCase):
         """Verify a user who is the last admin in one tenant cannot be deleted."""
         # They are the last admin of self.tenant, but maybe not other_tenant
         # Deletion should still be blocked
-        with self.assertRaisesMessage(ValidationError, "The tenant"):
-            self.multi_admin.delete()
+        with schema_context(self.tenant.schema_name):
+             with self.assertRaisesMessage(ValidationError, "The tenant"):
+                self.multi_admin.delete()
 
     def test_max_admins_reverse_m2m(self):
         """Verify tenant.users.add() enforces max_admins limit."""

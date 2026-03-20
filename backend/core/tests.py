@@ -154,10 +154,14 @@ class CoreModuleTestCase(TenantTestCase):
 
     def test_employee_termination_system_access(self):
         """Verify that terminatng an employee (or setting to a restricted status) blocks API access."""
-        # Assuming we have a check in Middleware or User model.
-        # Let's verify if deactivating the related User works.
-        self.user.is_active = False
-        self.user.save()
+        # Add a second admin to allow deactivating self.user without triggering Admin Safeguard
+        with schema_context(self.tenant.schema_name):
+            User.objects.create_user(email='dummy_admin@company.com', password='password', is_staff=True).tenants.add(self.tenant)
+
+        # Auth should fail for inactive users
+        with schema_context(self.tenant.schema_name):
+            self.user.is_active = False
+            self.user.save()
         
         self.client.force_login(self.user)
         response = self.client.get(reverse('employee-list'), SERVER_NAME=self.domain_name)

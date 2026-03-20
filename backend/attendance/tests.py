@@ -367,13 +367,14 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             # Set balance to 2 days
             balance, _ = LeaveBalance.objects.get_or_create(employee=self.employee, year=self.today.year)
-            balance.entitlement_days = 2
+            balance.total_days = 2
             balance.used_days = 0
             balance.save()
             
         url = reverse('leaverequest-list')
         # Try to request 3 days
         payload = {
+            'employee': self.employee.id,
             'start_date': str(self.today + timedelta(days=30)),
             'end_date': str(self.today + timedelta(days=32)),
             'leave_type': 'CUTI',

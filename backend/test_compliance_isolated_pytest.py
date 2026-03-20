@@ -1,4 +1,5 @@
 from decimal import Decimal
+import pytest
 
 # Isolated copy of the classes for direct math auditing
 class BPJSManager:
@@ -64,36 +65,28 @@ class TaxEngine:
             return Decimal('0.08')
         return Decimal('0')
 
-def run_isolated_checks():
-    print("--- [ISOLATED] COMPLIANCE MATH AUDIT ---")
-    
+def test_isolated_health_ee_cap():
     salary_15m = Decimal('15000000')
     health = BPJSManager.calculate_health(salary_15m)
-    print(f"Health EE (15m): {health['employee']} [Capped at 12m] | Expected: 120000")
     assert health['employee'] == Decimal('120000')
 
+def test_isolated_jkk_company():
+    salary_15m = Decimal('15000000')
     emp_high = BPJSManager.calculate_employment(salary_15m, jkk_rate=Decimal('0.0174'))
-    print(f"JKK Comp (15m, 1.74%): {emp_high['jkk']['company']} | Expected: 261000")
-    print(f"JP EE (15m): {emp_high['jp']['employee']} [Capped at 10.04m] | Expected: 100423")
     assert emp_high['jkk']['company'] == Decimal('261000')
+
+def test_isolated_jp_ee_cap():
+    salary_15m = Decimal('15000000')
+    emp_high = BPJSManager.calculate_employment(salary_15m, jkk_rate=Decimal('0.0174'))
     assert emp_high['jp']['employee'] == Decimal('100423')
 
-    # TER Kategori A @ 6m -> 0.75%
-    rate_a = TaxEngine.get_ter_rate('A', Decimal('6000000'))
-    print(f"Tax A (6m): {6000000 * rate_a} (Rate: {rate_a}) | Expected: 45000.00")
-    assert (6000000 * rate_a) == Decimal('45000')
+@pytest.mark.parametrize("category, gross, expected_tax", [
+    ('A', Decimal('6000000'), Decimal('45000')),
+    ('B', Decimal('10000000'), Decimal('175000')),
+    ('C', Decimal('10000000'), Decimal('150000')),
+])
+def test_isolated_ter_rates(category, gross, expected_tax):
+    rate = TaxEngine.get_ter_rate(category, gross)
+    assert (gross * rate) == expected_tax
 
-    # TER Kategori B @ 10m -> 1.75%
-    rate_b = TaxEngine.get_ter_rate('B', Decimal('10000000'))
-    print(f"Tax B (10m): {10000000 * rate_b} (Rate: {rate_b}) | Expected: 175000.00")
-    assert (10000000 * rate_b) == Decimal('175000')
-
-    # TER Kategori C @ 10m -> 1.5%
-    rate_c = TaxEngine.get_ter_rate('C', Decimal('10000000'))
-    print(f"Tax C (10m): {10000000 * rate_c} (Rate: {rate_c}) | Expected: 150000.00")
-    assert (10000000 * rate_c) == Decimal('150000')
-
-    print("\n--- ALL ISOLATED MATH CHECKS PASSED ---")
-
-if __name__ == "__main__":
-    run_isolated_checks()
+# Removed main entry point for pytest compatibility
