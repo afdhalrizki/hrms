@@ -199,3 +199,114 @@ class RegistrationFlowTestCase(TenantTestCase):
         approve_url = reverse('internal-registration-approve', args=[registration.id])
         response = self.client.post(approve_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_registration_prefix_collision(self):
+        """Verify that duplicate subdomain prefixes are rejected."""
+        # 1. Prefix already exists in Tenant
+        Tenant.objects.create(schema_name='collision', name='Existing Tenant')
+        
+        data = {
+            'company_name': 'New Startup',
+            'subdomain_prefix': 'collision',
+            'admin_email': 'founder@startup.com'
+        }
+        response = self.client.post(self.signup_url, data)
+        # Should be blocked either by serializer validation or DB integrity handled by view
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_registration_duplicate_action_prevention(self):
+        """Verify that already approved requests cannot be approved again."""
+        registration = RegistrationRequest.objects.create(
+            company_name='Double Approval',
+            subdomain_prefix='double',
+            admin_email='admin@double.com',
+            status='APPROVED'
+        )
+        approve_url = reverse('internal-registration-approve', args=[registration.id])
+        response = self.client.post(approve_url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Only pending requests', response.data['error'])
+
+class TenantSettingsTestCase(TenantTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.domain_name = self.tenant.domains.first().domain
+        self.settings_url = reverse('tenant-settings')
+        
+        # Admin User
+        self.admin = User.objects.create_user(email='admin@settings.com', password='password', is_staff=True)
+        self.admin.tenants.add(self.tenant)
+        
+        # Regular User
+        self.regular = User.objects.create_user(email='user@settings.com', password='password')
+        self.regular.tenants.add(self.tenant)
+
+    def test_settings_retrieve_public(self):
+        """Verify that settings can be retrieved without authentication (for logo/branding)."""
+        # Ensure domain matches what middleware expects
+        response = self.client.get(self.settings_url, HTTP_HOST=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], self.tenant.name)
+
+    def test_settings_update_authorized(self):
+        """Verify that a tenant admin can update settings."""
+        self.client.force_login(self.admin)
+        payload = {
+            'address': 'New Headquarters, Tech Park',
+            'phone': '08123456789',
+            'overtime_rate': '150000.00'
+        }
+        response = self.client.patch(self.settings_url, payload, format='json', HTTP_HOST=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        self.tenant.refresh_from_db()
+        self.assertEqual(self.tenant.address, 'New Headquarters, Tech Park')
+        self.assertEqual(self.tenant.overtime_rate, 150000)
+
+    def test_settings_update_unauthorized(self):
+        """Verify that regular employees are blocked from updating settings."""
+        self.client.force_login(self.regular)
+        payload = {'name': 'Hacker Corp'}
+        response = self.client.patch(self.settings_url, payload, format='json', HTTP_HOST=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+class ProvisioningDepthTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='Public')
+        Domain.objects.get_or_create(domain='localhost', tenant=self.public_tenant, is_primary=True)
+        Domain.objects.get_or_create(domain='testserver', tenant=self.public_tenant, is_primary=False)
+        
+        self.admin = User.objects.create_superuser(email='master@platform.com', password='password123')
+        self.client.force_authenticate(user=self.admin)
+
+    def test_provisioning_accuracy(self):
+        """Verify the deep provisioned state after registration approval via API."""
+        registration = RegistrationRequest.objects.create(
+            company_name='Depth Test',
+            subdomain_prefix='depth',
+            admin_email='depth@test.com'
+        )
+        
+        url = reverse('internal-registration-approve', args=[registration.id])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        
+        # 2. Verify Schema State
+        tenant = Tenant.objects.get(schema_name='depth')
+        with schema_context(tenant.schema_name):
+            # Roles
+            from core.models import AccessRole
+            self.assertTrue(AccessRole.objects.filter(name="HR Administrator").exists())
+            self.assertTrue(AccessRole.objects.filter(name="Standard Employee").exists())
+            
+            # Admin User Connection
+            admin_user = User.objects.get(email='depth@test.com')
+            self.assertTrue(admin_user.tenants.filter(id=tenant.id).exists())
+            
+            # Employee Linkage
+            employee = Employee.objects.get(email='depth@test.com')
+            self.assertEqual(employee.nik, "ADMIN-001")
+            self.assertEqual(employee.access_role.name, "HR Administrator")
+            self.assertEqual(employee.status, 'PERMANENT')

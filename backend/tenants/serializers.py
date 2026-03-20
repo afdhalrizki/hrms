@@ -7,6 +7,13 @@ class RegistrationRequestSerializer(serializers.ModelSerializer):
         fields = ['id', 'company_name', 'subdomain_prefix', 'admin_email', 'status', 'created_at']
         read_only_fields = ['id', 'status', 'created_at']
 
+    def validate_subdomain_prefix(self, value):
+        # Check for collisions with existing tenants
+        schema_name = value.replace('-', '_').lower()
+        if Tenant.objects.filter(schema_name=schema_name).exists():
+            raise serializers.ValidationError("This subdomain is already in use by another company.")
+        return value
+
 class TenantSettingsSerializer(serializers.ModelSerializer):
     is_grace_period = serializers.BooleanField(read_only=True)
     is_subscription_active = serializers.BooleanField(read_only=True)

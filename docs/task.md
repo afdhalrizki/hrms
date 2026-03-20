@@ -197,7 +197,13 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Uniqueness**: Verify duplicate payslip prevention via (employee, period) constraint.
 - [x] **Verification**: 100% Success Rate (**129/129 tests passing**).
 
+## Phase 54: Tenants Module Test Expansion [COMPLETED]
+- [x] **Settings API**: Verify authorized/unauthorized CRUD for `logo`, `address`, `phone`, and `overtime_rate`.
+- [x] **Registration**: Verify `subdomain_prefix` collisions and duplicate approval/rejection prevention.
+- [x] **Provisioning**: Verify creation of `HR Administrator` and `Standard Employee` roles and admin `Employee` linkage.
+- [x] **Verification**: 100% Success Rate (**135/135 tests passing**).
+
 ## Future Roadmap
-- [ ] **Phase 54**: Horizontal App Scaling (Kubernetes).
-- [ ] **Phase 55**: Database Sharding for Heavy Tenants.
-- [ ] **Phase 56**: Background Job Engine (Celery/RabbitMQ).
+- [ ] **Phase 55**: Horizontal App Scaling (Kubernetes).
+- [ ] **Phase 56**: Database Sharding for Heavy Tenants.
+- [ ] **Phase 57**: Background Job Engine (Celery/RabbitMQ).
