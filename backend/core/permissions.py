@@ -39,11 +39,15 @@ class HasRBACPermission(permissions.BasePermission):
             
         # For POST, PATCH, PUT, allow only if the view explicitly enables self-service.
         # This is for things like Attendance, Leave Requests, Reimbursements, etc.
-        # Self-service should only apply to standard CRUD, not custom actions (approvals).
+        # Allow standard self-service actions (list, create, retrieve, etc.) if enabled on the view
         standard_actions = ['list', 'create', 'retrieve', 'update', 'partial_update', 'destroy']
         if getattr(view, 'allow_self_service', False) and view.action in standard_actions:
-            if request.method in ['POST', 'PATCH', 'PUT']:
-                return True
+            return True
+
+        # Allow detail actions to bypass global check so they can be handled by has_object_permission
+        # This is CRITICAL for supervisors who don't have global management permissions
+        if getattr(view, 'detail', False):
+            return True
             
         return False
 

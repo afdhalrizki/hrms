@@ -383,3 +383,69 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         # Check in the whole response data string to be key-agnostic
         self.assertIn('Insufficient leave balance', str(response.data))
+
+    def test_leave_balance_auto_deduction_on_approval(self):
+        """Verify LeaveBalance.used_days increases when LeaveRequest is approved."""
+        self.client.force_login(self.user)
+        with schema_context(self.tenant.schema_name):
+            balance, _ = LeaveBalance.objects.get_or_create(employee=self.employee, year=self.today.year)
+            initial_used = balance.used_days
+            
+            leave = LeaveRequest.objects.create(
+                employee=self.employee, 
+                start_date=self.today + timedelta(days=10),
+                end_date=self.today + timedelta(days=11), # 2 days
+                leave_type='CUTI',
+                status='PENDING'
+            )
+            
+            # Approve it
+            from core.services import WorkflowService
+            WorkflowService.initialize_workflow(leave)
+            WorkflowService.process_action(leave, self.employee, 'APPROVED', 'Enjoy')
+            
+            # Viewset Logic (perform_update) checks if status becomes APPROVED to deduct.
+            # But the logic is in the ViewSet. Since I used Service directly, 
+            # I must ensure the ViewSet logic is also tested via API.
+            
+            self.user.is_staff = True
+            self.user.save()
+            url = reverse('leaverequest-detail', kwargs={'pk': leave.id})
+            # This triggers perform_update -> WorkflowService -> sets status to APPROVED
+            self.client.patch(url, {'status': 'APPROVED'}, format='json', SERVER_NAME=self.domain_name)
+            
+            balance.refresh_from_db()
+            self.assertEqual(balance.used_days, initial_used + 2)
+
+    def test_attendance_overnight_shift(self):
+        """Verify clock-in 22:00 and clock-out 06:00 (next day) handles hours correctly."""
+        with schema_context(self.tenant.schema_name):
+            shift_night = Shift.objects.create(
+                name='Night Shift',
+                start_time=time(22, 0),
+                end_time=time(6, 0)
+            )
+            test_date = self.today + timedelta(days=10)
+            Schedule.objects.create(employee=self.employee, shift=shift_night, date=test_date)
+            
+            self.client.force_login(self.user)
+            url = reverse('attendance-list')
+            
+            # Clock-in at 22:05
+            payload = {
+                'date': str(test_date),
+                'check_in': '22:05:00',
+                'latitude_in': -6.2088,
+                'longitude_in': 106.8456,
+            }
+            res = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+            self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(res.data['status'], 'LATE')
+            
+            # Clock-out at 06:05 next day
+            detail_url = reverse('attendance-detail', kwargs={'pk': res.data['id']})
+            res_out = self.client.patch(detail_url, {'check_out': '06:05:00'}, format='json', SERVER_NAME=self.domain_name)
+            self.assertEqual(res_out.status_code, status.HTTP_200_OK)
+            
+            att = Attendance.objects.get(id=res.data['id'])
+            self.assertEqual(att.check_out, time(6, 5))

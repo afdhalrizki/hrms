@@ -24,6 +24,11 @@ class KPITarget(AuditModel):
     actual_value = models.DecimalField(_('Actual Value'), max_digits=20, decimal_places=2, default=0)
     period = models.DateField(_('Target Period (First day of month)'))
     
+    class Meta:
+        unique_together = ('employee', 'kpi', 'period')
+        verbose_name = _('KPI target')
+        verbose_name_plural = _('KPI targets')
+
     def __str__(self):
         return f"{self.employee.fullname} - {self.kpi.name} ({self.period})"
 

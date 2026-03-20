@@ -326,6 +326,19 @@ class KPITargetAPITestCase(PerformanceModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Decimal(response.data['actual_value']), Decimal('14000000'))
 
+    def test_kpi_target_uniqueness_constraint(self):
+        """Verify that duplicate targets for same Emp/KPI/Month are blocked."""
+        self.client.force_login(self.admin_user)
+        payload = {
+            'employee': self.emp.id,
+            'kpi': self.kpi.id,
+            'target_value': '10000000',
+            'period': '2026-03-01' # Already exists in setUp
+        }
+        response = self.client.post(reverse('kpitarget-list'), payload, format='json', SERVER_NAME=self.domain_name)
+        # Unique constraint should trigger 400
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 # ============================================================
 # 4. Appraisal API Tests
@@ -533,3 +546,27 @@ class AppraisalReviewAPITestCase(PerformanceModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('reviewer_name', response.data)
         self.assertEqual(response.data['reviewer_name'], 'Admin User')
+
+    def test_appraisal_review_invalid_reviewer(self):
+        """Verify that a non-supervisor cannot submit a MANAGER review without permission."""
+        # emp2 is NOT the supervisor of emp.
+        # emp2 tries to submit a MANAGER review for emp's appraisal.
+        self.client.force_login(self.emp2_user)
+        payload = {
+            'appraisal': self.appraisal.id,
+            'reviewer': self.emp2.id,
+            'reviewer_type': 'MANAGER',
+            'ratings': {'score': 5},
+            'comments': 'Unauthorized review'
+        }
+        response = self.client.post(reverse('appraisalreview-list'), payload, format='json', SERVER_NAME=self.domain_name)
+        # Should be forbidden by RBAC or ViewSet logic
+        # Actually our HasRBACPermission blocks POST/PATCH if allow_self_service=False for custom actions,
+        # but AppraisalReviewViewSet has allow_self_service=True? Let's check.
+        # Wait, if allow_self_service=True, owners can POST.
+        # But even if allow_self_service is True, we should probably check if it's the OWNER of the review.
+        # But here emp2 IS the owner of the *review* they are trying to create.
+        # So view-level RBAC passes (POST allowed).
+        # We need to check if the reviewer profile matches the reviewer_type and hierarchy.
+        # This requires validation in the serializer/view.
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

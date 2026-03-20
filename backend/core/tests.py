@@ -152,6 +152,18 @@ class CoreModuleTestCase(TenantTestCase):
         self.assertEqual(response.data['nik'], 'EMP001')
         self.assertEqual(response.data['ptkp_status'], 'TK/0')
 
+    def test_employee_termination_system_access(self):
+        """Verify that terminatng an employee (or setting to a restricted status) blocks API access."""
+        # Assuming we have a check in Middleware or User model.
+        # Let's verify if deactivating the related User works.
+        self.user.is_active = False
+        self.user.save()
+        
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('employee-list'), SERVER_NAME=self.domain_name)
+        # Auth should fail for inactive users
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 class BranchTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
@@ -183,6 +195,16 @@ class RBACManagementTestCase(TenantTestCase):
         """Verify that system default roles cannot be easily deleted if implemented (at least check the flag)."""
         self.assertTrue(self.role.is_default)
         self.assertEqual(str(self.role), "HR Specialist")
+
+    def test_access_role_permissions_schema_validation(self):
+        """Verify that AccessRole permissions can store and retrieve JSON correctly."""
+        from core.models import AccessRole
+        role = AccessRole.objects.create(
+            name="Test Role",
+            permissions={"manage_something": True, "nested": {"key": "val"}}
+        )
+        self.assertEqual(role.permissions['manage_something'], True)
+        self.assertEqual(role.permissions['nested']['key'], 'val')
 
 class InfrastructureTestCase(TenantTestCase):
     def setUp(self):

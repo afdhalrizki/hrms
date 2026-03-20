@@ -13,6 +13,16 @@ class TenantAccessMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated:
+            if not request.user.is_active:
+                logout(request)
+                if request.path.startswith('/api/'):
+                    from django.http import JsonResponse
+                    return JsonResponse({"detail": "User account is inactive."}, status=403)
+                
+                messages.error(request, "Akun Anda telah dinonaktifkan.")
+                login_url = getattr(settings, 'LOGIN_URL', '/admin/login/')
+                return redirect(login_url)
+
             # 1. Global Admins and Superusers bypass all checks
             is_internal = getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
             if is_internal:
