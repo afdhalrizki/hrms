@@ -14,3 +14,18 @@ class ReimbursementSerializer(serializers.ModelSerializer):
         model = Reimbursement
         fields = '__all__'
         read_only_fields = ['employee', 'status', 'supervisor_status', 'finance_status', 'approved_amount']
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return value
+
+    def validate(self, data):
+        category = data.get('category')
+        amount = data.get('amount')
+        
+        if category and category.max_amount and amount > category.max_amount:
+            raise serializers.ValidationError({
+                'amount': f"Amount exceeds the maximum limit for this category ({category.max_amount})."
+            })
+        return data

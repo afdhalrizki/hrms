@@ -116,7 +116,9 @@ Implemented the unified capability for Tenant Administrators to provision new em
 - **Phase 49**: Backend Test Coverage (Performance & Attendance).
 - **Phase 50**: Config & Infra Expansion (Subscription/CORS/i18n).
 - **Phase 51**: Core Master Data & Audit Expansion (Deep-diffing Audit Logs).
+- **Phase 52**: Users Module Test Expansion (Normalization & Login Fixes - 129 cases).
 - **Phase 53**: Payroll Module Test Expansion (Overtime/Reimbursement/BPJS - 129 cases).
 - **Phase 54**: Tenants Module Test Expansion (Settings/Registration/Provisioning - 135 cases).
+- **Phase 55**: Reimbursement Module Test Expansion (Validation/RBAC/Workflow - 141 cases).
 
 **Project Status**: 🏆 **Stable Release v1.0.0 (March 20, 2026)**

@@ -39,8 +39,11 @@ class HasRBACPermission(permissions.BasePermission):
             
         # For POST, PATCH, PUT, allow only if the view explicitly enables self-service.
         # This is for things like Attendance, Leave Requests, Reimbursements, etc.
-        if getattr(view, 'allow_self_service', False) and request.method in ['POST', 'PATCH']:
-            return True
+        # Self-service should only apply to standard CRUD, not custom actions (approvals).
+        standard_actions = ['list', 'create', 'retrieve', 'update', 'partial_update', 'destroy']
+        if getattr(view, 'allow_self_service', False) and view.action in standard_actions:
+            if request.method in ['POST', 'PATCH', 'PUT']:
+                return True
             
         return False
 
@@ -49,7 +52,8 @@ class HasRBACPermission(permissions.BasePermission):
         Object-level permission: 
         1. Tenant Admin (is_staff) -> True
         2. Manager with 'manage_attendance' (if applicable) -> True
-        3. Owner (obj.employee matches request.user) -> True
+        3. Supervisor of the employee -> True
+        4. Owner (obj.employee matches request.user) -> Only for standard CRUD
         """
         if request.user.is_staff:
             return True
@@ -58,20 +62,30 @@ class HasRBACPermission(permissions.BasePermission):
         if not employee:
             return False
             
-        # Check if user is the owner of the record
-        # Note: We assume the object has an 'employee' field
-        is_owner = hasattr(obj, 'employee') and obj.employee == employee
-        
-        # Check if user is the supervisor of the owner
-        is_supervisor = hasattr(obj, 'employee') and obj.employee and obj.employee.supervisor == employee
-
         # Check if user is manager
         required_perm = getattr(view, 'required_rbac_permission', None)
         has_mgmt = False
         if required_perm and employee.access_role:
             has_mgmt = employee.access_role.permissions.get(required_perm, False)
             
-        return is_owner or is_supervisor or has_mgmt
+        if has_mgmt:
+            return True
+
+        # Check if user is the owner of the record
+        is_owner = hasattr(obj, 'employee') and obj.employee == employee
+        
+        # Check if user is the supervisor of the owner
+        is_supervisor = hasattr(obj, 'employee') and obj.employee and obj.employee.supervisor == employee
+        
+        if is_supervisor:
+            return True
+            
+        # Self-service: Owners can only perform standard CRUD
+        standard_actions = ['retrieve', 'update', 'partial_update', 'destroy']
+        if is_owner and view.action in standard_actions:
+            return True
+            
+        return False
 
 
 class FeatureRequiredPermission(permissions.BasePermission):
