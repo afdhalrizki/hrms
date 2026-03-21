@@ -24,7 +24,8 @@
     "payroll": "Payroll",
     "workflows": "Workflows",
     "analytics": "Analytics",
-    "settings": "Settings"
+    "settings": "Settings",
+    "attendance_corrections": "Correction Requests"
   },
   "Common": {
     "submit": "Submit",
@@ -40,5 +41,17 @@
     "suspendedMessage": "Access to {name} has been blocked due to an expired subscription. Please renew to regain access.",
     "emergencyExport": "Emergency Export",
     "logout": "Log Out"
+  },
+  "AttendanceCorrection": {
+    "title": "Attendance Corrections",
+    "requestTitle": "Request Correction",
+    "reasonLabel": "Reason for Correction",
+    "requestedIn": "Requested In",
+    "requestedOut": "Requested Out",
+    "submit": "Submit Request",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "adminComment": "Admin Comment"
   }
 }

@@ -24,7 +24,8 @@
     "payroll": "Payroll",
     "workflows": "Alur Kerja",
     "analytics": "Analitik",
-    "settings": "Pengaturan"
+    "settings": "Pengaturan",
+    "attendance_corrections": "Koreksi Kehadiran"
   },
   "Common": {
     "submit": "Kirim",
@@ -40,5 +41,17 @@
     "suspendedMessage": "Akses ke {name} telah diblokir karena langganan berakhir. Silakan perbarui untuk memulihkan akses.",
     "emergencyExport": "Ekspor Darurat",
     "logout": "Keluar"
+  },
+  "AttendanceCorrection": {
+    "title": "Koreksi Kehadiran",
+    "requestTitle": "Ajukan Koreksi",
+    "reasonLabel": "Alasan Koreksi",
+    "requestedIn": "Jam Masuk Baru",
+    "requestedOut": "Jam Keluar Baru",
+    "submit": "Kirim Pengajuan",
+    "pending": "Menunggu",
+    "approved": "Disetujui",
+    "rejected": "Ditolak",
+    "adminComment": "Komentar Admin"
   }
 }

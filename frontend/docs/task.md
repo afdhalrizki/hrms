@@ -13,9 +13,9 @@ Features for managing the organization, data, and approvals.
 - [ ] **Advanced Reporting (Phase 61)**: Exportable monthly recaps (CSV/Excel) and appraisal summaries.
     - [ ] Implementation of `TableExport` component with server-side pagination.
     - [ ] Interactive KPI attainment charts using `Recharts`.
-- [ ] **Workflow Management (Phase 38/62)**: Unified inbox for approving Leaves, Overtime, and Attendance Corrections.
-    - [ ] "Comparison View" for attendance adjustments.
-    - [ ] Real-time notification badge on sidebar for pending approvals.
+- [x] **Workflow Management (Phase 38/62)**: Unified inbox for approving Leaves, Overtime, and Attendance Corrections.
+    - [x] "Comparison View" for attendance adjustments.
+    - [x] Real-time notification badge on sidebar for pending approvals.
 - [ ] **Modular Tiering**: Plan-based gating (Basic/Pro/Enterprise) management.
 
 ## 👤 2. Employee Self-Service (ESS) Web Portal

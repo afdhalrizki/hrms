@@ -8,12 +8,15 @@ import {
   CalendarDays,
   MoreVertical,
   CheckCircle2,
-  UserX
+  UserX,
+  AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { CorrectionRequestModal } from '@/components/attendance/CorrectionRequestModal';
+import { Attendance } from '@/types/core';
 
 interface AttendanceLog {
   id: number;
@@ -31,6 +34,8 @@ interface AttendanceLog {
 export default function AttendancePage() {
   const [logs, setLogs] = React.useState<AttendanceLog[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedAttendance, setSelectedAttendance] = React.useState<Attendance | null>(null);
+  const [isCorrectionModalOpen, setIsCorrectionModalOpen] = React.useState(false);
 
   const fetchLogs = React.useCallback(async () => {
     try {
@@ -65,6 +70,10 @@ export default function AttendancePage() {
             <a href="/attendance/schedule" className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2 text-white">
               <CalendarDays size={18} />
               Scheduling
+            </a>
+            <a href="/attendance/corrections" className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2 text-white">
+              <AlertCircle size={18} />
+              Correction Requests
             </a>
             <button className="px-4 py-2 bg-primary text-white rounded-xl font-medium shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
               Export Log
@@ -206,8 +215,14 @@ export default function AttendancePage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="p-2 rounded-lg text-gray-500 hover:bg-white/10 transition-colors">
-                        <MoreVertical size={16} />
+                      <button 
+                        onClick={() => {
+                          setSelectedAttendance(log as unknown as Attendance);
+                          setIsCorrectionModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-gray-400 hover:bg-white/10 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        Request Correction
                       </button>
                     </td>
                   </motion.tr>
@@ -217,6 +232,15 @@ export default function AttendancePage() {
           </div>
         </div>
       </div>
+
+      {selectedAttendance && (
+        <CorrectionRequestModal 
+          isOpen={isCorrectionModalOpen}
+          onClose={() => setIsCorrectionModalOpen(false)}
+          attendance={selectedAttendance}
+          onSuccess={fetchLogs}
+        />
+      )}
     </DashboardLayout>
   );
 }

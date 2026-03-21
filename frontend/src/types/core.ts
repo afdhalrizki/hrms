@@ -8,7 +8,7 @@ export interface Branch {
   timezone: string;
 }
 
-export type WorkflowType = 'LEAVE' | 'OVERTIME' | 'REIMBURSEMENT';
+export type WorkflowType = 'LEAVE' | 'OVERTIME' | 'REIMBURSEMENT' | 'CORRECTION';
 export type ApproverType = 'SUPERVISOR' | 'ROLE' | 'EMPLOYEE';
 export type WorkflowStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -40,5 +40,34 @@ export interface WorkflowAction {
   actor_name: string;
   action: WorkflowStatus;
   comment: string;
+  created_at: string;
+}
+
+export interface Attendance {
+  id: string;
+  employee: string;
+  employee_name: string;
+  date: string;
+  check_in?: string;
+  check_out?: string;
+  status: 'PRESENT' | 'LATE' | 'ABSENT' | 'OFF_SITE';
+  latitude_in?: number;
+  longitude_in?: number;
+  photo_in?: string;
+  is_out_of_bounds: boolean;
+  distance_from_branch?: number;
+}
+
+export interface AttendanceCorrectionRequest {
+  id: string;
+  attendance: string;
+  attendance_date: string;
+  employee: string;
+  employee_name: string;
+  requested_check_in?: string;
+  requested_check_out?: string;
+  reason: string;
+  status: WorkflowStatus;
+  comment?: string;
   created_at: string;
 }

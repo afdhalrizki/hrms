@@ -21,10 +21,10 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 ![Settings Validation](./assets/tenant_settings_ui_validation_1773630453833.webp)
 ![Add Admin Employee Modal](./assets/add_employee_modal_before_submit_1773638661925.png)
 
-### Phase 34-45: Advanced Modules
+### Phase 34-62: Advanced Workflows & Correction
 - **Attendance**: Dashboard for geofencing status and audit visualization.
 - **Approvals**: UI for multi-stage approval workflows (Leaves, Overtime).
-- **Performance**: KPI and appraisal lifecycle tracking at the organizational level.
+- **Attendance Correction**: A dedicated workflow for employees to request time adjustments, with a "Comparison Queue" for admins to approve/reject changes.
 
 ![Shift Management](./assets/shift_management.png)
 ![Reimbursement UI](./assets/reimbursement_ui.png)
