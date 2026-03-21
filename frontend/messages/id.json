@@ -7,30 +7,30 @@
     "stats": {
       "total_employees": "Total Karyawan",
       "today_attendance": "Kehadiran Hari Ini",
-      "pending_leaves": "Izin Tertunda",
-      "new_hires": "Karyawan Baru (Bulan Ini)"
+      "pending_leaves": "Izin Pending",
+      "new_hires": "Total Rekrutmen"
     },
     "attendance_trends": "Tren Kehadiran",
-    "recent_hires": "Karyawan Terbaru",
+    "recent_hires": "Rekrutan Terbaru",
     "realtime": "REALTIME"
   },
   "Navigation": {
     "overview": "Ikhtisar",
-    "performance": "Performa",
     "employees": "Karyawan",
     "branches": "Cabang",
     "attendance": "Kehadiran",
     "reimbursement": "Reimbursement",
+    "performance": "Performa",
     "payroll": "Payroll",
-    "workflows": "Alur Kerja",
+    "workflows": "Workflow",
     "analytics": "Analitik",
     "settings": "Pengaturan",
-    "leaves": "Cuti",
+    "leaves": "Cuti/Izin",
     "reimbursements": "Reimbursement",
-    "attendance_corrections": "Koreksi Kehadiran",
+    "attendance_corrections": "Permintaan Koreksi",
     "reporting": "Pelaporan",
     "audit_logs": "Log Audit",
-    "api_keys": "API Key"
+    "api_keys": "Kunci API"
   },
   "Common": {
     "submit": "Kirim",
@@ -43,9 +43,22 @@
     "readOnlyMessage": "Langganan berakhir pada {date}. Sistem sekarang dalam mode Baca-Saja.",
     "renewNow": "Perbarui Sekarang",
     "suspendedTitle": "Akses Ditangguhkan",
-    "suspendedMessage": "Akses ke {name} telah diblokir karena langganan berakhir. Silakan perbarui untuk memulihkan akses.",
+    "suspendedMessage": "Akses ke {name} telah diblokir karena langganan berakhir. Silakan perbarui untuk mendapatkan akses kembali.",
     "emergencyExport": "Ekspor Darurat",
     "logout": "Keluar"
+  },
+  "Attendance": {
+    "title": "Manajemen Kehadiran",
+    "subtitle": "Pantau jam kerja dan riwayat kehadiran Anda.",
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "success": "Kehadiran berhasil dicatat",
+    "stats": {
+      "successRate": "Tingkat Keberhasilan",
+      "lateCheckins": "Check-in Terlambat",
+      "manualEdits": "Edit Manual",
+      "totalToday": "Total Hari Ini"
+    }
   },
   "AttendanceCorrection": {
     "title": "Koreksi Kehadiran",
@@ -111,7 +124,7 @@
   "Payroll": {
     "title": "Manajemen Payroll",
     "subtitle": "Hitung gaji, pajak (PPh 21), dan buat slip gaji.",
-    "runPayroll": "Jalankan Sistem Payroll",
+    "runPayroll": "Hasilkan Payroll",
     "stats": {
       "totalPayroll": "Total Payroll",
       "pph21": "Potongan PPh 21",
@@ -127,9 +140,9 @@
       "actions": "Aksi"
     },
     "modal": {
-      "generateTitle": "Buat Payroll",
+      "generateTitle": "Hasilkan Payroll Massal",
       "selectPeriod": "Pilih Periode",
-      "generateBtn": "Buat Sekarang",
+      "generateBtn": "Proses",
       "detailTitle": "Rincian Slip Gaji",
       "basicSalary": "Gaji Pokok",
       "allowances": "Tunjangan",
@@ -184,9 +197,10 @@
         "reliability": "Keandalan & Kehadiran",
         "teamwork": "Kerjasama Tim"
       },
-      "commentLabel": "Masukan Rinci / Komentar",
+      "commentLabel": "Umpan Balik Detail / Komentar",
       "scoreLabel": "Skor Numerik (1-5)",
-      "reviewType": "Peran Penilai"
+      "reviewType": "Peran Penilai",
+      "submitScore": "Kirim Skor"
     }
   },
   "Branding": {
@@ -200,8 +214,21 @@
     "success": "Branding berhasil diperbarui"
   },
   "Tiering": {
-    "upgradeTitle": "Fitur Dibatasi",
-    "upgradeNeeded": "Modul {module} hanya tersedia untuk paket yang lebih tinggi.",
     "upgradeBtn": "Tingkatkan Paket Sekarang"
+  },
+  "Auth": {
+    "loginTitle": "Login HRMS",
+    "restrictedTitle": "Akses Terbatas",
+    "restrictedDesc": "Login hanya tersedia melalui subdomain perusahaan Anda. Silakan akses URL seperti {example}",
+    "registerNew": "Daftarkan Perusahaan Baru",
+    "portalBadge": "Portal Admin Global",
+    "welcomePortal": "Selamat datang di portal {name}",
+    "emailLabel": "Alamat Email",
+    "passwordLabel": "Kata Sandi",
+    "rememberMe": "Ingat saya",
+    "forgotPassword": "Lupa kata sandi?",
+    "signIn": "Masuk",
+    "noAccount": "Belum punya akun?",
+    "contactHR": "Hubungi HR"
   }
 }

@@ -52,7 +52,7 @@ export function GeneratePayrollModal({ onClose, onSuccess }: Props) {
         method: 'POST',
         body: JSON.stringify({ period_id: parseInt(selectedPeriod) }),
       });
-      toast.success('Successfully generated payslips');
+      toast.success('Payroll generated successfully');
       onSuccess();
       onClose();
     } catch (error: any) {

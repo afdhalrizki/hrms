@@ -80,6 +80,11 @@ python manage.py bootstrap_tenants
 Enable your virtual environment and run the following:
 
 ```bash
+# Windows
+.\venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
+
+# Linux/Mac
+source venv/bin/activate
 python manage.py runserver
 ```
 

@@ -16,7 +16,7 @@ export function SubscriptionBanner() {
       <div className="flex items-center gap-2 text-amber-500">
         <AlertCircle size={16} />
         <p className="text-xs font-medium">
-          {t('readOnlyMessage', { date: expiryDate })}
+          {t('readOnlyMessage', { date: expiryDate || 'N/A' })}
         </p>
       </div>
       <button className="flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/20">

@@ -7,8 +7,10 @@ import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage({ forceShowForm = false }: { forceShowForm?: boolean }) {
+  const t = useTranslations('Auth');
   const { tenantName, isPublic } = useTenant();
   const { login } = useAuth();
   const router = useRouter();
@@ -60,16 +62,15 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
             <div className="inline-flex h-16 w-16 rounded-2xl bg-primary items-center justify-center text-white shadow-xl shadow-primary/30 mx-auto mb-2">
               <Briefcase size={32} />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">HRMS Login</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('loginTitle')}</h1>
             
             {!showForm ? (
               <div className="space-y-4 pt-2">
                 <p className="text-lg font-medium text-foreground">
-                  Akses Terbatas
+                  {t('restrictedTitle')}
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Login hanya tersedia melalui subdomain perusahaan Anda. 
-                  Silakan akses URL seperti <code className="text-primary font-mono bg-primary/5 px-2 py-0.5 rounded">perusahaan.harikerja.com</code>
+                  {t('restrictedDesc', { example: 'perusahaan.harikerja.com' })}
                 </p>
                 
                 <div className="pt-4 flex flex-col gap-3">
@@ -77,7 +78,7 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                     href="/signup" 
                     className="w-full py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
                   >
-                    Daftarkan Perusahaan Baru
+                    {t('registerNew')}
                     <ArrowRight size={16} />
                   </a>
                 </div>
@@ -87,10 +88,10 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                 <p className="text-sm text-muted-foreground">
                   {forceShowForm ? (
                     <span className="text-accent font-bold uppercase tracking-widest text-[10px] bg-accent/10 px-2 py-1 rounded-full border border-accent/20">
-                      Portal Admin Global
+                      {t('portalBadge')}
                     </span>
                   ) : (
-                    <>Welcome to <span className="text-primary font-bold">{tenantName}</span> portal</>
+                    <>{t('welcomePortal', { name: tenantName })}</>
                   )}
                 </p>
                 {/* Form */}
@@ -101,7 +102,7 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                     </div>
                   )}
                   <div className="space-y-1.5 text-left">
-                    <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
+                    <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('emailLabel')}</label>
                     <div className="relative group">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                       <input 
@@ -116,7 +117,7 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                   </div>
 
                   <div className="space-y-1.5 text-left">
-                    <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</label>
+                    <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('passwordLabel')}</label>
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                       <input 
@@ -133,9 +134,9 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                   <div className="flex items-center justify-between px-1">
                     <label className="flex items-center gap-2 cursor-pointer group">
                       <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-white/5 accent-primary" />
-                      <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Remember me</span>
+                      <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{t('rememberMe')}</span>
                     </label>
-                    <button type="button" className="text-sm font-semibold text-primary hover:underline underline-offset-4">Forgot password?</button>
+                    <button type="button" className="text-sm font-semibold text-primary hover:underline underline-offset-4">{t('forgotPassword')}</button>
                   </div>
 
                   <button 
@@ -147,7 +148,7 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
                       <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
-                        Sign In
+                        {t('signIn')}
                         <ArrowRight size={20} />
                       </>
                     )}
@@ -161,7 +162,7 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
           {showForm && (
             <div className="text-center pt-2">
               <p className="text-sm text-muted-foreground">
-                Don't have an account? <span className="text-primary font-bold cursor-pointer hover:underline">Contact HR</span>
+                {t('noAccount')} <span className="text-primary font-bold cursor-pointer hover:underline">{t('contactHR')}</span>
               </p>
             </div>
           )}
@@ -170,5 +171,3 @@ export default function LoginPage({ forceShowForm = false }: { forceShowForm?: b
     </div>
   );
 }
-
-

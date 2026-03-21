@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { CorrectionRequestModal } from '@/components/attendance/CorrectionRequestModal';
 import { Attendance } from '@/types/core';
 
@@ -32,22 +33,67 @@ interface AttendanceLog {
 }
 
 export default function AttendancePage() {
+  const t = useTranslations('Attendance');
   const [logs, setLogs] = React.useState<AttendanceLog[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [todayAttendance, setTodayAttendance] = React.useState<AttendanceLog | null>(null);
   const [selectedAttendance, setSelectedAttendance] = React.useState<Attendance | null>(null);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = React.useState(false);
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
   const fetchLogs = React.useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await apiFetch('/attendance/attendances/');
       setLogs(data);
+
+      const today = new Date().toISOString().split('T')[0];
+      const todayRecord = data.find((l: AttendanceLog) => l.date === today);
+      setTodayAttendance(todayRecord || null);
     } catch (error) {
       toast.error('Failed to fetch attendance logs');
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  const handleClockAction = async () => {
+    setIsProcessing(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const time = new Date().toLocaleTimeString('id-ID', { hour12: false });
+
+      if (!todayAttendance) {
+        // Check In
+        const data = await apiFetch('/attendance/attendances/', {
+          method: 'POST',
+          body: JSON.stringify({
+            date: today,
+            check_in: time,
+            latitude_in: '-6.200000', // Mock data
+            longitude_in: '106.816666'
+          })
+        });
+        toast.success(t('success'));
+        setTodayAttendance(data);
+      } else {
+        // Check Out
+        const data = await apiFetch(`/attendance/attendances/${todayAttendance.id}/`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            check_out: time
+          })
+        });
+        toast.success(t('success'));
+        setTodayAttendance(data);
+      }
+      fetchLogs();
+    } catch (error: any) {
+      toast.error(error.message || 'Action failed');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   React.useEffect(() => {
     fetchLogs();
@@ -59,8 +105,8 @@ export default function AttendancePage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Attendance Analytics</h1>
-            <p className="text-sm text-gray-400">Monitor daily check-ins, leaves, and overtime.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-white">{t('title')}</h1>
+            <p className="text-sm text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/attendance/shifts" className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2 text-white">
@@ -75,7 +121,26 @@ export default function AttendancePage() {
               <AlertCircle size={18} />
               Correction Requests
             </a>
-            <button className="px-4 py-2 bg-primary text-white rounded-xl font-medium shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+            <button 
+              onClick={handleClockAction}
+              disabled={isProcessing || !!(todayAttendance && todayAttendance.check_out)}
+              className={cn(
+                "px-8 py-2 rounded-xl font-bold shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100",
+                !todayAttendance ? "bg-primary text-white shadow-primary/20" : "bg-emerald-500 text-white shadow-emerald-500/20"
+              )}
+            >
+              {isProcessing ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Processing...
+                </div>
+              ) : !todayAttendance ? (
+                t('checkIn')
+              ) : (
+                t('checkOut')
+              )}
+            </button>
+            <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 rounded-xl font-medium hover:bg-white/10 transition-transform">
               Export Log
             </button>
           </div>
@@ -85,25 +150,25 @@ export default function AttendancePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[
             { 
-              label: 'Success Rate', 
+              label: t('stats.successRate'), 
               value: `${logs.length > 0 ? Math.round((logs.filter(l => l.liveness_verified).length / logs.length) * 100) : 0}%`, 
               icon: CheckCircle2, 
               color: 'text-emerald-500' 
             },
             { 
-              label: 'Late Check-ins', 
+              label: t('stats.lateCheckins'), 
               value: logs.filter(l => l.status === 'LATE').length.toString(), 
               icon: Clock, 
               color: 'text-orange-500' 
             },
             { 
-              label: 'Manual Edits', 
+              label: t('stats.manualEdits'), 
               value: logs.filter(l => l.verification_method === 'MANUAL').length.toString(), 
               icon: UserX, 
               color: 'text-red-500' 
             },
             { 
-              label: 'Total Today', 
+              label: t('stats.totalToday'), 
               value: logs.length.toString(), 
               icon: CalendarDays, 
               color: 'text-blue-500' 
@@ -114,7 +179,7 @@ export default function AttendancePage() {
                 <stat.icon size={20} />
               </div>
               <div>
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-tight">{stat.label}</p>
+                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">{stat.label}</p>
                 <p className="text-xl font-bold text-white">{stat.value}</p>
               </div>
             </div>

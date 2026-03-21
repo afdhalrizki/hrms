@@ -15,6 +15,8 @@ interface TenantContextType {
   themeSecondaryColor?: string;
   planType?: string;
   enabledModules?: string[];
+  subscriptionStatus?: string;
+  expiryDate?: string;
   isSubscriptionActive?: boolean;
 }
 
@@ -26,6 +28,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     subdomain: '',
     isPublic: true,
     isLoading: true,
+    subscriptionStatus: 'ACTIVE',
+    enabledModules: [],
   });
 
   useEffect(() => {

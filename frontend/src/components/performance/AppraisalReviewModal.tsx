@@ -63,7 +63,7 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
           comments: comments
         }),
       });
-      toast.success('Review submitted successfully');
+      toast.success('Score submitted successfully');
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -171,7 +171,7 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
             disabled={isSubmitting || !employeeId}
             className="w-full py-5 bg-primary text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0 flex items-center justify-center gap-2"
           >
-            {isSubmitting ? <Loader2 className="animate-spin" /> : tCommon('submit')}
+            {isSubmitting ? <Loader2 className="animate-spin" /> : t('submitScore')}
           </button>
         </form>
       </motion.div>

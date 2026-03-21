@@ -77,13 +77,17 @@ Then access [http://company1.harikerja.com:3000](http://company1.harikerja.com:3
 
 ---
 
-## 3. Testing
-
-Verify core logic and UI components:
 ```bash
 npm test
 ```
+
+### E2E Testing (Playwright)
+Ensure the development server and backend are running, then:
+```bash
+npx playwright test
+```
 **Coverage**: 100% logic coverage for critical helpers (`api.ts`, `TenantContext.tsx`, `AuthContext.tsx`).
+
 
 ---
 **Status**: 🏆 **Phase 69 (Modular Tiering) Integrated (March 21, 2026)**

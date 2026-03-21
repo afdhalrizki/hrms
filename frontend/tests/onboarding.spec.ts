@@ -7,7 +7,8 @@ test.describe('Company Onboarding Flow', () => {
 
     // 2. Verify we are on the right page
     await expect(page).toHaveTitle(/harikerja/i);
-    await expect(page.getByText('Create your account')).toBeVisible();
+    await expect(page).toHaveURL(/.*\/signup/);
+    await expect(page.getByText(/Create your account/i)).toBeVisible();
 
     // 3. Fill in the company details
     const timestamp = Date.now();
