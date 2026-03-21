@@ -19,7 +19,7 @@ Features for managing the organization, data, and approvals.
 ---
 ### 🌊 Full Backend Parity Phase (Next Steps)
 - [x] **Phase 63: Self-Service Expansion**: Dedicated pages for Leave Requests and Reimbursements.
-- [ ] **Phase 64: Financial Core**: Live BPJS & PPh 21 calculation dashboards.
+- [x] **Phase 64: Financial Core**: Live BPJS & PPh 21 calculation dashboards.
 - [ ] **Phase 65: Operational Clarity**: Admin Audit Logs viewer and API Key manager.
 - [ ] **Phase 66: Appraisal Lifecycle**: Full submission workflow for KPIs and reviews.
 - [ ] **Phase 67: Tenant Branding**: Admin settings for company logo and theme colors.

@@ -9,115 +9,210 @@ import {
   Wallet, 
   PieChart, 
   TrendingUp,
-  FileText
+  FileText,
+  Play,
+  CheckCircle2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { apiFetch, apiDownload } from '@/lib/api';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { apiDownload } from '@/lib/api';
+import { PayslipDetailModal } from '@/components/payroll/PayslipDetailModal';
+import { GeneratePayrollModal } from '@/components/payroll/GeneratePayrollModal';
 
-const payrollData = [
-  { id: 1, name: 'John Doe', period: 'Mar 2026', basic: 'Rp 12,000,000', net: 'Rp 13,500,000', status: 'PAID' },
-  { id: 2, name: 'Jane Smith', period: 'Mar 2026', basic: 'Rp 15,000,000', net: 'Rp 16,200,000', status: 'PROCESSING' },
-  { id: 3, name: 'Alice Johnson', period: 'Mar 2026', basic: 'Rp 9,000,000', net: 'Rp 9,500,000', status: 'PAID' },
-];
+interface Payslip {
+  id: number;
+  employee_name: string;
+  period_display: string;
+  basic_salary: string;
+  net_pay: string;
+  pph21_tax: string;
+  status: string;
+  details: any[];
+}
 
 export default function PayrollPage() {
+  const t = useTranslations('Payroll');
+  const tCommon = useTranslations('Common');
+  
+  const [payslips, setPayslips] = React.useState<Payslip[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedPayslip, setSelectedPayslip] = React.useState<Payslip | null>(null);
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
+  const [isAdmin, setIsAdmin] = React.useState(false);
+
+  const fetchData = React.useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const [payslipData, userData] = await Promise.all([
+        apiFetch('/payroll/payslips/'),
+        apiFetch('/users/me/'),
+      ]);
+      setPayslips(payslipData || []);
+      setIsAdmin(userData.role === 'ADMIN' || userData.is_staff);
+    } catch (error) {
+      toast.error('Failed to load payroll data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const totalPayroll = payslips.reduce((sum, p) => sum + parseFloat(p.net_pay || '0'), 0);
+  const totalTax = payslips.reduce((sum, p) => sum + parseFloat(p.pph21_tax || '0'), 0);
+  
+  // BPJS is part of details, we can aggregate if needed but for now we'll sum the tax
+  // In a real scenario, we'd have a specific endpoint for stats
+
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">Payroll</h1>
-            <p className="text-sm text-muted-foreground">Calculate salaries, taxes (PPh 21), and generate payslips.</p>
+            <h1 className="text-3xl font-black tracking-tight text-white">{t('title')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl font-medium shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-            Run Payroll System
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => setIsGenerateModalOpen(true)}
+              className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <Play size={20} fill="currentColor" />
+              {t('runPayroll')}
+            </button>
+          )}
         </div>
 
-        {/* Wealth Cards */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card rounded-3xl p-6 border relative overflow-hidden group">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card p-8 rounded-[32px] border border-white/10 relative overflow-hidden group"
+          >
             <div className="absolute -right-4 -top-4 text-primary/5 group-hover:text-primary/10 transition-colors">
               <Wallet size={120} />
             </div>
-            <p className="text-sm font-medium text-muted-foreground mb-1 underline decoration-primary/30 underline-offset-4">Total Payroll (Mar)</p>
-            <p className="text-3xl font-bold tracking-tight">Rp 42.5M</p>
-            <div className="mt-4 flex items-center gap-2 text-xs text-emerald-500 font-bold">
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('stats.totalPayroll')}</p>
+            <p className="text-4xl font-black text-white tracking-tighter">
+              Rp {totalPayroll.toLocaleString()}
+            </p>
+            <div className="mt-4 flex items-center gap-2 text-[10px] text-emerald-500 font-bold uppercase tracking-wider">
               <TrendingUp size={14} />
-              +5.2% from last month
+              Live Sync Active
             </div>
-          </div>
-          <div className="glass-card rounded-3xl p-6 border bg-white/5">
-            <p className="text-sm font-medium text-muted-foreground mb-1">PPh 21 Deducted</p>
-            <p className="text-3xl font-bold tracking-tight">Rp 3.8M</p>
-            <div className="mt-4 text-xs text-muted-foreground">Estimated for all employees</div>
-          </div>
-          <div className="glass-card rounded-3xl p-6 border bg-white/5">
-            <p className="text-sm font-medium text-muted-foreground mb-1">BPJS Contribution</p>
-            <p className="text-3xl font-bold tracking-tight">Rp 2.1M</p>
-            <div className="mt-4 text-xs text-muted-foreground">Company + Employee share</div>
-          </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="glass-card p-8 rounded-[32px] border border-white/10 bg-white/[0.02]"
+          >
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('stats.pph21')}</p>
+            <p className="text-4xl font-black text-white tracking-tighter">
+              Rp {totalTax.toLocaleString()}
+            </p>
+            <div className="mt-4 text-[10px] text-muted-foreground uppercase tracking-widest">TER 2024 Category A/B/C</div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="glass-card p-8 rounded-[32px] border border-white/10 bg-white/[0.02]"
+          >
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('stats.bpjs')}</p>
+            <p className="text-4xl font-black text-white tracking-tighter">
+              Rp {(totalPayroll * 0.04).toLocaleString()}
+            </p>
+            <div className="mt-4 text-[10px] text-muted-foreground uppercase tracking-widest">Est. Employer Share (4%)</div>
+          </motion.div>
         </div>
 
-        {/* Payroll List */}
-        <div className="glass-card rounded-3xl border overflow-hidden">
-          <div className="p-6 border-b bg-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <FileText size={20} />
+        {/* Payslip Table */}
+        <div className="glass-card rounded-[32px] border border-white/10 overflow-hidden shadow-2xl">
+          <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <FileText size={24} />
               </div>
-              <h2 className="font-bold text-lg">Payroll Period: March 2026</h2>
+              <div>
+                <h2 className="text-lg font-bold text-white uppercase tracking-tighter">{t('period')}</h2>
+                <p className="text-xs text-muted-foreground">Historical records and generated slips</p>
+              </div>
             </div>
-            <button className="text-sm font-bold text-primary hover:underline">View All History</button>
           </div>
           
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
-                <tr className="border-b bg-white/5">
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Employee</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Basic Salary</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Net Pay</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Status</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-right">Actions</th>
+                <tr className="bg-white/[0.02]">
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.employee')}</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.basic')}</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.net')}</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.status')}</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right">{t('table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {payrollData.map((row, index) => (
+                {isLoading ? (
+                  <tr><td colSpan={5} className="p-20 text-center text-gray-500 animate-pulse font-mono uppercase tracking-widest">Syncing with Financial Engine...</td></tr>
+                ) : payslips.length === 0 ? (
+                  <tr><td colSpan={5} className="p-20 text-center text-gray-500 italic">No payslips found for this period.</td></tr>
+                ) : payslips.map((row, index) => (
                   <motion.tr 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                     key={row.id} 
-                    className="hover:bg-white/5 transition-colors"
+                    className="hover:bg-white/[0.04] transition-all group"
                   >
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-semibold">{row.name}</p>
-                      <p className="text-xs text-muted-foreground">{row.period}</p>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 p-[2px]">
+                          <div className="h-full w-full rounded-full bg-[#0f172a] flex items-center justify-center text-xs font-bold text-white">
+                            {row.employee_name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white">{row.employee_name}</p>
+                          <p className="text-[10px] text-gray-500 font-mono uppercase tracking-tighter">{row.period_display}</p>
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium">{row.basic}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-primary">{row.net}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-8 py-6 text-sm font-medium text-gray-300">Rp {parseFloat(row.basic_salary).toLocaleString()}</td>
+                    <td className="px-8 py-6">
+                      <p className="text-sm font-black text-white">Rp {parseFloat(row.net_pay).toLocaleString()}</p>
+                    </td>
+                    <td className="px-8 py-6">
                       <span className={cn(
-                        "px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider",
-                        row.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500" : "bg-orange-500/10 text-orange-500 border border-orange-500/20"
+                        "px-3 py-1 rounded-full text-[10px] font-bold tracking-widest flex items-center gap-1.5 w-fit",
+                        row.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500" : "bg-orange-500/10 text-orange-500"
                       )}>
+                        {row.status === 'PAID' ? <CheckCircle2 size={12} /> : <div className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />}
                         {row.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button className="p-2 rounded-lg bg-white/5 text-muted-foreground hover:text-primary hover:bg-white/10 transition-all">
-                          <Eye size={16} />
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => setSelectedPayslip(row)}
+                          aria-label={`view-payslip-${row.id}`}
+                          className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-primary hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
+                        >
+                          <Eye size={18} />
                         </button>
                         <button 
-                          onClick={() => apiDownload(`payslips/${row.id}/download_pdf/`, `Payslip_${row.period.replace(' ', '_')}.pdf`)}
-                          className="p-2 rounded-lg bg-white/5 text-muted-foreground hover:text-primary hover:bg-white/10 transition-all"
-                          title="Download PDF"
+                          onClick={() => apiDownload(`/payroll/payslips/${row.id}/download_pdf/`, `Payslip_${row.employee_name.replace(' ', '_')}.pdf`)}
+                          className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-primary hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
                         >
-                          <Download size={16} />
+                          <Download size={18} />
                         </button>
                       </div>
                     </td>
@@ -128,6 +223,21 @@ export default function PayrollPage() {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {selectedPayslip && (
+          <PayslipDetailModal 
+            payslip={selectedPayslip} 
+            onClose={() => setSelectedPayslip(null)} 
+          />
+        )}
+        {isGenerateModalOpen && (
+          <GeneratePayrollModal 
+            onClose={() => setIsGenerateModalOpen(false)} 
+            onSuccess={fetchData}
+          />
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 }

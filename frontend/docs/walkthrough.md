@@ -33,5 +33,11 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Reimbursements**: Category-based expense claims with file upload support for receipts.
 - **Infrastructure**: Optimized `apiFetch` to handle `FormData` and multi-part uploads.
 
+### Phase 64: Financial Command Center (Sync Payroll)
+- **Live Sync**: Payroll dashboard now mirrors backend payslips in real-time.
+- **Tax & BPJS Insight**: Detailed breakdown modal showing PPh 21 (TER 2024) and BPJS Kesehatan/Ketenagakerjaan.
+- **Admin Power**: Dedicated modal for bulk payroll generation across specific periods.
+- **PDF Generation**: Direct integration with backend `pdf_generator` for instant payslip downloads.
+
 ---
-**Status**: 🏆 Self-Service Expansion (Phase 63) Complete (March 21, 2026)
+**Status**: 🏆 Financial Core (Phase 64) Complete (March 21, 2026)

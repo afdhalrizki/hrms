@@ -105,5 +105,34 @@
       "attachment": "Lampiran Kwitansi (PDF/Gambar)",
       "receiptNumber": "Nomor Kwitansi / Faktur"
     }
+  },
+  "Payroll": {
+    "title": "Manajemen Payroll",
+    "subtitle": "Hitung gaji, pajak (PPh 21), dan buat slip gaji.",
+    "runPayroll": "Jalankan Sistem Payroll",
+    "stats": {
+      "totalPayroll": "Total Payroll",
+      "pph21": "Potongan PPh 21",
+      "bpjs": "Kontribusi BPJS"
+    },
+    "period": "Periode Payroll",
+    "history": "Lihat Semua Riwayat",
+    "table": {
+      "employee": "Karyawan",
+      "basic": "Gaji Pokok",
+      "net": "Gaji Bersih",
+      "status": "Status",
+      "actions": "Aksi"
+    },
+    "modal": {
+      "generateTitle": "Buat Payroll",
+      "selectPeriod": "Pilih Periode",
+      "generateBtn": "Buat Sekarang",
+      "detailTitle": "Rincian Slip Gaji",
+      "basicSalary": "Gaji Pokok",
+      "allowances": "Tunjangan",
+      "deductions": "Potongan",
+      "takeHomePay": "Gaji Bersih (THP)"
+    }
   }
 }

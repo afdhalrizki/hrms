@@ -105,5 +105,34 @@
       "attachment": "Receipt Attachment (PDF/Image)",
       "receiptNumber": "Receipt / Invoice #"
     }
+  },
+  "Payroll": {
+    "title": "Payroll Management",
+    "subtitle": "Calculate salaries, taxes (PPh 21), and generate payslips.",
+    "runPayroll": "Run Payroll System",
+    "stats": {
+      "totalPayroll": "Total Payroll",
+      "pph21": "PPh 21 Deducted",
+      "bpjs": "BPJS Contribution"
+    },
+    "period": "Payroll Period",
+    "history": "View All History",
+    "table": {
+      "employee": "Employee",
+      "basic": "Basic Salary",
+      "net": "Net Pay",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "modal": {
+      "generateTitle": "Generate Payroll",
+      "selectPeriod": "Select Period",
+      "generateBtn": "Generate Now",
+      "detailTitle": "Payslip Breakdown",
+      "basicSalary": "Basic Salary",
+      "allowances": "Allowances",
+      "deductions": "Deductions",
+      "takeHomePay": "Take Home Pay"
+    }
   }
 }
