@@ -42,6 +42,10 @@ src/
 ### Phase 67: SaaS Profile & Branding
 - **Branding**: Tenant settings for company logo, colors, and subscription limits.
 
+### Phase 68: E2E Hardening (Playwright)
+- **Coverage Expansion**: Implementation of full-flow testing for Admin (Provisioning, Approvals) and Employee (ESS, Payslip download).
+- **Automation**: Integration of Playwright into the CI/CD pipeline.
+
 ## 🎨 3. Design System: Glassmorphism Hub
 We use a unified design language to ensure a "Premium SaaS" feel.
 
@@ -70,4 +74,11 @@ We use a unified design language to ensure a "Premium SaaS" feel.
 ## ✅ 7. Testing Philosophy
 - **Unit Tests**: Focus on logic in `hooks/` and `utils/`.
 - **Integration Tests**: Focus on critical flows like `Login`, `Signup`, and `Attendance Correction`.
+
+## 🎭 8. E2E Testing Strategy: Playwright
+We use Playwright for cross-browser validation of the most critical business flows.
+
+- **Storage State**: Use a shared `auth.setup.ts` to reuse login sessions and speed up tests.
+- **Geofencing Simulation**: Mocking browser geolocation API to test attendance validation.
+- **Visual Regression**: Baseline screenshots for the premium Glassmorphism UI components.
 - **Mocks**: Standardize API mocks using `msw` (Mock Service Worker) for consistent testing environment.
