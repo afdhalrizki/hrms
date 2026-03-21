@@ -4,13 +4,14 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 
 ## ✨ High-End Features
 
-- **Multi-Tenant Experience**: Automatic tenant detection via subdomain parsing.
-- **Premium Aesthetics**: Glassmorphism UI design with smooth Framer Motion transitions and dark-mode optimization.
-- **Identity Hydration**: Real-time user profile management integrated with the unified backend identity API.
-- **Admin Provisioning**: Centralized dashboard to map employees efficiently structure global access right.
-- **Executive Analytics**: Dynamic charts for headcount, attendance trends, and HR cost distribution.
-- **Self-Service Onboarding**: Integrated registration flow for new customers with real-time validation.
-- **Tenant Workspace Customization**: Settings dashboard for admins to upload branding logos and contact details dynamically mapped across the UI.
+- **Multi-Tenant Experience**: Automatic tenant detection via subdomain parsing and workspace branding.
+- **Attendance Management**: Real-time tracking of employee check-ins, geofencing status, and correction requests.
+- **Workflow & Approvals**: Multi-stage approval system for leaves, overtime, and reimbursements with configurable stages.
+- **Payroll Processing**: Automated payslip generation with TER 2024 compliance and salary component management.
+- **Performance Appraisals**: KPI-based performance tracking and review cycles for all organizational levels.
+- **Provisioning & RBAC**: Granular role-based access control and branch-specific management for distributed teams.
+- **Analytics Dashboard**: High-level executive insights into headcount, attendance trends, and payroll costs.
+- **Secret Admin Portal**: Centralized registrar for managing tenant growth and system-wide configurations.
 
 ## 🖼 UI Previews
 

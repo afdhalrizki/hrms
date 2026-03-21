@@ -1,0 +1,64 @@
+00:00 +0: loading D:/hr/hrms/mobile/test/api_service_test.dart
+test/api_service_test.dart:44:9: Error: The argument type 'Null' can't be assigned to the parameter type 'Uri'.
+ - 'Uri' is from 'dart:core'.
+        any,
+        ^
+test/api_service_test.dart:61:9: Error: The argument type 'Null' can't be assigned to the parameter type 'Uri'.
+ - 'Uri' is from 'dart:core'.
+        any,
+        ^
+00:00 +0 -1: loading D:/hr/hrms/mobile/test/api_service_test.dart [E]
+  Failed to load "D:/hr/hrms/mobile/test/api_service_test.dart":
+  Compilation failed for testPath=D:/hr/hrms/mobile/test/api_service_test.dart: test/api_service_test.dart:44:9: Error: The argument type 'Null' can't be assigned to the parameter type 'Uri'.
+   - 'Uri' is from 'dart:core'.
+          any,
+          ^
+  test/api_service_test.dart:61:9: Error: The argument type 'Null' can't be assigned to the parameter type 'Uri'.
+   - 'Uri' is from 'dart:core'.
+          any,
+          ^
+  .
+  Error: The Dart compiler exited unexpectedly.
+  package:flutter_tools/src/base/common.dart 34:3  throwToolExit
+  package:flutter_tools/src/compile.dart 939:11    DefaultResidentCompiler._compile.<fn>
+  dart:async/zone_root.dart 48:47                  _rootRunUnary
+  dart:async/zone.dart 733:19                      _CustomZone.runUnary
+  dart:async/future_impl.dart 948:45               Future._propagateToListeners.handleValueCallback
+  dart:async/future_impl.dart 977:13               Future._propagateToListeners
+  dart:async/future_impl.dart 862:9                Future._propagateToListeners
+  dart:async/future_impl.dart 720:5                Future._completeWithValue
+  dart:async/future_impl.dart 804:7                Future._asyncCompleteWithValue.<fn>
+  dart:async/zone_root.dart 35:13                  _rootRun
+  dart:async/zone.dart 726:19                      _CustomZone.run
+  dart:async/zone.dart 625:7                       _CustomZone.runGuarded
+  dart:async/zone.dart 666:23                      _CustomZone.bindCallbackGuarded.<fn>
+  dart:async/schedule_microtask.dart 40:35         _microtaskLoop
+  dart:async/schedule_microtask.dart 49:5          _startMicrotaskLoop
+  dart:isolate-patch/isolate_patch.dart 127:13     _runPendingImmediateCallback
+  dart:isolate-patch/isolate_patch.dart 194:5      _RawReceivePort._handleMessage
+  
+Error: Couldn't resolve the package 'flutter_gen' in 'package:flutter_gen/gen_l10n/app_localizations.dart'.
+lib/main.dart:3:8: Error: Not found: 'package:flutter_gen/gen_l10n/app_localizations.dart'
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+       ^
+00:00 +0 -1: D:/hr/hrms/mobile/test/models_test.dart: Model Parsing Tests Shift.fromJson parses correctly
+00:00 +1 -1: D:/hr/hrms/mobile/test/models_test.dart: Model Parsing Tests Shift.fromJson handles missing break_duration with default
+00:00 +2 -1: D:/hr/hrms/mobile/test/models_test.dart: Model Parsing Tests Schedule.fromJson parses correctly with nested shift
+lib/main.dart:29:9: Error: The getter 'AppLocalizations' isn't defined for the type 'HRMSApp'.
+ - 'HRMSApp' is from 'package:mobile/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLocalizations'.
+        AppLocalizations.delegate,
+        ^^^^^^^^^^^^^^^^
+00:02 +3 -2: loading D:/hr/hrms/mobile/test/widget_test.dart [E]
+  Failed to load "D:/hr/hrms/mobile/test/widget_test.dart":
+  Compilation failed for testPath=D:/hr/hrms/mobile/test/widget_test.dart: Error: Couldn't resolve the package 'flutter_gen' in 'package:flutter_gen/gen_l10n/app_localizations.dart'.
+  lib/main.dart:3:8: Error: Not found: 'package:flutter_gen/gen_l10n/app_localizations.dart'
+  import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+         ^
+  lib/main.dart:29:9: Error: The getter 'AppLocalizations' isn't defined for the type 'HRMSApp'.
+   - 'HRMSApp' is from 'package:mobile/main.dart' ('lib/main.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLocalizations'.
+          AppLocalizations.delegate,
+          ^^^^^^^^^^^^^^^^
+  .
+00:02 +3 -2: Some tests failed.

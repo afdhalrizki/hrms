@@ -9,6 +9,8 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Integrated Identity**: Real-time synchronization with the unified backend identity system (Employee NIK, Role, Department).
 - **Shift & Schedule**: Personal work calendar with real-time shift status.
 - **Dynamic Payslips**: View and download payroll details with TER 2024 compliance data.
+- **Leave Management**: Submit leave requests (Annual, Permission, Sick) and track balances in real-time.
+- **Reimbursement Claims**: Easy expense submission with category-based validation and status tracking.
 
 ## 🖼 UI Previews
 
@@ -72,7 +74,7 @@ Run the mobile test suite (API logic & Widgets):
 ```bash
 flutter test
 ```
-**Status**: All core flows verified with manual mocks and unit tests.
+**Status**: 11 core tests passed (Unit + Widget). Includes API validation, model parsing, and UI flow verification.
 
 ---
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

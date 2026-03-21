@@ -13,6 +13,10 @@ class ApiService {
   // Singleton pattern with internal constructor
   static ApiService? _instance;
   
+  static void reset() {
+    _instance = null;
+  }
+
   factory ApiService({http.Client? client}) {
     _instance ??= ApiService._internal(client ?? http.Client());
     return _instance!;
@@ -154,5 +158,73 @@ class ApiService {
     } else {
       throw Exception('Failed to fetch schedules');
     }
+  }
+
+  // Phase 2: Leave Management
+  Future<List<dynamic>> getLeaveRequests() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/leave-requests/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch leave requests');
+  }
+
+  Future<void> applyLeave(Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.post(
+      Uri.parse("$baseUrl/leave-requests/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    );
+    if (response.statusCode != 201) throw Exception('Failed to apply leave: ${response.body}');
+  }
+
+  Future<List<dynamic>> getLeaveBalances() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/leave-balances/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch leave balance');
+  }
+
+  // Phase 2: Reimbursements
+  Future<List<dynamic>> getReimbursements() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/reimbursements/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch reimbursements');
+  }
+
+  Future<List<dynamic>> getReimbursementCategories() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/reimbursement-categories/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch reimbursement categories');
+  }
+
+  Future<void> applyReimbursement(Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.post(
+      Uri.parse("$baseUrl/reimbursements/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    );
+    if (response.statusCode != 201) throw Exception('Failed to submit reimbursement: ${response.body}');
   }
 }

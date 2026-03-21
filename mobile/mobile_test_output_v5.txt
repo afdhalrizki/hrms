@@ -1,0 +1,21 @@
+00:00 +0: loading D:/hr/hrms/mobile/test/api_service_test.dart
+00:00 +0: D:/hr/hrms/mobile/test/api_service_test.dart: (setUpAll)
+00:00 +0: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests Tenant storage works
+00:00 +1: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests login sends correct payload and saves token
+00:00 +2: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests login sends correct payload and saves token
+00:00 +3: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests login sends correct payload and saves token
+00:00 +3 -1: D:/hr/hrms/mobile/test/models_test.dart: Model Parsing Tests Schedule.fromJson parses correctly with nested shift
+00:00 +3 -1: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests login sends correct payload and saves token [E]
+  Exception: Failed to login: 
+  package:mobile/api/api_service.dart 63:7  ApiService.login
+  
+00:00 +4 -1: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests login throws exception on failure
+00:00 +5 -1: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests getUserProfile returns parsed JSON on success
+00:00 +5 -2: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests getUserProfile returns parsed JSON on success [E]
+  MissingPluginException(No implementation found for method read on channel plugins.it_nomads.com/flutter_secure_storage)
+  package:flutter/src/services/platform_channel.dart 364:7  MethodChannel._invokeMethod
+  
+00:00 +5 -2: D:/hr/hrms/mobile/test/api_service_test.dart: ApiService Tests User.fromJson parses flattened backend response
+00:00 +6 -2: D:/hr/hrms/mobile/test/api_service_test.dart: (tearDownAll)
+00:00 +6 -2: D:/hr/hrms/mobile/test/widget_test.dart: App smoke test - renders Login screen
+00:01 +7 -2: Some tests failed.

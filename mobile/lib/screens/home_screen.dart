@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'payslip_screen.dart';
 import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
+import 'leave_list_screen.dart';
+import 'reimbursement_list_screen.dart';
 import '../api/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -272,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final items = [
       {'icon': Icons.calendar_today, 'label': 'Leaves', 'color': const Color(0xFFEF4444)},
       {'icon': Icons.receipt, 'label': 'Payslip', 'color': const Color(0xFF10B981)},
-      {'icon': Icons.timer, 'label': 'Overtime', 'color': const Color(0xFFF59E0B)},
+      {'icon': Icons.payments, 'label': 'Reimbursements', 'color': const Color(0xFFF59E0B)},
       {'icon': Icons.description, 'label': 'Reports', 'color': const Color(0xFF6366F1)},
     ];
 
@@ -290,11 +292,12 @@ class _HomeScreenState extends State<HomeScreen> {
         final item = items[index];
         return InkWell(
           onTap: () {
-            if (item['label'] == 'Payslip') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PayslipScreen()),
-              );
+            if (item['label'] == 'Leaves') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const LeaveListScreen()));
+            } else if (item['label'] == 'Payslip') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const PayslipScreen()));
+            } else if (item['label'] == 'Reimbursements') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ReimbursementListScreen()));
             }
           },
           borderRadius: BorderRadius.circular(20),

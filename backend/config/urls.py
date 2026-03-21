@@ -28,7 +28,7 @@ from core.views import (
 )
 from attendance.views import (
     AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, 
-    ShiftViewSet, ScheduleViewSet, AttendanceCorrectionRequestViewSet
+    ShiftViewSet, ScheduleViewSet, AttendanceCorrectionRequestViewSet, LeaveBalanceViewSet
 )
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
@@ -49,6 +49,7 @@ router.register(r'leave-requests', LeaveRequestViewSet)
 router.register(r'overtime', OvertimeViewSet)
 router.register(r'shifts', ShiftViewSet)
 router.register(r'schedules', ScheduleViewSet)
+router.register(r'leave-balances', LeaveBalanceViewSet)
 router.register(r'salary-components', SalaryComponentViewSet)
 router.register(r'payroll-periods', PayrollPeriodViewSet)
 router.register(r'payslips', PayslipViewSet)
