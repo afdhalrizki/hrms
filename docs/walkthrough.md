@@ -64,7 +64,7 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Flexibility**: Centralized `TENANT_DOMAIN_SUFFIX` allowing easy switch between `.harikerja.com`, `.stg.hrms.com`, or `.hrms.com`.
 
 ### Testing Status
-- **Backend (149/149 Scenarios OK)**: 100% logic coverage across all modules.
+- **Backend (153/153 Scenarios OK)**: 100% logic coverage across all modules.
     - **Payroll**: TER 2024, BPJS 2024 Wage Caps (Health 12m, JP 10.04m), Overtime Precedences, and Reimbursement Integration.
     - **Performance**: KPI strategy tracking, Appraisal lifecycle with 33 dedicated tests.
     - **Attendance**: Geofencing, Flexible Shifts, Leave Conflict Blocking.
@@ -134,5 +134,11 @@ A complete administrative interface has been established for all backend modules
 - **Reimbursement Admin**: Category management and claim processing with detailed fieldsets.
 - **Performance Admin**: KPI definitions, target tracking, and Appraisal lifecycles with `AppraisalReview` inlines.
 - **Verification**: All 8 core modules now have native Django Admin support.
+
+### Phase 61: Comprehensive Reporting System (Complete)
+Transformed raw data into actionable insights through standardized export features.
+- **Attendance Recap**: New monthly CSV export providing a summary of Presence, Lateness, and Absence per employee. Verified with unit tests.
+- **Appraisal Summary**: New CSV export for performance reviews, allowing HR to aggregate appraisal statuses and timelines. Verified with unit tests.
+- **Payroll & Reimbursement**: Re-verified existing PDF and CSV export capabilities.
 
 **Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**

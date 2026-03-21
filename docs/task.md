@@ -227,6 +227,11 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Performance**: Register `KPI`, `KPITarget`, `Appraisal`, and `AppraisalReview`.
 - [x] **Verification**: Verify all modules are accessible in the Django Admin portal.
 
+## Phase 61: Comprehensive Reporting System [COMPLETED]
+- [x] **Attendance**: Monthly attendance recap export (CSV/Excel).
+- [x] **Performance**: Annual appraisal summary and KPI attainment reports.
+- [ ] **Executive Dashboard**: Unified cross-module insights (Headcount, Late Trends, Budget vs Actual).
+
 ## Future Roadmap
 - [ ] **Phase 57**: Horizontal App Scaling (Kubernetes).
 - [ ] **Phase 58**: Database Sharding for Heavy Tenants.

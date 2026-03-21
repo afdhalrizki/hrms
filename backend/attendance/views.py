@@ -2,6 +2,7 @@ import math
 from decimal import Decimal
 from datetime import date, datetime
 from rest_framework import viewsets, permissions, status, serializers
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.cache import cache
 from core.audit import AuditModelMixin
@@ -111,6 +112,44 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return super().create(request, *args, **kwargs)
+
+    @action(detail=False, methods=['get'])
+    def export_csv(self, request):
+        import csv
+        from django.http import HttpResponse
+        from django.db.models import Count, Q
+        
+        month = request.query_params.get('month')
+        year = request.query_params.get('year')
+        
+        if not (month and year):
+            return Response({'error': 'Month and year are required.'}, status=400)
+            
+        # Aggregate stats per employee for the given month/year
+        stats = Attendance.objects.filter(
+            date__month=month, 
+            date__year=year
+        ).values('employee__fullname', 'employee__nik').annotate(
+            total_present=Count('id', filter=Q(status='PRESENT')),
+            total_late=Count('id', filter=Q(status='LATE')),
+            total_offsite=Count('id', filter=Q(status='OFF_SITE')),
+            total_absent=Count('id', filter=Q(status='ABSENT')),
+        )
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="attendance_recap_{month}_{year}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Employee Name', 'NIK', 'Present', 'Late', 'Off-site', 'Absent'])
+        
+        for s in stats:
+            writer.writerow([
+                s['employee__fullname'], s['employee__nik'],
+                s['total_present'], s['total_late'], 
+                s['total_offsite'], s['total_absent']
+            ])
+            
+        return response
 
     def perform_update(self, serializer):
         user = self.request.user

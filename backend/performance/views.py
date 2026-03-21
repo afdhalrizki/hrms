@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission, FeatureRequiredPermission
 from .models import KPI, KPITarget, Appraisal, AppraisalReview
@@ -56,6 +57,30 @@ class AppraisalViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if employee:
             return Appraisal.objects.filter(employee=employee)
         return Appraisal.objects.none()
+
+    @action(detail=False, methods=['get'])
+    def export_csv(self, request):
+        import csv
+        from django.http import HttpResponse
+        
+        queryset = self.get_queryset()
+        status_filter = request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+            
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="appraisal_summary.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Employee Name', 'Period', 'Status', 'Start Date', 'End Date'])
+        
+        for a in queryset:
+            writer.writerow([
+                a.employee.fullname, a.period_name, a.get_status_display(),
+                a.start_date, a.end_date
+            ])
+            
+        return response
 
 class AppraisalReviewViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = AppraisalReview.objects.all()
