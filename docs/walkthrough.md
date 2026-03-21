@@ -1,8 +1,25 @@
-# Walkthrough: Web Frontend (harikerja HRMS)
+# Walkthrough: harikerja HRMS (Fullstack)
 
-A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR management and executive analytics.
+A premium HRMS ecosystem with a robust Multi-Tenant Backend and a glassmorphism Next.js 14 Frontend.
 
-## ✨ Feature Evolution
+## 🖥️ Backend Infrastructure (Core)
+
+The backend is built with Python 3.12 and Django, focusing on security, performance, and enterprise-grade multi-tenancy.
+
+### Phase 1-10: Multi-Tenant Foundation
+- **Architecture**: Schema-level isolation using `django-tenants`.
+- **Identity**: Unified User-Employee model with JWT authentication.
+- **Organization**: Hierarchical master data (Departments, Roles, Employee Records).
+
+### Phase 56-61: Logic Hardening & Test Coverage
+- **Payroll Engine**: Implementation of TER 2024 PPh 21, BPJS calculations, and dynamic PDF generation.
+- **Biometric Attendance**: Geofencing and biometric validation logic for clock-ins.
+- **Hardening**: Achieved **100% test pass rate** across 86 mission-critical scenarios (Attendance, Payroll, Appraisal).
+- **Refactoring**: Standardized test directory structure ensuring modular scalability.
+
+---
+
+## ✨ Frontend Evolution (Web)
 
 ### Phase 1-3: UI Framework & Core Dashboard
 - **Tech Stack**: Next.js 14, Tailwind CSS, Framer Motion.
@@ -57,4 +74,24 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Unified Identity**: Seamless propagation of branding assets across the Sidebar, Topbar, and interactive UI elements.
 
 ---
-**Status**: 🏆 SaaS Branding (Phase 67) Complete (March 21, 2026)
+
+## 🛠️ Local Development Experience
+
+To streamline development across the stack, we provide automated scripts for local setup.
+
+### Backend Local Dev (`run_dev.ps1`)
+Located in the `backend/` directory, this script automates the entire local stack:
+1. **Container Orchestration**: Starts `db`, `redis`, and `pgbouncer`.
+2. **Auto-Environment**: Maps `.env.local` and overrides hosts for native execution.
+3. **Dependency Sync**: Manages Python `venv` and `pip install`.
+4. **Data Sync**: Runs schema migrations for both shared and tenant data.
+
+**Usage**:
+```powershell
+cd backend
+.\run_dev.ps1
+```
+
+---
+**Status**: 🏆 Fullstack Hardening (v1.1.0-Hardened) Complete (March 21, 2026)
+

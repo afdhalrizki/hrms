@@ -1,5 +1,5 @@
-# HRMS Backend Test Runner (PowerShell)
-# This script ensures Docker services are running and then executes pytest.
+# HRMS Backend Local Development Script (PowerShell)
+# This script automates Docker services, environment setup, and Django server execution.
 
 $ErrorActionPreference = "Stop"
 
@@ -8,9 +8,9 @@ $BackendDir = Get-Location
 $RootDir = Split-Path -Parent $BackendDir
 $EnvFile = Join-Path $RootDir "environments\.env.local"
 $VenvDir = Join-Path $BackendDir "venv"
-$PytestExec = Join-Path $VenvDir "Scripts\pytest.exe"
+$PythonExec = Join-Path $VenvDir "Scripts\python.exe"
 
-Write-Host "--- HRMS Backend Test Environment Setup ---" -ForegroundColor Cyan
+Write-Host "--- HRMS Backend Local Dev Setup ---" -ForegroundColor Cyan
 
 # 2. Check for .env.local
 if (-not (Test-Path $EnvFile)) {
@@ -18,7 +18,7 @@ if (-not (Test-Path $EnvFile)) {
 }
 
 # 3. Handle Docker Services (DB, Redis, PgBouncer)
-Write-Host "[1/3] Ensuring Docker services (db, redis, pgbouncer) are running..." -ForegroundColor Yellow
+Write-Host "[1/5] Ensuring Docker services (db, redis, pgbouncer) are running..." -ForegroundColor Yellow
 
 # Check if Docker is running
 docker info >$null 2>&1
@@ -28,7 +28,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 try {
+    # We use docker-compose from the root directory
     Push-Location $RootDir
+    # Support both 'docker-compose' and 'docker compose'
     $dockerCmd = "docker-compose"
     if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
         $dockerCmd = "docker compose"
@@ -47,8 +49,9 @@ try {
     exit 1
 }
 
+
 # 4. Sourcing Environment Variables & Overriding for Local
-Write-Host "[2/3] Loading environment variables..." -ForegroundColor Yellow
+Write-Host "[2/5] Loading environment variables..." -ForegroundColor Yellow
 $content = Get-Content $EnvFile
 foreach ($line in $content) {
     if ($line -match "^([^#=]+)=(.*)$") {
@@ -84,12 +87,26 @@ if ($tryCount -eq $maxTries) {
 }
 
 # 5. Virtual Environment Check
-Write-Host "[3/3] Checking pytest in virtual environment..." -ForegroundColor Yellow
-if (-not (Test-Path $PytestExec)) {
-    Write-Host "pytest not found in $VenvDir. Please ensure venv is setup and dependencies are installed." -ForegroundColor Red
-    exit 1
+
+Write-Host "[3/5] Checking virtual environment..." -ForegroundColor Yellow
+if (-not (Test-Path $VenvDir)) {
+    Write-Host "Creating virtual environment..." -ForegroundColor Gray
+    python -m venv venv
 }
 
-# 6. Run Pytest
-Write-Host "--- Running HRMS Backend Tests ---" -ForegroundColor Green
-& $PytestExec @args
+# 6. Install/Update Requirements
+Write-Host "[4/5] Syncing dependencies..." -ForegroundColor Yellow
+& $PythonExec -m pip install -r requirements.txt | Out-Null
+
+# 7. Database Migrations
+Write-Host "[5/5] Checking migrations (shared & tenant)..." -ForegroundColor Yellow
+try {
+    & $PythonExec manage.py migrate_schemas --shared --noinput
+    & $PythonExec manage.py migrate_schemas --tenant --noinput
+} catch {
+    Write-Host "Migration failed. You might need to run 'python manage.py bootstrap_tenants' if this is first run." -ForegroundColor Red
+}
+
+# 8. Start Server
+Write-Host "--- Starting Django Server at http://localhost:8000 ---" -ForegroundColor Green
+& $PythonExec manage.py runserver 0.0.0.0:8000
