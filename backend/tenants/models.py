@@ -72,18 +72,25 @@ class Tenant(TenantMixin):
     def save(self, *args, **kwargs):
         # Set default modules and quotas based on plan if not already set
         if not self.pk:
-            if self.plan_type == 'BASIC':
-                self.enabled_modules = ['core', 'attendance']
+            if not self.enabled_modules:
+                if self.plan_type == 'BASIC':
+                    self.enabled_modules = ['core', 'attendance']
+                    self.max_employees = 50
+                    self.storage_limit_mb = 100
+                elif self.plan_type == 'PROFESSIONAL':
+                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement']
+                    self.max_employees = 250
+                    self.storage_limit_mb = 1000
+                elif self.plan_type == 'ENTERPRISE':
+                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+                    self.max_employees = 10000
+                    self.storage_limit_mb = 10000
+            
+            # Quotas should still be applied if not default
+            if self.plan_type == 'BASIC' and self.max_employees == 1000:
                 self.max_employees = 50
-                self.storage_limit_mb = 100
-            elif self.plan_type == 'PROFESSIONAL':
-                self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement']
+            elif self.plan_type == 'PROFESSIONAL' and self.max_employees == 1000:
                 self.max_employees = 250
-                self.storage_limit_mb = 1000
-            elif self.plan_type == 'ENTERPRISE':
-                self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
-                self.max_employees = 10000
-                self.storage_limit_mb = 10000
         super().save(*args, **kwargs)
 
     @property

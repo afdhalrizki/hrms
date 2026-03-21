@@ -14,6 +14,21 @@ class TenantModelTestCase(TestCase):
         self.assertEqual(tenant.name, 'Test Company')
         self.assertTrue(tenant.auto_create_schema)
 
+    def test_tenant_branding_and_tiering_fields(self):
+        """Verify that branding and tiering fields can be stored and retrieved."""
+        tenant = Tenant.objects.create(
+            schema_name='branding_test',
+            name='Branding Inc',
+            theme_primary_color='#FF0000',
+            theme_secondary_color='#00FF00',
+            enabled_modules=['core', 'attendance', 'payroll'],
+            plan_type='PROFESSIONAL'
+        )
+        self.assertEqual(tenant.theme_primary_color, '#FF0000')
+        self.assertEqual(tenant.theme_secondary_color, '#00FF00')
+        self.assertEqual(tenant.enabled_modules, ['core', 'attendance', 'payroll'])
+        self.assertEqual(tenant.plan_type, 'PROFESSIONAL')
+
     def test_domain_association(self):
         """Verify that a domain can be correctly linked to a tenant."""
         tenant = Tenant.objects.create(
@@ -255,7 +270,9 @@ class TenantSettingsTestCase(TenantTestCase):
         payload = {
             'address': 'New Headquarters, Tech Park',
             'phone': '08123456789',
-            'overtime_rate': '150000.00'
+            'overtime_rate': '150000.00',
+            'theme_primary_color': '#0000FF',
+            'enabled_modules': ['core', 'attendance', 'performance']
         }
         response = self.client.patch(self.settings_url, payload, format='json', HTTP_HOST=self.domain_name)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -263,6 +280,8 @@ class TenantSettingsTestCase(TenantTestCase):
         self.tenant.refresh_from_db()
         self.assertEqual(self.tenant.address, 'New Headquarters, Tech Park')
         self.assertEqual(self.tenant.overtime_rate, 150000)
+        self.assertEqual(self.tenant.theme_primary_color, '#0000FF')
+        self.assertEqual(self.tenant.enabled_modules, ['core', 'attendance', 'performance'])
 
     def test_settings_update_unauthorized(self):
         """Verify that regular employees are blocked from updating settings."""

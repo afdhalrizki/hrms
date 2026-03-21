@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { AppraisalReviewModal } from '@/components/performance/AppraisalReviewModal';
 import { cn } from '@/lib/utils';
+import { FeatureGuard } from '@/components/shared/FeatureGuard';
 
 interface KPI {
   id: number;

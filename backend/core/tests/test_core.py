@@ -276,6 +276,25 @@ class AuditIntegrationTestCase(TenantTestCase):
         self.assertIn('name', update_log.changed_fields)
         self.assertEqual(update_log.changed_fields['name']['new'], 'AuditGradeUpdated')
 
+    def test_audit_log_api_listing(self):
+        """Verify that admins can list audit logs via API."""
+        from core.models import AuditLog
+        with schema_context(self.tenant.schema_name):
+            AuditLog.objects.create(
+                model_name='TestModel',
+                object_id='1',
+                action_type='CREATE',
+                actor=self.user,
+                changed_fields={'test': {'new': True}}
+            )
+        
+        self.client.force_login(self.user)
+        url = reverse('auditlog-list')
+        response = self.client.get(url, SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['model_name'], 'TestModel')
+
 class DataConstraintTestCase(TenantTestCase):
     def test_employee_ptkp_validation(self):
         """Verify PTKP status choices in Employee model."""

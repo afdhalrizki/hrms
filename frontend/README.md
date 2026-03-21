@@ -11,6 +11,7 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 - **Performance Appraisals**: KPI-based performance tracking and review cycles for all organizational levels.
 - **Provisioning & RBAC**: Granular role-based access control and branch-specific management for distributed teams.
 - **Analytics Dashboard**: High-level executive insights into headcount, attendance trends, and payroll costs.
+- **Modular Tiering & Gating**: Intelligent feature masking via `FeatureGuard` based on tenant subscription plans.
 - **Secret Admin Portal**: Centralized registrar for managing tenant growth and system-wide configurations.
 
 ## 🖼 UI Previews
@@ -38,8 +39,8 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 ## 📁 Key Components
 
 - `src/app/`: File-based routing including Signup, Login, and Dashboard.
-- `src/context/`: Tenant and Auth state management.
-- `src/components/`: Reusable UI components (Sidebar, Charts, Cards).
+- `src/context/`: Tenant and Auth state management with **Module Gating**.
+- `src/components/`: Reusable UI components including the new `FeatureGuard`.
 - `src/lib/`: API client and utility helpers.
 
 ---
@@ -79,4 +80,5 @@ npm test
 **Coverage**: 100% logic coverage for critical helpers (`api.ts`, `TenantContext.tsx`, `AuthContext.tsx`).
 
 ---
+**Status**: 🏆 **Phase 69 (Modular Tiering) Integrated (March 21, 2026)**
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

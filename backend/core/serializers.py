@@ -36,7 +36,7 @@ class APIKeySerializer(serializers.ModelSerializer):
 
 
 class AuditLogSerializer(serializers.ModelSerializer):
-    actor_name = serializers.ReadOnlyField(source='actor.fullname')
+    actor_name = serializers.ReadOnlyField(source='actor.email')
 
     class Meta:
         model = AuditLog

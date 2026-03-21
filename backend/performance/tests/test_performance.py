@@ -547,26 +547,46 @@ class AppraisalReviewAPITestCase(PerformanceModuleTestCase):
         self.assertIn('reviewer_name', response.data)
         self.assertEqual(response.data['reviewer_name'], 'Admin User')
 
-    def test_appraisal_review_invalid_reviewer(self):
-        """Verify that a non-supervisor cannot submit a MANAGER review without permission."""
-        # emp2 is NOT the supervisor of emp.
-        # emp2 tries to submit a MANAGER review for emp's appraisal.
+    def test_manager_review_permission_supervisor_success(self):
+        """Verify that a direct supervisor can submit a MANAGER review."""
+        with schema_context(self.tenant.schema_name):
+            # Set emp2 as supervisor of emp
+            self.emp.supervisor = self.emp2
+            self.emp.save()
+        
         self.client.force_login(self.emp2_user)
         payload = {
             'appraisal': self.appraisal.id,
             'reviewer': self.emp2.id,
             'reviewer_type': 'MANAGER',
             'ratings': {'score': 5},
-            'comments': 'Unauthorized review'
+            'comments': 'Supervisor review'
         }
         response = self.client.post(reverse('appraisalreview-list'), payload, format='json', SERVER_NAME=self.domain_name)
-        # Should be forbidden by RBAC or ViewSet logic
-        # Actually our HasRBACPermission blocks POST/PATCH if allow_self_service=False for custom actions,
-        # but AppraisalReviewViewSet has allow_self_service=True? Let's check.
-        # Wait, if allow_self_service=True, owners can POST.
-        # But even if allow_self_service is True, we should probably check if it's the OWNER of the review.
-        # But here emp2 IS the owner of the *review* they are trying to create.
-        # So view-level RBAC passes (POST allowed).
-        # We need to check if the reviewer profile matches the reviewer_type and hierarchy.
-        # This requires validation in the serializer/view.
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_self_review_permission_owner_success(self):
+        """Verify that an employee can submit a SELF review for their own appraisal."""
+        self.client.force_login(self.emp_user)
+        payload = {
+            'appraisal': self.appraisal.id,
+            'reviewer': self.emp.id,
+            'reviewer_type': 'SELF',
+            'ratings': {'score': 4},
+            'comments': 'My self review'
+        }
+        response = self.client.post(reverse('appraisalreview-list'), payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_self_review_permission_wrong_owner_failure(self):
+        """Verify that an employee CANNOT submit a SELF review for someone else's appraisal."""
+        self.client.force_login(self.emp2_user)
+        payload = {
+            'appraisal': self.appraisal.id,
+            'reviewer': self.emp2.id,
+            'reviewer_type': 'SELF',
+            'ratings': {'score': 4},
+            'comments': 'Hack review'
+        }
+        response = self.client.post(reverse('appraisalreview-list'), payload, format='json', SERVER_NAME=self.domain_name)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

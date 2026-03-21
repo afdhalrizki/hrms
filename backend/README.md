@@ -11,13 +11,13 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - **Biometric Attendance**: Geofencing-validated clock-in/out with face reference tracking and liveness check metadata.
 - **Comprehensive Reporting**: Standardized CSV/PDF exports for Attendance recaps, Appraisal summaries, and Payroll data.
 - **Strategic HR**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
-- **Enterprise Ready**: Request caching with Redis and connection pooling with PgBouncer.
+- **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Basic, Professional, Enterprise).
 
 ## 📁 Core Modules
 
-- `tenants/`: Manages customer registration, domain routing, and schema migrations.
+- `tenants/`: Manages customer registration, domain routing, schema migrations, and **Modular Tiering**.
 - `users/`: Centralized authentication and identity management.
-- `core/`: Basic HR master data (Departments, Roles, Employee Records).
+- `core/`: Basic HR master data (Departments, Roles, Employee Records) and **Audit Logs**.
 - `attendance/`: Scheduling, Geofencing, and Biometric attendance logs.
 - `payroll/`: Salary components, TER 2024 tax engine, and payslip management.
 - `performance/`: KPI strategy tracking and Appraisal lifecycles.
@@ -82,7 +82,7 @@ The system automatically generates OpenAPI 3.0 schemas.
 - **Redoc**: [http://localhost:8000/api/schema/redoc/](http://localhost:8000/api/schema/redoc/)
 
 ### Running Tests
-The backend uses `pytest` with 100% logic coverage across 153 test scenarios.
+The backend uses `pytest` and `manage.py test` with **100% pass rate** across 86 mission-critical scenarios.
 
 ```bash
 # General
@@ -94,5 +94,5 @@ pytest
 
 ---
 
-**Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**
+**Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**. 100% Tests Passed (86/86).
 **Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.
