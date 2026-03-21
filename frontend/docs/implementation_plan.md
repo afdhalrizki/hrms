@@ -37,7 +37,9 @@ src/
 - **API Keys**: UI for managing third-party integration keys.
 
 ### Phase 66: Performance Appraisal Lifecycle
-- **Appraisal Workflow**: Submission Modal for managers to score KPIs and finalize reviews.
+- **Appraisal Workflow**: Dynamic submission modal for managers and employees to score KPIs and finalize reviews.
+- **Ratings Engine**: Standardized 1-5 scoring system stored as JSON in `AppraisalReview`.
+- **KPI Monitoring**: Real-time visualization of `KPITarget` attainment during the review process.
 
 ### Phase 67: SaaS Profile & Branding
 - **Branding**: Tenant settings for company logo, colors, and subscription limits.

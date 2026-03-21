@@ -44,5 +44,11 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **API Key Portal**: Robust management of third-party credentials with secure "show-once" generation logic.
 - **Admin Visibility**: Hardened sidebar navigation to allow only authorized personnel to access system settings.
 
+### Phase 66: Appraisal Lifecycle (KPI Finalization)
+- **KPI Attainment Tracking**: Real-time progress bars and attainment calculation for individual Key Performance Indicators.
+- **Multi-Role Reviews**: Dual-action appraisal system supporting both Self-Appraisal (Employee) and Manager Evaluations.
+- **Weighted Scoring**: Multi-dimensional rating engine (Quality, Communication, Reliability, Teamwork) with automated average calculation.
+- **History Viewer**: Consolidated view of all historical appraisal results with reviewer role identification.
+
 ---
-**Status**: 🏆 Operational Clarity (Phase 65) Complete (March 21, 2026)
+**Status**: 🏆 Appraisal Lifecycle (Phase 66) Complete (March 21, 2026)

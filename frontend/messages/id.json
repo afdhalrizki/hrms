@@ -166,5 +166,27 @@
       "copyBtn": "Salin Key",
       "success": "API Key berhasil dibuat"
     }
+  },
+  "Performance": {
+    "title": "Performa & Penilaian",
+    "subtitle": "Pantau pertumbuhan, KPI, dan tinjauan profesional.",
+    "kpiSection": "Indikator Kinerja Utama (KPI)",
+    "attainment": "Pencapaian",
+    "overallScore": "Skor Keseluruhan",
+    "appraisalHistory": "Riwayat Performa",
+    "modal": {
+      "submitReview": "Kirim Penilaian Kinerja",
+      "selfReview": "Penilaian Diri (Self)",
+      "managerReview": "Evaluasi Manajer",
+      "ratings": {
+        "quality": "Kualitas Kerja",
+        "communication": "Komunikasi",
+        "reliability": "Keandalan & Kehadiran",
+        "teamwork": "Kerjasama Tim"
+      },
+      "commentLabel": "Masukan Rinci / Komentar",
+      "scoreLabel": "Skor Numerik (1-5)",
+      "reviewType": "Peran Penilai"
+    }
   }
 }

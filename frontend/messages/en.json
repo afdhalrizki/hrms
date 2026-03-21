@@ -166,5 +166,27 @@
       "copyBtn": "Copy Key",
       "success": "API Key created successfully"
     }
+  },
+  "Performance": {
+    "title": "Performance & Appraisals",
+    "subtitle": "Track growth, KPIs, and professional reviews.",
+    "kpiSection": "Key Performance Indicators",
+    "attainment": "Attainment",
+    "overallScore": "Overall Score",
+    "appraisalHistory": "Performance History",
+    "modal": {
+      "submitReview": "Submit Performance Review",
+      "selfReview": "Self-Appraisal",
+      "managerReview": "Manager Evaluation",
+      "ratings": {
+        "quality": "Quality of Work",
+        "communication": "Communication",
+        "reliability": "Reliability & Attendance",
+        "teamwork": "Teamwork & Collaboration"
+      },
+      "commentLabel": "Detailed Feedback / Comments",
+      "scoreLabel": "Numeric Score (1-5)",
+      "reviewType": "Review Role"
+    }
   }
 }
