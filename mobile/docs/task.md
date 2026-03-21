@@ -17,11 +17,10 @@ This checklist tracks the implementation of the Flutter-based employee self-serv
 - [ ] **Root/Jailbreak Detection**: Hardware integrity check before biometric submission.
 - [ ] **Biometric Enrollment**: UI flow for initial face reference registration.
 
-## 🚀 3. Advanced Roadmap & Infrastructure
+## 🚀 3. Advanced Roadmap & Infrastructure (Sync Phases)
+- [ ] **Phase M1: Backend Alignment**: Fix API URLs and integrate real GPS (`geolocator`).
+- [ ] **Phase M2: Attendance Lifecycle**: Implement Correction Requests and dynamic Clock-out.
+- [ ] **Phase M3: Strategic Performance**: KPI Progress & Appraisal history screens.
+- [ ] **Phase M4: Operational Feed**: Dynamic Activity list on Home screen.
 - [ ] **Push Notifications**: Real-time alerts for leave/reimbursement approval status.
-- [ ] **Offline Attendance Buffer**: Local caching for check-ins in low-signal areas.
-- [ ] **Performance Feed**: Weekly KPI progress and team leaderboard (optional).
-- [ ] **Architecture Hardening**:
-    - [ ] Implementation of `Clean Architecture` with Repository pattern.
-    - [ ] Migration to `Riverpod` or `BLoC` for robust state management.
-- [x] **Internationalization**: Full ID/EN bilingual support.
+- [ ] **Offline Attendance Buffer**: Local caching for check-ins.

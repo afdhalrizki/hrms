@@ -40,7 +40,20 @@ lib/
 - **Icons**: `Lucide` or `Cupertino` for a modern, clean interface.
 - **Feedback**: Vibrate and Haptic feedback for successful clock-ins.
 
-## ✅ 5. Testing & Validation
-- **Unit Tests**: Coverage for `ApiService` and data parsing in `Models`.
-- **Widget Tests**: Verification of form validation and loading states.
-- **Integration Tests**: Full flow of Login -> Check-in -> Logout using `integration_test` package.
+## 🚀 6. Phased Roadmap: Full Backend Parity
+
+### Phase M1: Infrastructure Alignment & Real-GPS
+- **API URL Correction**: Fix `ApiService` prefixes (e.g., `/api/attendance/leave-requests/`).
+- **Real Geolocation**: Replace hardcoded coords in `HomeScreen` with `geolocator` service.
+
+### Phase M2: Attendance Lifecycle Completion
+- **Clock-Out Logic**: Ensure `submitAttendance` handles the `check_out` payload correctly.
+- **Correction Requests**: [NEW SCREEN] `CorrectionRequestScreen` to allow employees to justify missed logs.
+
+### Phase M3: Strategic Self-Service (Performance)
+- **KPI Tracker**: [NEW SCREEN] Dashboard for personal KPI targets and current progress.
+- **Appraisal View**: [NEW SCREEN] View history of performance reviews and feedback.
+
+### Phase M4: Operational Feed & Audit
+- **Live Activity**: Fetch real data for the "Recent Activity" list on the Home Screen.
+- **Document Center**: Fully functional policy downloader.
