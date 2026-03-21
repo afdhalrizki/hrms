@@ -21,6 +21,8 @@ export function FeatureGuard({
   const { enabledModules, planType } = useTenant();
   const t = useTranslations('Tiering');
 
+  console.log(`Checking access for module: ${module}. Plan: ${planType}, Enabled: ${JSON.stringify(enabledModules)}`);
+  
   // If planning type is Enterprise, always grant access (Safety fallback)
   const hasAccess = planType === 'ENTERPRISE' || (enabledModules?.includes(module));
 

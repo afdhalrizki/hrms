@@ -23,7 +23,7 @@ export default function AttendanceCorrectionsPage() {
   const fetchRequests = React.useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetch('/attendance/attendance-correction-requests/');
+      const data = await apiFetch('/attendance-correction-requests/');
       setRequests(data);
     } catch (error) {
       toast.error('Failed to fetch correction requests');

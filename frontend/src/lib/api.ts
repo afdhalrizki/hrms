@@ -19,7 +19,7 @@ export const getBaseUrl = () => {
     if (isProjectDomain) {
       // For Staging (harikerja.web.id) and Production (harikerja.com), use https
       // If it's a local test (harikerja.web.id:3000), we might still need http + port
-      if (port === '3000' || port === '8000') {
+      if (port === '3000' || port === '3001' || port === '8000') {
          return `http://${host}:${apiPort}/api`;
       }
       return `https://${host}/api`;
@@ -36,17 +36,30 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
   
   const isFormData = options.body instanceof FormData;
+
+  function getCookie(name: string) {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return null;
+  }
   
-  const headers = {
+  const headers: Record<string, string> = {
     ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-    ...options.headers,
+    ...options.headers as Record<string, string>,
   };
+
+  const csrfToken = getCookie('csrftoken');
+  if (csrfToken && typeof window !== 'undefined') {
+    headers['X-CSRFToken'] = csrfToken;
+  }
 
   try {
     const response = await fetch(url, { 
       ...options, 
       headers,
-      credentials: 'include'
+      credentials: options.credentials || 'include'
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

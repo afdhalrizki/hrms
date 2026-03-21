@@ -58,8 +58,8 @@ export default function ReimbursementsPage() {
     try {
       setIsLoading(true);
       const [catData, claimData] = await Promise.all([
-        apiFetch('/reimbursement/reimbursement-categories/'),
-        apiFetch('/reimbursement/reimbursements/'),
+        apiFetch('/reimbursement-categories/'),
+        apiFetch('/reimbursements/'),
       ]);
       setCategories(catData || []);
       setClaims(claimData || []);
@@ -90,7 +90,7 @@ export default function ReimbursementsPage() {
         data.append('attachment', formData.attachment);
       }
 
-      await apiFetch('/reimbursement/reimbursements/', {
+      await apiFetch('/reimbursements/', {
         method: 'POST',
         body: data,
       });

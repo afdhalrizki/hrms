@@ -46,7 +46,7 @@ export default function PayrollPage() {
     try {
       setIsLoading(true);
       const [payslipData, userData] = await Promise.all([
-        apiFetch('/payroll/payslips/'),
+        apiFetch('/payslips/'),
         apiFetch('/users/me/'),
       ]);
       setPayslips(payslipData || []);
@@ -74,18 +74,16 @@ export default function PayrollPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-3xl font-black tracking-tight text-white">{t('title')}</h1>
+            <h1 className="text-3xl font-black tracking-tight text-gray-900">{t('title')}</h1>
             <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
-          {isAdmin && (
-            <button 
-              onClick={() => setIsGenerateModalOpen(true)}
-              className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
-            >
-              <Play size={20} fill="currentColor" />
-              {t('runPayroll')}
-            </button>
-          )}
+          <button 
+            onClick={() => setIsGenerateModalOpen(true)}
+            className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
+          >
+            <Play size={20} fill="currentColor" />
+            {t('runPayroll')}
+          </button>
         </div>
 
         {/* Stats Grid */}
@@ -209,7 +207,7 @@ export default function PayrollPage() {
                           <Eye size={18} />
                         </button>
                         <button 
-                          onClick={() => apiDownload(`/payroll/payslips/${row.id}/download_pdf/`, `Payslip_${row.employee_name.replace(' ', '_')}.pdf`)}
+                          onClick={() => apiDownload(`/payslips/${row.id}/download_pdf/`, `Payslip_${row.employee_name.replace(' ', '_')}.pdf`)}
                           className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-primary hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
                         >
                           <Download size={18} />

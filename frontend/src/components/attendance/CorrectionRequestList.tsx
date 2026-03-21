@@ -31,7 +31,7 @@ export const CorrectionRequestList: React.FC<CorrectionRequestListProps> = ({
     if (comment === null) return;
 
     try {
-      await apiFetch(`/attendance/attendance-correction-requests/${id}/`, {
+      await apiFetch(`/attendance-correction-requests/${id}/`, {
         method: 'PATCH',
         body: JSON.stringify({ status: action, comment }),
       });

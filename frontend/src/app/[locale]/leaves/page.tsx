@@ -55,8 +55,8 @@ export default function LeavesPage() {
     try {
       setIsLoading(true);
       const [balanceData, requestData] = await Promise.all([
-        apiFetch('/attendance/leave-balances/'),
-        apiFetch('/attendance/leave-requests/'),
+        apiFetch('/leave-balances/'),
+        apiFetch('/leave-requests/'),
       ]);
       setBalances(balanceData);
       setRequests(requestData);
@@ -74,7 +74,7 @@ export default function LeavesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiFetch('/attendance/leave-requests/', {
+      await apiFetch('/leave-requests/', {
         method: 'POST',
         body: JSON.stringify(formData),
       });

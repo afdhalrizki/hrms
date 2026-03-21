@@ -30,7 +30,8 @@
     "attendance_corrections": "Correction Requests",
     "reporting": "Reporting",
     "audit_logs": "Audit Logs",
-    "api_keys": "API Keys"
+    "api_keys": "API Keys",
+    "branding": "Branding"
   },
   "Common": {
     "submit": "Submit",
@@ -210,9 +211,12 @@
     "primaryColor": "Primary Theme Color",
     "secondaryColor": "Secondary Theme Color",
     "updateBtn": "Apply Changes",
+    "previewTitle": "Theme Preview",
     "success": "Branding updated successfully"
   },
   "Tiering": {
+    "upgradeTitle": "Premium Feature",
+    "upgradeNeeded": "The {module} module is not available in your current plan. Upgrade to unlock.",
     "upgradeBtn": "Upgrade Plan Now"
   },
   "Auth": {

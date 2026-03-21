@@ -59,8 +59,8 @@ export default function SchedulePage() {
       setIsLoading(true);
       const [empData, shiftData, scheduleData] = await Promise.all([
         apiFetch('/core/employees/'),
-        apiFetch('/attendance/shifts/'),
-        apiFetch(`/attendance/schedules/?start_date=${format(weekDays[0], 'yyyy-MM-dd')}&end_date=${format(weekDays[6], 'yyyy-MM-dd')}`)
+        apiFetch('/shifts/'),
+        apiFetch(`/schedules/?start_date=${format(weekDays[0], 'yyyy-MM-dd')}&end_date=${format(weekDays[6], 'yyyy-MM-dd')}`)
       ]);
       setEmployees(empData);
       setShifts(shiftData);
@@ -90,7 +90,7 @@ export default function SchedulePage() {
       
       if (shiftId === null) {
         if (existing?.id) {
-          await apiFetch(`/attendance/schedules/${existing.id}/`, { method: 'DELETE' });
+          await apiFetch(`/schedules/${existing.id}/`, { method: 'DELETE' });
         }
       } else {
         const body = {
@@ -100,12 +100,12 @@ export default function SchedulePage() {
         };
         
         if (existing?.id) {
-          await apiFetch(`/attendance/schedules/${existing.id}/`, {
+          await apiFetch(`/schedules/${existing.id}/`, {
             method: 'PUT',
             body: JSON.stringify(body),
           });
         } else {
-          await apiFetch('/attendance/schedules/', {
+          await apiFetch('/schedules/', {
             method: 'POST',
             body: JSON.stringify(body),
           });

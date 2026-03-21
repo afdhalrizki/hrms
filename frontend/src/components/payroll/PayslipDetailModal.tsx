@@ -111,7 +111,7 @@ export function PayslipDetailModal({ payslip, onClose }: Props) {
                 </p>
               </div>
               <button 
-                onClick={() => apiDownload(`/payroll/payslips/${payslip.id}/download_pdf/`, `Payslip_${payslip.employee_name.replace(' ', '_')}.pdf`)}
+                onClick={() => apiDownload(`/payslips/${payslip.id}/download_pdf/`, `Payslip_${payslip.employee_name.replace(' ', '_')}.pdf`)}
                 className="px-6 py-3 bg-white text-black rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform shadow-xl shadow-white/5"
               >
                 <Download size={18} />

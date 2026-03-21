@@ -71,8 +71,8 @@ export default function PerformancePage() {
     try {
       setLoading(true);
       const [tData, aData] = await Promise.all([
-        apiFetch('/performance/kpi-targets/'),
-        apiFetch('/performance/appraisals/')
+        apiFetch('/kpi-targets/'),
+        apiFetch('/appraisals/')
       ]);
       setTargets(tData || []);
       setAppraisals(aData || []);

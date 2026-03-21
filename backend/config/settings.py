@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-default-key-repla
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 TENANT_DOMAIN_SUFFIX = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.localhost').split(',')
 
 
 # Application definition
@@ -192,6 +192,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://.*\.localhost:3000$",
     r"^http://localhost:3000$",
 ]
+CORS_ALLOW_CREDENTIALS = True
 # Session and CSRF Cookie Settings for Multi-tenant support
 # Mapping: Dev (.localhost), Staging (.harikerja.web.id), Prod (.harikerja.com)
 SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', '.localhost')

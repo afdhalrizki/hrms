@@ -44,7 +44,7 @@ export default function AttendancePage() {
   const fetchLogs = React.useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetch('/attendance/attendances/');
+      const data = await apiFetch('/');
       setLogs(data);
 
       const today = new Date().toISOString().split('T')[0];
@@ -65,7 +65,7 @@ export default function AttendancePage() {
 
       if (!todayAttendance) {
         // Check In
-        const data = await apiFetch('/attendance/attendances/', {
+        const data = await apiFetch('/', {
           method: 'POST',
           body: JSON.stringify({
             date: today,
@@ -78,7 +78,7 @@ export default function AttendancePage() {
         setTodayAttendance(data);
       } else {
         // Check Out
-        const data = await apiFetch(`/attendance/attendances/${todayAttendance.id}/`, {
+        const data = await apiFetch(`/${todayAttendance.id}/`, {
           method: 'PATCH',
           body: JSON.stringify({
             check_out: time

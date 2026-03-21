@@ -35,6 +35,7 @@ export default function SignupPage() {
       await apiFetch('/public/signup/', {
         method: 'POST',
         body: JSON.stringify(formData),
+        credentials: 'omit',
       });
       setSuccess(true);
     } catch (err: any) {

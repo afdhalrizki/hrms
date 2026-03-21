@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "Next-generation Human Resource Management System",
 };
 
+import { Toaster } from "sonner";
+
 export default async function RootLayout({
   children,
   params,
@@ -50,6 +52,7 @@ export default async function RootLayout({
           <TenantProvider>
             <AuthProvider>
               {children}
+              <Toaster position="top-right" expand={true} richColors />
             </AuthProvider>
           </TenantProvider>
         </NextIntlClientProvider>

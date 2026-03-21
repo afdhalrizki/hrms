@@ -53,7 +53,7 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
 
     setIsSubmitting(true);
     try {
-      await apiFetch('/performance/appraisal-reviews/', {
+      await apiFetch('/appraisal-reviews/', {
         method: 'POST',
         body: JSON.stringify({
           appraisal: appraisalId,
