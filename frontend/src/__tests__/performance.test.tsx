@@ -16,6 +16,13 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock('@/context/TenantContext', () => ({
+  useTenant: vi.fn(() => ({
+    enabledModules: ['performance', 'core', 'attendance', 'payroll'],
+    planType: 'ENTERPRISE',
+  })),
+}));
+
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
