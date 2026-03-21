@@ -48,6 +48,11 @@ src/
 - **Coverage Expansion**: Implementation of full-flow testing for Admin (Provisioning, Approvals) and Employee (ESS, Payslip download).
 - **Automation**: Integration of Playwright into the CI/CD pipeline.
 
+### Phase 69: Modular Tiering (Plan-Based Gating)
+- **Module Mapping**: Define core vs premium features (Performance, Audit, API Keys).
+- **UI Gating**: Implementation of `FeatureGuard` for page-level and component-level restrictions.
+- **Tenant Sync**: Propagating `enabled_modules` from backend to frontend context.
+
 ## 🎨 3. Design System: Glassmorphism Hub
 We use a unified design language to ensure a "Premium SaaS" feel.
 

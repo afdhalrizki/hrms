@@ -13,9 +13,8 @@ interface TenantContextType {
   isLoading: boolean;
   themePrimaryColor?: string;
   themeSecondaryColor?: string;
-  subscriptionStatus?: 'ACTIVE' | 'EXPIRED' | 'SUSPENDED';
-  expiryDate?: string;
   planType?: string;
+  enabledModules?: string[];
   isSubscriptionActive?: boolean;
 }
 
@@ -76,6 +75,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 subscriptionStatus: data.subscription_status,
                 expiryDate: data.expiry_date,
                 planType: data.plan_type,
+                enabledModules: data.enabled_modules,
                 isSubscriptionActive: data.is_subscription_active,
                 isLoading: false,
               }));

@@ -198,5 +198,10 @@
     "updateBtn": "Apply Changes",
     "previewTitle": "UI Preview",
     "success": "Branding updated successfully"
+  },
+  "Tiering": {
+    "upgradeTitle": "Feature Restricted",
+    "upgradeNeeded": "The {module} module is only available in higher plans.",
+    "upgradeBtn": "Upgrade Plan Now"
   }
 }

@@ -39,12 +39,19 @@ const menuItems = [
   { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', isAdminOnly: true },
   { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', isAdminOnly: true },
   { nameKey: 'settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
-  { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', isAdminOnly: true },
-  { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', isAdminOnly: true },
-  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', isAdminOnly: true },
+  { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', isAdminOnly: true, module: 'audit' },
+  { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', isAdminOnly: true, module: 'core' },
+  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', isAdminOnly: true, module: 'core' },
 ];
 
 export function Sidebar() {
+  const { enabledModules, planType } = useTenant();
+  
+  const filteredItems = menuItems.filter(item => {
+    if (planType === 'ENTERPRISE') return true;
+    if (!item.module) return true;
+    return enabledModules?.includes(item.module);
+  });
   const t = useTranslations('Navigation');
   const tCommon = useTranslations('Common');
   const pathname = usePathname();
@@ -91,7 +98,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-1 mt-4">
-          {menuItems.filter(item => {
+          {filteredItems.filter(item => {
             if (item.isAdminOnly && !user?.is_staff && !user?.is_global_admin) {
               return false;
             }

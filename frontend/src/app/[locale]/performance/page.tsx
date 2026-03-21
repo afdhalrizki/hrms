@@ -106,7 +106,8 @@ export default function PerformancePage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <FeatureGuard module="performance" showInUpgradePrompt>
+        <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -317,6 +318,7 @@ export default function PerformancePage() {
           />
         )}
       </AnimatePresence>
+     </FeatureGuard>
     </DashboardLayout>
   );
 }

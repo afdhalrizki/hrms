@@ -198,5 +198,10 @@
     "updateBtn": "Terapkan Perubahan",
     "previewTitle": "Pratinjau UI",
     "success": "Branding berhasil diperbarui"
+  },
+  "Tiering": {
+    "upgradeTitle": "Fitur Dibatasi",
+    "upgradeNeeded": "Modul {module} hanya tersedia untuk paket yang lebih tinggi.",
+    "upgradeBtn": "Tingkatkan Paket Sekarang"
   }
 }
