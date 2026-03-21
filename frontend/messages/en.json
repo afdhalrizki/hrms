@@ -28,7 +28,9 @@
     "leaves": "Leaves",
     "reimbursements": "Reimbursements",
     "attendance_corrections": "Correction Requests",
-    "reporting": "Reporting"
+    "reporting": "Reporting",
+    "audit_logs": "Audit Logs",
+    "api_keys": "API Keys"
   },
   "Common": {
     "submit": "Submit",
@@ -133,6 +135,36 @@
       "allowances": "Allowances",
       "deductions": "Deductions",
       "takeHomePay": "Take Home Pay"
+    }
+  },
+  "Audit": {
+    "title": "System Audit Logs",
+    "subtitle": "Track all administrative changes and system events.",
+    "table": {
+      "timestamp": "Timestamp",
+      "actor": "Actor",
+      "action": "Action",
+      "model": "Model",
+      "details": "Changes"
+    }
+  },
+  "APIKeys": {
+    "title": "API Key Management",
+    "subtitle": "Manage credentials for external system integrations.",
+    "newKey": "Create New API Key",
+    "empty": "No API keys generated yet.",
+    "table": {
+      "label": "Label",
+      "prefix": "Key Prefix",
+      "lastUsed": "Last Used",
+      "status": "Status"
+    },
+    "modal": {
+      "title": "New API Key",
+      "label": "Key Label (e.g. ERP Sync)",
+      "warning": "Copy this key now. It will not be shown again!",
+      "copyBtn": "Copy Key",
+      "success": "API Key created successfully"
     }
   }
 }

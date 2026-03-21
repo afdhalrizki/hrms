@@ -39,5 +39,10 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Admin Power**: Dedicated modal for bulk payroll generation across specific periods.
 - **PDF Generation**: Direct integration with backend `pdf_generator` for instant payslip downloads.
 
+### Phase 65: Operational Clarity (Audit & API)
+- **Audit Logs**: Interactive timeline of system changes with side-by-side diffing of field updates.
+- **API Key Portal**: Robust management of third-party credentials with secure "show-once" generation logic.
+- **Admin Visibility**: Hardened sidebar navigation to allow only authorized personnel to access system settings.
+
 ---
-**Status**: 🏆 Financial Core (Phase 64) Complete (March 21, 2026)
+**Status**: 🏆 Operational Clarity (Phase 65) Complete (March 21, 2026)

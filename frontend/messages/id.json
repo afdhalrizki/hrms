@@ -28,7 +28,9 @@
     "leaves": "Cuti",
     "reimbursements": "Reimbursement",
     "attendance_corrections": "Koreksi Kehadiran",
-    "reporting": "Pelaporan"
+    "reporting": "Pelaporan",
+    "audit_logs": "Log Audit",
+    "api_keys": "API Key"
   },
   "Common": {
     "submit": "Kirim",
@@ -133,6 +135,36 @@
       "allowances": "Tunjangan",
       "deductions": "Potongan",
       "takeHomePay": "Gaji Bersih (THP)"
+    }
+  },
+  "Audit": {
+    "title": "Log Audit Sistem",
+    "subtitle": "Pantau semua perubahan administratif dan peristiwa sistem.",
+    "table": {
+      "timestamp": "Waktu",
+      "actor": "Pelaku",
+      "action": "Aksi",
+      "model": "Model",
+      "details": "Perubahan"
+    }
+  },
+  "APIKeys": {
+    "title": "Manajemen API Key",
+    "subtitle": "Kelola kredensial untuk integrasi sistem eksternal.",
+    "newKey": "Buat API Key Baru",
+    "empty": "Belum ada API key yang dibuat.",
+    "table": {
+      "label": "Label",
+      "prefix": "Prefiks Key",
+      "lastUsed": "Terakhir Digunakan",
+      "status": "Status"
+    },
+    "modal": {
+      "title": "API Key Baru",
+      "label": "Label Key (misal: Sinkronisasi ERP)",
+      "warning": "Salin key ini sekarang. Key ini tidak akan ditampilkan lagi!",
+      "copyBtn": "Salin Key",
+      "success": "API Key berhasil dibuat"
     }
   }
 }
