@@ -177,6 +177,7 @@ class WorkflowConfig(AuditModel):
         ('OVERTIME', _('Overtime Request')),
         ('REIMBURSEMENT', _('Reimbursement')),
         ('TRANSFER', _('Employee Transfer')),
+        ('ATTENDANCE_CORRECTION', _('Attendance Correction')),
     ]
     
     name = models.CharField(_("workflow name"), max_length=255)

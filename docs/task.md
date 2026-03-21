@@ -231,6 +231,7 @@ This checklist tracks the setup of the Django multi-tenant foundation and the co
 - [x] **Attendance**: Monthly attendance recap export (CSV/Excel).
 - [x] **Performance**: Annual appraisal summary and KPI attainment reports.
 - [ ] **Executive Dashboard**: Unified cross-module insights (Headcount, Late Trends, Budget vs Actual).
+- [x] **Phase 62**: Attendance Correction System (Correction Requests & Approval Workflow).
 
 ## Future Roadmap
 - [ ] **Phase 57**: Horizontal App Scaling (Kubernetes).

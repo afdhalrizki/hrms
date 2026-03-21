@@ -1,6 +1,7 @@
 import math
 from decimal import Decimal
 from datetime import date, datetime
+from django.db import transaction
 from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,10 +10,11 @@ from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission, FeatureRequiredPermission
 # Using absolute import from core
 from core.models import Employee
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest
 from .serializers import (
     AttendanceSerializer, LeaveRequestSerializer, OvertimeSerializer,
-    ShiftSerializer, ScheduleSerializer, LeaveBalanceSerializer
+    ShiftSerializer, ScheduleSerializer, LeaveBalanceSerializer,
+    AttendanceCorrectionRequestSerializer
 )
 
 
@@ -157,13 +159,19 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
 
         if not is_manager:
-            # Restricted fields for regular employees
+            instance = serializer.instance
+            # Fields always restricted for non-managers
             restricted_fields = ['status', 'date', 'employee', 'is_out_of_bounds', 'distance_from_branch']
             for field in restricted_fields:
                 if field in self.request.data:
-                    # Ignore the change or could raise ValidationError. 
-                    # Ignoring is safer for 'partial' updates where the frontend might send the whole object.
                     serializer.validated_data.pop(field, None)
+
+            # Restrict editing check_in/check_out if already set (requires approval request)
+            if 'check_in' in self.request.data and instance.check_in is not None:
+                serializer.validated_data.pop('check_in', None)
+            
+            if 'check_out' in self.request.data and instance.check_out is not None:
+                serializer.validated_data.pop('check_out', None)
 
         instance = serializer.save(updated_by=user)
         from core.audit import AuditLogger
@@ -342,3 +350,64 @@ class LeaveBalanceViewSet(viewsets.ReadOnlyModelViewSet):
         if employee:
             return LeaveBalance.objects.filter(employee=employee)
         return LeaveBalance.objects.none()
+
+
+class AttendanceCorrectionRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = AttendanceCorrectionRequest.objects.all()
+    serializer_class = AttendanceCorrectionRequestSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'manage_attendance'
+    required_feature = 'attendance'
+    allow_self_service = True
+
+    def get_queryset(self):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+            return AttendanceCorrectionRequest.objects.all()
+            
+        if employee:
+            from django.db.models import Q
+            return AttendanceCorrectionRequest.objects.filter(Q(employee=employee) | Q(employee__supervisor=employee))
+        return AttendanceCorrectionRequest.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        if not employee:
+             raise serializers.ValidationError({"detail": "Employee profile required."})
+        
+        # Auto-assign the requesting employee
+        instance = serializer.save(employee=employee)
+        WorkflowService.initialize_workflow(instance)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        user_choice = self.request.data.get('status')
+        comment = self.request.data.get('comment', '')
+        
+        if user_choice not in ['APPROVED', 'REJECTED']:
+            serializer.save()
+            return
+
+        WorkflowService.process_action(instance, employee, user_choice, comment)
+
+        # Apply Correction: When FINAL status moves to APPROVED
+        instance.refresh_from_db()
+        if instance.status == 'APPROVED':
+            with transaction.atomic():
+                attendance = instance.attendance
+                if instance.requested_check_in:
+                    attendance.check_in = instance.requested_check_in
+                if instance.requested_check_out:
+                    attendance.check_out = instance.requested_check_out
+                attendance.save()
+                
+                # Re-calculate status (LATE etc) if needed? 
+                # For now just save the requested times.
+                from core.audit import AuditLogger
+                AuditLogger.log_change('UPDATE', attendance, actor=user)

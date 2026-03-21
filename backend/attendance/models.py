@@ -137,3 +137,25 @@ class LeaveBalance(AuditModel):
 
     def __str__(self):
         return f"{self.employee.fullname} - {self.year} (Remaining: {self.remaining_days})"
+
+
+class AttendanceCorrectionRequest(AuditModel):
+    STATUS_CHOICES = [
+        ('PENDING', 'Menunggu Persetujuan'),
+        ('APPROVED', 'Disetujui'),
+        ('REJECTED', 'Ditolak'),
+    ]
+
+    attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE, related_name='correction_requests')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendance_corrections')
+    
+    requested_check_in = models.TimeField(blank=True, null=True)
+    requested_check_out = models.TimeField(blank=True, null=True)
+    reason = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+
+    # Workflow Integration
+    current_stage = models.ForeignKey('core.WorkflowStage', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="current stage")
+
+    def __str__(self):
+        return f"Correction: {self.attendance.employee.fullname} - {self.attendance.date}"

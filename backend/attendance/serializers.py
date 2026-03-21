@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest
 
 class AttendanceSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
@@ -48,3 +48,20 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = '__all__'
+
+
+class AttendanceCorrectionRequestSerializer(serializers.ModelSerializer):
+    employee_name = serializers.ReadOnlyField(source='employee.fullname')
+    attendance_date = serializers.ReadOnlyField(source='attendance.date')
+    current_check_in = serializers.ReadOnlyField(source='attendance.check_in')
+    current_check_out = serializers.ReadOnlyField(source='attendance.check_out')
+
+    class Meta:
+        model = AttendanceCorrectionRequest
+        fields = [
+            'id', 'attendance', 'attendance_date', 'employee', 'employee_name',
+            'current_check_in', 'current_check_out', 
+            'requested_check_in', 'requested_check_out', 
+            'reason', 'status', 'current_stage'
+        ]
+        read_only_fields = ['status', 'current_stage', 'employee']

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule
+from django.db import transaction
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, AttendanceCorrectionRequest
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
@@ -28,3 +29,10 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('employee', 'shift', 'date')
     list_filter = ('shift', 'date')
     search_fields = ('employee__fullname',)
+
+
+@admin.register(AttendanceCorrectionRequest)
+class AttendanceCorrectionRequestAdmin(admin.ModelAdmin):
+    list_display = ('attendance', 'employee', 'requested_check_in', 'requested_check_out', 'status')
+    list_filter = ('status',)
+    search_fields = ('employee__fullname', 'attendance__date')

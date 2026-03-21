@@ -11,6 +11,7 @@ class WorkflowService:
             'LeaveRequest': 'LEAVE',
             'Overtime': 'OVERTIME',
             'Reimbursement': 'REIMBURSEMENT',
+            'AttendanceCorrectionRequest': 'ATTENDANCE_CORRECTION',
         }
         model_type = mapping.get(model_name)
         if not model_type:

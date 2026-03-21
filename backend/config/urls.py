@@ -26,7 +26,10 @@ from core.views import (
     AccessRoleViewSet, BranchViewSet, WorkflowConfigViewSet, 
     WorkflowStageViewSet, WorkflowActionViewSet, APIKeyViewSet, AuditLogViewSet
 )
-from attendance.views import AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, ShiftViewSet, ScheduleViewSet
+from attendance.views import (
+    AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, 
+    ShiftViewSet, ScheduleViewSet, AttendanceCorrectionRequestViewSet
+)
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
 from reimbursement.views import ReimbursementViewSet, ReimbursementCategoryViewSet
@@ -41,6 +44,7 @@ router.register(r'golongan', GolonganViewSet)
 router.register(r'access-roles', AccessRoleViewSet)
 router.register(r'employees', EmployeeViewSet)
 router.register(r'attendance', AttendanceViewSet)
+router.register(r'attendance-corrections', AttendanceCorrectionRequestViewSet)
 router.register(r'leave-requests', LeaveRequestViewSet)
 router.register(r'overtime', OvertimeViewSet)
 router.register(r'shifts', ShiftViewSet)

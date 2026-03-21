@@ -64,7 +64,7 @@ Standardized OpenAPI 3.0 documentation for extensibility.
 - **Flexibility**: Centralized `TENANT_DOMAIN_SUFFIX` allowing easy switch between `.harikerja.com`, `.stg.hrms.com`, or `.hrms.com`.
 
 ### Testing Status
-- **Backend (153/153 Scenarios OK)**: 100% logic coverage across all modules.
+- **Backend (155/155 Scenarios OK)**: 100% logic coverage across all modules.
     - **Payroll**: TER 2024, BPJS 2024 Wage Caps (Health 12m, JP 10.04m), Overtime Precedences, and Reimbursement Integration.
     - **Performance**: KPI strategy tracking, Appraisal lifecycle with 33 dedicated tests.
     - **Attendance**: Geofencing, Flexible Shifts, Leave Conflict Blocking.
@@ -135,10 +135,12 @@ A complete administrative interface has been established for all backend modules
 - **Performance Admin**: KPI definitions, target tracking, and Appraisal lifecycles with `AppraisalReview` inlines.
 - **Verification**: All 8 core modules now have native Django Admin support.
 
-### Phase 61: Comprehensive Reporting System (Complete)
-Transformed raw data into actionable insights through standardized export features.
-- **Attendance Recap**: New monthly CSV export providing a summary of Presence, Lateness, and Absence per employee. Verified with unit tests.
-- **Appraisal Summary**: New CSV export for performance reviews, allowing HR to aggregate appraisal statuses and timelines. Verified with unit tests.
-- **Payroll & Reimbursement**: Re-verified existing PDF and CSV export capabilities.
 
-**Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**
+### Phase 62: Attendance Correction System (Complete)
+Implemented a formal workflow for attendance adjustments to maintain data integrity.
+- **Direct Edit Prevention**: Regular employees are blocked from modifying `check_in`/`check_out` times on existing records.
+- **Correction Requests**: New model and API for proposing attendance corrections with mandatory reasoning.
+- **Approval Workflow**: Integrated with `WorkflowService` for multi-stage approval (Supervisor -> HR). All approved corrections auto-update the master record.
+- **Audit Transparency**: Full audit trail for every correction, identifying the requester, the reason, and the final approver.
+
+**Project Status**: 🏆 **Stable Release v1.1.1-Hardened (March 21, 2026)**
