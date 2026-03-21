@@ -29,6 +29,14 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 ![Shift Management](./assets/shift_management.png)
 ![Reimbursement UI](./assets/reimbursement_ui.png)
 
-## 🛠 Reliability & Testing
-- **Unit Tests**: 29 tests (Vitest) with 100% logic coverage for critical components.
-- **Performance**: Optimized App Router patterns for SEO and hydration speed.
+## 🛠 Technical Reference for Developers
+This frontend is built with scalability and premium UI as top priorities.
+
+### Core Architecture
+- **App Router**: Leveraging Server Components for data performance.
+- **Unified Identity**: Hydrates state from `/api/users/me/` for multi-persona support (Admin vs ESS).
+- **Glassmorphism System**: Standardized `backdrop-blur` and `transparent-border` tokens across all modules.
+- **Type Safety**: 100% TypeScript coverage with shared schema definitions.
+
+---
+**Status**: 🏆 Premium Dashboard Baseline Established (March 21, 2026)

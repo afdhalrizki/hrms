@@ -1,11 +1,53 @@
-# Implementation Plan: Premium Web Experience
+# Ultra-Detailed Implementation Plan: Web Frontend reference
 
-## Proposed Changes
-- Build high-performance Next.js App Router structure.
-- Implement glassmorphism design system using Tailwind and Framer Motion.
-- Create dynamic multi-tenant context for subdomain detection.
-- Develop real-time hydration logic for user profiles and live streams.
+This document serves as the primary technical reference for building and maintaining the harikerja HRMS web frontend.
 
-## Verification
-- 100% Vitest coverage for identity and environment helpers.
-- Responsive UI check across mobile and desktop breakpoints.
+## 🏗 1. Component & Directory Architecture
+To maintain a clean separation between Admin and Employee personas while sharing core logic:
+
+```bash
+src/
+├── app/                  # Next.js App Router (Routing & Layouts)
+│   ├── (admin)/         # Admin-only route group
+│   ├── (ess)/           # Employee-only route group
+│   └── auth/            # Shared auth pages (login/signup)
+├── components/          # Reusable UI components
+│   ├── ui/              # Atom components (Buttons, Inputs, Modals)
+│   ├── admin/           # Admin-specific molecule components
+│   ├── ess/             # Employee-specific molecule components
+│   └── shared/          # Multi-persona components (Sidebar, Topbar)
+├── context/             # Global State (AuthContext, TenantContext)
+├── hooks/               # Custom React hooks (usePermissions, useTenant)
+├── services/            # API Service Layer (Axios/Fetch instances)
+└── utils/               # Formatting, Validation, and Helper functions
+```
+
+## 🎨 2. Design System: Glassmorphism Hub
+We use a unified design language to ensure a "Premium SaaS" feel.
+
+- **Background**: `bg-slate-950` with a subtle radial gradient.
+- **Glass Effect**: `bg-white/5 backdrop-blur-xl border border-white/10`.
+- **Primary Accent**: `bg-indigo-500` for buttons and active states.
+- **Typography**: `Inter` (Inter-var) for maximum readability.
+- **Animations**: `framer-motion` for page transitions and modal entries.
+
+## 🔄 3. State Management & Data Fetching
+- **Client State**: `React.useContext` for small, global data (User, Tenant).
+- **Server State**: `TanStack Query` (React Query) for caching, optimistic updates, and automatic re-fetching of attendance/payroll data.
+- **Form Management**: `react-hook-form` + `zod` for robust schema-based validation.
+
+## 🚪 4. Security & Access Control
+- **CSRF Protection**: Native Next.js CSRF guards + backend cookie validation.
+- **Multi-Tenant Header**: Every outgoing request must include `X-Tenant-Domain` via the `api.ts` interceptor.
+- **Role-Based Gating**:
+    - Use `<RoleGuard roles={['HR', 'Admin']}>` for UI elements.
+    - Use `middleware.ts` for route-level protection.
+
+## 📊 5. Advanced Feature: Reporting Engine
+- **Implementation**: The reporting dashboard uses `recharts` for visualization.
+- **CSV Downloads**: Use a custom `useReport` hook that handles the `Blob` response from the backend and triggers a local file download.
+
+## ✅ 6. Testing Philosophy
+- **Unit Tests**: Focus on logic in `hooks/` and `utils/`.
+- **Integration Tests**: Focus on critical flows like `Login`, `Signup`, and `Attendance Correction`.
+- **Mocks**: Standardize API mocks using `msw` (Mock Service Worker) for consistent testing environment.

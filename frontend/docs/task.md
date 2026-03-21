@@ -1,29 +1,40 @@
-# Tasks: Web Frontend (harikerja HRMS)
+# Master Task List: Web Frontend (harikerja HRMS)
 
-This checklist tracks the implementation of the premium Next.js 14 dashboard and its integration with the backend API.
+This checklist tracks the implementation of the premium Next.js 14 dashboard and its integration with the backend API, divided by user persona.
 
-## Core UI & Layout
-- [x] **Framework**: Initialize Next.js 14 project with App Router.
-- [x] **Premium Aesthetics**: Implement glassmorphism design system using Tailwind CSS.
-- [x] **Responsive Sidebar**: Navigation for HR, Attendance, Payroll, and Performance.
-- [x] **Tenant Detection**: Automated subdomain parsing logic in `TenantContext`.
+## 🏢 1. Administrator & Manager Features
+Features for managing the organization, data, and approvals.
 
-## Authentication & Identity
-- [x] **Mobile-Sync Login**: Support for multi-tenant authentication.
-- [x] **AuthContext**: Centralized state management for user identity.
-- [x] **Identity Hydration**: Real-time profile data mapping (Fullname, NIK, Role).
-- [x] **Secret Portal**: Hidden login route at `/login/portal-admin` for global managers.
+- [x] **Executive Analytics**: Dynamic charts for headcount, salary costs, and late-check-in trends.
+- [x] **Tenant Branding**: Configuration for company logo, colors, and workspace profile.
+- [x] **Provisioning Hub**: Modal for creating employees and automated IAM provisioning.
+- [x] **RBAC Management**: Assignment of roles and custom JSON permission masks.
+- [x] **Secret Portal**: Professional manager-only login at `/login/portal-admin`.
+- [ ] **Advanced Reporting (Phase 61)**: Exportable monthly recaps (CSV/Excel) and appraisal summaries.
+    - [ ] Implementation of `TableExport` component with server-side pagination.
+    - [ ] Interactive KPI attainment charts using `Recharts`.
+- [ ] **Workflow Management (Phase 38/62)**: Unified inbox for approving Leaves, Overtime, and Attendance Corrections.
+    - [ ] "Comparison View" for attendance adjustments.
+    - [ ] Real-time notification badge on sidebar for pending approvals.
+- [ ] **Modular Tiering**: Plan-based gating (Basic/Pro/Enterprise) management.
 
-## Operational Dashboards
-- [x] **Attendance Live Stream**: Real-time view of daily clock-in/out activity.
-- [x] **Executive Analytics**: Dynamic charts for salary costs, headcount, and attendance trends.
-- [x] **Employee Provisioning**: Modal for creating employees with provisioning toggles (RBAC/User).
-- [x] **Workflow Approvals**: UI for multi-stage approval lists (Leaves, Overtime, Reimbursements).
-- [x] **Payroll Management**: Integrated payslip generator and historical data viewer.
-- [x] **Performance UI**: KPI target management and Appraisal review workflows.
+## 👤 2. Employee Self-Service (ESS) Web Portal
+Features for individual employees to manage their own data (Web-based ESS).
 
-## Infrastructure & Testing
-- [x] **Node.js 22 Migration**: Migration to Debian-based runtime for binary compatibility.
-- [x] **Tailwind 4 Support**: Resolved native binding issues for high-performance builds.
-- [x] **Vitest Coverage**: 100% logic coverage for critical helpers (`api.ts`, `TenantContext`, `AuthContext`).
-- [x] **Localization**: Bilingual support (ID/EN) throughout the application.
+- [x] **Identity Hydration**: Personalized "Welcome" dashboard with real-time profile data.
+- [x] **Attendance Live View**: Visualizing own daily check-in/out status.
+- [x] **Historical Payslips**: Downloadable PDF payslips with TER 2024 compliance.
+- [ ] **Personal Profile Management**: Self-service interface for updating personal info and documents.
+    - [ ] Document upload module (KTP, NPWP, Education Certificates).
+- [ ] **Web Attendance Correction**: Request form for time adjustments (similar to Mobile Phase 2).
+- [ ] **Leave & Reimbursement Dashboard**: Monitoring own quotas and tracking claim status via web.
+- [ ] **Performance Review (Phase 45)**: Form for submitting self-appraisals and viewing targets.
+
+## 🛠 3. Technical & Infrastructure Roadmap
+- [x] **Node.js 22 Migration**: High-performance Debian-based runtime.
+- [x] **Tailwind 4 Support**: Oxide engine integration for rapid UI styling.
+- [x] **Vitest Coverage**: 100% logic coverage for multi-tenant and auth contexts.
+- [x] **Localization**: Full ID/EN bilingual support.
+- [ ] **Performance Optimization**:
+    - [ ] Implement `next/dynamic` for heavy chart components.
+    - [ ] Zero-CLS (Cumulative Layout Shift) skeletons for dashboard widgets.
