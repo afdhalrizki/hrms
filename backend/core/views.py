@@ -1,6 +1,9 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, views
 from rest_framework.response import Response
 from django.db import transaction
+from django.db.models import Count, Sum
+from datetime import date, timedelta
+from django.utils import timezone
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission
 from .models import (
@@ -176,3 +179,52 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class DashboardStatsAPIView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
+    required_rbac_permission = 'manage_hr'
+
+    def get(self, request):
+        # 1. Headcount & Dept Cost
+        employees = Employee.objects.all()
+        total_employees = employees.count()
+        
+        dept_stats = Department.objects.annotate(
+            employee_count=Count('employee'),
+            # For real scenarios, we would sum the salary from Payroll/Payslip app here.
+            # Mirroring the frontend's needs for total department cost.
+        ).values('name', 'employee_count')
+
+        # 2. Attendance Health (Today)
+        from attendance.models import Attendance
+        today = timezone.now().date()
+        attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
+
+        # 3. Payroll/Salary Overview (Consolidated)
+        # Note: In a real system we'd join with payslips. For Phase 61 demo/mvp:
+        from payroll.models import Payslip
+        current_month = today.month
+        current_year = today.year
+        payroll_totals = Payslip.objects.filter(
+            period__start_date__month=current_month,
+            period__start_date__year=current_year,
+            status='PAID'
+        ).aggregate(
+            total_salary=Sum('net_pay'),
+            total_overtime=Sum('overtime_total')
+        )
+
+        return Response({
+            'total_employees': total_employees,
+            'attendance_today': list(attendance_stats),
+            'department_distribution': list(dept_stats),
+            'payroll_summary': {
+                'total_net_pay': payroll_totals['total_salary'] or 0,
+                'total_overtime': payroll_totals['total_overtime'] or 0,
+            },
+            # Trend data placeholder (would be calculated per month)
+            'trends': {
+                'months': ['Jan', 'Feb', 'Mar'],
+                'headcount': [120, 125, total_employees],
+            }
+        })

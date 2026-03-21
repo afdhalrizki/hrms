@@ -24,7 +24,8 @@ from users.views import UserViewSet, LoginAPIView
 from core.views import (
     DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, 
     AccessRoleViewSet, BranchViewSet, WorkflowConfigViewSet, 
-    WorkflowStageViewSet, WorkflowActionViewSet, APIKeyViewSet, AuditLogViewSet
+    WorkflowStageViewSet, WorkflowActionViewSet, APIKeyViewSet, AuditLogViewSet,
+    DashboardStatsAPIView
 )
 from attendance.views import (
     AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, 
@@ -73,6 +74,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/tenant/settings/', TenantSettingsAPIView.as_view(), name='tenant-settings'),
+    path('api/dashboard-stats/', DashboardStatsAPIView.as_view(), name='dashboard-stats'),
     # API Schema & Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

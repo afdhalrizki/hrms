@@ -25,7 +25,8 @@
     "workflows": "Workflows",
     "analytics": "Analytics",
     "settings": "Settings",
-    "attendance_corrections": "Correction Requests"
+    "attendance_corrections": "Correction Requests",
+    "reporting": "Reporting"
   },
   "Common": {
     "submit": "Submit",
@@ -53,5 +54,19 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "adminComment": "Admin Comment"
+  },
+  "Analytics": {
+    "title": "Advanced Analytics",
+    "subtitle": "Real-time monitoring of payroll, headcount, and organizational health.",
+    "payrollSection": "Financial Overview",
+    "attendanceSection": "Attendance Health",
+    "headcountSection": "Headcount Trend",
+    "exportAttendance": "Export Attendance (CSV)",
+    "exportPerformance": "Export Appraisals (CSV)",
+    "totalPayroll": "Total Payroll",
+    "totalHeadcount": "Total Headcount",
+    "overtimeCost": "Overtime Cost",
+    "costPerEmployee": "Cost per Employee",
+    "loading": "Aggregating metrics..."
   }
 }

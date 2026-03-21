@@ -1,198 +1,199 @@
-'use client';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { 
+  TrendingUp, 
+  Users, 
+  CreditCard, 
+  Clock, 
+  Download,
+  Calendar,
+  AlertCircle
+} from 'lucide-react';
+import { apiFetch, getBaseUrl } from '@/lib/api';
+import { toast } from 'sonner';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
-import { useState } from 'react';
-
-// ── Simulated analytics data (replace with API calls as needed) ─────────────
-const MONTHS = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
-
-const salaryData  = [285_000_000, 291_000_000, 287_000_000, 305_000_000, 312_000_000, 298_000_000, 318_500_000];
-const overtimeData = [18_500_000,  21_000_000,  16_800_000,  25_400_000,  31_200_000,  19_700_000,  22_800_000];
-const headcount   = [124, 126, 125, 128, 130, 131, 133];
-
-const deptCost = [
-  { dept: 'Engineering',  value: 118_000_000, color: '#3B82F6' },
-  { dept: 'Sales',        value:  72_000_000, color: '#10B981' },
-  { dept: 'Operations',   value:  64_500_000, color: '#F59E0B' },
-  { dept: 'HR & Admin',   value:  38_200_000, color: '#8B5CF6' },
-  { dept: 'Finance',      value:  25_800_000, color: '#EF4444' },
-];
-
-const fmt = (n: number) =>
-  n >= 1_000_000
-    ? `Rp ${(n / 1_000_000).toFixed(1)}jt`
-    : `Rp ${n.toLocaleString('id-ID')}`;
-
-const pct = (val: number, arr: number[]) =>
-  ((val / Math.max(...arr)) * 100).toFixed(1);
-
-// ── KPI cards ────────────────────────────────────────────────────────────────
-const kpis = [
-  { label: 'Total Payroll (Feb)', value: 'Rp 318,5jt', delta: '+6.9%', up: true,   color: '#3B82F6' },
-  { label: 'Total Headcount',     value: '133 orang',  delta: '+2 MoM', up: true,  color: '#10B981' },
-  { label: 'Overtime Cost',       value: 'Rp 22,8jt',  delta: '-26.9%', up: false, color: '#F59E0B' },
-  { label: 'Cost per Employee',   value: 'Rp 2,4jt',   delta: '+4.5%',  up: true,  color: '#8B5CF6' },
-];
+interface DashboardStats {
+  total_employees: number;
+  attendance_today: { status: string; count: number }[];
+  department_distribution: { name: string; employee_count: number }[];
+  payroll_summary: {
+    total_net_pay: number;
+    total_overtime: number;
+  };
+  trends: {
+    months: string[];
+    headcount: number[];
+  };
+}
 
 export default function AnalyticsPage() {
-  const [activeMonth, setActiveMonth] = useState(6); // Feb (last item)
+  const t = useTranslations('Analytics');
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await apiFetch('/dashboard-stats/');
+      setStats(data);
+    } catch (error) {
+      toast.error('Failed to load dashboard metrics');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleExport = (type: 'attendance' | 'performance') => {
+    const baseUrl = getBaseUrl().replace('/api', '');
+    const month = new Date().getMonth() + 1;
+    const year = new Date().getFullYear();
+    
+    let url = '';
+    if (type === 'attendance') {
+      url = `${baseUrl}/api/attendance/attendances/export_csv/?month=${month}&year=${year}`;
+    } else {
+      url = `${baseUrl}/api/performance/appraisals/export_csv/`;
+    }
+    
+    window.open(url, '_blank');
+  };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 animate-pulse">
+            {t('loading')}
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const fmt = (n: number) => `Rp ${(n / 1_000_000).toFixed(1)}jt`;
+
+  const kpis = [
+    { label: t('totalPayroll'), value: fmt(stats?.payroll_summary.total_net_pay || 0), icon: CreditCard, color: '#3B82F6' },
+    { label: t('totalHeadcount'), value: `${stats?.total_employees || 0}`, icon: Users, color: '#10B981' },
+    { label: t('overtimeCost'), value: fmt(stats?.payroll_summary.total_overtime || 0), icon: Clock, color: '#F59E0B' },
+    { label: t('costPerEmployee'), value: fmt((stats?.payroll_summary.total_net_pay || 0) / (stats?.total_employees || 1)), icon: TrendingUp, color: '#8B5CF6' },
+  ];
 
   return (
-    <main className="min-h-screen bg-[#0A0F1E] text-white p-8 font-sans">
-      {/* Header */}
-      <div className="mb-10">
-        <p className="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-1">Executive Dashboard</p>
-        <h1 className="text-3xl font-bold text-white">HR Cost Analytics</h1>
-        <p className="text-slate-400 mt-1 text-sm">Real-time monitoring of payroll, headcount, and operational costs.</p>
-      </div>
+    <DashboardLayout>
+      <div className="space-y-10">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black tracking-tighter text-white uppercase italic">{t('title')}</h1>
+            <p className="text-gray-400 font-medium max-w-2xl">{t('subtitle')}</p>
+          </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        {kpis.map((k) => (
-          <div
-            key={k.label}
-            className="rounded-2xl p-5 border border-white/5 bg-white/[0.03] backdrop-blur"
-            style={{ boxShadow: `0 0 30px ${k.color}18` }}
-          >
-            <p className="text-slate-400 text-xs mb-3 font-medium">{k.label}</p>
-            <p className="text-2xl font-bold" style={{ color: k.color }}>{k.value}</p>
-            <span
-              className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                k.up ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-              }`}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => handleExport('attendance')}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-white/10 transition-all"
             >
-              {k.delta}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Salary Trend Chart */}
-        <div className="lg:col-span-2 rounded-2xl p-6 border border-white/5 bg-white/[0.03]">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-bold text-lg">Salary vs Overtime Trend</h2>
-            <span className="text-xs text-slate-400">7 months view</span>
-          </div>
-          <div className="flex items-end gap-3 h-48">
-            {MONTHS.map((m, i) => (
-              <div
-                key={m}
-                className="flex-1 flex flex-col items-center gap-1 cursor-pointer"
-                onClick={() => setActiveMonth(i)}
-              >
-                {/* Overtime bar (stacked on top) */}
-                <div
-                  className="w-full rounded-t-sm transition-all duration-300"
-                  style={{
-                    height: `${(overtimeData[i] / 35_000_000) * 40}px`,
-                    background: i === activeMonth ? '#F59E0B' : '#F59E0B44',
-                  }}
-                />
-                {/* Salary bar */}
-                <div
-                  className="w-full rounded-t-md transition-all duration-300"
-                  style={{
-                    height: `${(salaryData[i] / 320_000_000) * 130}px`,
-                    background:
-                      i === activeMonth
-                        ? 'linear-gradient(to top, #2563EB, #3B82F6)'
-                        : '#3B82F644',
-                  }}
-                />
-                <span className="text-[10px] text-slate-500 mt-1">{m}</span>
-              </div>
-            ))}
-          </div>
-          {/* Legend */}
-          <div className="flex gap-5 mt-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-blue-500 inline-block" />Salary</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-amber-500 inline-block" />Overtime</span>
-          </div>
-          {/* Selected month breakdown */}
-          <div className="mt-5 pt-5 border-t border-white/5 grid grid-cols-3 gap-4 text-sm">
-            <div>
-              <p className="text-slate-400 text-xs">Salary</p>
-              <p className="font-bold text-blue-400">{fmt(salaryData[activeMonth])}</p>
-            </div>
-            <div>
-              <p className="text-slate-400 text-xs">Overtime</p>
-              <p className="font-bold text-amber-400">{fmt(overtimeData[activeMonth])}</p>
-            </div>
-            <div>
-              <p className="text-slate-400 text-xs">Headcount</p>
-              <p className="font-bold text-purple-400">{headcount[activeMonth]} org</p>
-            </div>
+              <Download size={16} className="text-primary" />
+              {t('exportAttendance')}
+            </button>
+            <button 
+              onClick={() => handleExport('performance')}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary text-white font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+            >
+              <Download size={16} />
+              {t('exportPerformance')}
+            </button>
           </div>
         </div>
 
-        {/* Dept Cost Breakdown */}
-        <div className="rounded-2xl p-6 border border-white/5 bg-white/[0.03]">
-          <h2 className="font-bold text-lg mb-6">Cost by Department</h2>
-          <div className="space-y-4">
-            {deptCost.map((d) => (
-              <div key={d.dept}>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-300">{d.dept}</span>
-                  <span style={{ color: d.color }} className="font-semibold">{fmt(d.value)}</span>
-                </div>
-                <div className="h-2 rounded-full bg-white/5 overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${pct(d.value, deptCost.map(x => x.value))}%`, background: d.color }}
-                  />
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kpis.map((k, i) => (
+            <div key={i} className="glass-card p-6 rounded-[2rem] border border-white/10 bg-white/5 relative overflow-hidden group">
+              <div 
+                className="absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-20 transition-opacity group-hover:opacity-40"
+                style={{ background: k.color }}
+              />
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 group-hover:text-white group-hover:bg-white/10 transition-all">
+                  <k.icon size={20} />
                 </div>
               </div>
-            ))}
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">{k.label}</p>
+              <p className="text-3xl font-black text-white">{k.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Trend Chart (Headcount) */}
+          <div className="lg:col-span-2 glass-card p-8 rounded-[2.5rem] border border-white/10 bg-white/5">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">{t('headcountSection')}</h2>
+              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] text-primary font-bold uppercase">
+                <TrendingUp size={12} />
+                +12% Growth
+              </div>
+            </div>
+            
+            <div className="flex items-end gap-4 h-64 px-4">
+              {stats?.trends.months.map((m, i) => (
+                <div key={m} className="flex-1 flex flex-col items-center gap-2 group">
+                  <div className="relative w-full">
+                    <div 
+                      className="w-full rounded-2xl bg-gradient-to-t from-primary/20 to-primary transition-all duration-1000 group-hover:scale-x-105"
+                      style={{ height: `${(stats.trends.headcount[i] / Math.max(...stats.trends.headcount)) * 200}px` }}
+                    />
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="px-3 py-1 bg-white rounded-lg text-primary font-bold text-xs shadow-xl">
+                        {stats.trends.headcount[i]}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">{m}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Total */}
-          <div className="mt-6 pt-5 border-t border-white/5">
-            <p className="text-slate-400 text-xs">Total Dept Cost</p>
-            <p className="text-xl font-bold text-white mt-1">
-              {fmt(deptCost.reduce((s, d) => s + d.value, 0))}
-            </p>
+          {/* Dept Breakdown */}
+          <div className="glass-card p-8 rounded-[2.5rem] border border-white/10 bg-white/5 space-y-8">
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">Staff Distribution</h2>
+            <div className="space-y-6">
+              {stats?.department_distribution.map((d) => (
+                <div key={d.name} className="space-y-2">
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-gray-400">{d.name}</span>
+                    <span className="text-white">{d.employee_count} staff</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-white/5 overflow-hidden border border-white/5 p-0.5">
+                    <div 
+                      className="h-full rounded-full bg-gradient-to-r from-primary to-blue-400 transition-all duration-1000"
+                      style={{ width: `${(d.employee_count / stats.total_employees) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-white/10">
+              <div className="flex items-start gap-4 p-4 rounded-3xl bg-blue-500/5 border border-blue-500/10">
+                <AlertCircle className="text-blue-500 shrink-0" size={20} />
+                <p className="text-[11px] text-gray-400 leading-relaxed italic">
+                  "Engineering remains our largest cost center, followed closely by Sales initiatives this quarter."
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Headcount Table */}
-      <div className="rounded-2xl p-6 border border-white/5 bg-white/[0.03]">
-        <h2 className="font-bold text-lg mb-5">Monthly Headcount Growth</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-slate-400 text-xs uppercase tracking-wider border-b border-white/5">
-                <th className="pb-3 text-left">Month</th>
-                {MONTHS.map(m => <th key={m} className="pb-3 text-center">{m}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-white/5">
-                <td className="py-3 text-slate-300 font-medium">Headcount</td>
-                {headcount.map((h, i) => (
-                  <td key={i} className="py-3 text-center font-bold" style={{ color: i === activeMonth ? '#3B82F6' : '#94A3B8' }}>{h}</td>
-                ))}
-              </tr>
-              <tr className="border-b border-white/5">
-                <td className="py-3 text-slate-300 font-medium">Gaji (juta)</td>
-                {salaryData.map((s, i) => (
-                  <td key={i} className="py-3 text-center" style={{ color: i === activeMonth ? '#3B82F6' : '#94A3B8' }}>
-                    {(s / 1_000_000).toFixed(1)}
-                  </td>
-                ))}
-              </tr>
-              <tr>
-                <td className="py-3 text-slate-300 font-medium">Lembur (juta)</td>
-                {overtimeData.map((o, i) => (
-                  <td key={i} className="py-3 text-center" style={{ color: i === activeMonth ? '#F59E0B' : '#94A3B8' }}>
-                    {(o / 1_000_000).toFixed(1)}
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
+    </DashboardLayout>
   );
 }

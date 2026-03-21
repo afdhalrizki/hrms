@@ -25,7 +25,8 @@
     "workflows": "Alur Kerja",
     "analytics": "Analitik",
     "settings": "Pengaturan",
-    "attendance_corrections": "Koreksi Kehadiran"
+    "attendance_corrections": "Koreksi Kehadiran",
+    "reporting": "Pelaporan"
   },
   "Common": {
     "submit": "Kirim",
@@ -53,5 +54,19 @@
     "approved": "Disetujui",
     "rejected": "Ditolak",
     "adminComment": "Komentar Admin"
+  },
+  "Analytics": {
+    "title": "Analitik Lanjutan",
+    "subtitle": "Pemantauan real-time untuk payroll, jumlah karyawan, dan kesehatan organisasi.",
+    "payrollSection": "Ringkasan Finansial",
+    "attendanceSection": "Kesehatan Kehadiran",
+    "headcountSection": "Tren Jumlah Karyawan",
+    "exportAttendance": "Ekspor Kehadiran (CSV)",
+    "exportPerformance": "Ekspor Penilaian (CSV)",
+    "totalPayroll": "Total Payroll",
+    "totalHeadcount": "Total Karyawan",
+    "overtimeCost": "Biaya Lembur",
+    "costPerEmployee": "Biaya per Karyawan",
+    "loading": "Mengagregasi metrik..."
   }
 }

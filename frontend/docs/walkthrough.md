@@ -25,6 +25,7 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Attendance**: Dashboard for geofencing status and audit visualization.
 - **Approvals**: UI for multi-stage approval workflows (Leaves, Overtime).
 - **Attendance Correction**: A dedicated workflow for employees to request time adjustments, with a "Comparison Queue" for admins to approve/reject changes.
+- **Advanced Reporting (Analytics)**: A dynamic dashboard for Admins providing real-time headcount trends, attendance health, and payroll cost summaries with one-click CSV exports.
 
 ![Shift Management](./assets/shift_management.png)
 ![Reimbursement UI](./assets/reimbursement_ui.png)

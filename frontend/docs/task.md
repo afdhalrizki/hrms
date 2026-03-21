@@ -10,12 +10,17 @@ Features for managing the organization, data, and approvals.
 - [x] **Provisioning Hub**: Modal for creating employees and automated IAM provisioning.
 - [x] **RBAC Management**: Assignment of roles and custom JSON permission masks.
 - [x] **Secret Portal**: Professional manager-only login at `/login/portal-admin`.
-- [ ] **Advanced Reporting (Phase 61)**: Exportable monthly recaps (CSV/Excel) and appraisal summaries.
-    - [ ] Implementation of `TableExport` component with server-side pagination.
-    - [ ] Interactive KPI attainment charts using `Recharts`.
+- [x] **Advanced Reporting (Phase 61)**: Exportable monthly recaps (CSV/Excel) and appraisal summaries.
+    - [x] Implementation of `TableExport` logic and analytics fetching.
+    - [x] Interactive KPI attainment charts using dynamic data.
 - [x] **Workflow Management (Phase 38/62)**: Unified inbox for approving Leaves, Overtime, and Attendance Corrections.
     - [x] "Comparison View" for attendance adjustments.
     - [x] Real-time notification badge on sidebar for pending approvals.
+- [ ] **Phase 63: Self-Service Expansion**: Dedicated pages for Leave Requests and Reimbursements.
+- [ ] **Phase 64: Financial Core**: Live BPJS & PPh 21 calculation dashboards.
+- [ ] **Phase 65: Operational Clarity**: Admin Audit Logs viewer and API Key manager.
+- [ ] **Phase 66: Appraisal Lifecycle**: Full submission workflow for KPIs and reviews.
+- [ ] **Phase 67: Tenant Branding**: Admin settings for company logo and theme colors.
 - [ ] **Modular Tiering**: Plan-based gating (Basic/Pro/Enterprise) management.
 
 ## 👤 2. Employee Self-Service (ESS) Web Portal

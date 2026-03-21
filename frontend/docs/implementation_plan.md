@@ -20,7 +20,27 @@ src/
 ├── hooks/               # Custom React hooks (usePermissions, useTenant)
 ├── services/            # API Service Layer (Axios/Fetch instances)
 └── utils/               # Formatting, Validation, and Helper functions
-```
+---
+
+## 🚀 7. Phased Roadmap: Full Backend Parity
+
+### Phase 63: ESS Expansion (Leaves & Reimbursements)
+- **Leaves**: Request form + Balance tracker (`/api/attendance/leave-requests/`).
+- **Reimbursements**: Receipt upload + Status tracking (`/api/reimbursement/reimbursements/`).
+
+### Phase 64: Financial Command Center (Real-time Payroll)
+- **Live Sync**: Connecting `PayrollPage` to `/api/payroll/payslips/`.
+- **BPJS/Tax Insight**: Interactive breakdown of PPh 21 (TER 2024) and BPJS Kesehatan/Ketenagakerjaan.
+
+### Phase 65: Operational Audit Hub (Admin Transparency)
+- **Audit Logs**: Visual "Deep-diff" activity feed from `/api/core/audit/`.
+- **API Keys**: UI for managing third-party integration keys.
+
+### Phase 66: Performance Appraisal Lifecycle
+- **Appraisal Workflow**: Submission Modal for managers to score KPIs and finalize reviews.
+
+### Phase 67: SaaS Profile & Branding
+- **Branding**: Tenant settings for company logo, colors, and subscription limits.
 
 ## 🎨 2. Design System: Glassmorphism Hub
 We use a unified design language to ensure a "Premium SaaS" feel.
