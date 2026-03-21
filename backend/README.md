@@ -6,11 +6,11 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 
 - **Multi-Tenant Foundation**: Complete data isolation using `django-tenants` and PostgreSQL schemas.
 - **Auto-Onboarding Flow**: Public registration request system with an internal admin approval workflow that auto-provisions tenants.
-- **Admin Provisioning**: Dynamic Employee and Global User creation logic with RBAC capabilities via `EmployeeViewSet`.
 - **Unified Identity (Admin-Employee)**: Integrated user profile API (`/api/users/me/`) that links Django users with their HR employee records.
 - **Indonesian Payroll Engine**: Full compliance with **TER 2024 PPh 21** regulations, BPJS calculations, and dynamic PDF payslip generation.
 - **Biometric Attendance**: Geofencing-validated clock-in/out with face reference tracking and liveness check metadata.
-- **Tenant Customization**: Admins can securely upload company logos and contact details via the `/api/tenant/settings/` endpoint.
+- **Comprehensive Reporting**: Standardized CSV/PDF exports for Attendance recaps, Appraisal summaries, and Payroll data.
+- **Strategic HR**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
 - **Enterprise Ready**: Request caching with Redis and connection pooling with PgBouncer.
 
 ## 📁 Core Modules
@@ -20,6 +20,8 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - `core/`: Basic HR master data (Departments, Roles, Employee Records).
 - `attendance/`: Scheduling, Geofencing, and Biometric attendance logs.
 - `payroll/`: Salary components, TER 2024 tax engine, and payslip management.
+- `performance/`: KPI strategy tracking and Appraisal lifecycles.
+- `reimbursement/`: Multi-stage approval for expense claims.
 
 ## 🛠 Prerequisites
 
@@ -80,10 +82,17 @@ The system automatically generates OpenAPI 3.0 schemas.
 - **Redoc**: [http://localhost:8000/api/schema/redoc/](http://localhost:8000/api/schema/redoc/)
 
 ### Running Tests
-The backend uses `pytest` with `django-tenants` support:
+The backend uses `pytest` with 100% logic coverage across 153 test scenarios.
+
 ```bash
+# General
 pytest
+
+# Windows (Auto-configures local DB env):
+.\run_tests.ps1
 ```
 
 ---
+
+**Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**
 **Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.
