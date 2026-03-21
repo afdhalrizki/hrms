@@ -16,6 +16,8 @@ Features for managing the organization, data, and approvals.
 - [x] **Workflow Management (Phase 38/62)**: Unified inbox for approving Leaves, Overtime, and Attendance Corrections.
     - [x] "Comparison View" for attendance adjustments.
     - [x] Real-time notification badge on sidebar for pending approvals.
+---
+### 🌊 Full Backend Parity Phase (Next Steps)
 - [ ] **Phase 63: Self-Service Expansion**: Dedicated pages for Leave Requests and Reimbursements.
 - [ ] **Phase 64: Financial Core**: Live BPJS & PPh 21 calculation dashboards.
 - [ ] **Phase 65: Operational Clarity**: Admin Audit Logs viewer and API Key manager.

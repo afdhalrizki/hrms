@@ -20,9 +20,9 @@ src/
 ├── hooks/               # Custom React hooks (usePermissions, useTenant)
 ├── services/            # API Service Layer (Axios/Fetch instances)
 └── utils/               # Formatting, Validation, and Helper functions
----
+```
 
-## 🚀 7. Phased Roadmap: Full Backend Parity
+## 🚀 2. Phased Roadmap: Full Backend Parity
 
 ### Phase 63: ESS Expansion (Leaves & Reimbursements)
 - **Leaves**: Request form + Balance tracker (`/api/attendance/leave-requests/`).
@@ -42,7 +42,7 @@ src/
 ### Phase 67: SaaS Profile & Branding
 - **Branding**: Tenant settings for company logo, colors, and subscription limits.
 
-## 🎨 2. Design System: Glassmorphism Hub
+## 🎨 3. Design System: Glassmorphism Hub
 We use a unified design language to ensure a "Premium SaaS" feel.
 
 - **Background**: `bg-slate-950` with a subtle radial gradient.
@@ -51,23 +51,23 @@ We use a unified design language to ensure a "Premium SaaS" feel.
 - **Typography**: `Inter` (Inter-var) for maximum readability.
 - **Animations**: `framer-motion` for page transitions and modal entries.
 
-## 🔄 3. State Management & Data Fetching
+## 🔄 4. State Management & Data Fetching
 - **Client State**: `React.useContext` for small, global data (User, Tenant).
 - **Server State**: `TanStack Query` (React Query) for caching, optimistic updates, and automatic re-fetching of attendance/payroll data.
 - **Form Management**: `react-hook-form` + `zod` for robust schema-based validation.
 
-## 🚪 4. Security & Access Control
+## 🚪 5. Security & Access Control
 - **CSRF Protection**: Native Next.js CSRF guards + backend cookie validation.
 - **Multi-Tenant Header**: Every outgoing request must include `X-Tenant-Domain` via the `api.ts` interceptor.
 - **Role-Based Gating**:
     - Use `<RoleGuard roles={['HR', 'Admin']}>` for UI elements.
     - Use `middleware.ts` for route-level protection.
 
-## 📊 5. Advanced Feature: Reporting Engine
+## 📊 6. Advanced Feature: Reporting Engine
 - **Implementation**: The reporting dashboard uses `recharts` for visualization.
 - **CSV Downloads**: Use a custom `useReport` hook that handles the `Blob` response from the backend and triggers a local file download.
 
-## ✅ 6. Testing Philosophy
+## ✅ 7. Testing Philosophy
 - **Unit Tests**: Focus on logic in `hooks/` and `utils/`.
 - **Integration Tests**: Focus on critical flows like `Login`, `Signup`, and `Attendance Correction`.
 - **Mocks**: Standardize API mocks using `msw` (Mock Service Worker) for consistent testing environment.
