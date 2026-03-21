@@ -5,8 +5,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import Employee, Department, Role, Golongan
-from .models import PayrollPeriod, Payslip, SalaryComponent, PayslipDetail
-from .services import PayrollCalculator, BPJSManager, TaxEngine
+from payroll.models import PayrollPeriod, Payslip, SalaryComponent, PayslipDetail
+from payroll.services import PayrollCalculator, BPJSManager, TaxEngine
 
 class PayrollExtendedTestCase(TenantTestCase):
     def setUp(self):

@@ -127,7 +127,7 @@ The testing infrastructure has been modernized to use `pytest`, providing a much
 - **Modern Suite**: Transitioned from standard Django `TestCase` to `pytest` for faster execution and advanced features like fixtures and parametrization.
 - **Granular Verification (149+ Scenarios)**: Broken down large compliance scripts into 149+ modular tests to ensure precise verification of Indonesian tax and BPJS logic.
 - **Improved DX**: Added `pytest.ini` and `conftest.py` with session-scoped multi-tenant schema bootstrap support.
-- **Test Instructions**: Tests are now executed simply by running `pytest` in the `backend/` directory.
+- **Test Instructions**: Tests are now executed simply by running `pytest` in the `backend/` directory. For Windows users, a helper script **`run_tests.ps1`** is provided to automatically set the local database environment variables.
 
 ### Phase 60: Comprehensive Django Admin Integration (Complete)
 A complete administrative interface has been established for all backend modules, ensuring that no model is left unmanaged.
