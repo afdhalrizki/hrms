@@ -28,16 +28,10 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Advanced Reporting (Analytics)**: A dynamic dashboard for Admins providing real-time headcount trends, attendance health, and payroll cost summaries with one-click CSV exports.
 
 ![Shift Management](./assets/shift_management.png)
-![Reimbursement UI](./assets/reimbursement_ui.png)
-
-## 🛠 Technical Reference for Developers
-This frontend is built with scalability and premium UI as top priorities.
-
-### Core Architecture
-- **App Router**: Leveraging Server Components for data performance.
-- **Unified Identity**: Hydrates state from `/api/users/me/` for multi-persona support (Admin vs ESS).
-- **Glassmorphism System**: Standardized `backdrop-blur` and `transparent-border` tokens across all modules.
-- **Type Safety**: 100% TypeScript coverage with shared schema definitions.
+### Phase 63: Self-Service Expansion (Leaves & Reimbursements)
+- **Leaves**: Real-time balance tracking and modal submission for annual/sick leaves.
+- **Reimbursements**: Category-based expense claims with file upload support for receipts.
+- **Infrastructure**: Optimized `apiFetch` to handle `FormData` and multi-part uploads.
 
 ---
-**Status**: 🏆 Premium Dashboard Baseline Established (March 21, 2026)
+**Status**: 🏆 Self-Service Expansion (Phase 63) Complete (March 21, 2026)

@@ -25,6 +25,8 @@
     "workflows": "Alur Kerja",
     "analytics": "Analitik",
     "settings": "Pengaturan",
+    "leaves": "Cuti",
+    "reimbursements": "Reimbursement",
     "attendance_corrections": "Koreksi Kehadiran",
     "reporting": "Pelaporan"
   },
@@ -68,5 +70,40 @@
     "overtimeCost": "Biaya Lembur",
     "costPerEmployee": "Biaya per Karyawan",
     "loading": "Mengagregasi metrik..."
+  },
+  "Leaves": {
+    "title": "Manajemen Cuti",
+    "balanceTitle": "Saldo Cuti",
+    "remainingDays": "Sisa Hari",
+    "usedDays": "Hari Terpakai",
+    "requestLeave": "Ajukan Cuti",
+    "history": "Riwayat Cuti",
+    "form": {
+      "type": "Jenis Cuti",
+      "startDate": "Tanggal Mulai",
+      "endDate": "Tanggal Selesai",
+      "reason": "Alasan",
+      "annual": "Cuti Tahunan",
+      "sick": "Sakit",
+      "emergency": "Darurat",
+      "maternity": "Cuti Melahirkan"
+    }
+  },
+  "Reimbursement": {
+    "title": "Reimbursement Biaya",
+    "newClaim": "Klaim Reimbursement Baru",
+    "history": "Riwayat Klaim",
+    "stats": {
+      "pending": "Klaim Tertunda",
+      "approved": "Jumlah Disetujui"
+    },
+    "form": {
+      "category": "Kategori Biaya",
+      "amount": "Jumlah yang Diajukan",
+      "date": "Tanggal Kwitansi",
+      "description": "Justifikasi",
+      "attachment": "Lampiran Kwitansi (PDF/Gambar)",
+      "receiptNumber": "Nomor Kwitansi / Faktur"
+    }
   }
 }

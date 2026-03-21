@@ -35,8 +35,10 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const baseUrl = getBaseUrl();
   const url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
   
+  const isFormData = options.body instanceof FormData;
+  
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...options.headers,
   };
 

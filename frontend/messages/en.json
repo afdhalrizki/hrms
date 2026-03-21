@@ -25,6 +25,8 @@
     "workflows": "Workflows",
     "analytics": "Analytics",
     "settings": "Settings",
+    "leaves": "Leaves",
+    "reimbursements": "Reimbursements",
     "attendance_corrections": "Correction Requests",
     "reporting": "Reporting"
   },
@@ -68,5 +70,40 @@
     "overtimeCost": "Overtime Cost",
     "costPerEmployee": "Cost per Employee",
     "loading": "Aggregating metrics..."
+  },
+  "Leaves": {
+    "title": "Leave Management",
+    "balanceTitle": "Leave Balance",
+    "remainingDays": "Remaining Days",
+    "usedDays": "Used Days",
+    "requestLeave": "Request Leave",
+    "history": "Leave History",
+    "form": {
+      "type": "Leave Type",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "reason": "Reason",
+      "annual": "Annual Leave",
+      "sick": "Sick Leave",
+      "emergency": "Emergency Leave",
+      "maternity": "Maternity Leave"
+    }
+  },
+  "Reimbursement": {
+    "title": "Expense Reimbursement",
+    "newClaim": "New Reimbursement Claim",
+    "history": "Claim History",
+    "stats": {
+      "pending": "Pending Claims",
+      "approved": "Approved Amount"
+    },
+    "form": {
+      "category": "Expense Category",
+      "amount": "Requested Amount",
+      "date": "Receipt Date",
+      "description": "Justification",
+      "attachment": "Receipt Attachment (PDF/Image)",
+      "receiptNumber": "Receipt / Invoice #"
+    }
   }
 }

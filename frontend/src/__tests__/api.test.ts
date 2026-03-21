@@ -69,6 +69,30 @@ describe('apiFetch', () => {
     expect(data).toEqual({ success: true });
   });
 
+  it('omits Content-Type header when body is FormData', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    const formData = new FormData();
+    formData.append('file', new Blob(['test'], { type: 'text/plain' }));
+
+    await apiFetch('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.not.objectContaining({
+          'Content-Type': 'application/json',
+        }),
+      })
+    );
+  });
+
   it('throws error when response is not ok', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
