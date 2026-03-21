@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import SignupPage from '@/app/signup/page';
+import SignupPage from '@/app/[locale]/signup/page';
 import * as api from '@/lib/api';
 
 // Mock the apiFetch helper
@@ -35,7 +35,7 @@ describe('SignupPage Component', () => {
     fireEvent.click(screen.getByText('Create Workspace'));
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/tenants/public-signup/', expect.objectContaining({
+      expect(mockPost).toHaveBeenCalledWith('/public/signup/', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           company_name: 'Acme Corp',

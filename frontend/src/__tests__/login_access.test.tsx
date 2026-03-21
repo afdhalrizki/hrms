@@ -1,12 +1,22 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import LoginPage from '@/app/login/page';
+import LoginPage from '@/app/[locale]/login/page';
 import { useTenant } from '@/context/TenantContext';
 
 // Mock dependencies
 vi.mock('@/context/TenantContext', () => ({
   useTenant: vi.fn(),
+}));
+
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    loading: false,
+    error: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+  })),
 }));
 
 vi.mock('next/navigation', () => ({

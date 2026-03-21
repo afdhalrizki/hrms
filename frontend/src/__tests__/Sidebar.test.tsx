@@ -26,7 +26,7 @@ describe('Sidebar Component', () => {
 
     render(<Sidebar />);
     
-    expect(screen.getByText('Loading...')).toBeDefined();
+    expect(screen.getByText('loading')).toBeDefined();
     expect(screen.getByText('...')).toBeDefined();
   });
 

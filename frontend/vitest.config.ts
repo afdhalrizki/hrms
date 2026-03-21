@@ -9,10 +9,12 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
+    exclude: ['**/node_modules/**', '**/tests/**', '**/dist/**'],
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@/app': path.resolve(__dirname, './src/app/[locale]'),
     },
   },
 });

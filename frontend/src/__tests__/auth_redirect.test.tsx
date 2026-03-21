@@ -1,7 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import Home from '@/app/page';
+import Home from '@/app/[locale]/page';
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
 import { useRouter } from 'next/navigation';

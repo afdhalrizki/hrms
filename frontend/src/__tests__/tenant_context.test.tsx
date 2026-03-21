@@ -18,6 +18,7 @@ const TestConsumer = () => {
 describe('TenantContext', () => {
   beforeEach(() => {
     vi.stubGlobal('location', { hostname: 'localhost' });
+    process.env.NEXT_PUBLIC_DOMAIN_SUFFIX = 'harikerja.com';
     vi.resetModules();
   });
 

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import RegistrationsPage from '@/app/admin/registrations/page';
+import RegistrationsPage from '@/app/[locale]/admin/registrations/page';
 import * as api from '@/lib/api';
 
 // Mock Layout because it uses Sidebar and other stuff we don't need for logic test
