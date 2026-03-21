@@ -188,5 +188,15 @@
       "scoreLabel": "Skor Numerik (1-5)",
       "reviewType": "Peran Penilai"
     }
+  },
+  "Branding": {
+    "title": "Branding Perusahaan",
+    "subtitle": "Sesuaikan identitas workspace perusahaan Anda.",
+    "logo": "Logo Perusahaan",
+    "primaryColor": "Warna Utama Tema",
+    "secondaryColor": "Warna Sekunder Tema",
+    "updateBtn": "Terapkan Perubahan",
+    "previewTitle": "Pratinjau UI",
+    "success": "Branding berhasil diperbarui"
   }
 }

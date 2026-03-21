@@ -50,5 +50,11 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Weighted Scoring**: Multi-dimensional rating engine (Quality, Communication, Reliability, Teamwork) with automated average calculation.
 - **History Viewer**: Consolidated view of all historical appraisal results with reviewer role identification.
 
+### Phase 67: SaaS Branding (Master Identity)
+- **Whitelabel Logic**: Full support for custom company logos and primary/secondary theme colors.
+- **Dynamic Style Injection**: Implementation of real-time CSS variable injection, allowing the UI to adapt instantly to branding changes.
+- **Branding Portal**: A dedicated settings workspace for administrators to manage their organization's visual identity.
+- **Unified Identity**: Seamless propagation of branding assets across the Sidebar, Topbar, and interactive UI elements.
+
 ---
-**Status**: 🏆 Appraisal Lifecycle (Phase 66) Complete (March 21, 2026)
+**Status**: 🏆 SaaS Branding (Phase 67) Complete (March 21, 2026)

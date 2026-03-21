@@ -18,7 +18,8 @@ import {
   MapPin,
   GitMerge,
   TrendingUp,
-  FileText
+  FileText,
+  Palette
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -40,6 +41,7 @@ const menuItems = [
   { nameKey: 'settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
   { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', isAdminOnly: true },
   { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', isAdminOnly: true },
+  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', isAdminOnly: true },
 ];
 
 export function Sidebar() {

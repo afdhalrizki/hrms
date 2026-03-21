@@ -7,6 +7,8 @@ class Tenant(TenantMixin):
     
     # Customization Fields
     logo = models.ImageField(upload_to='tenant_logos/', null=True, blank=True)
+    theme_primary_color = models.CharField(max_length=10, default='#6366f1', help_text="Primary brand color (hex)")
+    theme_secondary_color = models.CharField(max_length=10, default='#4f46e5', help_text="Secondary brand color (hex)")
     address = models.TextField(null=True, blank=True)
     phone = models.CharField(max_length=50, null=True, blank=True)
     

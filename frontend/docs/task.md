@@ -22,7 +22,7 @@ Features for managing the organization, data, and approvals.
 - [x] **Phase 64: Financial Core**: Live BPJS & PPh 21 calculation dashboards.
 - [x] **Phase 65: Operational Clarity**: Admin Audit Logs viewer and API Key manager.
 - [x] **Phase 66: Appraisal Lifecycle**: Full submission workflow for KPIs and reviews.
-- [ ] **Phase 67: Tenant Branding**: Admin settings for company logo and theme colors.
+- [x] **Phase 67: Tenant Branding**: Admin settings for company logo and theme colors.
 - [ ] **Phase 68: E2E Hardening**: Comprehensive Playwright test suite for all modules.
 - [ ] **Modular Tiering**: Plan-based gating (Basic/Pro/Enterprise) management.
 

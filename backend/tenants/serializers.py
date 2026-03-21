@@ -21,7 +21,8 @@ class TenantSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
         fields = [
-            'id', 'name', 'schema_name', 'logo', 'address', 'phone', 
+            'id', 'name', 'schema_name', 'logo', 'theme_primary_color', 'theme_secondary_color', 
+            'address', 'phone', 
             'overtime_rate', 'payroll_overtime_divisor', 'leave_approval_level', 
             'overtime_approval_level', 'max_admins',
             'subscription_status', 'expiry_date', 'plan_type', 

@@ -188,5 +188,15 @@
       "scoreLabel": "Numeric Score (1-5)",
       "reviewType": "Review Role"
     }
+  },
+  "Branding": {
+    "title": "Tenant Branding",
+    "subtitle": "Customize your company workspace identity.",
+    "logo": "Company Logo",
+    "primaryColor": "Primary Theme Color",
+    "secondaryColor": "Secondary Theme Color",
+    "updateBtn": "Apply Changes",
+    "previewTitle": "UI Preview",
+    "success": "Branding updated successfully"
   }
 }

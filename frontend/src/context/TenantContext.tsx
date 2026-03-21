@@ -11,6 +11,8 @@ interface TenantContextType {
   address?: string;
   phone?: string;
   isLoading: boolean;
+  themePrimaryColor?: string;
+  themeSecondaryColor?: string;
   subscriptionStatus?: 'ACTIVE' | 'EXPIRED' | 'SUSPENDED';
   expiryDate?: string;
   planType?: string;
@@ -67,6 +69,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 ...prev,
                 tenantName: data.name || prev.tenantName,
                 logo: data.logo,
+                themePrimaryColor: data.theme_primary_color,
+                themeSecondaryColor: data.theme_secondary_color,
                 address: data.address,
                 phone: data.phone,
                 subscriptionStatus: data.subscription_status,

@@ -7,10 +7,16 @@ import { SubscriptionBanner } from './SubscriptionBanner';
 import { SuspendedOverlay } from './SuspendedOverlay';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { tenantName } = useTenant();
+  const tenant = useTenant();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <style dangerouslySetInnerHTML={{ __html: `
+        :root {
+          ${tenant.themePrimaryColor ? `--primary: ${tenant.themePrimaryColor};` : ''}
+          ${tenant.themeSecondaryColor ? `--secondary: ${tenant.themeSecondaryColor};` : ''}
+        }
+      `}} />
       <SuspendedOverlay />
       <Sidebar />
       <main className="pl-64 min-h-screen flex flex-col">
@@ -24,7 +30,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20 uppercase tracking-wider">
-              {tenantName}
+              {tenant.tenantName}
             </div>
           </div>
         </header>
