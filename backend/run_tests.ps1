@@ -5,4 +5,4 @@ $env:DB_PASSWORD="hrms_password"
 $env:DB_NAME="hrms"
 
 Write-Host "Running HRMS Backend Tests..." -ForegroundColor Cyan
-.\venv\Scripts\pytest $args
+.\

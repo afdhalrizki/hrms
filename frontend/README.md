@@ -57,7 +57,13 @@ npm install
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) for the public portal.
+
+**Verify Frontend**:
+- **Public Portal**: [http://localhost:3000](http://localhost:3000) (For signup/login)
+- **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000) (For HR operations)
+
+> [!IMPORTANT]
+> To access tenant subdomains locally (e.g., `company1.localhost`), ensure your `hosts` file is configured correctly.
 
 ---
 

@@ -62,6 +62,10 @@ frontend/.vercel
 frontend/.eslintcache
 frontend/npm-debug.log*
 frontend/.next/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/playwright/.cache/
 
 # Mobile (Flutter/Dart)
 mobile/.dart_tool/

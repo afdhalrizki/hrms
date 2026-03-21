@@ -74,7 +74,22 @@ python manage.py bootstrap_tenants
 
 ---
 
-## 3. Developing & Testing
+## 3. Running the Application
+
+### Start Development Server
+Enable your virtual environment and run the following:
+
+```bash
+python manage.py runserver
+```
+
+**Verify Backend**:
+- **API Status**: [http://localhost:8000/api/users/me/](http://localhost:8000/api/users/me/)
+- **Swagger Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
+
+---
+
+## 4. Developing & Testing
 
 ### API Documentation
 The system automatically generates OpenAPI 3.0 schemas.
