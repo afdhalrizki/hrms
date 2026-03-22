@@ -49,7 +49,7 @@ if (-not $SkipSeed) {
     }
 
     Push-Location $BackendDir
-    & $PythonCmd scripts/seed_test_users.py
+    & $PythonCmd scripts/seed_test_frontend.py
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Seed successful." -ForegroundColor Green

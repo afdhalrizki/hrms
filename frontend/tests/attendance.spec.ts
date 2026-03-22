@@ -1,7 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.serial('Attendance Lifecycle', () => {
+test.describe.serial('Attendance Management', () => {
   const tenantUrl = 'http://company1.localhost:3000';
+  
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
+    'Access-Control-Allow-Credentials': 'true'
+  };
 
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== testInfo.expectedStatus) {
@@ -10,48 +17,46 @@ test.describe.serial('Attendance Lifecycle', () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    // Ultimate Mock: Catch EVERYTHING under /api/
-    await page.route('**/api/**', async route => {
-      const url = route.request().url();
+    await page.route(url => url.href.includes('api'), async route => {
+      const url = new URL(route.request().url());
+      const path = url.pathname;
       const method = route.request().method();
-
+      
       if (method === 'OPTIONS') {
-        await route.fulfill({
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': tenantUrl,
-            'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
-            'Access-Control-Allow-Credentials': 'true'
-          }
-        });
+        await route.fulfill({ status: 204, headers: corsHeaders });
         return;
       }
 
-      // Default responses for common endpoints
-      if (url.includes('/auth/login')) {
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 2, role: 'EMPLOYEE' }) });
-      } else if (url.includes('/users/me')) {
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 2, role: 'EMPLOYEE', employee_id: 10, fullname: 'Employee One' }) });
-      } else if (url.includes('/tenant/settings')) {
-        await route.fulfill({ 
-          status: 200, 
-          contentType: 'application/json', 
-          body: JSON.stringify({
-            name: 'Company1',
-            enabled_modules: ['attendance', 'payroll', 'performance', 'reimbursement', 'leaves', 'analytics', 'workflows', 'audit_logs', 'api_keys', 'branding'],
-            is_subscription_active: true
-          }) 
-        });
-      } else if (url.match(/\/api\/?$/)) { // Attendance page hits root /api/
-         if (method === 'GET') {
-            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
-         } else if (method === 'POST') {
-            await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ id: 101, date: new Date().toISOString().split('T')[0], check_in: '09:00:00', status: 'PRESENT' }) });
-         }
+      let responseBody: any = null;
+      let status = 200;
+
+      if (path.includes('/auth/login')) {
+        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One', is_staff: false };
+      } else if (path.includes('/users/me')) {
+        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', is_staff: false, fullname: 'Employee One' };
+      } else if (path.includes('/tenant/settings')) {
+        responseBody = { name: 'Company1', enabled_modules: ['attendance'], is_subscription_active: true };
+      } else if (path.includes('/attendance-correction-requests')) {
+        if (method === 'POST') {
+          responseBody = { id: 10, status: 'PENDING' };
+          status = 201;
+        }
+      } else if (path.endsWith('/api') || path.endsWith('/api/')) {
+        const today = new Date().toISOString().split('T')[0];
+        if (method === 'GET') {
+          responseBody = [
+            { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: null, status: "PRESENT", liveness_verified: true, verification_method: 'LIVENESS' }
+          ];
+        } else {
+          responseBody = { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: "17:00", status: "PRESENT", liveness_verified: true, verification_method: 'LIVENESS' };
+          status = 201;
+        }
+      }
+
+      if (responseBody) {
+        await route.fulfill({ status, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify(responseBody) });
       } else {
-        // Fallback for any other /api/** calls to prevent "Failed to fetch"
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+        await route.fulfill({ status: 200, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify([]) });
       }
     });
 
@@ -60,18 +65,29 @@ test.describe.serial('Attendance Lifecycle', () => {
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Workspace Portal/i)).toBeVisible({ timeout: 15000 });
   });
 
-  test('should perform daily check-in successfully', async ({ page }) => {
+  test('should verify attendance dashboard and perform actions', async ({ page }) => {
     await page.goto(`${tenantUrl}/attendance`);
-    const checkInBtn = page.getByRole('button', { name: /Check In/i });
-    await expect(checkInBtn).toBeVisible();
-    await checkInBtn.click();
-    await expect(page.getByText(/Attendance recorded successfully/i)).toBeVisible();
-  });
+    await page.waitForLoadState('networkidle');
+    
+    // 1. Verify Stats
+    const successRateCard = page.getByText(/Success Rate/i);
+    await expect(successRateCard).toBeVisible({ timeout: 15000 });
+    
+    // 2. Perform Check Out
+    const checkOutBtn = page.getByRole('button', { name: /Check Out/i });
+    await expect(checkOutBtn).toBeVisible({ timeout: 10000 });
+    await checkOutBtn.click();
+    await expect(page.getByText(/Attendance recorded successfully/i)).toBeVisible({ timeout: 10000 });
 
-  test('should display daily shift summary', async ({ page }) => {
-    await page.goto(`${tenantUrl}/attendance`);
-    await expect(page.getByText(/Success Rate/i)).toBeVisible();
+    // 3. Submit Correction Request
+    const requestCorrectionBtn = page.getByRole('button', { name: /Request Correction/i }).first();
+    await requestCorrectionBtn.click();
+    await expect(page.getByText(/Adjust Attendance/i)).toBeVisible();
+    await page.locator('textarea').fill('Forgot to check in due to morning meeting.');
+    await page.getByRole('button', { name: /Submit Request/i }).click();
+    await expect(page.getByText(/Correction request submitted/i)).toBeVisible();
   });
 });

@@ -60,8 +60,8 @@ describe('PerformancePage (Phase 66)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (apiFetch as any).mockImplementation((endpoint: string) => {
-      if (endpoint === '/performance/kpi-targets/') return Promise.resolve(mockTargets);
-      if (endpoint === '/performance/appraisals/') return Promise.resolve(mockAppraisals);
+      if (endpoint === '/kpi-targets/') return Promise.resolve(mockTargets);
+      if (endpoint === '/appraisals/') return Promise.resolve(mockAppraisals);
       return Promise.resolve([]);
     });
   });

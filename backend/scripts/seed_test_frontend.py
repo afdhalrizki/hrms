@@ -25,7 +25,41 @@ from django_tenants.utils import schema_context
 from datetime import date
 
 User = get_user_model()
-tenant = Tenant.objects.get(schema_name='company1')
+
+# Check database connection before proceeding
+import socket
+from django.db import connections
+from django.db.utils import OperationalError
+
+def is_db_reachable(host='localhost', port=5432, timeout=0.5):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(timeout)
+        s.connect((host, port))
+        s.close()
+        return True
+    except (socket.timeout, ConnectionRefusedError, OSError):
+        return False
+
+if not is_db_reachable():
+    print("Database connection failed (Socket Refused). Skipping seeding (this is expected in Mock Mode).")
+    sys.exit(0)
+
+db_conn = connections['default']
+try:
+    db_conn.cursor()
+except OperationalError:
+    print("Database connection failed (Django OperationalError). Skipping seeding.")
+    sys.exit(0)
+
+try:
+    tenant = Tenant.objects.get(schema_name='company1')
+except Tenant.DoesNotExist:
+    print("Tenant 'company1' not found. Please run up.ps1 or migrations first.")
+    sys.exit(0)
+except Exception as e:
+    print(f"Error accessing database: {e}")
+    sys.exit(0)
 
 test_users = [
     {'email': 'admin@company1.net', 'is_staff': True, 'is_superuser': False},

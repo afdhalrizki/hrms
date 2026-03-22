@@ -52,9 +52,9 @@ describe('PayrollPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (apiFetch as any).mockImplementation((endpoint: string) => {
-      if (endpoint === '/payroll/payslips/') return Promise.resolve(mockPayslips);
+      if (endpoint === '/payslips/') return Promise.resolve(mockPayslips);
       if (endpoint === '/users/me/') return Promise.resolve({ role: 'ADMIN', is_staff: false });
-      if (endpoint === '/payroll/payroll-periods/') return Promise.resolve([]);
+      if (endpoint === '/payroll-periods/') return Promise.resolve([]);
       return Promise.resolve([]);
     });
   });

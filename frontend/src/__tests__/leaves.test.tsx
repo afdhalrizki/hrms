@@ -34,8 +34,8 @@ describe('LeavesPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (apiFetch as any).mockImplementation((endpoint: string) => {
-      if (endpoint === '/attendance/leave-balances/') return Promise.resolve(mockBalances);
-      if (endpoint === '/attendance/leave-requests/') return Promise.resolve(mockRequests);
+      if (endpoint === '/leave-balances/') return Promise.resolve(mockBalances);
+      if (endpoint === '/leave-requests/') return Promise.resolve(mockRequests);
       return Promise.resolve([]);
     });
   });
@@ -61,7 +61,7 @@ describe('LeavesPage', () => {
     fireEvent.click(submitBtn);
     
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/attendance/leave-requests/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/leave-requests/', expect.objectContaining({
         method: 'POST'
       }));
     });

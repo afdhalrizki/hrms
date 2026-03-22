@@ -19,9 +19,21 @@ vi.mock('@/context/AuthContext', () => ({
   })),
 }));
 
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string, params?: any) => {
+    if (params) {
+      return `${key} ${Object.values(params).join(' ')}`;
+    }
+    return key;
+  },
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
+  }),
+  useSearchParams: () => ({
+    get: vi.fn(),
   }),
 }));
 
@@ -30,7 +42,7 @@ describe('LoginPage Access Restrictions', () => {
     vi.clearAllMocks();
   });
 
-  it('renders "Akses Terbatas" on public domain without forceShowForm', () => {
+  it('renders "Akses Terbatas" on public domain without forceShowForm', async () => {
     (useTenant as any).mockReturnValue({
       isPublic: true,
       tenantName: 'Public',
@@ -38,12 +50,12 @@ describe('LoginPage Access Restrictions', () => {
 
     render(<LoginPage />);
     
-    expect(screen.getByText('Akses Terbatas')).toBeDefined();
-    expect(screen.queryByLabelText(/Email Address/i)).toBeNull();
-    expect(screen.getByText(/Login hanya tersedia melalui subdomain perusahaan Anda/i)).toBeDefined();
+    expect(await screen.findByText(/restrictedTitle/i)).toBeDefined();
+    expect(screen.queryByLabelText(/emailLabel/i)).toBeNull();
+    expect(await screen.findByText(/restrictedDesc/i)).toBeDefined();
   });
 
-  it('renders login form on public domain when forceShowForm is true', () => {
+  it('renders login form on public domain when forceShowForm is true', async () => {
     (useTenant as any).mockReturnValue({
       isPublic: true,
       tenantName: 'Public',
@@ -51,13 +63,13 @@ describe('LoginPage Access Restrictions', () => {
 
     render(<LoginPage forceShowForm={true} />);
     
-    expect(screen.getByText('Portal Admin Global')).toBeDefined();
-    expect(screen.getByLabelText(/Email Address/i)).toBeDefined();
-    expect(screen.getByLabelText(/Password/i)).toBeDefined();
-    expect(screen.queryByText('Akses Terbatas')).toBeNull();
+    expect(await screen.findByText(/portalBadge/i)).toBeDefined();
+    expect(await screen.findByLabelText(/emailLabel/i)).toBeDefined();
+    expect(await screen.findByLabelText(/passwordLabel/i)).toBeDefined();
+    expect(screen.queryByText(/restrictedTitle/i)).toBeNull();
   });
 
-  it('renders normal login form on tenant subdomain', () => {
+  it('renders normal login form on tenant subdomain', async () => {
     (useTenant as any).mockReturnValue({
       isPublic: false,
       tenantName: 'Acme Corp',
@@ -65,10 +77,10 @@ describe('LoginPage Access Restrictions', () => {
 
     render(<LoginPage />);
     
-    expect(screen.getByText(/Welcome to/i)).toBeDefined();
-    expect(screen.getByText('Acme Corp')).toBeDefined();
-    expect(screen.getByLabelText(/Email Address/i)).toBeDefined();
-    expect(screen.getByLabelText(/Password/i)).toBeDefined();
-    expect(screen.queryByText('Akses Terbatas')).toBeNull();
+    expect(await screen.findByText(/welcomePortal/i)).toBeDefined();
+    expect(await screen.findByText(/Acme Corp/i)).toBeDefined();
+    expect(await screen.findByLabelText(/emailLabel/i)).toBeDefined();
+    expect(await screen.findByLabelText(/passwordLabel/i)).toBeDefined();
+    expect(screen.queryByText(/restrictedTitle/i)).toBeNull();
   });
 });

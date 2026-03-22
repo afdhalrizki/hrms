@@ -34,8 +34,8 @@ describe('ReimbursementsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (apiFetch as any).mockImplementation((endpoint: string) => {
-      if (endpoint === '/reimbursement/reimbursement-categories/') return Promise.resolve(mockCategories);
-      if (endpoint === '/reimbursement/reimbursements/') return Promise.resolve(mockClaims);
+      if (endpoint === '/reimbursement-categories/') return Promise.resolve(mockCategories);
+      if (endpoint === '/reimbursements/') return Promise.resolve(mockClaims);
       return Promise.resolve([]);
     });
   });
@@ -69,7 +69,7 @@ describe('ReimbursementsPage', () => {
     fireEvent.click(submitBtn);
     
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/reimbursement/reimbursements/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/reimbursements/', expect.objectContaining({
         method: 'POST',
         body: expect.any(FormData)
       }));

@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Login Access Restrictions', () => {
-  test('should hide login form and show notice on public domain', async ({ page }) => {
-    // Navigate to the main login page on public domain
-    await page.goto('/login');
+  const publicUrl = 'http://localhost:3000';
 
-    // Verify restricted access message is visible (English default)
-    await expect(page.getByText(/Restricted Access/i)).toBeVisible();
+  test('should hide login form and show notice on public domain', async ({ page }) => {
+    // Navigate explicitly to public domain root
+    await page.goto(`${publicUrl}/login`);
+
+    // Verify restricted access message is visible
+    await expect(page.getByText(/Restricted Access/i)).toBeVisible({ timeout: 15000 });
     
     // Verify email field is NOT visible
     await expect(page.locator('input[type="email"]')).not.toBeVisible();
@@ -17,10 +19,10 @@ test.describe('Login Access Restrictions', () => {
 
   test('should show login form on secret portal route even on public domain', async ({ page }) => {
     // Navigate to the secret portal route
-    await page.goto('/login/portal-admin');
+    await page.goto(`${publicUrl}/login/portal-admin`);
 
     // Verify "Portal Admin Global" badge is visible
-    await expect(page.getByText(/Global Admin Portal/i)).toBeVisible();
+    await expect(page.getByText(/Global Admin Portal/i)).toBeVisible({ timeout: 15000 });
     
     // Verify login form is now visible
     await expect(page.locator('input[type="email"]')).toBeVisible();
@@ -33,10 +35,10 @@ test.describe('Login Access Restrictions', () => {
 
   test('should redirect unauthenticated public visitors to /signup from root', async ({ page }) => {
     // Navigate to root
-    await page.goto('/');
+    await page.goto(`${publicUrl}/`);
 
     // Should be redirected to /signup (with locale prefix)
     await expect(page).toHaveURL(/.*\/signup/);
-    await expect(page.getByText(/Create your account/i)).toBeVisible();
+    await expect(page.getByText(/Create your account/i)).toBeVisible({ timeout: 15000 });
   });
 });

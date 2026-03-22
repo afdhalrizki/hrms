@@ -19,15 +19,15 @@ test.describe('Branding and Identity', () => {
         return;
       }
 
-      if (url.match(/\/auth\/login\/?$/)) {
+      if (url.match(/\/auth\/login\/?/)) {
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 1, email: 'admin@company1.net', role: 'ADMIN' }) });
         return;
       }
-      if (url.match(/\/users\/me\/?$/)) {
+      if (url.match(/\/users\/me\/?/)) {
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 1, email: 'admin@company1.net', role: 'ADMIN', is_staff: true, fullname: 'Admin User' }) });
         return;
       }
-      if (url.match(/\/tenant\/settings\/?$/)) {
+      if (url.match(/\/tenant\/settings\/?/)) {
         if (method === 'PATCH') { await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) }); return; }
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ name: 'Company1', logo: null, theme_primary_color: '#6366f1', theme_secondary_color: '#4f46e5', is_subscription_active: true, enabled_modules: ['attendance', 'payroll', 'performance', 'reimbursement', 'leaves', 'analytics', 'workflows', 'audit_logs', 'api_keys', 'branding'] }) });
         return;
