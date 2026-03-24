@@ -75,21 +75,31 @@ mobile/.packages
 mobile/.pub-cache/
 mobile/.pub/
 mobile/*.iml
-mobile/ios/Flutter/.last_build_id
+mobile/*.transformed.dart
+mobile/*.sync-conflict.*
+mobile/doc/api/
+mobile/.temp/
+mobile/local/
+
+# Android-specific
+mobile/android/local.properties
+mobile/android/key.properties
+mobile/android/app/src/main/res/values/google-services.json
+mobile/android/**/*.keystore
+mobile/android/**/*.jks
+
+# iOS-specific
+mobile/ios/Runner/GeneratedPluginRegistrant.h
+mobile/ios/Runner/GeneratedPluginRegistrant.m
 mobile/ios/Flutter/Generated.xcconfig
 mobile/ios/Flutter/flutter_export_environment.sh
 mobile/ios/Flutter/Flutter.framework
 mobile/ios/Flutter/Flutter.podspec
 mobile/ios/Flutter/App.framework
-mobile/android/app/debug/
-mobile/android/app/profile/
-mobile/android/app/release/
-mobile/android/key.properties
-mobile/android/app/src/main/res/values/google-services.json
+mobile/ios/Flutter/ephemeral/
+mobile/ios/Flutter/.last_build_id
 mobile/ios/Runner/GoogleService-Info.plist
-mobile/doc/api/
-mobile/*.transformed.dart
-mobile/*.sync-conflict.*
+mobile/ios/ServiceDefinitions.json
 
 # Docker
 .docker_data/

@@ -6,7 +6,12 @@ import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
 import 'leave_list_screen.dart';
 import 'reimbursement_list_screen.dart';
+import 'profile_edit_screen.dart';
+import 'profile_documents_screen.dart';
+import 'correction_request_screen.dart';
+import 'performance_dashboard_screen.dart';
 import '../api/api_service.dart';
+import '../api/location_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -219,16 +224,19 @@ class _HomeScreenState extends State<HomeScreen> {
               );
               if (result is Map && result['verified'] == true) {
                 try {
-                  final now = DateTime.now();
-                  final timeStr = DateFormat('HH:mm:ss').format(now);
-                  
-                  final api = ApiService();
-                  await api.submitAttendance(
-                    employeeId: employeeId!,
-                    latitude: -6.2088, // Mocking center of office for dev
-                    longitude: 106.8456,
-                    checkInTime: timeStr,
-                  );
+                    final now = DateTime.now();
+                    final timeStr = DateFormat('HH:mm:ss').format(now);
+                    
+                    // Fetch real GPS location
+                    final position = await LocationService().getCurrentLocation();
+                    
+                    final api = ApiService();
+                    await api.submitAttendance(
+                      employeeId: employeeId!,
+                      latitude: position?.latitude ?? -6.2088,
+                      longitude: position?.longitude ?? 106.8456,
+                      checkInTime: timeStr,
+                    );
                   
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -275,7 +283,10 @@ class _HomeScreenState extends State<HomeScreen> {
       {'icon': Icons.calendar_today, 'label': 'Leaves', 'color': const Color(0xFFEF4444)},
       {'icon': Icons.receipt, 'label': 'Payslip', 'color': const Color(0xFF10B981)},
       {'icon': Icons.payments, 'label': 'Reimbursements', 'color': const Color(0xFFF59E0B)},
-      {'icon': Icons.description, 'label': 'Reports', 'color': const Color(0xFF6366F1)},
+      {'icon': Icons.person, 'label': 'My Profile', 'color': const Color(0xFF6366F1)},
+      {'icon': Icons.badge, 'label': 'Documents', 'color': const Color(0xFF8B5CF6)},
+      {'icon': Icons.edit_calendar, 'label': 'Correction', 'color': const Color(0xFFF43F5E)},
+      {'icon': Icons.trending_up, 'label': 'Performance', 'color': const Color(0xFF10B981)},
     ];
 
     return GridView.builder(
@@ -298,6 +309,18 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const PayslipScreen()));
             } else if (item['label'] == 'Reimbursements') {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const ReimbursementListScreen()));
+            } else if (item['label'] == 'My Profile') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen(userData: _userData!)))
+                .then((_) => _loadProfile());
+            } else if (item['label'] == 'Documents') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileDocumentsScreen(userData: _userData!)))
+                .then((_) => _loadProfile());
+            } else if (item['label'] == 'Correction') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CorrectionRequestScreen(userData: _userData!)))
+                .then((_) => _loadProfile());
+            } else if (item['label'] == 'Performance') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PerformanceDashboardScreen(userData: _userData!)))
+                .then((_) => _loadProfile());
             }
           },
           borderRadius: BorderRadius.circular(20),

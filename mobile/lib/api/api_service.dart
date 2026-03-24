@@ -40,7 +40,11 @@ class ApiService {
       'Accept': 'application/json',
     };
     if (tenant != null) {
-      headers['X-Tenant'] = tenant;
+      // Use X-Tenant-Domain for backend alignment
+      headers['X-Tenant-Domain'] = "$tenant.localhost";
+      // Manually set Host header so django-tenants can identify the schema 
+      // when hitting 10.0.2.2 or a shared IP
+      headers['Host'] = "$tenant.localhost:8000";
     }
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
@@ -50,7 +54,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> login(String email, String password, String tenant) async {
     final response = await _client.post(
-      Uri.parse("$baseUrl/users/login/"), // Assuming a login endpoint exists
+      Uri.parse("$baseUrl/auth/login/"), // Corrected from /users/login/ to /auth/login/
       headers: _headers(tenant),
       body: jsonEncode({
         'email': email,
@@ -81,7 +85,7 @@ class ApiService {
     final tenant = await getTenant();
     final token = await getToken();
     
-    final url = "\$baseUrl\$endpoint";
+    final url = "$baseUrl$endpoint";
     final response = await _client.get(
       Uri.parse(url),
       headers: _headers(tenant, token),
@@ -226,5 +230,120 @@ class ApiService {
       body: jsonEncode(data),
     );
     if (response.statusCode != 201) throw Exception('Failed to submit reimbursement: ${response.body}');
+  }
+
+  // Phase M2: Profile & Documents
+  Future<Map<String, dynamic>> updateProfile(int employeeId, Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    
+    final response = await _client.patch(
+      Uri.parse("$baseUrl/employees/$employeeId/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to update profile: ${response.body}');
+    }
+  }
+
+  Future<void> uploadDocument(int employeeId, String fieldName, List<int> bytes, String fileName) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    
+    final request = http.MultipartRequest(
+      'PATCH',
+      Uri.parse("$baseUrl/employees/$employeeId/"),
+    );
+    
+    request.headers.addAll(_headers(tenant, token));
+    
+    request.files.add(http.MultipartFile.fromBytes(
+      fieldName,
+      bytes,
+      filename: fileName,
+    ));
+
+    final streamedResponse = await _client.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to upload document: ${response.body}');
+    }
+  }
+
+  // Phase M3: Attendance Corrections
+  Future<List<dynamic>> getAttendanceRecords() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/attendance/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch attendance history');
+  }
+
+  Future<List<dynamic>> getCorrectionRequests() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/attendance-correction-requests/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch correction requests');
+  }
+
+  Future<void> submitCorrectionRequest(Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.post(
+      Uri.parse("$baseUrl/attendance-correction-requests/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    );
+    if (response.statusCode != 201) {
+       throw Exception('Failed to submit correction: ${response.body}');
+    }
+  }
+
+  // Phase M4: Strategic Performance
+  Future<List<dynamic>> getKPITargets() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/kpi-targets/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch KPI targets');
+  }
+
+  Future<List<dynamic>> getAppraisals() async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.get(
+      Uri.parse("$baseUrl/appraisals/"),
+      headers: _headers(tenant, token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch appraisals');
+  }
+
+  Future<void> submitAppraisalReview(Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final token = await getToken();
+    final response = await _client.post(
+      Uri.parse("$baseUrl/appraisal-reviews/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    );
+    if (response.statusCode != 201) {
+       throw Exception('Failed to submit review: ${response.body}');
+    }
   }
 }

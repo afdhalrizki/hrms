@@ -41,19 +41,27 @@ lib/
 - **Feedback**: Vibrate and Haptic feedback for successful clock-ins.
 
 ## 🚀 6. Phased Roadmap: Full Backend Parity
-
 ### Phase M1: Infrastructure Alignment & Real-GPS
-- **API URL Correction**: Fix `ApiService` prefixes (e.g., `/api/attendance/leave-requests/`).
-- **Real Geolocation**: Replace hardcoded coords in `HomeScreen` with `geolocator` service.
+- **API URL Correction**: Ensure `ApiService` correctly handles dynamic tenant subdomains and `/api/` prefixes.
+- **Real Geolocation**: Integrate `geolocator` with high-accuracy settings for clock-in/out.
+- **Header Injection**: Enforce `X-Tenant-Domain` and `Authorization` headers in all requests.
 
-### Phase M2: Attendance Lifecycle Completion
-- **Clock-Out Logic**: Ensure `submitAttendance` handles the `check_out` payload correctly.
-- **Correction Requests**: [NEW SCREEN] `CorrectionRequestScreen` to allow employees to justify missed logs.
+### Phase M2: ESS Profile & Documents (NEW)
+- **Profile Edit**: [NEW SCREEN] `ProfileEditScreen` for self-service fields (Phone, Address, PTKP Status).
+- **Document Manager**: [NEW SCREEN] `ProfileDocumentsScreen` for KTP/NPWP uploads using `multipart/form-data`.
+- **Validation**: Align with backend `EmployeeProfileSerializer` field locks.
 
-### Phase M3: Strategic Self-Service (Performance)
-- **KPI Tracker**: [NEW SCREEN] Dashboard for personal KPI targets and current progress.
-- **Appraisal View**: [NEW SCREEN] View history of performance reviews and feedback.
+### Phase M3: Attendance Lifecycle & Corrections (NEW)
+- **Clock-Out**: Refine `submitAttendance` to handle `check_out` timestamps and geofencing.
+- **Correction Requests**: [NEW SCREEN] `CorrectionRequestScreen` for justified adjustments to attendance logs.
+- **Workflow Feed**: Track `ATTENDANCE_CORRECTION` approval status (Pending/Approved/Rejected).
 
-### Phase M4: Operational Feed & Audit
-- **Live Activity**: Fetch real data for the "Recent Activity" list on the Home Screen.
-- **Document Center**: Fully functional policy downloader.
+### Phase M4: Strategic Performance (NEW)
+- **KPI progress**: [NEW SCREEN] Visual dashboard for personal KPI targets and real-time attainment.
+- **Self-Appraisal**: [NEW SCREEN] Submit ratings and feedback for active appraisal periods.
+- **History**: View historical review results once appraisal status is `COMPLETED`.
+
+### Phase M5: Quality Assurance & Testing
+- **Unit Tests**: Implement 100% coverage for API Services and Data Models.
+- **Widget Tests**: Verify critical UI flows (Clock-in, Leave submission, Profile Edit).
+- **Parity Check**: Ensure all logic mirrors `test_correction.py` and `test_performance.py` from the backend.

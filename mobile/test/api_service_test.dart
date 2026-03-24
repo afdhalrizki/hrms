@@ -57,7 +57,7 @@ void main() {
 
     test('login sends correct payload and saves token', () async {
       final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/users/login/')) {
+        if (request.url.path.contains('/auth/login/')) {
           return http.Response(jsonEncode({'token': 'fake-jwt-token'}), 200);
         }
         return http.Response('Not Found: ${request.url.path}', 404);
