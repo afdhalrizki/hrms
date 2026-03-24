@@ -7,13 +7,15 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Biometric Face Recognition**: AI-powered attendance verification with liveness checks using Google ML Kit.
 - **Smart Geofencing**: High-accuracy GPS validation to ensure attendance records are within office boundaries.
 - **Integrated Identity**: Real-time synchronization with the unified backend identity system (Employee NIK, Role, Department).
+- **ESS Profile Management**: Self-service portal for updating contact info and uploading KTP/NPWP documents using camera capture.
+- **Attendance Corrections**: Request workflow for fixing missed or incorrect logs directly from the mobile app.
+- **Strategic Performance**: Personal KPI dashboard with progress visualization and self-appraisal submissions.
 - **Shift & Schedule**: Personal work calendar with real-time shift status.
 - **Dynamic Payslips**: View and download payroll details with TER 2024 compliance data.
 - **Leave Management**: Submit leave requests (Annual, Permission, Sick) and track balances in real-time.
 - **Reimbursement Claims**: Easy expense submission with category-based validation and status tracking.
 
 ## 🖼 UI Previews
-
 ### Employee Dashboard
 ![Mobile Dashboard](../docs/assets/mobile_preview.png)
 *Premium glassmorphism dashboard with real-time shift and attendance tracking.*
@@ -26,7 +28,8 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 
 - **Framework**: Flutter 3.19+
 - **Biometrics**: Google ML Kit (Face Detection)
-- **Maps/Location**: Geolocator API
+- **Maps/Location**: Geolocator API (High Accuracy)
+- **Media**: Camera & Image Picker (Documents)
 - **Storage**: Flutter Secure Storage (JWT)
 - **Fonts**: Plus Jakarta Sans (Google Fonts)
 
@@ -37,7 +40,7 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 ### Prerequisites
 - **Flutter SDK**: 3.19 or later.
 - **Android Studio / Xcode**: For emulator or physical device testing.
-- **Backend Running**: Ensure the backend is active (e.g., run `.\up.ps1 dev` in the project root).
+- **Backend Running**: Ensure the backend is active (e.g., run `.\run_dev.ps1` in the backend directory).
 
 ### Setup
 ```powershell
@@ -52,9 +55,11 @@ flutter run
 
 ---
 
-## 2. API Integration & Environments
+## 2. API Integration & Multi-Tenancy
 
-The app is designed to connect to different environments. You can adjust the `baseUrl` in `lib/api/api_service.dart`:
+The app handles multi-tenancy by injecting custom headers into every request via `ApiService`:
+- `X-Tenant-Domain`: Standard tenant routing.
+- `Host`: Required for `django-tenants` schema isolation in development.
 
 | Target | API URL (Local Dev) | Notes |
 | :--- | :--- | :--- |
@@ -63,18 +68,19 @@ The app is designed to connect to different environments. You can adjust the `ba
 | **Physical Device** | `http://<your-ip>:8000/api` | Same Wi-Fi required |
 | **Staging** | `https://harikerja.web.id/api` | Requires production build |
 
-> [!TIP]
-> Ensure the **Backend** is running using `.\up.ps1 dev` before starting the mobile app for local testing.
-
 ---
 
 ## 3. Testing
 
-Run the mobile test suite (API logic & Widgets):
-```bash
-flutter test
+Run the full mobile test suite using the one-click script:
+```powershell
+# Run from workspace root:
+pwsh .\mobile\run_tests.ps1
+
+# Or run from mobile directory:
+pwsh ./run_tests.ps1
 ```
-**Status**: 11 core tests passed (Unit + Widget). Includes API validation, model parsing, and UI flow verification.
+**Status**: ✅ **19 tests passed** (100% success). Includes Infrastructure, Profile Logic, Attendance Corrections, and Performance Appraisals.
 
 ---
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

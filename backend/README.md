@@ -111,17 +111,14 @@ The system automatically generates OpenAPI 3.0 schemas.
 ### Running Tests
 The backend uses `pytest` and `manage.py test` with **100% pass rate** across 155+ mission-critical scenarios.
 
-```bash
-# General
-pytest
-
-# Windows (Auto-configures local DB env & Docker):
-# This script ensures Docker is running and uses the project's venv automatically.
-.\run_tests.ps1
-
-# To run specific tests:
-.\run_tests.ps1 core/tests/test_core.py
+Run normal unit/integration tests (uses temporary DB):
+```powershell
+pwsh ./run_tests.ps1
 ```
+
+Run E2E tests (requires running server):
+1. Start server: `pwsh ./run_dev.ps1`
+2. In a new terminal, run: `pwsh ./run_e2e.ps1`
 
 ---
 
