@@ -41,7 +41,7 @@ export default function ApiKeysPage() {
   const fetchData = React.useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetch('/core/api-keys/');
+      const data = await apiFetch('/api-keys');
       setKeys(data || []);
     } catch (error) {
       toast.error('Failed to load API keys');
@@ -58,7 +58,7 @@ export default function ApiKeysPage() {
     if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;
     
     try {
-      await apiFetch(`/core/api-keys/${id}/`, { method: 'DELETE' });
+      await apiFetch(`/api-keys/${id}`, { method: 'DELETE' });
       toast.success('API Key revoked');
       fetchData();
     } catch (error) {

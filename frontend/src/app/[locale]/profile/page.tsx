@@ -35,7 +35,7 @@ export default function ProfilePage() {
     if (!user?.employee_id) return;
     try {
       setIsLoading(true);
-      const data = await apiFetch(`/employees/${user.employee_id}/`);
+      const data = await apiFetch(`/employees/${user.employee_id}`);
       setProfile(data);
     } catch (error: any) {
       console.error('Profile fetch error:', error);
@@ -57,7 +57,7 @@ export default function ProfilePage() {
     
     try {
       setIsSaving(true);
-      await apiFetch(`/employees/${profile.id}/`, {
+      await apiFetch(`/employees/${profile.id}`, {
         method: 'PATCH',
         body: JSON.stringify({
           phone: profile.phone,
@@ -83,7 +83,7 @@ export default function ProfilePage() {
     
     try {
       toast.loading(t('form.uploading'), { id: 'upload' });
-      const updated = await apiFetch(`/employees/${profile.id}/`, {
+      const updated = await apiFetch(`/employees/${profile.id}`, {
         method: 'PATCH',
         body: formData,
         // apiFetch handles multipart if body is FormData

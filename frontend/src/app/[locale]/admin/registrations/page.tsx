@@ -34,7 +34,7 @@ export default function RegistrationsPage() {
 
   const fetchRequests = async () => {
     try {
-      const data = await apiFetch('/tenants/internal-registration/');
+      const data = await apiFetch('/internal/registrations');
       setRequests(data);
     } catch (error) {
       console.error('Failed to fetch requests:', error);
@@ -50,7 +50,7 @@ export default function RegistrationsPage() {
   const handleAction = async (id: number, action: 'approve' | 'reject') => {
     setActionLoading(id);
     try {
-      await apiFetch(`/tenants/internal-registration/${id}/${action}/`, {
+      await apiFetch(`/internal/registrations/${id}/${action}`, {
         method: 'POST',
       });
       // Refresh list

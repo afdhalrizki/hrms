@@ -54,7 +54,7 @@ export default function ShiftsPage() {
   const fetchShifts = useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetch('/shifts/');
+      const data = await apiFetch('/shifts');
       setShifts(data);
     } catch (error) {
       toast.error('Failed to fetch shifts');
@@ -71,13 +71,13 @@ export default function ShiftsPage() {
     e.preventDefault();
     try {
       if (editingShift?.id) {
-        await apiFetch(`/shifts/${editingShift.id}/`, {
+        await apiFetch(`/shifts/${editingShift.id}`, {
           method: 'PUT',
           body: JSON.stringify(formData),
         });
         toast.success('Shift updated successfully');
       } else {
-        await apiFetch('/shifts/', {
+        await apiFetch('/shifts', {
           method: 'POST',
           body: JSON.stringify(formData),
         });
@@ -94,7 +94,7 @@ export default function ShiftsPage() {
   const handleDeleteShift = async (id: number) => {
     if (!confirm('Are you sure you want to delete this shift?')) return;
     try {
-      await apiFetch(`/shifts/${id}/`, { method: 'DELETE' });
+      await apiFetch(`/shifts/${id}`, { method: 'DELETE' });
       toast.success('Shift deleted successfully');
       fetchShifts();
     } catch (error) {

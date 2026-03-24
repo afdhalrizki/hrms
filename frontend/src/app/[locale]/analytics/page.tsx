@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetch('/dashboard-stats/');
+      const data = await apiFetch('/dashboard-stats');
       setStats(data);
     } catch (error) {
       toast.error('Failed to load dashboard metrics');
@@ -57,9 +57,9 @@ export default function AnalyticsPage() {
     
     let url = '';
     if (type === 'attendance') {
-      url = `${baseUrl}/api/attendance/attendances/export_csv/?month=${month}&year=${year}`;
+      url = `${baseUrl}/api/attendance/attendances/export_csv?month=${month}&year=${year}`;
     } else {
-      url = `${baseUrl}/api/performance/appraisals/export_csv/`;
+      url = `${baseUrl}/api/performance/appraisals/export_csv`;
     }
     
     window.open(url, '_blank');

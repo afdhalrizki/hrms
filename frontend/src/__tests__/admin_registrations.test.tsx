@@ -59,7 +59,7 @@ describe('RegistrationsPage Component', () => {
     fireEvent.click(approveBtn);
 
     await waitFor(() => {
-      expect(api.apiFetch).toHaveBeenCalledWith('/tenants/internal-registration/1/approve/', {
+      expect(api.apiFetch).toHaveBeenCalledWith('/internal/registrations/1/approve', {
         method: 'POST',
       });
     });
@@ -74,7 +74,7 @@ describe('RegistrationsPage Component', () => {
     fireEvent.click(rejectBtn);
 
     await waitFor(() => {
-      expect(api.apiFetch).toHaveBeenCalledWith('/tenants/internal-registration/1/reject/', {
+      expect(api.apiFetch).toHaveBeenCalledWith('/internal/registrations/1/reject', {
         method: 'POST',
       });
     });

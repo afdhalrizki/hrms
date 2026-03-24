@@ -47,7 +47,7 @@ export default function BrandingPage() {
       formData.append('theme_primary_color', primaryColor);
       formData.append('theme_secondary_color', secondaryColor);
 
-      await apiFetch('/tenant/settings/', {
+      await apiFetch('/tenant/settings', {
         method: 'PATCH',
         body: formData,
         // FormData doesn't need JSON content type, apiFetch handles it

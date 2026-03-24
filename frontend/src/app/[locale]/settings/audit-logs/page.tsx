@@ -42,7 +42,7 @@ export default function AuditLogsPage() {
   const fetchData = React.useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetch('/core/audit-logs/');
+      const data = await apiFetch('/audit-logs');
       setLogs(data || []);
     } catch (error) {
       toast.error('Failed to load audit logs');

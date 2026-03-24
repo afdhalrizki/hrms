@@ -21,7 +21,7 @@ test.describe.serial('Reimbursement Management', () => {
     await page.on('request', request => console.log(`[REQUEST] ${request.method()} ${request.url()}`));
     await page.on('requestfailed', request => console.log(`FAILED REQUEST: ${request.method()} ${request.url()} [${request.failure()?.errorText}]`));
 
-    await page.route(url => url.pathname.includes('/api/'), async route => {
+    await page.route(url => url.pathname.includes('/api'), async route => {
       const method = route.request().method();
       const url = new URL(route.request().url());
       const path = url.pathname;

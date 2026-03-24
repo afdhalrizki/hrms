@@ -35,7 +35,7 @@ describe('SignupPage Component', () => {
     fireEvent.click(screen.getByText('Create Workspace'));
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/public/signup/', expect.objectContaining({
+      expect(mockPost).toHaveBeenCalledWith('/public/signup', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           company_name: 'Acme Corp',

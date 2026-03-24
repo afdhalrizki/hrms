@@ -21,7 +21,7 @@ test.describe.serial('Performance & Appraisal Lifecycle', () => {
     await page.on('request', request => console.log(`PERF_REQUEST: ${request.method()} ${request.url()}`));
     await page.on('requestfailed', request => console.log(`PERF_FAILED_REQUEST: ${request.method()} ${request.url()} [${request.failure()?.errorText}]`));
 
-    await page.route(url => url.pathname.includes('/api/'), async route => {
+    await page.route(url => url.pathname.includes('/api'), async route => {
       const method = route.request().method();
       const url = new URL(route.request().url());
       const path = url.pathname;
@@ -40,7 +40,7 @@ test.describe.serial('Performance & Appraisal Lifecycle', () => {
         responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One' };
       } else if (path.includes('/users/me')) {
         responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', is_staff: false, fullname: 'Employee One' };
-      } else if (path.includes('/core/employees')) {
+      } else if (path.includes('/employees')) {
         responseBody = [{ id: 99, email: 'employee1@company1.net', fullname: 'Employee One' }];
       } else if (path.includes('/tenant/settings')) {
         responseBody = { name: 'Company1', enabled_modules: ['performance'], is_subscription_active: true };

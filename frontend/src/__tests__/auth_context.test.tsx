@@ -52,7 +52,7 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('user-fullname').textContent).toBe('Test User');
     });
 
-    expect(api.apiFetch).toHaveBeenCalledWith('/users/me/');
+    expect(api.apiFetch).toHaveBeenCalledWith('/users/me');
   });
 
   it('handles API errors gracefully', async () => {

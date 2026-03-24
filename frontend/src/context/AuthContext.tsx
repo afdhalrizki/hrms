@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiFetch('/users/me/');
+      const data = await apiFetch('/users/me');
       setUser(data);
     } catch (err: any) {
       console.error('Failed to fetch profile:', err);
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiFetch('/auth/login/', {
+      const data = await apiFetch('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });

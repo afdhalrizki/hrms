@@ -3,6 +3,15 @@ import { test, expect } from '@playwright/test';
 test.describe('Login Access Restrictions', () => {
   const publicUrl = 'http://localhost:3000';
 
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/users/me', async route => {
+      await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ detail: 'Not authenticated' }) });
+    });
+    await page.route('**/api/tenant/settings', async route => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ name: 'Public', is_public: true }) });
+    });
+  });
+
   test('should hide login form and show notice on public domain', async ({ page }) => {
     // Navigate explicitly to public domain root
     await page.goto(`${publicUrl}/login`);

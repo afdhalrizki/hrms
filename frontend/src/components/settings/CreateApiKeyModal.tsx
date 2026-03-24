@@ -27,7 +27,7 @@ export function CreateApiKeyModal({ onClose, onSuccess }: Props) {
 
     setIsSubmitting(true);
     try {
-      const data = await apiFetch('/core/api-keys/', {
+      const data = await apiFetch('/api-keys', {
         method: 'POST',
         body: JSON.stringify({ label }),
       });

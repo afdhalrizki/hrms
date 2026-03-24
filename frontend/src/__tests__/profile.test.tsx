@@ -72,7 +72,7 @@ describe('ProfilePage (Phase 70 ESS)', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/');
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1');
       expect(screen.getByText('John Doe')).toBeDefined();
       expect(screen.getByText(/EMP001/)).toBeDefined();
       expect(screen.getByDisplayValue('08123456789')).toBeDefined();
@@ -97,11 +97,11 @@ describe('ProfilePage (Phase 70 ESS)', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         method: 'PATCH',
         body: expect.stringContaining('"phone":"08999999999"')
       }));
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         body: expect.stringContaining('"address":"New Updated Address"')
       }));
     });
@@ -119,7 +119,7 @@ describe('ProfilePage (Phase 70 ESS)', () => {
     fireEvent.change(ktpInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         method: 'PATCH',
         body: expect.any(FormData)
       }));
@@ -170,7 +170,7 @@ describe('ProfilePage (Phase 70 ESS)', () => {
     fireEvent.change(avatarInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         method: 'PATCH',
         body: expect.any(FormData)
       }));
@@ -200,14 +200,14 @@ describe('ProfilePage (Phase 70 ESS)', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         method: 'PATCH',
         body: expect.stringContaining('"ktp_number":"9999999999"')
       }));
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         body: expect.stringContaining('"npwp_number":"NPWP99999"')
       }));
-      expect(apiFetch).toHaveBeenCalledWith('/employees/1/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/employees/1', expect.objectContaining({
         body: expect.stringContaining('"ptkp_status":"K/1"')
       }));
     });

@@ -36,7 +36,7 @@ export default function WorkflowsPage() {
 
   const fetchConfigs = async () => {
     try {
-      const data = await apiFetch('/workflow-configs/');
+      const data = await apiFetch('/workflow-configs');
       setConfigs(data);
       if (data.length > 0) setSelectedConfig(data[0]);
     } catch (err) {
@@ -49,8 +49,8 @@ export default function WorkflowsPage() {
   const fetchSupportData = async () => {
     try {
       const [rData, eData] = await Promise.all([
-        apiFetch('/access-roles/'),
-        apiFetch('/employees/?lite=true')
+        apiFetch('/access-roles'),
+        apiFetch('/employees?lite=true')
       ]);
       setRoles(rData);
       setEmployees(eData);
@@ -95,7 +95,7 @@ export default function WorkflowsPage() {
       // For now, let's assume we update the stages individually via API.
       
       // First, ensure the config itself is updated (active status)
-      await apiFetch(`/workflow-configs/${selectedConfig.id}/`, {
+      await apiFetch(`/workflow-configs/${selectedConfig.id}`, {
         method: 'PATCH',
         body: JSON.stringify({ is_active: selectedConfig.is_active })
       });
@@ -104,12 +104,12 @@ export default function WorkflowsPage() {
       // Note: This is an abstraction. In production, use a single bulk endpoint.
       for (const stage of selectedConfig.stages) {
         if (stage.id) {
-          await apiFetch(`/workflow-stages/${stage.id}/`, {
+          await apiFetch(`/workflow-stages/${stage.id}`, {
             method: 'PATCH',
             body: JSON.stringify(stage)
           });
         } else {
-          await apiFetch('/workflow-stages/', {
+          await apiFetch('/workflow-stages', {
             method: 'POST',
             body: JSON.stringify({ ...stage, workflow: selectedConfig.id })
           });

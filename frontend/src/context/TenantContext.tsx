@@ -66,7 +66,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           }));
 
           // Fetch true tenant profile including logo
-          apiFetch('/tenant/settings/')
+          apiFetch('/tenant/settings')
             .then((data) => {
               setTenant(prev => ({
                 ...prev,

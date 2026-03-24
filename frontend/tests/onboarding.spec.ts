@@ -26,7 +26,7 @@ test.describe('Company Onboarding Flow', () => {
         return;
       }
 
-      if (url.includes('/api/public/signup/') && method === 'POST') {
+      if (url.includes('/api/public/signup') && method === 'POST') {
         await route.fulfill({
           status: 201,
           contentType: 'application/json',

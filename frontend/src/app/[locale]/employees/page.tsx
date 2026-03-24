@@ -79,7 +79,7 @@ export default function EmployeesPage() {
 
   const fetchEmployees = async () => {
     try {
-      const data = await apiFetch('employees/');
+      const data = await apiFetch('employees');
       setEmployees(data);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -90,13 +90,13 @@ export default function EmployeesPage() {
 
   const fetchDropdownData = async () => {
     try {
-      const depts = await apiFetch('departments/');
+      const depts = await apiFetch('departments');
       setDepartments(depts);
-      const rls = await apiFetch('roles/');
+      const rls = await apiFetch('roles');
       setRoles(rls);
-      const gols = await apiFetch('golongan/');
+      const gols = await apiFetch('golongan');
       setGolongans(gols);
-      const accRoles = await apiFetch('access-roles/');
+      const accRoles = await apiFetch('access-roles');
       setAccessRoles(accRoles);
     } catch (error) {
       console.error("Failed to fetch dropdowns:", error);
@@ -126,7 +126,7 @@ export default function EmployeesPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await apiFetch('employees/', {
+      await apiFetch('employees', {
         method: 'POST',
         body: JSON.stringify(formData),
       });

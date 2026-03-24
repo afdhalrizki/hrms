@@ -31,7 +31,7 @@ export default function BranchesPage() {
 
   const fetchBranches = async () => {
     try {
-      const data = await apiFetch('/branches/');
+      const data = await apiFetch('/branches');
       setBranches(data);
     } catch (err) {
       console.error(err);
@@ -55,12 +55,12 @@ export default function BranchesPage() {
 
     try {
       if (editingBranch) {
-        await apiFetch(`/branches/${editingBranch.id}/`, {
+        await apiFetch(`/branches/${editingBranch.id}`, {
           method: 'PATCH',
           body: JSON.stringify(payload),
         });
       } else {
-        await apiFetch('/branches/', {
+        await apiFetch('/branches', {
           method: 'POST',
           body: JSON.stringify(payload),
         });
@@ -77,7 +77,7 @@ export default function BranchesPage() {
   const deleteBranch = async (id: string) => {
     if (!confirm('Are you sure you want to delete this branch?')) return;
     try {
-      await apiFetch(`/branches/${id}/`, { method: 'DELETE' });
+      await apiFetch(`/branches/${id}`, { method: 'DELETE' });
       fetchBranches();
     } catch (err) {
       console.error(err);

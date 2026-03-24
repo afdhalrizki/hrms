@@ -55,8 +55,8 @@ export default function LeavesPage() {
     try {
       setIsLoading(true);
       const [balanceData, requestData] = await Promise.all([
-        apiFetch('/leave-balances/'),
-        apiFetch('/leave-requests/'),
+        apiFetch('/leave-balances'),
+        apiFetch('/leave-requests'),
       ]);
       setBalances(balanceData);
       setRequests(requestData);
@@ -118,7 +118,7 @@ export default function LeavesPage() {
                   {t('remainingDays')} ({balance.year})
                 </p>
                 <div className="flex items-end gap-2">
-                  <span className="text-5xl font-black text-white leading-none">
+                  <span className="text-5xl font-black text-white leading-none" data-testid="remaining-days-value">
                     {Math.floor(parseFloat(balance.remaining_days))}
                   </span>
                   <span className="text-sm font-medium text-gray-400 mb-1">Days</span>

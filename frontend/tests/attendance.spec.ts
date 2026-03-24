@@ -41,7 +41,7 @@ test.describe.serial('Attendance Management', () => {
           responseBody = { id: 10, status: 'PENDING' };
           status = 201;
         }
-      } else if (path.endsWith('/api') || path.endsWith('/api/')) {
+      } else if (path.includes('/attendance')) {
         const today = new Date().toISOString().split('T')[0];
         if (method === 'GET') {
           responseBody = [
