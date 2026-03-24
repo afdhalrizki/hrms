@@ -4,7 +4,7 @@ test.describe.serial('Performance & Appraisal Lifecycle', () => {
   const employeeUrl = 'http://company1.localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -21,9 +21,15 @@ test.describe.serial('Performance & Appraisal Lifecycle', () => {
     await page.on('request', request => console.log(`PERF_REQUEST: ${request.method()} ${request.url()}`));
     await page.on('requestfailed', request => console.log(`PERF_FAILED_REQUEST: ${request.method()} ${request.url()} [${request.failure()?.errorText}]`));
 
-    await page.route(url => url.pathname.includes('/api'), async route => {
+    await page.route('**/*', async route => {
+      const urlStr = route.request().url();
+      if (!urlStr.includes('/api/')) {
+        await route.continue();
+        return;
+      }
+      
       const method = route.request().method();
-      const url = new URL(route.request().url());
+      const url = new URL(urlStr);
       const path = url.pathname;
       
       console.log(`PERF_INTERCEPTED: ${method} ${path}`);

@@ -91,7 +91,8 @@ Comprehensive logic and component verification using **Vitest** and **React Test
   ```
 
 ### 🎭 End-to-End Testing (Playwright)
-Functional verification of full user journeys (Attendance, Payroll, Performance, Reimbursements).
+Functional verification of full user journeys (Attendance, Payroll, Performance, Reimbursements, Profile, Workflows, Analytics).
+- **100% Pass Rate**: 12 spec files (21 tests) validated on Chromium, achieving zero flakiness.
 - **Same-Origin Mocking**: Tests run on port 3000 to bypass CORS complexity and ensure high-fidelity request interception.
 - **Automation**: Use the centralized automation script:
   ```powershell

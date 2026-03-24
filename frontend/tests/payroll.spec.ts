@@ -4,7 +4,7 @@ test.describe.serial('Payroll Management', () => {
   const employeeUrl = 'http://company1.localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -17,9 +17,15 @@ test.describe.serial('Payroll Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    await page.route(url => url.href.includes('api'), async route => {
+    await page.route('**/*', async route => {
+      const urlStr = route.request().url();
+      if (!urlStr.toLowerCase().includes('api')) {
+        await route.continue();
+        return;
+      }
+      
       const method = route.request().method();
-      const url = new URL(route.request().url());
+      const url = new URL(urlStr);
       const path = url.pathname;
       
       if (method === 'OPTIONS') {
@@ -30,17 +36,17 @@ test.describe.serial('Payroll Management', () => {
       let responseBody: any = null;
       let status = 200;
 
-      if (path.includes('/auth/login')) {
-        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One' };
-      } else if (path.includes('/users/me')) {
+      if (urlStr.includes('/auth/login')) {
+        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One', is_staff: false };
+      } else if (urlStr.includes('/users/me')) {
         responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', is_staff: false, fullname: 'Employee One' };
-      } else if (path.includes('/tenant/settings')) {
+      } else if (urlStr.includes('/tenant/settings')) {
         responseBody = { name: 'Company1', enabled_modules: ['attendance', 'payroll'], is_subscription_active: true };
-      } else if (path.includes('/payslips')) {
+      } else if (urlStr.includes('/payslips')) {
         responseBody = [
           { id: 1, employee_name: 'Employee One', period_display: 'March 2026', basic_salary: "10000000.00", allowance: "2000000.00", deductions: "500000.00", net_pay: "11500000.00", status: "PAID", created_at: "2026-03-25", details: [] }
         ];
-      } else if (path.includes('/download_pdf/')) {
+      } else if (urlStr.includes('/download_pdf/')) {
         await route.fulfill({ status: 200, contentType: 'application/pdf', headers: corsHeaders, body: Buffer.from('%PDF-1.4 test') });
         return;
       }

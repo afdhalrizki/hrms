@@ -4,7 +4,7 @@ test.describe.serial('Employee Management', () => {
   const adminUrl = 'http://company1.localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -17,7 +17,13 @@ test.describe.serial('Employee Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    await page.route(url => url.href.includes('api'), async route => {
+    await page.route('**/*', async route => {
+      const urlStr = route.request().url();
+      if (!urlStr.toLowerCase().includes('api')) {
+        await route.continue();
+        return;
+      }
+      
       const method = route.request().method();
       const url = route.request().url();
       
@@ -31,7 +37,7 @@ test.describe.serial('Employee Management', () => {
       let status = 200;
 
       if (cleanUrl.match(/\/auth\/login\/?$/)) {
-        responseBody = { id: 1, email: 'admin@company1.net', role: 'ADMIN', fullname: 'Admin User' };
+        responseBody = { id: 1, email: 'admin@company1.net', role: 'ADMIN', fullname: 'Admin User', is_staff: true };
       } else if (cleanUrl.match(/\/users\/me\/?$/)) {
         responseBody = { id: 1, email: 'admin@company1.net', role: 'ADMIN', is_staff: true, fullname: 'Admin User' };
       } else if (cleanUrl.match(/\/tenant\/settings\/?$/)) {

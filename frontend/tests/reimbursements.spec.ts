@@ -4,7 +4,7 @@ test.describe.serial('Reimbursement Management', () => {
   const employeeUrl = 'http://company1.localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -21,13 +21,17 @@ test.describe.serial('Reimbursement Management', () => {
     await page.on('request', request => console.log(`[REQUEST] ${request.method()} ${request.url()}`));
     await page.on('requestfailed', request => console.log(`FAILED REQUEST: ${request.method()} ${request.url()} [${request.failure()?.errorText}]`));
 
-    await page.route(url => url.pathname.includes('/api'), async route => {
+    await page.context().route('**/*', async route => {
+      const urlStr = route.request().url();
+      if (!urlStr.toLowerCase().includes('api')) {
+        await route.continue();
+        return;
+      }
+      
       const method = route.request().method();
-      const url = new URL(route.request().url());
+      const url = new URL(urlStr);
       const path = url.pathname;
       
-      console.log(`INTERCEPTED: ${method} ${path}`);
-
       if (method === 'OPTIONS') {
         await route.fulfill({ status: 204, headers: corsHeaders });
         return;
@@ -36,32 +40,29 @@ test.describe.serial('Reimbursement Management', () => {
       let responseBody: any = null;
       let status = 200;
 
-      if (path.includes('/auth/login')) {
-        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One' };
-      } else if (path.includes('/users/me')) {
+      if (urlStr.includes('/auth/login')) {
+        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One', is_staff: false };
+      } else if (urlStr.includes('/users/me')) {
         responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', is_staff: false, fullname: 'Employee One' };
-      } else if (path.includes('/tenant/settings')) {
+      } else if (urlStr.includes('/tenant/settings')) {
         responseBody = { name: 'Company1', enabled_modules: ['attendance', 'reimbursement'], is_subscription_active: true };
-      } else if (path.includes('/reimbursement-categories')) {
+      } else if (urlStr.includes('/reimbursement-categories')) {
         responseBody = [{ id: 1, name: 'Transport', max_amount: '500000.00' }];
-      } else if (path.includes('/reimbursements')) {
+      } else if (urlStr.includes('/reimbursements')) {
         if (method === 'GET') {
           responseBody = [
             { id: 1, category: { name: 'Transport' }, date: '2026-03-20', amount: '150000.00', status: 'PENDING', description: 'Business Trip Uber' }
           ];
         } else {
-          console.log(`MOCKING POST RESPONSE FOR ${path}`);
           responseBody = { id: 2, status: 'PENDING' };
           status = 201;
         }
       }
 
       if (responseBody) {
-        console.log(`FULFILLING: ${method} ${path} with ${status}`);
         await route.fulfill({ status, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify(responseBody) });
       } else {
-        console.log(`FALLBACK: ${method} ${path}`);
-        await route.continue();
+        await route.fulfill({ status: 200, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify([]) });
       }
     });
 

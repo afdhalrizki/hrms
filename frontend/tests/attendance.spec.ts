@@ -4,7 +4,7 @@ test.describe.serial('Attendance Management', () => {
   const tenantUrl = 'http://company1.localhost:3000';
   
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -17,8 +17,14 @@ test.describe.serial('Attendance Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    await page.route(url => url.href.includes('api'), async route => {
-      const url = new URL(route.request().url());
+    await page.route('**/*', async route => {
+      const urlStr = route.request().url();
+      if (!urlStr.includes('/api/')) {
+        await route.continue();
+        return;
+      }
+      
+      const url = new URL(urlStr);
       const path = url.pathname;
       const method = route.request().method();
       
