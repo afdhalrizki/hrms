@@ -7,10 +7,11 @@ param (
     [switch]$SkipSeed      # Skip database seeding
 )
 
-# Since script is in frontend/, RootDir is parent
-$FrontendDir = Get-Location
-$RootDir = (Get-Item $FrontendDir).Parent.FullName
+$ScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+$RootDir = Split-Path -Parent -Path $ScriptDir
 $BackendDir = Join-Path $RootDir "backend"
+
+Push-Location $ScriptDir
 
 Write-Host "--- HRMS Playwright Automation ---" -ForegroundColor Cyan
 
@@ -25,22 +26,20 @@ if (-not $SkipInstall) {
 if ($Live) {
     Write-Host "[2/3] Setting up Live Backend Environment..." -ForegroundColor Yellow
     
-    # Start Docker if not running (assumes up.ps1 exists in root)
     $UpScript = Join-Path $RootDir "up.ps1"
     if (Test-Path $UpScript) {
         Write-Host "Ensuring backend is up..."
-        Set-Location $RootDir
+        Push-Location $RootDir
         .\up.ps1 dev
-        Set-Location $FrontendDir
+        Pop-Location
         # Wait for DB
         Start-Sleep -Seconds 5
     }
 }
 
 if (-not $SkipSeed) {
-    Write-Host "[2/3] Preparating/Seeding test data (Backend)..." -ForegroundColor Yellow
+    Write-Host "[2/3] Preparing/Seeding test data (Backend)..." -ForegroundColor Yellow
     
-    # Determine the correct python command (prefer venv)
     $PythonCmd = "python"
     $VenvPath = Join-Path $BackendDir "venv\Scripts\python.exe"
     if (Test-Path $VenvPath) {
@@ -48,21 +47,26 @@ if (-not $SkipSeed) {
         Write-Host "Using Virtual Environment: $VenvPath" -ForegroundColor Gray
     }
 
-    Push-Location $BackendDir
-    & $PythonCmd scripts/seed_test_frontend.py
-    
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Seed successful." -ForegroundColor Green
+    if (Test-Path (Join-Path $BackendDir "scripts/seed_test_frontend.py")) {
+        Push-Location $BackendDir
+        & $PythonCmd scripts/seed_test_frontend.py
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Seed successful." -ForegroundColor Green
+        } else {
+            Write-Host "Warning: Seed script failed (Exit Code: $LASTEXITCODE)." -ForegroundColor Gray
+        }
+        Pop-Location
     } else {
-        Write-Host "Warning: Seed script failed (Exit Code: $LASTEXITCODE). This is expected if Backend/Database is not running or venv is missing dependencies." -ForegroundColor Gray
+        Write-Host "Warning: Seed script not found at backend/scripts/seed_test_frontend.py" -ForegroundColor Yellow
     }
-    Pop-Location
 } else {
     Write-Host "[2/3] Skipping Seed..." -ForegroundColor Gray
 }
 
 # 3. Execution
 Write-Host "[3/3] Launching Playwright Tests..." -ForegroundColor Cyan
+# grep-invert to skip heavy diagnostic tests if needed, workers=1 for stability
 npx playwright test --grep-invert "diagnostic|Instrumentation" --workers=1
 
 $ExitCode = $LASTEXITCODE
@@ -73,4 +77,5 @@ if ($ExitCode -eq 0) {
     Write-Host "`nFAILURE. Some tests failed. Check the Playwright report." -ForegroundColor Red
 }
 
+Pop-Location
 exit $ExitCode

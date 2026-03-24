@@ -63,7 +63,7 @@ describe('CorrectionRequestList', () => {
 
   it('shows empty state when no requests', () => {
     render(<CorrectionRequestList requests={[]} />);
-    expect(screen.getByText(/No correction requests found/i)).toBeInTheDocument();
+    expect(screen.getByText(/empty/i)).toBeInTheDocument();
   });
 
   it('handles approval action', async () => {
@@ -76,7 +76,7 @@ describe('CorrectionRequestList', () => {
     fireEvent.click(approveButton);
 
     await waitFor(() => {
-      expect(mockApiFetch).toHaveBeenCalled();
+      expect(mockApiFetch).toHaveBeenCalledWith('/attendance-correction-requests/req-1', expect.anything());
     });
 
     expect(mockToast.success).toHaveBeenCalled();

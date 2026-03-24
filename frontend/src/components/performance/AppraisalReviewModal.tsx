@@ -34,9 +34,9 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
   React.useEffect(() => {
     const fetchMe = async () => {
       try {
-        const userData = await apiFetch('/users/me/');
+        const userData = await apiFetch('/users/me');
         // We need the employee ID associated with this user
-        const employees = await apiFetch(`/core/employees/?email=${userData.email}`);
+        const employees = await apiFetch(`/core/employees?email=${userData.email}`);
         if (employees.length > 0) {
           setEmployeeId(employees[0].id);
         }
@@ -53,7 +53,7 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
 
     setIsSubmitting(true);
     try {
-      await apiFetch('/appraisal-reviews/', {
+      await apiFetch('/appraisal-reviews', {
         method: 'POST',
         body: JSON.stringify({
           appraisal: appraisalId,
@@ -63,7 +63,7 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
           comments: comments
         }),
       });
-      toast.success('Score submitted successfully');
+      toast.success(t('success'));
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -96,7 +96,11 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <form 
+          onSubmit={handleSubmit} 
+          data-testid="performance-review-form"
+          className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar"
+        >
           {/* Reviewer Type Toggle */}
           <div className="flex gap-4 p-1 bg-white/5 rounded-2xl border border-white/5">
             <button

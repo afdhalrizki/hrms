@@ -34,13 +34,6 @@
     "api_keys": "API Keys",
     "branding": "Branding"
   },
-  "Common": {
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "save": "Save Changes",
-    "loading": "Loading...",
-    "joined_days_ago": "Joined {days} days ago"
-  },
   "Subscription": {
     "readOnlyMessage": "Subscription expired on {date}. The system is now in Read-Only mode.",
     "renewNow": "Renew Now",
@@ -72,7 +65,15 @@
     "pending": "Pending",
     "approved": "Approved",
     "rejected": "Rejected",
-    "adminComment": "Admin Comment"
+    "adminComment": "Admin Comment",
+    "requestedChange": "Requested Change",
+    "correctionFor": "Correction for",
+    "processed": "Request {action} successfully",
+    "empty": "No correction requests found",
+    "reasonRequired": "Please provide a reason for the correction.",
+    "success": "Correction request submitted successfully!",
+    "fail": "Failed to process request",
+    "enterComment": "Enter comment for"
   },
   "Analytics": {
     "title": "Advanced Analytics",
@@ -99,11 +100,9 @@
       "type": "Leave Type",
       "startDate": "Start Date",
       "endDate": "End Date",
-      "reason": "Reason",
-      "annual": "Annual Leave",
-      "sick": "Sick Leave",
-      "emergency": "Emergency Leave",
-      "maternity": "Maternity Leave"
+      "maternity": "Maternity Leave",
+      "reasonPlaceholder": "Briefly explain your reason...",
+      "success": "Leave request submitted successfully!"
     }
   },
   "Reimbursement": {
@@ -120,7 +119,18 @@
       "date": "Receipt Date",
       "description": "Justification",
       "attachment": "Receipt Attachment (PDF/Image)",
-      "receiptNumber": "Receipt / Invoice #"
+      "receiptNumber": "Receipt / Invoice #",
+      "submit": "Submit Claim",
+      "cancel": "Cancel",
+      "success": "Reimbursement claim submitted successfully!"
+    },
+    "table": {
+      "category": "Category",
+      "date": "Date",
+      "reason": "Reason / Justification",
+      "amount": "Requested Amount",
+      "status": "Status",
+      "receipt": "Receipt"
     }
   },
   "Payroll": {
@@ -202,7 +212,15 @@
       "commentLabel": "Detailed Feedback / Comments",
       "scoreLabel": "Numeric Score (1-5)",
       "reviewType": "Review Role",
-      "submitScore": "Submit Score"
+      "submitScore": "Submit Score",
+      "success": "Performance review submitted successfully!"
+    },
+    "table": {
+      "period": "Assessment Period",
+      "status": "Status",
+      "reviews": "Reviews",
+      "score": "Final Score",
+      "actions": "Actions"
     }
   },
   "Branding": {
@@ -258,5 +276,16 @@
       "uploading": "Uploading..."
     },
     "success": "Profile updated successfully"
+  },
+  "Common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "joined_days_ago": "Submitted {days} days ago",
+    "loading": "Loading...",
+    "noData": "No data found",
+    "save": "Save Changes",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View"
   }
 }

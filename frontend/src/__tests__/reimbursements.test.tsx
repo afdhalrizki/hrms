@@ -38,9 +38,9 @@ describe('ReimbursementsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (apiFetch as any).mockImplementation((endpoint: string, options?: any) => {
-      if (endpoint === '/reimbursement-categories/') return Promise.resolve(mockCategories);
-      if (endpoint === '/reimbursements/' && (!options || options.method === 'GET')) return Promise.resolve(mockClaims);
-      if (endpoint === '/reimbursements/' && options?.method === 'POST') return Promise.resolve({ id: 99 });
+      if (endpoint === '/reimbursement-categories') return Promise.resolve(mockCategories);
+      if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.resolve(mockClaims);
+      if (endpoint === '/reimbursements' && options?.method === 'POST') return Promise.resolve({ id: 99 });
       return Promise.resolve([]);
     });
   });
@@ -57,8 +57,8 @@ describe('ReimbursementsPage', () => {
 
   it('handles empty claims and categories', async () => {
     (apiFetch as any).mockImplementation((endpoint: string) => {
-       if (endpoint === '/reimbursement-categories/') return Promise.resolve([]);
-       if (endpoint === '/reimbursements/') return Promise.resolve([]);
+       if (endpoint === '/reimbursement-categories') return Promise.resolve([]);
+       if (endpoint === '/reimbursements') return Promise.resolve([]);
        return Promise.resolve([]);
     });
     render(<ReimbursementsPage />);
@@ -105,22 +105,22 @@ describe('ReimbursementsPage', () => {
     }
     
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/reimbursements/', expect.objectContaining({
+      expect(apiFetch).toHaveBeenCalledWith('/reimbursements', expect.objectContaining({
         method: 'POST',
         body: expect.any(FormData)
       }));
     });
 
-    const postCall = (apiFetch as any).mock.calls.find((call: any) => call[0] === '/reimbursements/' && call[1]?.method === 'POST');
+    const postCall = (apiFetch as any).mock.calls.find((call: any) => call[0] === '/reimbursements' && call[1]?.method === 'POST');
     const sentFormData = postCall[1].body;
     expect(sentFormData.get('amount')).toBe('200000');
   });
 
   it('handles submission error', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (endpoint === '/reimbursements/' && options?.method === 'POST') return Promise.reject(new Error('Invalid amount'));
-      if (endpoint === '/reimbursement-categories/') return Promise.resolve(mockCategories);
-      if (endpoint === '/reimbursements/') return Promise.resolve(mockClaims);
+      if (endpoint === '/reimbursements' && options?.method === 'POST') return Promise.reject(new Error('Invalid amount'));
+      if (endpoint === '/reimbursement-categories') return Promise.resolve(mockCategories);
+      if (endpoint === '/reimbursements') return Promise.resolve(mockClaims);
       return Promise.resolve([]);
     });
 

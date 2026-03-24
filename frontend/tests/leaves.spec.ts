@@ -87,6 +87,6 @@ test.describe.serial('Leaves Management', () => {
     await page.getByRole('button', { name: /Submit/i }).last().click();
     
     // Verify success toast
-    await expect(page.getByText(/Leave request submitted successfully/i)).toBeVisible();
+    await expect(page.getByText(/Leave request submitted successfully!/i)).toBeVisible();
   });
 });

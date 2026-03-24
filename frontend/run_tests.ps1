@@ -6,8 +6,8 @@ param (
     [switch]$SkipInstall   # Skip npm install check
 )
 
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-Push-Location $PSScriptRoot
+$ScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+Push-Location $ScriptDir
 
 Write-Host "--- HRMS Frontend Unit Test Automation ---" -ForegroundColor Cyan
 
@@ -20,11 +20,9 @@ if (-not $SkipInstall) {
 # 2. Execution
 Write-Host "[2/2] Launching Vitest Suite..." -ForegroundColor Cyan
 
-$TestCmd = "npm test"
+$TestCmd = "npx vitest run"
 if ($Coverage) {
     $TestCmd = "npx vitest run --coverage"
-} else {
-    $TestCmd = "npx vitest run"
 }
 
 Write-Host "Executing: $TestCmd" -ForegroundColor Gray
@@ -38,4 +36,5 @@ if ($ExitCode -eq 0) {
     Write-Host "`nFAILURE. Some unit tests failed. Check the output above." -ForegroundColor Red
 }
 
+Pop-Location
 exit $ExitCode

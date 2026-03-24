@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, AlertCircle, Loader2, Send } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { Attendance } from '@/types/core';
@@ -21,6 +22,9 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
   attendance,
   onSuccess
 }) => {
+  const t = useTranslations('AttendanceCorrection');
+  const tCommon = useTranslations('Common');
+  
   const [formData, setFormData] = useState({
     requested_check_in: attendance.check_in || '',
     requested_check_out: attendance.check_out || '',
@@ -31,13 +35,13 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.reason.trim()) {
-      toast.error('Please provide a reason for the correction.');
+      toast.error(t('reasonRequired'));
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await apiFetch('/attendance-correction-requests/', {
+      await apiFetch('/attendance-correction-requests', {
         method: 'POST',
         body: JSON.stringify({
           attendance: attendance.id,
@@ -46,11 +50,11 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
           reason: formData.reason
         }),
       });
-      toast.success('Correction request submitted successfully!');
+      toast.success(t('success'));
       onSuccess();
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to submit request');
+      toast.error(t('fail'));
     } finally {
       setIsSubmitting(false);
     }
@@ -85,10 +89,10 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
               <div className="mb-8 space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-widest">
                   <AlertCircle size={12} />
-                  Correction Request
+                  {t('requestTitle')}
                 </div>
-                <h2 className="text-2xl font-bold text-white">Adjust Attendance</h2>
-                <p className="text-sm text-gray-400">Requesting correction for {attendance.date}</p>
+                <h2 className="text-2xl font-bold text-white">{t('requestTitle')}</h2>
+                <p className="text-sm text-gray-400">{tCommon('joined_days_ago', { days: 0 })} {attendance.date}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -96,7 +100,7 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                       <Clock size={12} />
-                      Requested In
+                      {t('requestedIn')}
                     </label>
                     <input 
                       type="time" 
@@ -109,7 +113,7 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                       <Clock size={12} />
-                      Requested Out
+                      {t('requestedOut')}
                     </label>
                     <input 
                       type="time" 
@@ -122,10 +126,10 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Reason for Correction</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('reasonLabel')}</label>
                   <textarea 
                     required
-                    placeholder="e.g. Forgot to clock out, GPS error, etc."
+                    placeholder={t('reasonLabel')}
                     rows={3}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-primary/20 transition-all outline-none resize-none text-sm placeholder:text-gray-600"
                     value={formData.reason}
@@ -139,7 +143,7 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
                     onClick={onClose}
                     className="flex-1 px-6 py-3.5 rounded-2xl border border-white/10 text-white text-sm font-bold hover:bg-white/5 transition-all"
                   >
-                    Cancel
+                    {tCommon('cancel')}
                   </button>
                   <button 
                     type="submit" 
@@ -147,7 +151,7 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
                     className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
                   >
                     {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                    Submit Request
+                    {t('submit')}
                   </button>
                 </div>
               </form>

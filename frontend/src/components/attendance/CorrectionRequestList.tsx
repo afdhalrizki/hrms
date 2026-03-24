@@ -10,6 +10,7 @@ import {
   MessageSquare,
   ArrowRight
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { AttendanceCorrectionRequest } from '@/types/core';
 import { apiFetch } from '@/lib/api';
@@ -26,19 +27,22 @@ export const CorrectionRequestList: React.FC<CorrectionRequestListProps> = ({
   onAction,
   isAdmin = false
 }) => {
+  const t = useTranslations('AttendanceCorrection');
+  const tCommon = useTranslations('Common');
+
   const handleProcess = async (id: string, action: 'APPROVED' | 'REJECTED') => {
-    const comment = window.prompt(`Enter comment for ${action.toLowerCase()}:`);
+    const comment = window.prompt(`${t('enterComment')} ${action.toLowerCase()}:`);
     if (comment === null) return;
 
     try {
-      await apiFetch(`/attendance-correction-requests/${id}/`, {
+      await apiFetch(`/attendance-correction-requests/${id}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: action, comment }),
       });
-      toast.success(`Request ${action.toLowerCase()} successfully`);
+      toast.success(t('processed', { action: action.toLowerCase() }));
       onAction?.();
     } catch (error) {
-      toast.error('Failed to process request');
+      toast.error(t('fail'));
     }
   };
 
@@ -54,7 +58,7 @@ export const CorrectionRequestList: React.FC<CorrectionRequestListProps> = ({
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-500">
         <Clock size={48} className="mb-4 opacity-20" />
-        <p className="text-sm font-bold uppercase tracking-widest leading-none">No correction requests found</p>
+        <p className="text-sm font-bold uppercase tracking-widest leading-none">{t('empty')}</p>
       </div>
     );
   }
@@ -85,9 +89,9 @@ export const CorrectionRequestList: React.FC<CorrectionRequestListProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-400 font-medium italic">
-                  <span>Correction for {request.attendance_date}</span>
+                  <span>{t('correctionFor')} {request.attendance_date}</span>
                   <span>•</span>
-                  <span>Submitted {new Date(request.created_at).toLocaleDateString()}</span>
+                  <span>{tCommon('joined_days_ago', { days: 0 })} {new Date(request.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -96,7 +100,7 @@ export const CorrectionRequestList: React.FC<CorrectionRequestListProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center gap-6">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Requested Change</p>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('requestedChange')}</p>
                     <div className="flex items-center gap-3 text-white font-mono text-sm font-bold bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
                       <span>{request.requested_check_in || '--:--'}</span>
                       <ArrowRight size={14} className="text-gray-600" />
@@ -135,7 +139,7 @@ export const CorrectionRequestList: React.FC<CorrectionRequestListProps> = ({
           
           {request.comment && (
             <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-3 text-[11px] text-gray-400">
-              <span className="font-bold uppercase tracking-wider text-gray-600">Admin Comment:</span>
+              <span className="font-bold uppercase tracking-wider text-gray-600">{t('adminComment')}:</span>
               <span className="italic">"{request.comment}"</span>
             </div>
           )}

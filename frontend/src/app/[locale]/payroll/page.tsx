@@ -46,8 +46,8 @@ export default function PayrollPage() {
     try {
       setIsLoading(true);
       const [payslipData, userData] = await Promise.all([
-        apiFetch('/payslips/'),
-        apiFetch('/users/me/'),
+        apiFetch('/payslips'),
+        apiFetch('/users/me'),
       ]);
       setPayslips(payslipData || []);
       setIsAdmin(userData.role === 'ADMIN' || userData.is_staff);
@@ -207,7 +207,8 @@ export default function PayrollPage() {
                           <Eye size={18} />
                         </button>
                         <button 
-                          onClick={() => apiDownload(`/payslips/${row.id}/download_pdf/`, `Payslip_${row.employee_name.replace(' ', '_')}.pdf`)}
+                          onClick={() => apiDownload(`/payslips/${row.id}/download_pdf`, `Payslip_${row.employee_name.replace(' ', '_')}.pdf`)}
+                          aria-label={`download-payslip-${row.id}`}
                           className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-primary hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
                         >
                           <Download size={18} />

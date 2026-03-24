@@ -59,7 +59,7 @@ describe('CorrectionRequestModal', () => {
       />
     );
 
-    expect(screen.getByText(/Adjust Attendance/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/requestTitle/i)[0]).toBeInTheDocument();
   });
 
   it('validates that reason is required', async () => {
@@ -78,7 +78,7 @@ describe('CorrectionRequestModal', () => {
     
     fireEvent.submit(form);
 
-    expect(mockToast.error).toHaveBeenCalledWith('Please provide a reason for the correction.');
+    expect(mockToast.error).toHaveBeenCalledWith('reasonRequired');
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
 
@@ -95,7 +95,7 @@ describe('CorrectionRequestModal', () => {
       />
     );
 
-    const reasonInput = screen.getByPlaceholderText(/Forgot to clock out/i);
+    const reasonInput = screen.getByPlaceholderText(/reasonLabel/i);
     fireEvent.change(reasonInput, { target: { value: 'Forgot to check out yesterday' } });
 
     const form = container.querySelector('form');
@@ -103,10 +103,10 @@ describe('CorrectionRequestModal', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockApiFetch).toHaveBeenCalled();
+      expect(mockApiFetch).toHaveBeenCalledWith('/attendance-correction-requests', expect.anything());
     });
 
-    expect(mockToast.success).toHaveBeenCalledWith('Correction request submitted successfully!');
+    expect(mockToast.success).toHaveBeenCalledWith('success');
     expect(onSuccess).toHaveBeenCalled();
   });
 });

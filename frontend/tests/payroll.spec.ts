@@ -68,12 +68,12 @@ test.describe.serial('Payroll Management', () => {
     await expect(table.getByText(/Employee One/i)).toBeVisible();
     
     // Check amounts (scoped to table)
-    await expect(table.getByText('11,500,000')).toBeVisible();
+    await expect(table.getByText(/11,500,000/)).toBeVisible();
     await expect(table.getByText(/PAID/i).first()).toBeVisible();
     
     // Download PDF (Verify download starts)
     const downloadPromise = page.waitForEvent('download');
-    await table.getByRole('button', { name: /view-payslip-1/i }).click({ force: true, timeout: 30000 });
+    await table.getByRole('button', { name: /download-payslip-1/i }).click({ force: true, timeout: 30000 });
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toContain('.pdf');
   });

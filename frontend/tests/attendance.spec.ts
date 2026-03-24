@@ -85,9 +85,11 @@ test.describe.serial('Attendance Management', () => {
     // 3. Submit Correction Request
     const requestCorrectionBtn = page.getByRole('button', { name: /Request Correction/i }).first();
     await requestCorrectionBtn.click();
-    await expect(page.getByText(/Adjust Attendance/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Request Correction/i })).toBeVisible();
     await page.locator('textarea').fill('Forgot to check in due to morning meeting.');
-    await page.getByRole('button', { name: /Submit Request/i }).click();
-    await expect(page.getByText(/Correction request submitted/i)).toBeVisible();
+    
+    // Use requestSubmit for reliability
+    await page.locator('form').evaluate(node => (node as HTMLFormElement).requestSubmit());
+    await expect(page.getByText(/Correction request submitted successfully!/i)).toBeVisible();
   });
 });

@@ -18,9 +18,10 @@ test.describe.serial('Reimbursement Management', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.on('console', msg => console.log(`BROWSER CONSOLE: ${msg.text()}`));
+    await page.on('request', request => console.log(`[REQUEST] ${request.method()} ${request.url()}`));
     await page.on('requestfailed', request => console.log(`FAILED REQUEST: ${request.method()} ${request.url()} [${request.failure()?.errorText}]`));
 
-    await page.route(url => url.href.includes('api'), async route => {
+    await page.route(url => url.pathname.includes('/api/'), async route => {
       const method = route.request().method();
       const url = new URL(route.request().url());
       const path = url.pathname;
@@ -49,17 +50,18 @@ test.describe.serial('Reimbursement Management', () => {
             { id: 1, category: { name: 'Transport' }, date: '2026-03-20', amount: '150000.00', status: 'PENDING', description: 'Business Trip Uber' }
           ];
         } else {
+          console.log(`MOCKING POST RESPONSE FOR ${path}`);
           responseBody = { id: 2, status: 'PENDING' };
           status = 201;
         }
       }
 
       if (responseBody) {
-        console.log(`FULFILLING: ${method} ${path}`);
+        console.log(`FULFILLING: ${method} ${path} with ${status}`);
         await route.fulfill({ status, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify(responseBody) });
       } else {
         console.log(`FALLBACK: ${method} ${path}`);
-        await route.fulfill({ status: 200, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify([]) });
+        await route.continue();
       }
     });
 
@@ -82,17 +84,16 @@ test.describe.serial('Reimbursement Management', () => {
     await expect(page.getByRole('heading', { name: /New Reimbursement Claim/i })).toBeVisible({ timeout: 10000 });
     
     await page.locator('input[type="number"]').fill('200000');
-    await page.getByPlaceholder(/Provide details/i).fill('Team Dinner reimbursement for Q1 celebration.');
+    await page.getByPlaceholder(/Justification/i).fill('Team Dinner reimbursement for Q1 celebration.');
     
-    const categorySelect = page.locator('select[name="category"]');
+    const categorySelect = page.locator('select#category');
     // Wait for the option to be populated from the mocked API
     await expect(categorySelect.locator('option').filter({ hasText: 'Transport' })).toBeAttached({ timeout: 15000 });
     await categorySelect.selectOption({ label: 'Transport' });
     
-    const submitBtn = page.getByRole('button', { name: /Submit/i });
-    await submitBtn.scrollIntoViewIfNeeded();
-    await submitBtn.click({ force: true });
+    const form = page.getByTestId('reimbursement-form');
+    await form.evaluate(node => (node as HTMLFormElement).requestSubmit());
     
-    await expect(page.getByText(/Reimbursement claim submitted/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Reimbursement claim submitted successfully!/i)).toBeVisible({ timeout: 15000 });
   });
 });

@@ -31,7 +31,7 @@ export function GeneratePayrollModal({ onClose, onSuccess }: Props) {
   React.useEffect(() => {
     const fetchPeriods = async () => {
       try {
-        const data = await apiFetch('/payroll-periods/');
+        const data = await apiFetch('/payroll-periods');
         setPeriods(data.filter((p: Period) => !p.is_closed));
         if (data.length > 0) setSelectedPeriod(data[0].id.toString());
       } catch (error) {
@@ -48,7 +48,7 @@ export function GeneratePayrollModal({ onClose, onSuccess }: Props) {
     
     setIsGenerating(true);
     try {
-      await apiFetch('/payslips/generate/', {
+      await apiFetch('/payslips/generate', {
         method: 'POST',
         body: JSON.stringify({ period_id: parseInt(selectedPeriod) }),
       });

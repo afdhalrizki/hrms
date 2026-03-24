@@ -58,8 +58,8 @@ export default function ReimbursementsPage() {
     try {
       setIsLoading(true);
       const [catData, claimData] = await Promise.all([
-        apiFetch('/reimbursement-categories/'),
-        apiFetch('/reimbursements/'),
+        apiFetch('/reimbursement-categories'),
+        apiFetch('/reimbursements'),
       ]);
       setCategories(catData || []);
       setClaims(claimData || []);
@@ -90,12 +90,12 @@ export default function ReimbursementsPage() {
         data.append('attachment', formData.attachment);
       }
 
-      await apiFetch('/reimbursements/', {
+      await apiFetch('/reimbursements', {
         method: 'POST',
         body: data,
       });
       
-      toast.success('Reimbursement claim submitted');
+      toast.success(t('form.success'));
       setIsModalOpen(false);
       fetchData();
     } catch (error: any) {
@@ -169,12 +169,12 @@ export default function ReimbursementsPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white/5">
-                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Category</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Date</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Reason</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Amount</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Status</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Receipt</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.category')}</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.date')}</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.reason')}</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('table.amount')}</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">{t('table.status')}</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">{t('table.receipt')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -249,7 +249,11 @@ export default function ReimbursementsPage() {
                 <h2 className="text-3xl font-black text-white tracking-tighter">{t('newClaim')}</h2>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form 
+                onSubmit={handleSubmit} 
+                data-testid="reimbursement-form"
+                className="space-y-6"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="category" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('form.category')}</label>
@@ -295,7 +299,7 @@ export default function ReimbursementsPage() {
                     id="description"
                     rows={3}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none transition-all"
-                    placeholder="Provide details for this expense..."
+                    placeholder={t('form.description')}
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     required
@@ -336,6 +340,7 @@ export default function ReimbursementsPage() {
                   </button>
                   <button 
                     type="submit"
+                    data-testid="reimbursement-submit"
                     className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all"
                   >
                     {tCommon('submit')}

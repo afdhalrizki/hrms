@@ -74,11 +74,11 @@ export default function LeavesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiFetch('/leave-requests/', {
+      await apiFetch('/leave-requests', {
         method: 'POST',
         body: JSON.stringify(formData),
       });
-      toast.success('Leave request submitted successfully');
+      toast.success(t('form.success'));
       setIsModalOpen(false);
       fetchData();
     } catch (error: any) {
@@ -250,7 +250,7 @@ export default function LeavesPage() {
                     id="reason"
                     rows={3}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                    placeholder="Briefly explain your reason..."
+                    placeholder={t('form.reasonPlaceholder')}
                     value={formData.reason}
                     onChange={(e) => setFormData({...formData, reason: e.target.value})}
                   />
