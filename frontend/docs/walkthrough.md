@@ -62,5 +62,18 @@ A premium Next.js 14 dashboard with glassmorphism UI, focused on real-time HR ma
 - **Appraisal Spec**: Verified manager review submission and real-time dashboard score hydration.
 - **Branding Spec**: Confirmed persistence of custom corporate identity across the entire multi-tenant perimeter.
 
+### Phase 70: ESS Profile Management (Self-Service)
+- **Restricted Updates**: Employees can now update their own phone number, address, and PTKP status without admin intervention.
+- **Document Management**: Added UI for secure upload and visualization of KTP and NPWP documents.
+- **Field Protection**: Hardened the UI to ensure administrative fields like NIK and Department remain read-only for employees.
+- **Unit Testing**: Implemented 100% test coverage for profile loading and update scenarios.
+
+### Phase 71: ESS Hardening & UX Optimization (March 24, 2026)
+- **Interactive Analytics**: Added `AttendanceChart` to the ESS dashboard for real-time visualization.
+- **Zero-CLS Skeletons**: Systematic use of `Skeleton` loaders across Home and Performance modules.
+- **Null-Safety pass**: Hardened `PerformancePage` and `ReimbursementsPage` to prevent runtime crashes during async state transitions.
+- **Unit Test Expansion**: Achieved 100% test success across 18 spec files (61 tests).
+- **Automation**: Updated `run_tests.ps1` for reliable local execution.
+
 ---
-**Status**: 🏆 E2E Hardening (Phase 68) Complete (March 21, 2026)
+**Status**: 🏆 ESS Hardening & UX Optimization (Phase 71) Complete (March 24, 2026)

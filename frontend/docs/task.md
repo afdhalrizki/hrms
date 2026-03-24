@@ -24,7 +24,9 @@ Features for managing the organization, data, and approvals.
 - [x] **Phase 66: Appraisal Lifecycle**: Full submission workflow for KPIs and reviews.
 - [x] **Phase 67: Tenant Branding**: Admin settings for company logo and theme colors.
 - [x] **Phase 68: E2E Hardening**: Comprehensive Playwright test suite for all modules.
-- [ ] **Modular Tiering**: Plan-based gating (Basic/Pro/Enterprise) management.
+- [x] **Phase 69: Modular Tiering**: Plan-based gating (Basic/Pro/Enterprise) management.
+- [x] **Phase 70: ESS Profile Management**: Dedicated UI for updating personal data and documents.
+- [x] **Phase 71: ESS Hardening & UX Optimization**: 100% unit test success, interactive charts, and zero-CLS skeletons.
 
 ## 👤 2. Employee Self-Service (ESS) Web Portal
 Features for individual employees to manage their own data (Web-based ESS).
@@ -32,17 +34,17 @@ Features for individual employees to manage their own data (Web-based ESS).
 - [x] **Identity Hydration**: Personalized "Welcome" dashboard with real-time profile data.
 - [x] **Attendance Live View**: Visualizing own daily check-in/out status.
 - [x] **Historical Payslips**: Downloadable PDF payslips with TER 2024 compliance.
-- [ ] **Personal Profile Management**: Self-service interface for updating personal info and documents.
-    - [ ] Document upload module (KTP, NPWP, Education Certificates).
-- [ ] **Web Attendance Correction**: Request form for time adjustments (similar to Mobile Phase 2).
-- [ ] **Leave & Reimbursement Dashboard**: Monitoring own quotas and tracking claim status via web.
-- [ ] **Performance Review (Phase 45)**: Form for submitting self-appraisals and viewing targets.
+- [x] **Personal Profile Management**: Self-service interface for updating personal info and documents.
+    - [x] Document upload module (KTP, NPWP, Avatar).
+- [x] **Web Attendance Correction**: Request form for time adjustments (similar to Mobile Phase 2).
+- [x] **Leave & Reimbursement Dashboard**: Monitoring own quotas and tracking claim status via web.
+- [x] **Performance Review (Phase 45)**: Form for submitting self-appraisals and viewing targets.
 
 ## 🛠 3. Technical & Infrastructure Roadmap
 - [x] **Node.js 22 Migration**: High-performance Debian-based runtime.
 - [x] **Tailwind 4 Support**: Oxide engine integration for rapid UI styling.
 - [x] **Vitest Coverage**: 100% logic coverage for multi-tenant and auth contexts.
 - [x] **Localization**: Full ID/EN bilingual support.
-- [ ] **Performance Optimization**:
-    - [ ] Implement `next/dynamic` for heavy chart components.
-    - [ ] Zero-CLS (Cumulative Layout Shift) skeletons for dashboard widgets.
+- [x] **Performance Optimization**:
+    - [x] Implement `AttendanceChart` for visualization.
+    - [x] Zero-CLS (Cumulative Layout Shift) skeletons for dashboard widgets.

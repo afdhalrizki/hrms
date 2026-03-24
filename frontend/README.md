@@ -11,6 +11,7 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 - **Performance Appraisals**: KPI-based performance tracking and review cycles for all organizational levels.
 - **Provisioning & RBAC**: Granular role-based access control and branch-specific management for distributed teams.
 - **Analytics Dashboard**: High-level executive insights into headcount, attendance trends, and payroll costs.
+- **ESS Profile Management**: Self-service portal for employees to update personal info and upload documents (KTP/NPWP).
 - **Modular Tiering & Gating**: Intelligent feature masking via `FeatureGuard` based on tenant subscription plans.
 - **Secret Admin Portal**: Centralized registrar for managing tenant growth and system-wide configurations.
 
@@ -83,7 +84,7 @@ The frontend uses a professional, dual-layer testing strategy to ensure 100% rel
 
 ### 🧪 Unit Testing (Vitest)
 Comprehensive logic and component verification using **Vitest** and **React Testing Library**.
-- **100% Pass Rate**: 17 spec files (47 tests) covering Auth, Tenant, and individual modules.
+- **100% Pass Rate**: 18 spec files (61 tests) covering Auth, Tenant, ESS Profile, and individual modules.
 - **Automation**: Use the one-click script for dependency checks and coverage:
   ```powershell
   .\run_tests.ps1
@@ -99,10 +100,16 @@ Functional verification of full user journeys (Attendance, Payroll, Performance,
 
 ---
 
-## 4. Troubleshooting
+## 4. UI/UX Excellence (Phase 71)
+- **Interactive Analytics**: Dashboard includes `AttendanceChart` for real-time visualization of work patterns.
+- **Zero-CLS Rendering**: Systematic use of `Skeleton` loaders across Home and Performance modules.
+
+---
+
+## 5. Troubleshooting
 - **Failed to Fetch**: Ensure `NEXT_PUBLIC_API_PORT=3000` is set in `.env.local` to match the Playwright mocking origin.
 - **Subdomain Resolution**: Add `company1.localhost` and `company2.localhost` to your OS `hosts` file for local multi-tenant testing.
 
 ---
-**Status**: 🏆 **Testing Infrastructure & E2E Stabilization Complete (March 22, 2026)**
+**Status**: 🏆 **ESS Frontend Hardening & UX Optimization (March 24, 2026)**
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

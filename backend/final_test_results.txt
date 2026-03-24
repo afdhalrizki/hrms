@@ -1,0 +1,36 @@
+time="2026-03-22T22:08:29+07:00" level=warning msg="D:\\hr\\hrms\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Container hrms-redis-1 Running 
+ Container hrms-db-1 Running 
+ Container hrms-pgbouncer-1 Running 
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-8.3.4, pluggy-1.6.0 -- D:\hr\hrms\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 6.0.3, settings: config.settings (from ini)
+rootdir: D:\hr\hrms\backend
+configfile: pytest.ini
+plugins: django-4.9.0
+collecting ... collected 21 items
+
+core/tests/test_core.py::CoreModuleTestCase::test_department_api PASSED  [  4%]
+core/tests/test_core.py::CoreModuleTestCase::test_employee_api PASSED    [  9%]
+core/tests/test_core.py::CoreModuleTestCase::test_employee_detail_fields PASSED [ 14%]
+core/tests/test_core.py::CoreModuleTestCase::test_employee_provisioning_user PASSED [ 19%]
+core/tests/test_core.py::CoreModuleTestCase::test_employee_termination_system_access PASSED [ 23%]
+core/tests/test_core.py::CoreModuleTestCase::test_golongan_api PASSED    [ 28%]
+core/tests/test_core.py::CoreModuleTestCase::test_role_api PASSED        [ 33%]
+core/tests/test_core.py::BranchTestCase::test_branch_geofencing_defaults PASSED [ 38%]
+core/tests/test_core.py::RBACManagementTestCase::test_access_role_permissions_schema_validation PASSED [ 42%]
+core/tests/test_core.py::RBACManagementTestCase::test_default_role_protection PASSED [ 47%]
+core/tests/test_core.py::InfrastructureTestCase::test_api_key_lifecycle PASSED [ 52%]
+core/tests/test_core.py::InfrastructureTestCase::test_system_notification_filtering PASSED [ 57%]
+core/tests/test_core.py::AuditIntegrationTestCase::test_audit_log_api_listing PASSED [ 61%]
+core/tests/test_core.py::AuditIntegrationTestCase::test_audit_log_generation PASSED [ 66%]
+core/tests/test_core.py::DataConstraintTestCase::test_employee_ptkp_validation PASSED [ 71%]
+core/tests/test_core.py::MultiTenancyIsolationTestCase::test_schema_isolation PASSED [ 76%]
+core/tests/test_profile_self_service.py::EmployeeProfileSelfServiceTest::test_admin_can_update_everything PASSED [ 80%]
+core/tests/test_profile_self_service.py::EmployeeProfileSelfServiceTest::test_employee_can_update_own_profile PASSED [ 85%]
+core/tests/test_profile_self_service.py::EmployeeProfileSelfServiceTest::test_employee_can_upload_documents PASSED [ 90%]
+core/tests/test_profile_self_service.py::EmployeeProfileSelfServiceTest::test_employee_cannot_update_others_profile PASSED [ 95%]
+core/tests/test_profile_self_service.py::EmployeeProfileSelfServiceTest::test_employee_cannot_update_restricted_fields PASSED [100%]
+
+======================= 21 passed in 123.32s (0:02:03) ========================

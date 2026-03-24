@@ -16,11 +16,15 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('sonner', () => ({
-  toast: {
+const { mockToast } = vi.hoisted(() => ({
+  mockToast: {
     success: vi.fn(),
     error: vi.fn(),
-  },
+  }
+}));
+
+vi.mock('sonner', () => ({
+  toast: mockToast,
 }));
 
 describe('ReimbursementsPage', () => {
@@ -33,9 +37,10 @@ describe('ReimbursementsPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (apiFetch as any).mockImplementation((endpoint: string) => {
+    (apiFetch as any).mockImplementation((endpoint: string, options?: any) => {
       if (endpoint === '/reimbursement-categories/') return Promise.resolve(mockCategories);
-      if (endpoint === '/reimbursements/') return Promise.resolve(mockClaims);
+      if (endpoint === '/reimbursements/' && (!options || options.method === 'GET')) return Promise.resolve(mockClaims);
+      if (endpoint === '/reimbursements/' && options?.method === 'POST') return Promise.resolve({ id: 99 });
       return Promise.resolve([]);
     });
   });
@@ -43,36 +48,102 @@ describe('ReimbursementsPage', () => {
   it('renders reimbursement stats and history', async () => {
     render(<ReimbursementsPage />);
     
-    // Check for "Uber to office" to ensure data is loaded
     await waitFor(() => {
-      expect(screen.getByText(/Uber to office/i)).toBeDefined();
-    }, { timeout: 5000 });
+      expect(screen.getByText(/Uber to office/i)).toBeInTheDocument();
+    });
     
-    // Check for IDR prefix at least
     expect(screen.getAllByText(/IDR/i)).toBeDefined();
   });
 
-  it('submits a new claim with FormData', async () => {
+  it('handles empty claims and categories', async () => {
+    (apiFetch as any).mockImplementation((endpoint: string) => {
+       if (endpoint === '/reimbursement-categories/') return Promise.resolve([]);
+       if (endpoint === '/reimbursements/') return Promise.resolve([]);
+       return Promise.resolve([]);
+    });
     render(<ReimbursementsPage />);
+    
+    await waitFor(() => {
+      expect(screen.getByText(/No claims found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('handles API fetch error', async () => {
+    (apiFetch as any).mockRejectedValue(new Error('Fetch failed'));
+    render(<ReimbursementsPage />);
+    
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
+  it('submits a new claim with FormData and attachment', async () => {
+    const { container } = render(<ReimbursementsPage />);
     
     await waitFor(() => screen.getByText('newClaim'));
     fireEvent.click(screen.getByText('newClaim'));
     
-    // Fill form using IDs
-    const amountInput = await screen.findByLabelText(/form.amount/i);
+    const categorySelect = await screen.findByLabelText(/form.category/i) as HTMLSelectElement;
+    fireEvent.change(categorySelect, { target: { value: '1' } });
+
+    const amountInput = screen.getByLabelText(/form.amount/i);
     fireEvent.change(amountInput, { target: { value: '200000' } });
     
-    const descInput = await screen.findByLabelText(/form.description/i);
+    const descInput = screen.getByLabelText(/form.description/i);
     fireEvent.change(descInput, { target: { value: 'Dinner' } });
     
-    const submitBtn = screen.getByText('submit');
-    fireEvent.click(submitBtn);
+    const file = new File(['receipt'], 'receipt.pdf', { type: 'application/pdf' });
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    // Use fireEvent.submit on the form directly
+    const form = container.querySelector('form');
+    if (form) {
+      fireEvent.submit(form);
+    } else {
+      fireEvent.click(screen.getByText('submit'));
+    }
     
     await waitFor(() => {
       expect(apiFetch).toHaveBeenCalledWith('/reimbursements/', expect.objectContaining({
         method: 'POST',
         body: expect.any(FormData)
       }));
+    });
+
+    const postCall = (apiFetch as any).mock.calls.find((call: any) => call[0] === '/reimbursements/' && call[1]?.method === 'POST');
+    const sentFormData = postCall[1].body;
+    expect(sentFormData.get('amount')).toBe('200000');
+  });
+
+  it('handles submission error', async () => {
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint === '/reimbursements/' && options?.method === 'POST') return Promise.reject(new Error('Invalid amount'));
+      if (endpoint === '/reimbursement-categories/') return Promise.resolve(mockCategories);
+      if (endpoint === '/reimbursements/') return Promise.resolve(mockClaims);
+      return Promise.resolve([]);
+    });
+
+    const { container } = render(<ReimbursementsPage />);
+    
+    await waitFor(() => screen.getByText('newClaim'));
+    fireEvent.click(screen.getByText('newClaim'));
+    
+    const categorySelect = await screen.findByLabelText(/form.category/i) as HTMLSelectElement;
+    fireEvent.change(categorySelect, { target: { value: '1' } });
+    
+    const amountInput = screen.getByLabelText(/form.amount/i);
+    fireEvent.change(amountInput, { target: { value: '200000' } });
+
+    const form = container.querySelector('form');
+    if (form) {
+      fireEvent.submit(form);
+    } else {
+      fireEvent.click(screen.getByText('submit'));
+    }
+    
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
     });
   });
 });

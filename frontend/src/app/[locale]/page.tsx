@@ -17,7 +17,14 @@ import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/shared/Skeleton';
+
+const AttendanceChart = dynamic(() => import('@/components/dashboard/AttendanceChart'), {
+  loading: () => <Skeleton className="w-full h-64" />,
+  ssr: false
+});
 
 const stats = [
   { 
@@ -71,8 +78,15 @@ export default function Home() {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-muted-foreground animate-pulse">Loading workspace...</p>
+        <div className="space-y-8">
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 w-full rounded-3xl" />)}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Skeleton className="lg:col-span-2 h-[400px] rounded-3xl" />
+            <Skeleton className="h-[400px] rounded-3xl" />
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -146,12 +160,9 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Visual Placeholder for a chart */}
-            <div className="w-full h-64 bg-primary/5 rounded-2xl flex items-center justify-center border border-dashed border-primary/20">
-              <div className="flex flex-col items-center gap-4">
-                <TrendingUp size={48} className="text-primary/40 animate-pulse" />
-                <p className="text-sm text-muted-foreground italic">Interactive charts integration pending...</p>
-              </div>
+            {/* Real Chart */}
+            <div className="w-full h-72">
+              <AttendanceChart />
             </div>
           </motion.div>
 

@@ -16,6 +16,7 @@
   },
   "Navigation": {
     "overview": "Overview",
+    "profile": "My Profile",
     "employees": "Employees",
     "branches": "Branches",
     "attendance": "Attendance",
@@ -233,5 +234,29 @@
     "signIn": "Sign In",
     "noAccount": "Don't have an account?",
     "contactHR": "Contact HR"
+  },
+  "Profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information and documents.",
+    "sections": {
+      "personal": "Personal Information",
+      "contact": "Contact Details",
+      "documents": "Identity Documents",
+      "employment": "Employment Information"
+    },
+    "form": {
+      "nik": "NIK (Employee ID)",
+      "fullname": "Full Name",
+      "email": "Work Email",
+      "phone": "Phone Number",
+      "address": "Home Address",
+      "ktp": "KTP Number",
+      "npwp": "NPWP Number",
+      "ptkp": "Tax Status (PTKP)",
+      "ktpImage": "KTP Photo/Scan",
+      "npwpImage": "NPWP Photo/Scan",
+      "uploading": "Uploading..."
+    },
+    "success": "Profile updated successfully"
   }
 }

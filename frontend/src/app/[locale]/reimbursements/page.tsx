@@ -303,12 +303,16 @@ export default function ReimbursementsPage() {
                 </div>
 
                 <div className="p-6 border border-dashed border-white/20 rounded-3xl bg-white/5 hover:bg-white/10 transition-colors group relative cursor-pointer">
-                  <input 
-                    type="file"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    onChange={(e) => setFormData({...formData, attachment: e.target.files?.[0] || null})}
-                    accept="image/*,application/pdf"
-                  />
+                  <label htmlFor="attachment" className="absolute inset-0 w-full h-full cursor-pointer z-10">
+                    <span className="sr-only">{t('form.attachment')}</span>
+                    <input 
+                      id="attachment"
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => setFormData({...formData, attachment: e.target.files?.[0] || null})}
+                      accept="image/*,application/pdf"
+                    />
+                  </label>
                   <div className="flex flex-col items-center gap-3 py-2">
                     <div className="h-12 w-12 rounded-full border-2 border-primary/40 border-dashed flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Plus className="text-primary" />

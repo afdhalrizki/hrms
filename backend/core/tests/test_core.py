@@ -98,11 +98,14 @@ class CoreModuleTestCase(TenantTestCase):
             'nik': 'EMP002',
             'fullname': 'Jane Smith',
             'email': 'jane@company.com',
+            'phone': '08123456789',
+            'address': 'Jl. Keadilan No. 70',
             'department': self.dept.id,
             'role': self.role.id,
             'golongan': self.golongan.id,
             'join_date': str(date.today()),
             'ktp_number': '0000000000000000',
+            'npwp_number': 'NPWP002',
             'ptkp_status': 'K/1'
         }
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
@@ -151,6 +154,9 @@ class CoreModuleTestCase(TenantTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['nik'], 'EMP001')
         self.assertEqual(response.data['ptkp_status'], 'TK/0')
+        # Check newly added fields
+        self.assertIn('address', response.data)
+        self.assertIn('npwp_number', response.data)
 
     def test_employee_termination_system_access(self):
         """Verify that terminatng an employee (or setting to a restricted status) blocks API access."""

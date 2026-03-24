@@ -10,8 +10,9 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - **Indonesian Payroll Engine**: Full compliance with **TER 2024 PPh 21** regulations, BPJS calculations, and dynamic PDF payslip generation.
 - **Biometric Attendance**: Geofencing-validated clock-in/out with face reference tracking and liveness check metadata.
 - **Comprehensive Reporting**: Standardized CSV/PDF exports for Attendance recaps, Appraisal summaries, and Payroll data.
-- **Strategic HR**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
-- **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Basic, Professional, Enterprise).
+- [x] **Strategic HR**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
+- [x] **ESS Profile Management**: Restricted self-service API allowing employees to update personal contact info and upload KTP/NPWP documents without compromising HR master data.
+- [x] **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Basic, Professional, Enterprise).
 
 ## 📁 Core Modules
 

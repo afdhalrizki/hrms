@@ -112,3 +112,25 @@ class EmployeeLiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'fullname', 'nik', 'department_name', 'role_name', 'join_date']
+
+
+class EmployeeProfileSerializer(serializers.ModelSerializer):
+    """Specialized serializer for self-service profile updates (Phase 70)."""
+    department_name = serializers.ReadOnlyField(source='department.name')
+    role_name = serializers.ReadOnlyField(source='role.name')
+    golongan_name = serializers.ReadOnlyField(source='golongan.name')
+    supervisor_name = serializers.ReadOnlyField(source='supervisor.fullname')
+    
+    class Meta:
+        model = Employee
+        fields = [
+            'id', 'fullname', 'nik', 'email', 'phone', 'address',
+            'department_name', 'role_name', 'golongan_name', 'supervisor_name',
+            'ktp_number', 'npwp_number', 'ptkp_status', 'ktp_image', 'npwp_image',
+            'face_reference', 'join_date', 'status'
+        ]
+        read_only_fields = [
+            'id', 'fullname', 'nik', 'email', 'department_name', 
+            'role_name', 'golongan_name', 'supervisor_name', 
+            'join_date', 'status'
+        ]

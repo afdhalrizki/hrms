@@ -76,10 +76,18 @@ class HasRBACPermission(permissions.BasePermission):
             return True
 
         # Check if user is the owner of the record
-        is_owner = hasattr(obj, 'employee') and obj.employee == employee
+        is_owner = False
+        if isinstance(obj, Employee):
+            is_owner = obj == employee
+        elif hasattr(obj, 'employee'):
+            is_owner = obj.employee == employee
         
         # Check if user is the supervisor of the owner
-        is_supervisor = hasattr(obj, 'employee') and obj.employee and obj.employee.supervisor == employee
+        is_supervisor = False
+        if isinstance(obj, Employee):
+            is_supervisor = obj.supervisor == employee
+        elif hasattr(obj, 'employee') and obj.employee:
+            is_supervisor = obj.employee.supervisor == employee
         
         if is_supervisor:
             return True

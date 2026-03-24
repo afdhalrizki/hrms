@@ -6,7 +6,8 @@ param (
     [switch]$SkipInstall   # Skip npm install check
 )
 
-$FrontendDir = Get-Location
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+Push-Location $PSScriptRoot
 
 Write-Host "--- HRMS Frontend Unit Test Automation ---" -ForegroundColor Cyan
 

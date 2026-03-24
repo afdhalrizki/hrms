@@ -16,6 +16,7 @@
   },
   "Navigation": {
     "overview": "Ikhtisar",
+    "profile": "Profil Saya",
     "employees": "Karyawan",
     "branches": "Cabang",
     "attendance": "Kehadiran",
@@ -230,5 +231,29 @@
     "signIn": "Masuk",
     "noAccount": "Belum punya akun?",
     "contactHR": "Hubungi HR"
+  },
+  "Profile": {
+    "title": "Profil Saya",
+    "subtitle": "Kelola informasi pribadi dan dokumen Anda.",
+    "sections": {
+      "personal": "Informasi Pribadi",
+      "contact": "Detail Kontak",
+      "documents": "Dokumen Identitas",
+      "employment": "Informasi Pekerjaan"
+    },
+    "form": {
+      "nik": "NIK (Karyawan)",
+      "fullname": "Nama Lengkap",
+      "email": "Email Kerja",
+      "phone": "Nomor Telepon",
+      "address": "Alamat Tempat Tinggal",
+      "ktp": "Nomor KTP",
+      "npwp": "Nomor NPWP",
+      "ptkp": "Status Pajak (PTKP)",
+      "ktpImage": "Foto/Scan KTP",
+      "npwpImage": "Foto/Scan NPWP",
+      "uploading": "Mengunggah..."
+    },
+    "success": "Profil berhasil diperbarui"
   }
 }

@@ -18,6 +18,7 @@ The backend uses **schema-level isolation** via `django-tenants`. Each client ha
 - **Hybrid RBAC**: Combines fixed system roles (`is_staff`, `is_superuser`) with dynamic `AccessRole` JSON permissions.
 - **Audit System**: `AuditModelMixin` tracks every change in the master data with deep-diffing support.
 - **Ownership Filter**: Strict `get_queryset` filtering ensuring employees only see their own payslips and attendance records.
+- **ESS Profile Self-Service**: Dedicated serializer (`EmployeeProfileSerializer`) that restricts editable fields for employees, ensuring master data integrity while allowing personal info updates.
 - **Admin Safeguards**: Signals to prevent accidental deletion of critical admin users or roles.
 
 ## 4. Operational Modules

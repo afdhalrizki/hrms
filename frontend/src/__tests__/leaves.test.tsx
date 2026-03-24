@@ -16,11 +16,15 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('sonner', () => ({
-  toast: {
+const { mockToast } = vi.hoisted(() => ({
+  mockToast: {
     success: vi.fn(),
     error: vi.fn(),
-  },
+  }
+}));
+
+vi.mock('sonner', () => ({
+  toast: mockToast,
 }));
 
 describe('LeavesPage', () => {
@@ -49,21 +53,69 @@ describe('LeavesPage', () => {
     });
   });
 
+  it('handles empty leave balances and history', async () => {
+    (apiFetch as any).mockImplementation((endpoint: string) => {
+      if (endpoint === '/leave-balances/') return Promise.resolve([]);
+      if (endpoint === '/leave-requests/') return Promise.resolve([]);
+      return Promise.resolve([]);
+    });
+
+    render(<LeavesPage />);
+    
+    await waitFor(() => {
+      expect(screen.getByText(/No leave balance records found/i)).toBeInTheDocument();
+      expect(screen.getByText(/No leave history found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('handles API fetch error gracefully', async () => {
+    (apiFetch as any).mockRejectedValue(new Error('Network error'));
+    render(<LeavesPage />);
+    
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to load leave data');
+    });
+  });
+
   it('opens and submits leave request modal', async () => {
     render(<LeavesPage />);
     
-    const requestBtn = screen.getByText('requestLeave');
-    fireEvent.click(requestBtn);
+    fireEvent.click(screen.getByText('requestLeave'));
     
-    expect(screen.getByText('form.type')).toBeDefined();
-    
-    const submitBtn = screen.getByText('submit');
-    fireEvent.click(submitBtn);
+    const reasonInput = screen.getByLabelText(/form.reason/i);
+    fireEvent.change(reasonInput, { target: { value: 'Personal matters' } });
+
+    fireEvent.click(screen.getByText('submit'));
     
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/leave-requests/', expect.objectContaining({
-        method: 'POST'
-      }));
+      const calls = (apiFetch as any).mock.calls;
+      const postCall = calls.find((c: any) => c[0] === '/leave-requests/' && c[1]?.method === 'POST');
+      expect(postCall).toBeDefined();
+      const body = JSON.parse(postCall[1].body);
+      expect(body.leave_type).toBe('CUTI');
+      expect(body.reason).toBe('Personal matters');
+    });
+  });
+
+  it('handles submission error', async () => {
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (options?.method === 'POST') return Promise.reject(new Error('Quota exceeded'));
+      if (endpoint === '/leave-balances/') return Promise.resolve(mockBalances);
+      if (endpoint === '/leave-requests/') return Promise.resolve(mockRequests);
+      return Promise.resolve([]);
+    });
+
+    render(<LeavesPage />);
+    
+    fireEvent.click(screen.getByText('requestLeave'));
+    
+    const reasonInput = screen.getByLabelText(/form.reason/i);
+    fireEvent.change(reasonInput, { target: { value: 'Personal matters' } }); // Fill reason to enable submission
+
+    fireEvent.click(screen.getByText('submit'));
+    
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Quota exceeded');
     });
   });
 });

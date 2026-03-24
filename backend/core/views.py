@@ -94,11 +94,21 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     serializer_class = EmployeeSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
+    allow_self_service = True  # Enable owner updates (Phase 70)
 
     def get_serializer_class(self):
         if self.request.query_params.get('lite') == 'true':
             from .serializers import EmployeeLiteSerializer
             return EmployeeLiteSerializer
+            
+        # If it's a self-service update (not a manager), use the restricted profile serializer
+        user = self.request.user
+        if not user.is_staff:
+            employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
+            if employee and not (employee.access_role and employee.access_role.permissions.get('manage_hr')):
+                from .serializers import EmployeeProfileSerializer
+                return EmployeeProfileSerializer
+                
         return super().get_serializer_class()
 
     def get_queryset(self):

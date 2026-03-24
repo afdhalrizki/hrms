@@ -41,6 +41,10 @@ A highly secure attendance system that prevents fraud.
 - **Configurable Stages**: Admins can define approval flows (Supervisor -> HR).
 - **Automatic Triggers**: Approved workflows automatically update the target record.
 
+## 👤 ESS Profile Management (Phase 70)
+- **Restricted Self-Service**: Implemented `EmployeeProfileSerializer` to allow employees to update personal info (Phone, Address, Marital Status) while locking master data (NIK, Salary, Role).
+- **Document Management**: Added support for KTP and NPWP image uploads with automated storage pathing in `employee_docs/`.
+
 ## 🛠 Testing & Quality Assurance
 - **Suite**: 155+ test scenarios using `pytest`.
 - **Coverage**: 100% logic coverage for tax, BPJS, and geofencing modules.

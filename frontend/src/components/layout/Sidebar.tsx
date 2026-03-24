@@ -29,6 +29,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 
 const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
+  { nameKey: 'profile',    icon: Users,            href: '/profile' },
   { nameKey: 'employees', icon: Users,            href: '/employees', isAdminOnly: true },
   { nameKey: 'performance', icon: TrendingUp,     href: '/performance' },
   { nameKey: 'branches',  icon: MapPin,           href: '/branches',  isAdminOnly: true },

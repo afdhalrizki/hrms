@@ -129,6 +129,11 @@ class Employee(AuditModel):
     npwp_number = models.CharField(_("NPWP number"), max_length=30, blank=True, null=True)
     ptkp_status = models.CharField(_("PTKP status"), max_length=5, choices=MARITAL_STATUS_CHOICES, default='TK/0')
 
+    # Contact & Documentation (Phase 70)
+    address = models.TextField(_("home address"), blank=True, null=True)
+    ktp_image = models.ImageField(_("KTP document scan"), upload_to='employee_docs/ktp/', blank=True, null=True)
+    npwp_image = models.ImageField(_("NPWP document scan"), upload_to='employee_docs/npwp/', blank=True, null=True)
+
     # Face Recognition Reference
     face_reference = models.ImageField(_("face reference"), upload_to='face_references/', blank=True, null=True, help_text=_("Master photo for face recognition"))
 

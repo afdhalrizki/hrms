@@ -24,11 +24,11 @@ src/
 
 ## 🚀 2. Phased Roadmap: Full Backend Parity
 
-### Phase 63: ESS Expansion (Leaves & Reimbursements)
+### Phase 63: ESS Expansion (Leaves & Reimbursements) [COMPLETE]
 - **Leaves**: Request form + Balance tracker (`/api/attendance/leave-requests/`).
 - **Reimbursements**: Receipt upload + Status tracking (`/api/reimbursement/reimbursements/`).
 
-### Phase 64: Financial Command Center (Real-time Payroll)
+### Phase 64: Financial Command Center (Real-time Payroll) [COMPLETE]
 - **Live Sync**: Connecting `PayrollPage` to `/api/payroll/payslips/`.
 - **BPJS/Tax Insight**: Interactive breakdown of PPh 21 (TER 2024) and BPJS Kesehatan/Ketenagakerjaan.
 
@@ -36,7 +36,7 @@ src/
 - **Audit Logs**: Visual "Deep-diff" activity feed from `/api/core/audit/`.
 - **API Keys**: UI for managing third-party integration keys.
 
-### Phase 66: Performance Appraisal Lifecycle
+### Phase 66: Performance Appraisal Lifecycle [COMPLETE]
 - **Appraisal Workflow**: Dynamic submission modal for managers and employees to score KPIs and finalize reviews.
 - **Ratings Engine**: Standardized 1-5 scoring system stored as JSON in `AppraisalReview`.
 - **KPI Monitoring**: Real-time visualization of `KPITarget` attainment during the review process.
@@ -48,10 +48,9 @@ src/
 - **Coverage Expansion**: Implementation of full-flow testing for Admin (Provisioning, Approvals) and Employee (ESS, Payslip download).
 - **Automation**: Integration of Playwright into the CI/CD pipeline.
 
-### Phase 69: Modular Tiering (Plan-Based Gating)
-- **Module Mapping**: Define core vs premium features (Performance, Audit, API Keys).
-- **UI Gating**: Implementation of `FeatureGuard` for page-level and component-level restrictions.
-- **Tenant Sync**: Propagating `enabled_modules` from backend to frontend context.
+- [x] **Phase 69: Modular Tiering (Plan-Based Gating)**: Implement `FeatureGuard` and tenant-level module synchronization.
+- [x] **Phase 70: ESS Profile Management**: Enhanced self-service UI for personal info, document uploads (KTP, NPWP), and avatar management.
+- [x] **Phase 71: ESS Hardening & UX Optimization**: 100% unit test success, interactive charts, and zero-CLS skeletons.
 
 ## 🎨 3. Design System: Glassmorphism Hub
 We use a unified design language to ensure a "Premium SaaS" feel.

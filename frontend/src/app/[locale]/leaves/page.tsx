@@ -209,8 +209,9 @@ export default function LeavesPage() {
               <h2 className="text-2xl font-bold text-white mb-6 font-primary">{t('requestLeave')}</h2>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.type')}</label>
+                  <label htmlFor="leave_type" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.type')}</label>
                   <select 
+                    id="leave_type"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
                     value={formData.leave_type}
                     onChange={(e) => setFormData({...formData, leave_type: e.target.value})}
@@ -223,8 +224,9 @@ export default function LeavesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.startDate')}</label>
+                    <label htmlFor="start_date" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.startDate')}</label>
                     <input 
+                      id="start_date"
                       type="date"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 [color-scheme:dark]"
                       value={formData.start_date}
@@ -232,8 +234,9 @@ export default function LeavesPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.endDate')}</label>
+                    <label htmlFor="end_date" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.endDate')}</label>
                     <input 
+                      id="end_date"
                       type="date"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 [color-scheme:dark]"
                       value={formData.end_date}
@@ -242,8 +245,9 @@ export default function LeavesPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.reason')}</label>
+                  <label htmlFor="reason" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">{t('form.reason')}</label>
                   <textarea 
+                    id="reason"
                     rows={3}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     placeholder="Briefly explain your reason..."
