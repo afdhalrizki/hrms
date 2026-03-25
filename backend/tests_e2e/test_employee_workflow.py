@@ -14,11 +14,11 @@ def test_complete_attendance_workflow(base_url, tenant1_domain, client):
         headers=get_auth_headers(tenant1_domain)
     )
     assert login_resp.status_code == 200
-    # httpx.Client handles cookies automatically if used properly
+    token = login_resp.json()["access"]
     
     # 2. Clock In
     # We need to know the employee ID or use /users/me/ to find it
-    me_resp = client.get(f"{base_url}/users/me/", headers=get_auth_headers(tenant1_domain))
+    me_resp = client.get(f"{base_url}/users/me/", headers=get_auth_headers(tenant1_domain, token))
     assert me_resp.status_code == 200
     employee_id = me_resp.json().get("employee_id")
     assert employee_id is not None
@@ -38,7 +38,7 @@ def test_complete_attendance_workflow(base_url, tenant1_domain, client):
     unique_date = datetime.date.today().strftime("%Y-%m-%d")
     clock_in_data["date"] = unique_date
     
-    res_in = client.post(attendance_url, json=clock_in_data, headers=get_auth_headers(tenant1_domain))
+    res_in = client.post(attendance_url, json=clock_in_data, headers=get_auth_headers(tenant1_domain, token))
     # It might be 201 Created or 400 if already exists
     assert res_in.status_code in [201, 400]
     
@@ -49,7 +49,7 @@ def test_complete_attendance_workflow(base_url, tenant1_domain, client):
         res_out = client.patch(
             f"{attendance_url}{attendance_id}/",
             json={"check_out": "17:00:00"},
-            headers=get_auth_headers(tenant1_domain)
+            headers=get_auth_headers(tenant1_domain, token)
         )
         assert res_out.status_code == 200
         assert res_out.json()["check_out"] == "17:00:00"
@@ -60,12 +60,15 @@ def test_leave_request_workflow(base_url, tenant1_domain, client):
     Test: Request Leave -> Admin Approval -> Balance Verification.
     """
     # 1. Login as Admin
-    client.post(f"{base_url}/auth/login/", 
+    login_resp = client.post(f"{base_url}/auth/login/", 
                json={"email": "admin@company1.com", "password": "password123"},
                headers=get_auth_headers(tenant1_domain))
+    assert login_resp.status_code == 200
+    token = login_resp.json()["access"]
     
     # 2. Create Leave Request
-    me_resp = client.get(f"{base_url}/users/me/", headers=get_auth_headers(tenant1_domain))
+    me_resp = client.get(f"{base_url}/users/me/", headers=get_auth_headers(tenant1_domain, token))
+    assert me_resp.status_code == 200
     employee_id = me_resp.json()["employee_id"]
     
     leave_url = f"{base_url}/leave-requests/"
@@ -77,7 +80,7 @@ def test_leave_request_workflow(base_url, tenant1_domain, client):
         "reason": "E2E Test Request"
     }
     
-    res_leave = client.post(leave_url, json=leave_data, headers=get_auth_headers(tenant1_domain))
+    res_leave = client.post(leave_url, json=leave_data, headers=get_auth_headers(tenant1_domain, token))
     assert res_leave.status_code == 201
     leave_id = res_leave.json()["id"]
     
@@ -85,7 +88,7 @@ def test_leave_request_workflow(base_url, tenant1_domain, client):
     res_approve = client.patch(
         f"{leave_url}{leave_id}/",
         json={"status": "APPROVED"},
-        headers=get_auth_headers(tenant1_domain)
+        headers=get_auth_headers(tenant1_domain, token)
     )
     assert res_approve.status_code == 200
     assert res_approve.json()["status"] == "APPROVED"

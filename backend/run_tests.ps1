@@ -4,7 +4,8 @@
 $ErrorActionPreference = "Stop"
 
 # 1. Setup Paths
-$BackendDir = Get-Location
+$BackendDir = $PSScriptRoot
+Push-Location $BackendDir
 $RootDir = Split-Path -Parent $BackendDir
 $EnvFile = Join-Path $RootDir "environments\.env.local"
 $VenvDir = Join-Path $BackendDir "venv"
@@ -93,3 +94,4 @@ if (-not (Test-Path $PytestExec)) {
 # 6. Run Pytest
 Write-Host "--- Running HRMS Backend Tests ---" -ForegroundColor Green
 & $PytestExec @args
+Pop-Location

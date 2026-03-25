@@ -20,6 +20,16 @@ class PerformanceReportingTestCase(TenantTestCase):
             self.user = User.objects.create_user(email='hr_report@example.com', password='password', is_staff=True)
             self.user.tenants.add(self.tenant)
             
+            # User must have an Employee record for HasRBACPermission
+            Employee.objects.create(
+                fullname='HR Reporter',
+                email='hr_report@example.com',
+                department=self.dept,
+                nik='HR001',
+                join_date=date.today(),
+                ktp_number='HR12345'
+            )
+            
             self.employee = Employee.objects.create(
                 fullname='Performance Reviewee',
                 email='reviewee@example.com',

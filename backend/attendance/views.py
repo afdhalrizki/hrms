@@ -203,6 +203,19 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
             
         return LeaveRequest.objects.none()
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        # Explicitly return refreshed data to ensure workflow status is reflected
+        instance.refresh_from_db()
+        data = self.get_serializer(instance).data
+        print(f"DEBUG: LeaveRequest updated, final status in DB: {instance.status}, in response: {data['status']}")
+        return Response(data)
+
     def perform_create(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
@@ -232,30 +245,33 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
         WorkflowService.initialize_workflow(instance)
 
     def perform_update(self, serializer):
-        instance = self.get_object()
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
-        user_choice = self.request.data.get('status') # 'APPROVED' or 'REJECTED'
+        user_choice = self.request.data.get('action') or self.request.data.get('status')
         comment = self.request.data.get('comment', '')
         
-        if user_choice not in ['APPROVED', 'REJECTED']:
-            serializer.save()
-            return
+        # Always save first to handle other field changes and set updated_by
+        instance = serializer.save(updated_by=user)
 
-        # Use WorkflowService to handle transition
-        WorkflowService.process_action(instance, employee, user_choice, comment)
+        if user_choice in ['APPROVED', 'REJECTED', 'RETURNED']:
+            # Use WorkflowService to handle transition
+            WorkflowService.process_action(instance, employee, user_choice, comment)
+            # Re-read from DB to get the final status after workflow processing
+            instance.refresh_from_db()
+            # Clear serializer cache to ensure the response reflects the refresh
+            if hasattr(serializer, '_data'):
+                del serializer._data
 
-        # Deduction Logic: When FINAL status moves to APPROVED
-        instance.refresh_from_db()
-        if instance.status == 'APPROVED' and instance.leave_type == 'CUTI':
-            duration = (instance.end_date - instance.start_date).days + 1
-            balance, _ = LeaveBalance.objects.get_or_create(
-                employee=instance.employee, 
-                year=instance.start_date.year
-            )
-            balance.used_days += Decimal(str(duration))
-            balance.save()
+            # Deduction Logic: When FINAL status moves to APPROVED
+            if instance.status == 'APPROVED' and instance.leave_type == 'CUTI':
+                duration = (instance.end_date - instance.start_date).days + 1
+                balance, _ = LeaveBalance.objects.get_or_create(
+                    employee=instance.employee, 
+                    year=instance.start_date.year
+                )
+                balance.used_days += Decimal(str(duration))
+                balance.save()
 
 
 class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -278,6 +294,16 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
             return Overtime.objects.filter(Q(employee=employee) | Q(employee__supervisor=employee))
         return Overtime.objects.none()
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        instance.refresh_from_db()
+        return Response(self.get_serializer(instance).data)
+
     def perform_create(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
@@ -285,17 +311,18 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
         WorkflowService.initialize_workflow(inst)
 
     def perform_update(self, serializer):
-        instance = self.get_object()
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        user_choice = self.request.data.get('status')
+        user_choice = self.request.data.get('action') or self.request.data.get('status')
         comment = self.request.data.get('comment', '')
         
-        if user_choice not in ['APPROVED', 'REJECTED']:
-            serializer.save()
-            return
+        instance = serializer.save(updated_by=user)
 
-        WorkflowService.process_action(instance, employee, user_choice, comment)
+        if user_choice in ['APPROVED', 'REJECTED', 'RETURNED']:
+            WorkflowService.process_action(instance, employee, user_choice, comment)
+            instance.refresh_from_db()
+            if hasattr(serializer, '_data'):
+                del serializer._data
 
 
 class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -372,6 +399,16 @@ class AttendanceCorrectionRequestViewSet(AuditModelMixin, viewsets.ModelViewSet)
             return AttendanceCorrectionRequest.objects.filter(Q(employee=employee) | Q(employee__supervisor=employee))
         return AttendanceCorrectionRequest.objects.none()
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        instance.refresh_from_db()
+        return Response(self.get_serializer(instance).data)
+
     def perform_create(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
@@ -383,18 +420,19 @@ class AttendanceCorrectionRequestViewSet(AuditModelMixin, viewsets.ModelViewSet)
         WorkflowService.initialize_workflow(instance)
 
     def perform_update(self, serializer):
-        instance = self.get_object()
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
-        user_choice = self.request.data.get('status')
+        user_choice = self.request.data.get('action') or self.request.data.get('status')
         comment = self.request.data.get('comment', '')
         
-        if user_choice not in ['APPROVED', 'REJECTED']:
-            serializer.save()
-            return
+        instance = serializer.save(updated_by=user)
 
-        WorkflowService.process_action(instance, employee, user_choice, comment)
+        if user_choice in ['APPROVED', 'REJECTED', 'RETURNED']:
+            WorkflowService.process_action(instance, employee, user_choice, comment)
+            instance.refresh_from_db()
+            if hasattr(serializer, '_data'):
+                del serializer._data
 
         # Apply Correction: When FINAL status moves to APPROVED
         instance.refresh_from_db()

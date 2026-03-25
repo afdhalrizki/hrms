@@ -55,16 +55,22 @@ except OperationalError:
 try:
     tenant = Tenant.objects.get(schema_name='company1')
 except Tenant.DoesNotExist:
-    print("Tenant 'company1' not found. Please run up.ps1 or migrations first.")
-    sys.exit(0)
-except Exception as e:
-    print(f"Error accessing database: {e}")
-    sys.exit(0)
+    tenant = Tenant.objects.create(schema_name='company1', name='Company One')
+    from tenants.models import Domain
+    Domain.objects.create(domain='company1.localhost', tenant=tenant, is_primary=True)
+
+try:
+    tenant2 = Tenant.objects.get(schema_name='company2')
+except Tenant.DoesNotExist:
+    tenant2 = Tenant.objects.create(schema_name='company2', name='Company Two')
+    from tenants.models import Domain
+    Domain.objects.create(domain='company2.localhost', tenant=tenant2, is_primary=True)
 
 test_users = [
-    {'email': 'admin@company1.net', 'is_staff': True, 'is_superuser': False},
-    {'email': 'manager1@company1.net', 'is_staff': False, 'is_superuser': False},
-    {'email': 'employee1@company1.net', 'is_staff': False, 'is_superuser': False},
+    # Company 1
+    {'email': 'admin@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
+    {'email': 'manager1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
+    {'email': 'employee1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
 ]
 
 for user_data in test_users:
@@ -76,22 +82,38 @@ for user_data in test_users:
         }
     )
     user.set_password('password123')
-    user.tenants.add(tenant)
+    user.tenants.clear() # Ensure strict isolation for E2E tests
+    user.tenants.add(user_data['tenant'])
     user.save()
     print(f"{'Created' if created else 'Updated'} user: {user.email}")
 
 # Now ensure Employee records exist in company1 schema
 with schema_context('company1'):
     # Cleanup mutated state from previous test runs
-    from attendance.models import Attendance
+    from attendance.models import Attendance, LeaveRequest, Overtime
     from payroll.models import PayrollPeriod, Payslip
     from performance.models import AppraisalReview, Appraisal
+    from core.models import WorkflowConfig, WorkflowStage
+    from reimbursement.models import Reimbursement
     
     Attendance.objects.all().delete()
+    LeaveRequest.objects.all().delete()
+    Overtime.objects.all().delete()
+    Reimbursement.objects.all().delete()
     Payslip.objects.all().delete()
     PayrollPeriod.objects.all().delete()
     AppraisalReview.objects.all().delete()
     Appraisal.objects.all().delete()
+    WorkflowStage.objects.all().delete()
+    WorkflowConfig.objects.all().delete()
+    
+    # Cleanup core master data to avoid unique constraint violations
+    Employee.objects.all().delete()
+    Role.objects.all().delete()
+    Department.objects.all().delete()
+    Golongan.objects.all().delete()
+    AccessRole.objects.all().delete()
+
     # Reset branding settings if they exist to prevent text match failure on 'Tenant Branding' vs whatever it changes to
     if hasattr(tenant, 'settings'):
         tenant.settings.primary_color = '#6366f1'
@@ -107,7 +129,7 @@ with schema_context('company1'):
         defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'view_payroll': True}}
     )
     manager_emp, _ = Employee.objects.get_or_create(
-        email='manager1@company1.net',
+        email='manager1@company1.com',
         defaults={
             'nik': 'MGR001',
             'fullname': 'Manager One',
@@ -127,7 +149,7 @@ with schema_context('company1'):
         defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'manage_payroll': True, 'manage_branding': True}}
     )
     admin_emp, _ = Employee.objects.get_or_create(
-        email='admin@company1.net',
+        email='admin@company1.com',
         defaults={
             'nik': 'ADM001',
             'fullname': 'Admin One',
@@ -143,7 +165,7 @@ with schema_context('company1'):
 
     # Employee
     employee_emp, _ = Employee.objects.get_or_create(
-        email='employee1@company1.net',
+        email='employee1@company1.com',
         defaults={
             'nik': 'EMP001',
             'fullname': 'Employee One',
@@ -172,5 +194,14 @@ with schema_context('company1'):
         period_name="Q1 2026",
         defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'SUBMITTED'}
     )
+
+# Clean up company2 schema as well
+with schema_context('company2'):
+    from attendance.models import Attendance, LeaveRequest, Overtime
+    from core.models import Employee
+    Attendance.objects.all().delete()
+    LeaveRequest.objects.all().delete()
+    Overtime.objects.all().delete()
+    Employee.objects.all().delete()
 
 print("Successfully seeded all test users and employee records.")

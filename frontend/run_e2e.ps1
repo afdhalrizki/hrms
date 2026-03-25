@@ -47,20 +47,23 @@ if (-not $SkipSeed) {
         Write-Host "Using Virtual Environment: $VenvPath" -ForegroundColor Gray
     }
 
-    if (Test-Path (Join-Path $BackendDir "scripts/seed_test_frontend.py")) {
+    if (Test-Path (Join-Path $BackendDir "scripts/seed_test_db.py")) {
         Push-Location $BackendDir
-        & $PythonCmd scripts/seed_test_frontend.py
+        & $PythonCmd scripts/seed_test_db.py
         
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Seed successful." -ForegroundColor Green
-        } else {
+        }
+        else {
             Write-Host "Warning: Seed script failed (Exit Code: $LASTEXITCODE)." -ForegroundColor Gray
         }
         Pop-Location
-    } else {
-        Write-Host "Warning: Seed script not found at backend/scripts/seed_test_frontend.py" -ForegroundColor Yellow
     }
-} else {
+    else {
+        Write-Host "Warning: Seed script not found at backend/scripts/seed_test_.py" -ForegroundColor Yellow
+    }
+}
+else {
     Write-Host "[2/3] Skipping Seed..." -ForegroundColor Gray
 }
 
@@ -73,7 +76,8 @@ $ExitCode = $LASTEXITCODE
 
 if ($ExitCode -eq 0) {
     Write-Host "`nWINNER! All tests passed." -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "`nFAILURE. Some tests failed. Check the Playwright report." -ForegroundColor Red
 }
 

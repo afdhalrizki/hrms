@@ -233,7 +233,7 @@ class KPIAPITestCase(PerformanceModuleTestCase):
     def test_unauthenticated_cannot_list_kpis(self):
         """Unauthenticated requests should be rejected."""
         response = self.client.get(reverse('kpi-list'), SERVER_NAME=self.domain_name)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_feature_gating_blocks_non_performance_tenant(self):
         """A tenant without 'performance' in enabled_modules should get 403."""

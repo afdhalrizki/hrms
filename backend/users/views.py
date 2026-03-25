@@ -5,10 +5,12 @@ from django.contrib.auth import login, authenticate
 from .models import User
 from .serializers import UserSerializer
 
+from core.permissions import HasRBACPermission, TenantAccessPermission
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, TenantAccessPermission]
 
     def get_queryset(self):
         # Users can see their own profile, staff can see all
@@ -16,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['get'])
     def me(self, request):
         """
         Returns the current user's profile and linked employee data for the current tenant.
@@ -46,12 +48,16 @@ class LoginAPIView(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'])
     def login(self, request):
+        from rest_framework_simplejwt.tokens import RefreshToken
         email = request.data.get('email')
         password = request.data.get('password')
         
         user = authenticate(request, email=email, password=password)
         if user:
-            login(request, user)
-            return Response(UserSerializer(user).data)
+            refresh = RefreshToken.for_user(user)
+            data = UserSerializer(user).data
+            data['access'] = str(refresh.access_token)
+            data['refresh'] = str(refresh)
+            return Response(data)
         
         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

@@ -17,7 +17,7 @@ class AttendanceReportingTestCase(TenantTestCase):
         
         with schema_context(self.tenant.schema_name):
             self.dept = Department.objects.create(name='Reporting IT')
-            self.user = User.objects.create_user(email='admin_report@example.com', password='password', is_staff=True)
+            self.user = User.objects.create_user(email='reporter@example.com', password='password', is_staff=True)
             self.user.tenants.add(self.tenant)
             
             self.employee = Employee.objects.create(

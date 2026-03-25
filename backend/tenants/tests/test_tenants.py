@@ -213,12 +213,12 @@ class RegistrationFlowTestCase(TenantTestCase):
         
         approve_url = reverse('internal-registration-approve', args=[registration.id])
         response = self.client.post(approve_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_registration_prefix_collision(self):
         """Verify that duplicate subdomain prefixes are rejected."""
-        # 1. Prefix already exists in Tenant
-        Tenant.objects.create(schema_name='collision', name='Existing Tenant')
+        with schema_context('public'):
+            Tenant.objects.create(schema_name='collision', name='Existing Tenant')
         
         data = {
             'company_name': 'New Startup',

@@ -4,7 +4,8 @@
 $ErrorActionPreference = "Stop"
 
 # 1. Setup Paths
-$BackendDir = Get-Location
+$BackendDir = $PSScriptRoot
+Push-Location $BackendDir
 $RootDir = Split-Path -Parent $BackendDir
 $EnvFile = Join-Path $RootDir "environments\.env.local"
 $VenvDir = Join-Path $BackendDir "venv"
@@ -110,3 +111,4 @@ try {
 # 8. Start Server
 Write-Host "--- Starting Django Server at http://localhost:8000 ---" -ForegroundColor Green
 & $PythonExec manage.py runserver 0.0.0.0:8000
+Pop-Location

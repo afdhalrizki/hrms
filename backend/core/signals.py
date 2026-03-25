@@ -23,12 +23,22 @@ def update_storage_on_save(sender, instance, created, **kwargs):
             total_bytes += emp.face_reference.size
 
     # Sum up all reimbursement receipts
-    for rem in Reimbursement.objects.exclude(receipt_image=''):
-        if rem.receipt_image:
-            total_bytes += rem.receipt_image.size
+    for rem in Reimbursement.objects.exclude(attachment=''):
+        if rem.attachment:
+            total_bytes += rem.attachment.size
 
-    tenant.storage_used_bytes = total_bytes
-    tenant.save(update_fields=['storage_used_bytes'])
+    if tenant and hasattr(tenant, 'save'):
+        tenant.storage_used_bytes = total_bytes
+        tenant.save(update_fields=['storage_used_bytes'])
+
+@receiver(post_save, sender=Employee)
+def deactivate_user_on_termination(sender, instance, **kwargs):
+    """
+    Deactivates the associated user when an employee is terminated.
+    """
+    if instance.status == 'TERMINATED' and instance.user:
+        instance.user.is_active = False
+        instance.user.save(update_fields=['is_active'])
 
 @receiver(post_delete, sender=Employee)
 @receiver(post_delete, sender=Reimbursement)

@@ -1,6 +1,26 @@
 from rest_framework import permissions
 from core.models import Employee
 
+class TenantAccessPermission(permissions.BasePermission):
+    """
+    Enforces that the authenticated user actually belongs to the current tenant.
+    This is necessary because Django's TenantAccessMiddleware cannot verify DRF JWT tokens
+    since request.user is set by DRF after Django middleware runs.
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+            
+        is_internal = getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
+        if is_internal:
+            return True
+            
+        current_tenant = getattr(request, 'tenant', None)
+        if current_tenant and current_tenant.schema_name != 'public':
+            return request.user.tenants.filter(id=current_tenant.id).exists()
+            
+        return True
+
 class HasRBACPermission(permissions.BasePermission):
     """
     Checks if the employee requesting has the required RBAC permission defined 
@@ -11,9 +31,19 @@ class HasRBACPermission(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
             
+        # Hard isolation: Never allow API access on public schema
+        if getattr(request, 'tenant', None) and request.tenant.schema_name == 'public':
+            return False
+
         # Tenant admins (is_staff) override RBAC and have full access
         if request.user.is_staff:
             return True
+
+        # Hard isolation: User MUST have an Employee record in this tenant schema
+        # to be considered authorized for this tenant.
+        has_employee = Employee.objects.filter(email=request.user.email).exists()
+        if not has_employee:
+            return False
             
         required_perm = getattr(view, 'required_rbac_permission', None)
         
