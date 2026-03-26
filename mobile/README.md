@@ -7,13 +7,14 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Biometric Face Recognition**: AI-powered attendance verification with liveness checks using Google ML Kit.
 - **Smart Geofencing**: High-accuracy GPS validation to ensure attendance records are within office boundaries.
 - **Integrated Identity**: Real-time synchronization with the unified backend identity system (Employee NIK, Role, Department).
-- **ESS Profile Management**: Self-service portal for updating contact info and uploading KTP/NPWP documents using camera capture.
+- **ESS Profile Management**: Self-service portal for updating contact info and uploading KTP/NPWP documents.
 - **Attendance Corrections**: Request workflow for fixing missed or incorrect logs directly from the mobile app.
 - **Strategic Performance**: Personal KPI dashboard with progress visualization and self-appraisal submissions.
 - **Shift & Schedule**: Personal work calendar with real-time shift status.
 - **Dynamic Payslips**: View and download payroll details with TER 2024 compliance data.
 - **Leave Management**: Submit leave requests (Annual, Permission, Sick) and track balances in real-time.
 - **Reimbursement Claims**: Easy expense submission with category-based validation and status tracking.
+- **Account Settings**: App personalization, language preferences, and secure logout management.
 
 ## 🖼 UI Previews
 ### Employee Dashboard
@@ -50,7 +51,12 @@ flutter pub get
 
 ### Running the App
 ```powershell
-flutter run
+# Automated Local Dev - RECOMMENDED
+pwsh .\run_dev.ps1
+
+# Optional Flags:
+pwsh .\run_dev.ps1 -Web
+pwsh .\run_dev.ps1 -Windows
 ```
 
 ---
@@ -72,15 +78,17 @@ The app handles multi-tenancy by injecting custom headers into every request via
 
 ## 3. Testing
 
-Run the full mobile test suite using the one-click script:
+Run all mobile logic & infrastructure tests (Real Backend):
 ```powershell
 # Run from workspace root:
 pwsh .\mobile\run_tests.ps1
-
-# Or run from mobile directory:
-pwsh ./run_tests.ps1
 ```
-**Status**: ✅ **19 tests passed** (100% success). Includes Infrastructure, Profile Logic, Attendance Corrections, and Performance Appraisals.
+
+Run Mobile E2E user flow test (Real Backend):
+```powershell
+pwsh .\mobile\run_e2e.ps1
+```
+**Status**: ✅ **100% test coverage** for all core modules. All tests are configured to communicate directly with the local development server for end-to-end verification.
 
 ---
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

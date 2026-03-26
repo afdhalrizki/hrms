@@ -112,9 +112,9 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
               child: CameraPreview(_cameraController!),
             )
           else
-            const Container(
+            Container(
               height: 300,
-              child: Center(child: CircularProgressIndicator()),
+              child: const Center(child: CircularProgressIndicator()),
             ),
           
           Expanded(

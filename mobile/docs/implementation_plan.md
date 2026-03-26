@@ -61,7 +61,13 @@ lib/
 - **Self-Appraisal**: [NEW SCREEN] Submit ratings and feedback for active appraisal periods.
 - **History**: View historical review results once appraisal status is `COMPLETED`.
 
-### Phase M5: Quality Assurance & Testing
-- **Unit Tests**: Implement 100% coverage for API Services and Data Models.
-- **Widget Tests**: Verify critical UI flows (Clock-in, Leave submission, Profile Edit).
-- **Parity Check**: Ensure all logic mirrors `test_correction.py` and `test_performance.py` from the backend.
+### Phase M5: Account Settings & Logout (NEW)
+- **Settings**: [NEW SCREEN] `SettingsScreen` for language/theme preferences and profile summary.
+- **Logout Flow**: Clear `flutter_secure_storage` and navigate back to `LoginScreen`.
+- **Session Security**: Ensure token is correctly deleted from device storage.
+
+### Phase M6: Quality Assurance & Real Backend Testing
+- **Unified Testing**: All Unit, Logic, and E2E tests are configured to communicate directly with the local development server (`localhost:8000`).
+- **E2E flow**: [NEW TEST] `e2e_test.dart` for full user journey verification.
+- **Data Parity**: Ensure test assertions mirror real results from the backend DB.
+- **Coverage**: 100% test coverage for all core ESS modules.

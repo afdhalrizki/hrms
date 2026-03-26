@@ -5,12 +5,15 @@ Write-Host "🚀 Starting Mobile Unit Test Suite..." -ForegroundColor Cyan
 Push-Location $PSScriptRoot
 
 $testFiles = @(
-    "test/infrastructure_test.dart",
-    "test/profile_logic_test.dart",
-    "test/correction_logic_test.dart",
-    "test/performance_logic_test.dart",
     "test/api_service_test.dart",
-    "test/models_test.dart"
+    "test/attendance_logic_test.dart",
+    "test/correction_logic_test.dart",
+    "test/leave_logic_test.dart",
+    "test/models_test.dart",
+    "test/payslip_logic_test.dart",
+    "test/performance_logic_test.dart",
+    "test/profile_logic_test.dart",
+    "test/reimbursement_logic_test.dart"
 )
 
 $failedTests = @()

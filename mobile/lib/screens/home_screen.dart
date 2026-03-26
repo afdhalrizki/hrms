@@ -10,6 +10,7 @@ import 'profile_edit_screen.dart';
 import 'profile_documents_screen.dart';
 import 'correction_request_screen.dart';
 import 'performance_dashboard_screen.dart';
+import 'settings_screen.dart';
 import '../api/api_service.dart';
 import '../api/location_service.dart';
 
@@ -452,7 +453,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildNavItem(context, Icons.home, true),
           _buildNavItem(context, Icons.calendar_today, false, target: const ScheduleScreen()),
           _buildNavItem(context, Icons.account_balance_wallet, false, target: const PayslipScreen()),
-          _buildNavItem(context, Icons.settings, false),
+          _buildNavItem(context, Icons.settings, false, target: SettingsScreen(userData: _userData!)),
         ],
       ),
     );

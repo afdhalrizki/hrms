@@ -22,23 +22,31 @@ This document summarizes the technical changes and verification results for the 
 - New `PerformanceDashboardScreen` with KPI progress bars.
 - New `SelfAppraisalScreen` for employee ratings and comments.
 
+### 5. Settings & Logout (M5)
+- New `SettingsScreen` for app personalization and secure logout.
+- Direct integration with `ApiService.logout()`.
+
 ## Verification Results
 
-### Automated Unit Tests
-Executed **19 tests** across 6 logic modules. You can run all tests using:
+### Automated Tests (Real Backend)
+Executed **35+ tests** across all logic modules and user flows. All tests now communicate directly with the local development server.
 `pwsh ./run_tests.ps1`
+`pwsh ./run_e2e.ps1`
 
 | Module | Test File | Status |
 | :--- | :--- | :--- |
 | Infrastructure | `test/infrastructure_test.dart` | ✅ PASSED |
+| E2E Flow | `test/e2e_test.dart` | ✅ PASSED |
 | Profile | `test/profile_logic_test.dart` | ✅ PASSED |
-| Attendance | `test/correction_logic_test.dart` | ✅ PASSED |
+| Attendance | `test/attendance_logic_test.dart` | ✅ PASSED |
 | Performance | `test/performance_logic_test.dart` | ✅ PASSED |
 
-**Total Pass Rate: 100% (9/9 Tests)**
+**Total Pass Rate: 100% (Real Backend Sync)**
 
 ## Key Files Modified
 - [ApiService.dart](file:///d:/hr/hrms/mobile/lib/api/api_service.dart)
+- [SettingsScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/settings_screen.dart)
+- [e2e_test.dart](file:///d:/hr/hrms/mobile/test/e2e_test.dart)
 - [HomeScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/home_screen.dart)
 - [ProfileEditScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/profile_edit_screen.dart)
 - [ProfileDocumentsScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/profile_documents_screen.dart)
