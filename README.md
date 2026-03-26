@@ -76,11 +76,12 @@ make down              # Stop containers
 
 The platform is architected for seamless transition from dev to enterprise scale:
 
-| Environment | Hosting Platform | Purpose |
-| :--- | :--- | :--- |
-| **Development** | Local Docker | Rapid prototyping & local testing. |
-| **Staging** | **IDCloudHost VPS** | UAT, QA, and early-stage production. |
-| **Production** | **Modern AWS** | High-availability, auto-scaling enterprise workloads. |
+| Environment | Hosting Platform | Domain | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Development** | Local Docker | `localhost` | Rapid prototyping & local testing. |
+| **QA** | **IDCloudHost VPS** | `harilibur.web.id` | Functional UAT and QA testing. |
+| **Staging** | **Enterprise AWS** | `harikerja.web.id` | 1M User stress test (Identical to Prod). |
+| **Production** | **Enterprise AWS** | `harikerja.com` | Official high-availability enterprise scale. |
 
 ---
 

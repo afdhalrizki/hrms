@@ -1,50 +1,34 @@
-# Detailed Implementation Plan: Backend (harikerja HRMS)
+# Ultra-Detailed Implementation Plan: Backend (Django) reference
 
-This plan expands the foundational multi-tenant architecture with the specific HR, Attendance, and Payroll features required for the SaaS platform.
+This document serves as the technical blueprint for the **harikerja HRMS** Django API backend.
 
-## 1. Multi-Tenant Architecture
-The backend uses **schema-level isolation** via `django-tenants`. Each client has a dedicated PostgreSQL schema.
-- **Service Layer**: [PayrollCalculator](file:///d:/hr/hrms/backend/payroll/services.py) for Indonesian payroll.
-- **BPJS Service**: [BPJSManager](file:///d:/hr/hrms/backend/payroll/services.py) for health and employment insurance logic.
-- **Tax Engine**: [TaxEngine](file:///d:/hr/hrms/backend/payroll/services.py) implementing TER 2024 regulations.
-- **PDF Service**: [PDFGenerator](file:///d:/hr/hrms/backend/payroll/pdf_generator.py) for ReportLab-based payslips.
+## 🏗 1. Multi-Tenant Architecture
+- **Schema Isolation**: Using `django-tenants` to provide one PostgreSQL schema per customer.
+- **Shared Schema**: Contains `public.User`, `public.Tenant`, and `public.DomainManagement`.
+- **Tenant Schema**: Contains `attendance.*`, `payroll.*`, `core.*`, and `performance.*`.
 
-## 2. Infrastructure & Scaling
-- **Redis Cache**: Used for storing domain-to-tenant mappings and session lookups.
-- **PgBouncer**: Manages connection pooling to handle heavy traffic spikes (e.g., 8:00 AM clock-ins).
-- **Asynchronous Processing**: Strategy for offloading bulk payroll and PDF generation to background workers (AWS Celery roadmap).
+## 🌐 2. Deployment Architecture (4-Tier)
 
-## 3. Security & Access Control
-- **Hybrid RBAC**: Combines fixed system roles (`is_staff`, `is_superuser`) with dynamic `AccessRole` JSON permissions.
-- **Audit System**: `AuditModelMixin` tracks every change in the master data with deep-diffing support.
-- **Ownership Filter**: Strict `get_queryset` filtering ensuring employees only see their own payslips and attendance records.
-- **ESS Profile Self-Service**: Dedicated serializer (`EmployeeProfileSerializer`) that restricts editable fields for employees, ensuring master data integrity while allowing personal info updates.
-- **Admin Safeguards**: Signals to prevent accidental deletion of critical admin users or roles.
+The backend is synchronized with the harikerja 4-tier environment hierarchy:
 
-## 4. Operational Modules
-### Attendance & Geofencing
-- **Verification**: Backend validates GPS coordinates using the Haversine formula against the branch's hard radius (100m).
-- **Biometrics**: Stores and verifies liveness metadata (blinks, head movement) from mobile devices.
+| Tier | Purpose | Domain | Hosting | Deploy Command |
+| :--- | :--- | :--- | :--- | :--- |
+| **Dev** | Prototyping | `localhost` | Docker | `make dev` |
+| **QA** | Functional UAT | `harilibur.web.id` | IDCloudHost | `make qa` |
+| **Staging** | 1M Stress Test | `harikerja.web.id` | AWS | `make staging` |
+| **Prod** | Enterprise | `harikerja.com` | AWS | `make prod` |
 
-### Workflow & Approvals
-- **State Machine**: Generic engine for multi-stage approvals.
-- **Notifications**: Automated dispatcher for system and email alerts upon status change.
+### Infrastructure Details
+- **QA**: Managed VPS via IDCloudHost using Docker Compose.
+- **Staging/Prod**: Managed Kubernetes (AWS EKS) with Amazon RDS (PostgreSQL) and ElastiCache (Redis).
 
-## 5. Deployment Framework
-- **CI/CD Logic**: Integrated unit testing suite with 155+ scenarios.
-- **Environment Management**: Centralized config in `environments/` for Local, Staging (VPS), and Production (AWS).
-- **Testing Hub**: 100% logic coverage for calculation-heavy apps (Payroll, Attendance).
+## 📊 3. Core Logic Modules
+- **Attendance**: Geofencing and AI Biometric verification.
+- **Payroll**: TER 2024 compliance and dynamic PDF generation.
+- **Performance**: KPI tracking and multi-stage appraisal lifecycles.
+- **Reimbursement**: Automated expense claims with approval workflows.
 
-## 🚀 Future Scaling Roadmap (Production Scale)
-To reliably serve **1 Million+ Users**, the following architectural shifts are planned:
-
-### 1. Database Sharding & Partitioning
-- **Sharding**: Distributing tenants across multiple physical database clusters using **Amazon RDS**.
-- **Partitioning**: Horizontal partitioning for high-volume logs (Attendance and Audit logs).
-
-### 2. Horizontal Compute Clustering
-- **Amazon EKS (Kubernetes)**: Deploying backend pods with Auto-Scaling (HPA) to handle traffic spikes.
-- **Amazon CloudFront**: Serving assets and pre-signed PDF payslips via Edge networks.
-
-### 3. Asynchronous Operations
-- **Celery + RabbitMQ**: Offloading bulk payroll generation and CSV exports to background workers to keep the main API thread responsive.
+## 🚀 4. Software Lifecycle
+- **Migrations**: `migrate_schemas --shared` followed by `--tenant`.
+- **Testing**: 100% logic coverage with `pytest`.
+- **API Docs**: Automated OpenAPI 3.0 generation (Spectacular).

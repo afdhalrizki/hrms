@@ -26,6 +26,14 @@ This document summarizes the technical changes and verification results for the 
 - New `SettingsScreen` for app personalization and secure logout.
 - Direct integration with `ApiService.logout()`.
 
+### 6. Environment Hierarchy & Multi-Cloud
+- Established a unified 4-tier environment structure:
+    - **QA**: `harilibur.web.id` on IDCloudHost (Functional Testing).
+    - **Staging**: `harikerja.web.id` on AWS (Identical to Prod for 1M user stress test).
+    - **Production**: `harikerja.com` on AWS Enterprise.
+- Updated [ApiService.dart](file:///d:/hr/hrms/mobile/lib/api/api_service.dart) to handle environment-specific domains via `--dart-define`.
+- All `mobile/` automation scripts (`run_dev.ps1`, `run_e2e.ps1`, `run_tests.ps1`) are synchronized with this hardening phase.
+
 ## Verification Results
 
 ### Automated Tests (Real Backend)

@@ -1,91 +1,34 @@
-# Staging Deployment (IDCloudHost VPS)
+# Staging Deployment (AWS - Stress Test)
 
-This guide outlines the steps to deploy the harikerja HRMS to a Virtual Private Server (VPS) via **IDCloudHost** or similar providers. This setup is perfect for staging environments, internal testing, or early-stage production workloads.
+This guide outlines the steps to deploy the harikerja HRMS to the **Staging environment** on **AWS**. This environment is identical to production to support stress testing for up to 1 million users.
 
-## Architecture Overview
-- **Server:** 1x VPS (Minimum 4 vCPU, 8GB RAM).
-- **Core OS:** Ubuntu 22.04 LTS.
-- **Routing:** Nginx as Reverse Proxy & SSL via Let's Encrypt.
-- **Stack:** Docker Compose running Backend, DB, Redis, PgBouncer, and Frontend containers.
+## Environment Details
+- **Domain:** `harikerja.web.id`
+- **Hosting:** AWS (EKS / ECS / EC2 Cluster).
+- **Purpose:** Stress testing, performance benchmarking (1M users), and final verification before production.
 
-## Step 1: Server Preparation
-1. SSH into your VPS.
-2. Install Docker and Docker Compose.
-   ```bash
-   sudo apt update
-   sudo apt install docker.io docker-compose -y
-   sudo systemctl enable --now docker
-   ```
+## Architecture Highlights
+- **Identical to Production:** Uses the same infrastructure-as-code (Terraform/CloudFormation) as the production environment.
+- **Database:** Amazon RDS (PostgreSQL) with high-availability and read-replicas.
+- **Scaling:** Auto-scaling groups enabled to handle massive traffic spikes.
+- **CDN:** CloudFront for global asset delivery.
 
-## Step 2: Clone & Configure Environments
-```bash
-git clone <repository-url> /opt/hrms
-cd /opt/hrms
-```
+## Step 1: Infrastructure Provisioning
+1. Use the provided Terraform scripts in `infrastructure/aws/` to spin up the staging cluster.
+2. Ensure the RDS instance is sized correctly for stress testing.
 
-The system uses environment-specific files located in the `environments/` directory. For staging:
-1.  Open `environments/.env.staging`.
-2.  Define the following critical variables:
-    - `TENANT_DOMAIN_SUFFIX=harikerja.web.id`
-    - `SECRET_KEY=your-secure-staging-key`
-    - `POSTGRES_PASSWORD=your-secure-db-password`
+## Step 2: Configuration
+1. Use `environments/.env.staging`.
+2. Critical Variables:
+   - `TENANT_DOMAIN_SUFFIX=harikerja.web.id`
+   - `STRESS_TEST_MODE=true`
 
-## Step 3: Frontend Build Configuration
-Ensure `environments/.env.staging` has the correct `NEXT_PUBLIC_API_URL` (usually `https://harikerja.web.id/api`).
+## Step 3: Deployment
+Deploy the Docker images to ECR and update the EKS cluster/ECS service.
 
-## Step 4: Deploy Stack
-The easiest way to deploy is using the provided tools:
-
-**Windows (PowerShell):**
-```powershell
-.\up.ps1 staging -build
-```
-
-**Linux/VPS (Make/Docker):**
 ```bash
 make staging
 ```
 
-These commands automatically pull the correct environment variables from `environments/.env.staging`.
-
-## Step 5: Configure Nginx & SSL
-Install Nginx and configure reverse proxy routing:
-```bash
-sudo apt install nginx -y
-```
-
-### Nginx Config Example
-Map subdomains correctly in Nginx to support Multi-Tenancy (Wildcard SSL is heavily recommended):
-```nginx
-server {
-    listen 80;
-    server_name harikerja.web.id *.harikerja.web.id;
-
-    location /api/ {
-        proxy_pass http://localhost:8000/api/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-Enable the site and install SSL using Certbot:
-```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d harikerja.web.id -d *.harikerja.web.id
-```
-
-## Step 6: Initial Database Setup
-Apply migrations to the production database:
-```bash
-docker-compose exec backend python manage.py migrate_schemas --shared
-```
-You are now live!
+## Step 4: SSL (AWS Certificate Manager)
+Ensure `harikerja.web.id` and `*.harikerja.web.id` are covered by ACM and attached to the Application Load Balancer (ALB).

@@ -7,11 +7,14 @@ This directory contains the necessary documentation to deploy the HRMS platform 
 1. **[Local Development](./local.md)**
    Quick start guide using `docker-compose` for rapid iteration and testing on your local machine.
 
-2. **[Staging (IDCloudHost VPS)](./staging.md)**
-   Deployment strategy for a Virtual Private Server (VPS) on IDCloudHost or similar providers, ideal for testing and early-stage deployments.
+2. **[QA (IDCloudHost VPS)](./qa.md)**
+   Deployment strategy for Quality Assurance on `harilibur.web.id`, ideal for functional testing.
 
-3. **[Modern Production (AWS)](./production.md)**
-   Scalable, high-availability architecture on AWS (EKS/RDS) designed for enterprise-grade production workloads.
+3. **[Staging (AWS - Stress Test)](./staging.md)**
+   Identical to production infrastructure on `harikerja.web.id`, designed for 1M user stress testing.
+
+4. **[Production (Enterprise AWS)](./production.md)**
+   Scalable, high-availability architecture on `harikerja.com` (EKS/RDS) for enterprise workloads.
 
 ## Deployment Tools
 

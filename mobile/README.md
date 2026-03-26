@@ -67,12 +67,19 @@ The app handles multi-tenancy by injecting custom headers into every request via
 - `X-Tenant-Domain`: Standard tenant routing.
 - `Host`: Required for `django-tenants` schema isolation in development.
 
-| Target | API URL (Local Dev) | Notes |
+| Target | API URL / Domain | Purpose |
 | :--- | :--- | :--- |
-| **Android Emulator** | `http://10.0.2.2:8000/api` | Default configuration |
-| **iOS Simulator** | `http://localhost:8000/api` | |
-| **Physical Device** | `http://<your-ip>:8000/api` | Same Wi-Fi required |
-| **Staging** | `https://harikerja.web.id/api` | Requires production build |
+| **Android Emulator** | `http://10.0.2.2:8000/api` | Local Development |
+| **QA** | `https://harilibur.web.id/api` | IDCloudHost (Functional Testing) |
+| **Staging** | `https://harikerja.web.id/api` | AWS (1M User Stress Test) |
+| **Production** | `https://harikerja.com/api` | AWS (Official Enterprise) |
+
+### Environment Switching
+The app supports environment-specific builds using `--dart-define`:
+```bash
+# Example: Build for QA
+flutter build apk --dart-define=APP_ENV=qa
+```
 
 ---
 

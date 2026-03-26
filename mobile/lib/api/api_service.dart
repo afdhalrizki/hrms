@@ -9,10 +9,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static String get baseUrl {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-      return "http://127.0.0.1:8000/api";
+    // Detect environment from build mode or custom define
+    const String env = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
+    
+    switch (env) {
+      case 'qa': return "https://harilibur.web.id/api";
+      case 'staging': return "https://harikerja.web.id/api";
+      case 'prod': return "https://harikerja.com/api";
+      default:
+        if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+          return "http://127.0.0.1:8000/api";
+        }
+        return "http://10.0.2.2:8000/api";
     }
-    return "http://10.0.2.2:8000/api";
+  }
+
+  static String get domainSuffix {
+    const String env = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
+    switch (env) {
+      case 'qa': return "harilibur.web.id";
+      case 'staging': return "harikerja.web.id";
+      case 'prod': return "harikerja.com";
+      default: return "localhost";
+    }
+  }
+
+  static String get hostSuffix {
+     const String env = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
+     if (env == 'dev') return ":8000";
+     return "";
   }
   
   final _storage = const FlutterSecureStorage();
@@ -48,11 +73,10 @@ class ApiService {
       'Accept': 'application/json',
     };
     if (tenant != null) {
-      // Use X-Tenant-Domain for backend alignment
-      headers['X-Tenant-Domain'] = "$tenant.localhost";
-      // Manually set Host header so django-tenants can identify the schema 
-      // when hitting 10.0.2.2 or a shared IP
-      headers['Host'] = "$tenant.localhost:8000";
+      // Use dynamic domain suffix based on environment
+      headers['X-Tenant-Domain'] = "$tenant.$domainSuffix";
+      // Manually set Host header so django-tenants can identify the schema
+      headers['Host'] = "$tenant.$domainSuffix$hostSuffix";
     }
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';

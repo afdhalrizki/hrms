@@ -1,90 +1,33 @@
-# Ultra-Detailed Implementation Plan: Web Frontend reference
+# Ultra-Detailed Implementation Plan: Frontend (Next.js) reference
 
-This document serves as the primary technical reference for building and maintaining the harikerja HRMS web frontend.
+This document serves as the technical blueprint for the **harikerja HRMS** Next.js dashboard.
 
-## 🏗 1. Component & Directory Architecture
-To maintain a clean separation between Admin and Employee personas while sharing core logic:
+## 🏗 1. Architecture Patterns
+- **Framework**: Next.js 14 (App Router).
+- **State Management**: React Context for Auth and Tenant synchronization.
+- **Styling**: Tailwind CSS with a custom glassmorphism design system.
+- **Module Gating**: `FeatureGuard` component to mask features based on tenant tier.
 
-```bash
-src/
-├── app/                  # Next.js App Router (Routing & Layouts)
-│   ├── (admin)/         # Admin-only route group
-│   ├── (ess)/           # Employee-only route group
-│   └── auth/            # Shared auth pages (login/signup)
-├── components/          # Reusable UI components
-│   ├── ui/              # Atom components (Buttons, Inputs, Modals)
-│   ├── admin/           # Admin-specific molecule components
-│   ├── ess/             # Employee-specific molecule components
-│   └── shared/          # Multi-persona components (Sidebar, Topbar)
-├── context/             # Global State (AuthContext, TenantContext)
-├── hooks/               # Custom React hooks (usePermissions, useTenant)
-├── services/            # API Service Layer (Axios/Fetch instances)
-└── utils/               # Formatting, Validation, and Helper functions
-```
+## 🌐 2. Deployment Architecture (4-Tier)
 
-## 🚀 2. Phased Roadmap: Full Backend Parity
+The frontend is synchronized with the harikerja 4-tier environment hierarchy:
 
-### Phase 63: ESS Expansion (Leaves & Reimbursements) [COMPLETE]
-- **Leaves**: Request form + Balance tracker (`/api/attendance/leave-requests/`).
-- **Reimbursements**: Receipt upload + Status tracking (`/api/reimbursement/reimbursements/`).
+| Tier | Purpose | Domain | Hosting | Deploy Command |
+| :--- | :--- | :--- | :--- | :--- |
+| **Dev** | Prototyping | `localhost` | Docker | `npm run dev` |
+| **QA** | Functional UAT | `harilibur.web.id` | IDCloudHost | `make qa` |
+| **Staging** | 1M Stress Test | `harikerja.web.id` | AWS | `make staging` |
+| **Prod** | Enterprise | `harikerja.com` | AWS | `make prod` |
 
-### Phase 64: Financial Command Center (Real-time Payroll) [COMPLETE]
-- **Live Sync**: Connecting `PayrollPage` to `/api/payroll/payslips/`.
-- **BPJS/Tax Insight**: Interactive breakdown of PPh 21 (TER 2024) and BPJS Kesehatan/Ketenagakerjaan.
+### Environment Isolation
+The frontend uses `environments/.env.*` to determine the `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_DOMAIN_SUFFIX`.
 
-### Phase 65: Operational Audit Hub (Admin Transparency)
-- **Audit Logs**: Visual "Deep-diff" activity feed from `/api/core/audit/`.
-- **API Keys**: UI for managing third-party integration keys.
+## 🧩 3. Core ESS Features
+- **Attendance**: Real-time clock-in visualization and correction request workflows.
+- **Payroll**: TER 2024 compliant payslip viewing and salary history.
+- **Performance**: KPI dashboards and interactive self-appraisal forms.
+- **SaaS Branding**: Dynamic logo and theme extraction from tenant settings.
 
-### Phase 66: Performance Appraisal Lifecycle [COMPLETE]
-- **Appraisal Workflow**: Dynamic submission modal for managers and employees to score KPIs and finalize reviews.
-- **Ratings Engine**: Standardized 1-5 scoring system stored as JSON in `AppraisalReview`.
-- **KPI Monitoring**: Real-time visualization of `KPITarget` attainment during the review process.
-
-### Phase 67: SaaS Profile & Branding
-- **Branding**: Tenant settings for company logo, colors, and subscription limits.
-
-### Phase 68: E2E Hardening (Playwright)
-- **Coverage Expansion**: Implementation of full-flow testing for Admin (Provisioning, Approvals) and Employee (ESS, Payslip download).
-- **Automation**: Integration of Playwright into the CI/CD pipeline.
-
-- [x] **Phase 69: Modular Tiering (Plan-Based Gating)**: Implement `FeatureGuard` and tenant-level module synchronization.
-- [x] **Phase 70: ESS Profile Management**: Enhanced self-service UI for personal info, document uploads (KTP, NPWP), and avatar management.
-- [x] **Phase 71: ESS Hardening & UX Optimization**: 100% unit test success, interactive charts, and zero-CLS skeletons.
-
-## 🎨 3. Design System: Glassmorphism Hub
-We use a unified design language to ensure a "Premium SaaS" feel.
-
-- **Background**: `bg-slate-950` with a subtle radial gradient.
-- **Glass Effect**: `bg-white/5 backdrop-blur-xl border border-white/10`.
-- **Primary Accent**: `bg-indigo-500` for buttons and active states.
-- **Typography**: `Inter` (Inter-var) for maximum readability.
-- **Animations**: `framer-motion` for page transitions and modal entries.
-
-## 🔄 4. State Management & Data Fetching
-- **Client State**: `React.useContext` for small, global data (User, Tenant).
-- **Server State**: `TanStack Query` (React Query) for caching, optimistic updates, and automatic re-fetching of attendance/payroll data.
-- **Form Management**: `react-hook-form` + `zod` for robust schema-based validation.
-
-## 🚪 5. Security & Access Control
-- **CSRF Protection**: Native Next.js CSRF guards + backend cookie validation.
-- **Multi-Tenant Header**: Every outgoing request must include `X-Tenant-Domain` via the `api.ts` interceptor.
-- **Role-Based Gating**:
-    - Use `<RoleGuard roles={['HR', 'Admin']}>` for UI elements.
-    - Use `middleware.ts` for route-level protection.
-
-## 📊 6. Advanced Feature: Reporting Engine
-- **Implementation**: The reporting dashboard uses `recharts` for visualization.
-- **CSV Downloads**: Use a custom `useReport` hook that handles the `Blob` response from the backend and triggers a local file download.
-
-## ✅ 7. Testing Philosophy
-- **Unit Tests**: Focus on logic in `hooks/` and `utils/`.
-- **Integration Tests**: Focus on critical flows like `Login`, `Signup`, and `Attendance Correction`.
-
-## 🎭 8. E2E Testing Strategy: Playwright
-We use Playwright for cross-browser validation of the most critical business flows.
-
-- **Storage State**: Use a shared `auth.setup.ts` to reuse login sessions and speed up tests.
-- **Geofencing Simulation**: Mocking browser geolocation API to test attendance validation.
-- **Visual Regression**: Baseline screenshots for the premium Glassmorphism UI components.
-- **Mocks**: Standardize API mocks using `msw` (Mock Service Worker) for consistent testing environment.
+## 🚀 4. Lifecycle & Delivery
+- **Testing**: Vitest for units, Playwright for E2E user journeys.
+- **Vercel/AWS**: Automated CD pipelines via GitHub Actions.

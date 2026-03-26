@@ -101,12 +101,24 @@ python manage.py runserver
 
 ---
 
-## 4. Developing & Testing
+## 🌐 5. Deployment Hierarchy & Infrastructure
 
-### API Documentation
-The system automatically generates OpenAPI 3.0 schemas.
-- **Swagger UI**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
-- **Redoc**: [http://localhost:8000/api/schema/redoc/](http://localhost:8000/api/schema/redoc/)
+The harikerja platform follows a strict 4-tier promotion path:
+
+| Tier | Domain | Hosting Provider | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
+| **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test (Identical to Production). |
+| **Production** | `harikerja.com` | **AWS Enterprise** | Official high-availability enterprise workloads. |
+
+### Environment Configuration
+The backend uses environment-specific files in the `environments/` directory:
+- `.env.qa`: Targets `harilibur.web.id`.
+- `.env.staging`: Targets `harikerja.web.id` (Stress Test Mode).
+- `.env.production`: Targets `harikerja.com`.
+
+Update your `TENANT_DOMAIN_SUFFIX` accordingly in your deployment CI/CD.
 
 ### Running Tests
 The backend uses `pytest` and `manage.py test` with **100% pass rate** across 155+ mission-critical scenarios.

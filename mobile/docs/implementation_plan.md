@@ -40,6 +40,20 @@ lib/
 - **Icons**: `Lucide` or `Cupertino` for a modern, clean interface.
 - **Feedback**: Vibrate and Haptic feedback for successful clock-ins.
 
+## 🌐 5. Deployment Architecture (4-Tier)
+
+The mobile application is synchronized with the harikerja 4-tier environment hierarchy:
+
+| Tier | Purpose | Domain | Hosting | Build Command |
+| :--- | :--- | :--- | :--- | :--- |
+| **Dev** | Prototyping | `localhost` | Docker | `flutter run` |
+| **QA** | Functional UAT | `harilibur.web.id` | IDCloudHost | `... --dart-define=APP_ENV=qa` |
+| **Staging** | 1M Stress Test | `harikerja.web.id` | AWS | `... --dart-define=APP_ENV=staging` |
+| **Prod** | Enterprise | `harikerja.com` | AWS | `... --dart-define=APP_ENV=prod` |
+
+### Environment Isolation
+The `ApiService` uses compile-time variables via `--dart-define=APP_ENV=...` to switch between backend domains and automatically inject correct `Host` and `X-Tenant-Domain` headers.
+
 ## 🚀 6. Phased Roadmap: Full Backend Parity
 ### Phase M1: Infrastructure Alignment & Real-GPS
 - **API URL Correction**: Ensure `ApiService` correctly handles dynamic tenant subdomains and `/api/` prefixes.

@@ -68,13 +68,23 @@ npm run dev
 
 ---
 
-## 2. Multi-Tenant Development
+## 🌐 5. Deployment Hierarchy & Infrastructure
 
-To test tenant-specific dashboards (e.g., `company1`), update your local `hosts` file:
+The harikerja platform follows a strict 4-tier promotion path:
+
+| Tier | Domain | Hosting Provider | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
+| **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test (Identical to Production). |
+| **Production** | `harikerja.com` | **AWS Enterprise** | Official high-availability enterprise workloads. |
+
+### Local Multi-Tenancy Setup
+To test tenant-specific dashboards locally (e.g., `company1`), update your OS `hosts` file:
 ```text
-127.0.0.1 company1.harikerja.com
+127.0.0.1 company1.localhost
 ```
-Then access [http://company1.harikerja.com:3000](http://company1.harikerja.com:3000).
+Then access [http://company1.localhost:3000](http://company1.localhost:3000).
 
 ---
 

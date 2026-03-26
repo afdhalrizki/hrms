@@ -1,4 +1,4 @@
-# Mobile Development Roadmap (Phases M1-M5)
+# Mobile Development Roadmap (Phases M1-M6)
 
 - [x] **M1: Infrastructure Alignment**
     - [x] Optimized headers for `django-tenants`.
@@ -16,3 +16,7 @@
 - [x] **M5: Quality Assurance**
     - [x] 100% Unit Test Pass Rate. 
     - [x] Comprehensive technical walkthroughs.
+- [x] **M6: Deployment & Environment Sync**
+    - [x] 4-Tier Environment Hierarchy (Dev, QA, Staging, Production).
+    - [x] Multi-Cloud documentation (IDCloudHost, AWS).
+    - [x] Dynamic domain switching via compile-time defines.
