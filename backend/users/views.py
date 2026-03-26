@@ -51,9 +51,13 @@ class LoginAPIView(viewsets.GenericViewSet):
         from rest_framework_simplejwt.tokens import RefreshToken
         email = request.data.get('email')
         password = request.data.get('password')
+        print(f"DEBUG: Login attempt for {email} on tenant {getattr(request, 'tenant', 'unknown')}")
         
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(request, username=email, password=password)
+        print(f"DEBUG: Authenticate result: {user}")
         if user:
+            login(request, user)  # Set session cookie for web clients using top-level import
+            
             refresh = RefreshToken.for_user(user)
             data = UserSerializer(user).data
             data['access'] = str(refresh.access_token)

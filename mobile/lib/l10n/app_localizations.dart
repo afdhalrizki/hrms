@@ -163,6 +163,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'History'**
   String get history;
+
+  /// No description provided for @appTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'HRMS Mobile'**
+  String get appTitle;
+
+  /// No description provided for @appSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Employee Portal'**
+  String get appSubtitle;
+
+  /// No description provided for @companySubdomain.
+  ///
+  /// In en, this message translates to:
+  /// **'Company Subdomain'**
+  String get companySubdomain;
+
+  /// No description provided for @subdomainHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. company1'**
+  String get subdomainHint;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'name@company.com'**
+  String get emailHint;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get passwordHint;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @quickAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Access'**
+  String get quickAccess;
+
+  /// No description provided for @recentActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Activities'**
+  String get recentActivities;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get loading;
+
+  /// No description provided for @onTime.
+  ///
+  /// In en, this message translates to:
+  /// **'ON TIME'**
+  String get onTime;
+
+  /// No description provided for @late.
+  ///
+  /// In en, this message translates to:
+  /// **'LATE'**
+  String get late;
+
+  /// No description provided for @headOffice.
+  ///
+  /// In en, this message translates to:
+  /// **'Head Office, Jakarta Selatan'**
+  String get headOffice;
+
+  /// No description provided for @clockInTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock In Time'**
+  String get clockInTime;
+
+  /// No description provided for @clockOutTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock Out Time'**
+  String get clockOutTime;
+
+  /// No description provided for @leaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves'**
+  String get leaves;
+
+  /// No description provided for @payslip.
+  ///
+  /// In en, this message translates to:
+  /// **'Payslip'**
+  String get payslip;
+
+  /// No description provided for @myProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get myProfile;
+
+  /// No description provided for @documents.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get documents;
+
+  /// No description provided for @correction.
+  ///
+  /// In en, this message translates to:
+  /// **'Correction'**
+  String get correction;
+
+  /// No description provided for @performance.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance'**
+  String get performance;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
 }
 
 class _AppLocalizationsDelegate

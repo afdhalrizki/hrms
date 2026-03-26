@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'payslip_screen.dart';
 import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
@@ -13,6 +14,7 @@ import 'performance_dashboard_screen.dart';
 import 'settings_screen.dart';
 import '../api/api_service.dart';
 import '../api/location_service.dart';
+import '../models/activity_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +25,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _userData;
+  List<Activity> _activities = [];
+  Map<String, dynamic>? _latestAttendance;
   bool _isLoading = true;
 
   @override
@@ -34,16 +38,74 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadProfile() async {
     try {
       final api = ApiService();
-      final data = await api.getUserProfile();
+      final user = await api.getUserProfile();
+      
+      // Fetch concurrent data
+      final results = await Future.wait([
+        api.getAttendanceRecords(),
+        api.getLeaveRequests(),
+        api.getPayslips(),
+      ]);
+
+      final List<dynamic> attendance = results[0];
+      final List<dynamic> leaves = results[1];
+      final List<dynamic> payslips = results[2];
+
+      List<Activity> activities = [];
+
+      // Process Attendance
+      for (var record in attendance) {
+        activities.add(Activity(
+          title: "Clocked ${record['check_out'] != null ? 'Out' : 'In'}",
+          subtitle: "${record['check_in']} • ${record['latitude_in']}, ${record['longitude_in']}",
+          time: record['date'] ?? "Today",
+          icon: Icons.check_circle,
+          color: const Color(0xFF10B981),
+          timestamp: DateTime.tryParse(record['date'] ?? "") ?? DateTime.now(),
+          type: ActivityType.attendance,
+        ));
+      }
+
+      // Process Leaves
+      for (var leave in leaves) {
+        activities.add(Activity(
+          title: "Leave Request ${leave['status']}",
+          subtitle: "${leave['leave_type_name']} • ${leave['start_date']}",
+          time: leave['created_at'] != null ? DateFormat('d MMM').format(DateTime.parse(leave['created_at'])) : "Recent",
+          icon: Icons.access_time,
+          color: const Color(0xFF6366F1),
+          timestamp: DateTime.tryParse(leave['created_at'] ?? "") ?? DateTime.now(),
+          type: ActivityType.leave,
+        ));
+      }
+
+      // Process Payslips
+      for (var payslip in payslips) {
+        activities.add(Activity(
+          title: "Payslip ${payslip['period_name']}",
+          subtitle: "Rp ${NumberFormat('#,###').format(double.tryParse(payslip['net_salary']?.toString() ?? '0'))}",
+          time: payslip['paid_at'] != null ? DateFormat('d MMM').format(DateTime.parse(payslip['paid_at'])) : "Recent",
+          icon: Icons.receipt,
+          color: const Color(0xFFF59E0B),
+          timestamp: DateTime.tryParse(payslip['paid_at'] ?? "") ?? DateTime.now(),
+          type: ActivityType.payslip,
+        ));
+      }
+
+      // Sort by timestamp desc
+      activities.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
       setState(() {
-        _userData = data;
+        _userData = user;
+        _activities = activities.take(5).toList();
+        _latestAttendance = attendance.isNotEmpty ? attendance.first : null;
         _isLoading = false;
       });
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading profile: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.error}: $e')),
         );
       }
     }
@@ -79,11 +141,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 32),
                   _buildAttendanceCard(context, _userData?['employee_id']),
                   const SizedBox(height: 32),
-                  _buildSectionHeader("Quick Access"),
+                  _buildSectionHeader(AppLocalizations.of(context)!.quickAccess),
                   const SizedBox(height: 16),
                   _buildQuickAccessGrid(context),
                   const SizedBox(height: 32),
-                  _buildSectionHeader("Recent Activities"),
+                  _buildSectionHeader(AppLocalizations.of(context)!.recentActivities),
                   const SizedBox(height: 16),
                   _buildRecentActivity(),
                 ]),
@@ -111,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back,',
+                    AppLocalizations.of(context)!.welcome + ",",
                     style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 14),
                   ),
                   Text(
@@ -176,20 +238,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '08:32 AM',
+                    _latestAttendance?['check_in'] ?? '--:--',
                     style: GoogleFonts.plusJakartaSans(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text(
-                    'Clock In Time',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  Text(
+                    AppLocalizations.of(context)!.clockInTime,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
-              const Icon(Icons.radio_button_checked, color: Colors.white, size: 32),
+              Icon(
+                _latestAttendance != null ? Icons.radio_button_checked : Icons.radio_button_off,
+                color: Colors.white,
+                size: 32,
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -199,9 +265,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 4),
               const Expanded(
                 child: Text(
-                  'Head Office, Jakarta Selatan',
+                  AppLocalizations.of(context)!.headOffice,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
               Container(
@@ -210,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text('ON TIME', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.onTime, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -261,7 +327,12 @@ class _HomeScreenState extends State<HomeScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 0,
             ),
-            child: const Text('Clock Out', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(
+              _latestAttendance != null && _latestAttendance!['check_out'] == null 
+                ? AppLocalizations.of(context)!.clockOut
+                : AppLocalizations.of(context)!.clockIn,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -281,13 +352,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildQuickAccessGrid(BuildContext context) {
     final items = [
-      {'icon': Icons.calendar_today, 'label': 'Leaves', 'color': const Color(0xFFEF4444)},
-      {'icon': Icons.receipt, 'label': 'Payslip', 'color': const Color(0xFF10B981)},
-      {'icon': Icons.payments, 'label': 'Reimbursements', 'color': const Color(0xFFF59E0B)},
-      {'icon': Icons.person, 'label': 'My Profile', 'color': const Color(0xFF6366F1)},
-      {'icon': Icons.badge, 'label': 'Documents', 'color': const Color(0xFF8B5CF6)},
-      {'icon': Icons.edit_calendar, 'label': 'Correction', 'color': const Color(0xFFF43F5E)},
-      {'icon': Icons.trending_up, 'label': 'Performance', 'color': const Color(0xFF10B981)},
+      {'icon': Icons.calendar_today, 'label': AppLocalizations.of(context)!.leaves, 'color': const Color(0xFFEF4444)},
+      {'icon': Icons.receipt, 'label': AppLocalizations.of(context)!.payslip, 'color': const Color(0xFF10B981)},
+      {'icon': Icons.payments, 'label': AppLocalizations.of(context)!.reimbursement, 'color': const Color(0xFFF59E0B)},
+      {'icon': Icons.person, 'label': AppLocalizations.of(context)!.myProfile, 'color': const Color(0xFF6366F1)},
+      {'icon': Icons.badge, 'label': AppLocalizations.of(context)!.documents, 'color': const Color(0xFF8B5CF6)},
+      {'icon': Icons.edit_calendar, 'label': AppLocalizations.of(context)!.correction, 'color': const Color(0xFFF43F5E)},
+      {'icon': Icons.trending_up, 'label': AppLocalizations.of(context)!.performance, 'color': const Color(0xFF10B981)},
     ];
 
     return GridView.builder(
@@ -304,22 +375,22 @@ class _HomeScreenState extends State<HomeScreen> {
         final item = items[index];
         return InkWell(
           onTap: () {
-            if (item['label'] == 'Leaves') {
+            if (item['label'] == AppLocalizations.of(context)!.leaves) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const LeaveListScreen()));
-            } else if (item['label'] == 'Payslip') {
+            } else if (item['label'] == AppLocalizations.of(context)!.payslip) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const PayslipScreen()));
-            } else if (item['label'] == 'Reimbursements') {
+            } else if (item['label'] == AppLocalizations.of(context)!.reimbursement) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const ReimbursementListScreen()));
-            } else if (item['label'] == 'My Profile') {
+            } else if (item['label'] == AppLocalizations.of(context)!.myProfile) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen(userData: _userData!)))
                 .then((_) => _loadProfile());
-            } else if (item['label'] == 'Documents') {
+            } else if (item['label'] == AppLocalizations.of(context)!.documents) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileDocumentsScreen(userData: _userData!)))
                 .then((_) => _loadProfile());
-            } else if (item['label'] == 'Correction') {
+            } else if (item['label'] == AppLocalizations.of(context)!.correction) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => CorrectionRequestScreen(userData: _userData!)))
                 .then((_) => _loadProfile());
-            } else if (item['label'] == 'Performance') {
+            } else if (item['label'] == AppLocalizations.of(context)!.performance) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => PerformanceDashboardScreen(userData: _userData!)))
                 .then((_) => _loadProfile());
             }
@@ -363,37 +434,29 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Recent Activity',
+              AppLocalizations.of(context)!.recentActivities,
               style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text('View All', style: TextStyle(color: Colors.blueAccent)),
+              child: Text(AppLocalizations.of(context)!.viewAll, style: const TextStyle(color: Colors.blueAccent)),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        _buildActivityItem(
-          icon: Icons.check_circle,
-          title: 'Clocked In',
-          subtitle: '08:45 AM • Office HQ',
-          time: 'Today',
-          color: const Color(0xFF10B981),
-        ),
-        _buildActivityItem(
-          icon: Icons.access_time,
-          title: 'Leave Request Approved',
-          subtitle: 'Annual Leave • 24-25 Feb 2026',
-          time: 'Yesterday',
-          color: const Color(0xFF6366F1),
-        ),
-        _buildActivityItem(
-          icon: Icons.receipt,
-          title: 'Jan 2026 Payslip Available',
-          subtitle: 'Rp 8.500.000',
-          time: '25 Jan',
-          color: const Color(0xFFF59E0B),
-        ),
+        if (_activities.isEmpty)
+           const Center(child: Padding(
+             padding: EdgeInsets.symmetric(vertical: 24),
+             child: Text("No recent activities", style: TextStyle(color: Colors.white38)),
+           ))
+        else
+          ..._activities.map((activity) => _buildActivityItem(
+            icon: activity.icon,
+            title: activity.title,
+            subtitle: activity.subtitle,
+            time: activity.time,
+            color: activity.color,
+          )),
       ],
     );
   }

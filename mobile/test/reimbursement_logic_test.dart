@@ -5,8 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 
 void main() {
-  HttpOverrides.global = MyHttpOverrides();
-  TestWidgetsFlutterBinding.ensureInitialized();
+  initRealBackendTest();
   late ApiService apiService;
 
   setUpAll(() {

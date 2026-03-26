@@ -67,9 +67,22 @@ else {
     Write-Host "[2/3] Skipping Seed..." -ForegroundColor Gray
 }
 
-# 3. Execution
-Write-Host "[3/3] Launching Playwright Tests..." -ForegroundColor Cyan
-# grep-invert to skip heavy diagnostic tests if needed, workers=1 for stability
+# 3. Port Cleanup (Ensure 3000 is available for Playwright)
+Write-Host "[3/4] Ensuring port 3000 is available..." -ForegroundColor Yellow
+$Port3000Line = netstat -ano | findstr :3000 | select-string "LISTENING" | Select-Object -First 1
+if ($Port3000Line) {
+    $PidMatch = [regex]::Match($Port3000Line.ToString(), "\d+$")
+    if ($PidMatch.Success) {
+        $ActivePid = $PidMatch.Value
+        Write-Host "Found process $ActivePid on port 3000. Cleaning up..." -ForegroundColor Gray
+        Stop-Process -Id $ActivePid -Force -ErrorAction SilentlyContinue
+    }
+}
+
+# 4. Execution
+Write-Host "[4/4] Launching Playwright Tests..." -ForegroundColor Cyan
+$env:PORT = "3000"
+# workers=1 for stability, grep-invert to skip heavy diagnostic tests
 npx playwright test --grep-invert "diagnostic|Instrumentation" --workers=1
 
 $ExitCode = $LASTEXITCODE

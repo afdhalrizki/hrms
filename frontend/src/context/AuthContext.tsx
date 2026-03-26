@@ -57,6 +57,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
+      if (data.access) {
+        localStorage.setItem('access_token', data.access);
+        if (data.refresh) {
+          localStorage.setItem('refresh_token', data.refresh);
+        }
+      }
       setUser(data);
     } catch (err: any) {
       setError(err.message || 'Login failed');
@@ -71,7 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchProfile]);
 
   const logout = () => {
-    // In a real app, clear tokens, cookies, etc.
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     setUser(null);
     window.location.href = '/login';
   };

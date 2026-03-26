@@ -11,6 +11,11 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
+void initRealBackendTest() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
+}
+
 final Map<String, String> mockSecureStorage = {};
 
 void setupSecureStorageMock() {

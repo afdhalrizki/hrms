@@ -6,8 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 
 void main() {
-  HttpOverrides.global = MyHttpOverrides();
-  TestWidgetsFlutterBinding.ensureInitialized();
+  initRealBackendTest();
 
   setUpAll(() {
     setupSecureStorageMock();
@@ -31,9 +30,9 @@ void main() {
     test('login sends real request and saves token', () async {
       final result = await apiService.login('admin@company1.com', 'password123', 'company1');
 
-      expect(result['token'], isNotNull);
+      expect(result['access'], isNotNull);
       final savedToken = await apiService.getToken();
-      expect(savedToken, result['token']);
+      expect(savedToken, result['access']);
       
       final savedTenant = await apiService.getTenant();
       expect(savedTenant, 'company1');
@@ -84,5 +83,4 @@ void main() {
       expect(list, isA<List>());
     });
   });
-}
 }

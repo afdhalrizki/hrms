@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'file_service.dart';
 import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../models/schedule_model.dart';
@@ -85,9 +86,13 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> login(String email, String password, String tenant) async {
+    print('DEBUG MOBILE: Login to ${baseUrl}/auth/login/ with tenant $tenant');
+    final headers = _headers(tenant);
+    print('DEBUG MOBILE: Headers: $headers');
+    
     final response = await _client.post(
-      Uri.parse("$baseUrl/auth/login/"), // Corrected from /users/login/ to /auth/login/
-      headers: _headers(tenant),
+      Uri.parse("$baseUrl/auth/login/"), 
+      headers: headers,
       body: jsonEncode({
         'email': email,
         'password': password,
@@ -96,12 +101,40 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      await _storage.write(key: 'jwt_token', value: data['token']);
+      // Backend returns 'access' and 'refresh' keys now
+      await _storage.write(key: 'jwt_token', value: data['access'] ?? data['token']);
+      if (data['refresh'] != null) {
+        await _storage.write(key: 'refresh_token', value: data['refresh']);
+      }
       await setTenant(tenant);
       return data;
     } else {
       throw Exception('Failed to login: ${response.body}');
     }
+  }
+
+  Future<bool> refreshToken() async {
+    final tenant = await getTenant();
+    final refreshToken = await _storage.read(key: 'refresh_token');
+    
+    if (refreshToken == null) return false;
+
+    try {
+      final response = await _client.post(
+        Uri.parse("$baseUrl/auth/token/refresh/"),
+        headers: _headers(tenant),
+        body: jsonEncode({'refresh': refreshToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _storage.write(key: 'jwt_token', value: data['access']);
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Token refresh error: $e');
+    }
+    return false;
   }
 
   Future<String?> getToken() async {
@@ -133,14 +166,31 @@ class ApiService {
     }
   }
 
+  Future<http.Response> _authenticatedRequest(
+    Future<http.Response> Function(String? token) requestBuilder,
+  ) async {
+    final tenant = await getTenant();
+    var token = await getToken();
+    
+    var response = await requestBuilder(token);
+    
+    if (response.statusCode == 401) {
+      final success = await refreshToken();
+      if (success) {
+        token = await getToken();
+        response = await requestBuilder(token);
+      }
+    }
+    
+    return response;
+  }
+
   Future<Map<String, dynamic>> getUserProfile() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/users/me/"),
       headers: _headers(tenant, token),
-    );
+    ));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -157,8 +207,6 @@ class ApiService {
     bool isClockIn = true,
   }) async {
     final tenant = await getTenant();
-    final token = await getToken();
-    
     final payload = {
       'employee': employeeId,
       'latitude_in': latitude,
@@ -166,11 +214,11 @@ class ApiService {
       'check_in': checkInTime,
     };
 
-    final response = await _client.post(
+    final response = await _authenticatedRequest((token) => _client.post(
       Uri.parse("$baseUrl/attendance/"),
       headers: _headers(tenant, token),
       body: jsonEncode(payload),
-    );
+    ));
 
     if (response.statusCode == 201) {
       return jsonDecode(response.body);
@@ -181,12 +229,10 @@ class ApiService {
 
   Future<List<Schedule>> getMySchedules() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/attendance/schedule/my-schedule/"),
       headers: _headers(tenant, token),
-    );
+    ));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -199,33 +245,30 @@ class ApiService {
   // Phase 2: Leave Management
   Future<List<dynamic>> getLeaveRequests() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/leave-requests/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch leave requests');
   }
 
   Future<void> applyLeave(Map<String, dynamic> data) async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.post(
+    final response = await _authenticatedRequest((token) => _client.post(
       Uri.parse("$baseUrl/leave-requests/"),
       headers: _headers(tenant, token),
       body: jsonEncode(data),
-    );
+    ));
     if (response.statusCode != 201) throw Exception('Failed to apply leave: ${response.body}');
   }
 
   Future<List<dynamic>> getLeaveBalances() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/leave-balances/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch leave balance');
   }
@@ -233,47 +276,42 @@ class ApiService {
   // Phase 2: Reimbursements
   Future<List<dynamic>> getReimbursements() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/reimbursements/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch reimbursements');
   }
 
   Future<List<dynamic>> getReimbursementCategories() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/reimbursement-categories/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch reimbursement categories');
   }
 
   Future<void> applyReimbursement(Map<String, dynamic> data) async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.post(
+    final response = await _authenticatedRequest((token) => _client.post(
       Uri.parse("$baseUrl/reimbursements/"),
       headers: _headers(tenant, token),
       body: jsonEncode(data),
-    );
+    ));
     if (response.statusCode != 201) throw Exception('Failed to submit reimbursement: ${response.body}');
   }
 
   // Phase M2: Profile & Documents
   Future<Map<String, dynamic>> updateProfile(int employeeId, Map<String, dynamic> data) async {
     final tenant = await getTenant();
-    final token = await getToken();
-    
-    final response = await _client.patch(
+    final response = await _authenticatedRequest((token) => _client.patch(
       Uri.parse("$baseUrl/employees/$employeeId/"),
       headers: _headers(tenant, token),
       body: jsonEncode(data),
-    );
+    ));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -310,34 +348,31 @@ class ApiService {
   // Phase M3: Attendance Corrections
   Future<List<dynamic>> getAttendanceRecords() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/attendance/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch attendance history');
   }
 
   Future<List<dynamic>> getCorrectionRequests() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/attendance-correction-requests/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch correction requests');
   }
 
   Future<void> submitCorrectionRequest(Map<String, dynamic> data) async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.post(
+    final response = await _authenticatedRequest((token) => _client.post(
       Uri.parse("$baseUrl/attendance-correction-requests/"),
       headers: _headers(tenant, token),
       body: jsonEncode(data),
-    );
+    ));
     if (response.statusCode != 201) {
        throw Exception('Failed to submit correction: ${response.body}');
     }
@@ -346,34 +381,42 @@ class ApiService {
   // Phase M4: Strategic Performance
   Future<List<dynamic>> getKPITargets() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/kpi-targets/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch KPI targets');
   }
 
   Future<List<dynamic>> getAppraisals() async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/appraisals/"),
       headers: _headers(tenant, token),
-    );
+    ));
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Failed to fetch appraisals');
   }
 
+  // Phase M7: Payslips & Hardening
+  Future<List<dynamic>> getPayslips() async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.get(
+      Uri.parse("$baseUrl/payslips/"),
+      headers: _headers(tenant, token),
+    ));
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch payslips');
+  }
+
   Future<void> submitAppraisalReview(Map<String, dynamic> data) async {
     final tenant = await getTenant();
-    final token = await getToken();
-    final response = await _client.post(
+    final response = await _authenticatedRequest((token) => _client.post(
       Uri.parse("$baseUrl/appraisal-reviews/"),
       headers: _headers(tenant, token),
       body: jsonEncode(data),
-    );
+    ));
     if (response.statusCode != 201) {
        throw Exception('Failed to submit review: ${response.body}');
     }

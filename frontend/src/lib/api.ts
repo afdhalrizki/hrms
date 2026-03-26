@@ -50,17 +50,59 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     ...options.headers as Record<string, string>,
   };
 
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
   const csrfToken = getCookie('csrftoken');
   if (csrfToken && typeof window !== 'undefined') {
     headers['X-CSRFToken'] = csrfToken;
   }
 
   try {
-    const response = await fetch(url, { 
+    let response = await fetch(url, { 
       ...options, 
       headers,
       credentials: options.credentials || 'include'
     });
+
+    // Handle Token Refresh (401 Unauthorized)
+    if (response.status === 401 && typeof window !== 'undefined') {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (refreshToken && !url.includes('/auth/token/refresh')) {
+        try {
+          const refreshUrl = `${baseUrl}/auth/token/refresh/`;
+          const refreshResponse = await fetch(refreshUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken }),
+          });
+
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            localStorage.setItem('access_token', refreshData.access);
+            
+            // Retry original request with new token
+            headers['Authorization'] = `Bearer ${refreshData.access}`;
+            response = await fetch(url, { 
+              ...options, 
+              headers,
+              credentials: options.credentials || 'include'
+            });
+          } else {
+            // Refresh failed, clear tokens
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+          }
+        } catch (refreshError) {
+          console.error('Token Refresh Failed:', refreshError);
+        }
+      }
+    }
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.detail || `API Error: ${response.statusText}`);

@@ -237,7 +237,7 @@ class UserAuthenticationTestCase(TenantTestCase):
         self.domain = self.tenant.domains.first().domain
 
     def test_login_success(self):
-        """Verify authenticating via /api/users/login/."""
+        """Verify authenticating via /api/auth/login/."""
         url = reverse('auth-login')
         payload = {'email': self.user.email, 'password': self.user_password}
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
@@ -250,6 +250,23 @@ class UserAuthenticationTestCase(TenantTestCase):
         payload = {'email': self.user.email, 'password': 'wrong_password'}
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_token_refresh(self):
+        """Verify token refresh via /api/auth/token/refresh/."""
+        # 1. Get initial tokens
+        login_url = reverse('auth-login')
+        login_payload = {'email': self.user.email, 'password': self.user_password}
+        login_response = self.client.post(login_url, login_payload, format='json', SERVER_NAME=self.domain)
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        refresh_token = login_response.data['refresh']
+        
+        # 2. Refresh
+        refresh_url = reverse('token_refresh')
+        refresh_payload = {'refresh': refresh_token}
+        refresh_response = self.client.post(refresh_url, refresh_payload, format='json', SERVER_NAME=self.domain)
+        
+        self.assertEqual(refresh_response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', refresh_response.data)
 
 class UserManagementTestCase(TenantTestCase):
     def test_email_normalization(self):
