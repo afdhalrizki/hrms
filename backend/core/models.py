@@ -242,7 +242,7 @@ class WorkflowAction(AuditModel):
     target_id = models.PositiveIntegerField()
     
     stage = models.ForeignKey(WorkflowStage, on_delete=models.CASCADE, verbose_name=_("stage"))
-    actor = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_("actor"))
+    actor = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("actor"))
     action = models.CharField(max_length=20, choices=ACTION_CHOICES)
     comment = models.TextField(blank=True, null=True)
 

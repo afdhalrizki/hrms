@@ -61,3 +61,14 @@ Executed **35+ tests** across all logic modules and user flows. All tests now co
 - [CorrectionRequestScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/correction_request_screen.dart)
 - [PerformanceDashboardScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/performance_dashboard_screen.dart)
 - [SelfAppraisalScreen.dart](file:///d:/hr/hrms/mobile/lib/screens/self_appraisal_screen.dart)
+
+---
+
+## 🚧 Future Hardening & Known Gaps
+
+Post-audit verification identified the following areas for Phase M7:
+- **I18n Completion**: Only 10% of strings are currently localized; full ARB migration is required.
+- **Payslip Dynamism**: Current screen is a static mockup; needs integration with real backend list/detail endpoints.
+- **Home Polishing**: "Recent Activity" and "Shift Info" are currently hardcoded and require dynamic API binding.
+- **JWT Resilience**: Implementation of Refresh Token flow to handle 401 session expirations.
+- **PDF Viewing**: Transition from console-logging to native `path_provider` + `open_file` implementation.

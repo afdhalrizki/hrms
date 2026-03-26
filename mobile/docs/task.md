@@ -4,19 +4,26 @@
     - [x] Optimized headers for `django-tenants`.
     - [x] Aligned Auth endpoints.
     - [x] Precision GPS for attendance correctly integrated.
-- [x] **M2: Profile & Document Sync**
+- [/] **M2: Profile & Document Sync**
     - [x] Self-service profile updates (phone/address/PTKP).
     - [x] Camera-based document capture (KTP/NPWP).
-- [x] **M3: Attendance Corrections**
+    - [ ] **Harden**: Implement document preview and validation.
+- [/] **M3: Attendance Corrections**
     - [x] Correction request flow (History & Form).
     - [x] Backend workflow integration.
-- [x] **M4: Performance Appraisals**
+- [/] **M4: Performance Appraisals**
     - [x] Real-time KPI progress visualization.
     - [x] Interactive self-appraisal submissions.
 - [x] **M5: Quality Assurance**
     - [x] 100% Unit Test Pass Rate. 
     - [x] Comprehensive technical walkthroughs.
-- [x] **M6: Deployment & Environment Sync**
+- [/] **M6: Deployment & Environment Sync**
     - [x] 4-Tier Environment Hierarchy (Dev, QA, Staging, Production).
     - [x] Multi-Cloud documentation (IDCloudHost, AWS).
     - [x] Dynamic domain switching via compile-time defines.
+- [ ] **M7: Feature Hardening & i18n**
+    - [ ] **I18n**: Complete `app_en.arb` / `app_id.arb` (100+ keys).
+    - [ ] **Payslips**: Connect `PayslipScreen` to real backend endpoints.
+    - [ ] **Home**: Make Recent Activity and Shift Info blocks dynamic.
+    - [ ] **Auth**: Implement JWT Refresh token flow.
+    - [ ] **PDF**: Implement native PDF viewer in mobile.

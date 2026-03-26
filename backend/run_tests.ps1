@@ -60,7 +60,7 @@ foreach ($line in $content) {
 }
 
 # Override container-local hosts to localhost for native execution
-$env:DB_HOST = "localhost"
+$env:DB_HOST = "127.0.0.1"
 $env:REDIS_URL = "redis://localhost:6379/1"
 $env:DATABASE_URL = "postgres://hrms_user:hrms_password@localhost:6432/hrms"
 

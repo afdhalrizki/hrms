@@ -15,6 +15,21 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Leave Management**: Submit leave requests (Annual, Permission, Sick) and track balances in real-time.
 - **Reimbursement Claims**: Easy expense submission with category-based validation and status tracking.
 - **Account Settings**: App personalization, language preferences, and secure logout management.
+- **Biometric Face Recognition**: AI-powered attendance verification with liveness checks using Google ML Kit.
+- **Smart Geofencing**: High-accuracy GPS validation to ensure attendance records are within office boundaries.
+
+### 📊 Feature Status & Maturity
+For a detailed audit of implemented vs. mocked features, see [**Feature Audit & Gap Analysis**](./docs/feature_audit.md).
+
+| Module | Status | Dynamic? |
+| :--- | :--- | :--- |
+| Auth & Face ID | ✅ Ready | Yes |
+| Profile & Docs | ✅ Ready | Yes |
+| Attendance Logic | ✅ Ready | Yes |
+| Leave & Reimb | ⚠️ Polishing | Yes |
+| Performance | ✅ Ready | Yes |
+| Payslips | ❌ Incomplete | No (Mock) |
+| L10n | ⚠️ Incomplete | No |
 
 ### 📱 Flutter UI Previews
 

@@ -85,6 +85,9 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         photo = request.data.get('photo_in')
 
         if lat and lng:
+            if not target_employee:
+                return Response({'error': 'Target employee record not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
             check_in_str = request.data.get('check_in')
             date_str = request.data.get('date')
             
