@@ -132,7 +132,16 @@ Run E2E tests (requires running server):
 1. Start server: `pwsh ./run_dev.ps1`
 2. In a new terminal, run: `pwsh ./run_e2e.ps1`
 
+
 ---
 
+## 📚 Technical Documentation
+
+For in-depth technical details, please refer to the internal documentation:
+- [**Implementation Plan**](./docs/implementation_plan.md)
+- [**Walkthrough & Results**](./docs/walkthrough.md)
+- [**Development Roadmap**](./docs/task.md)
+
+---
 **Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**. 100% Tests Passed (155/155).
 **Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.

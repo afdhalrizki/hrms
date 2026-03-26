@@ -5,15 +5,18 @@ This directory contains template configuration files for different stages of the
 ## Environments Overview
 
 1.  **Development (`.env.local`)**:
-    - Used for local coding on developer machines (Local Machine).
+    - Used for local coding on developer machines.
     - `DEBUG=True` to show detailed errors.
     - Points to local Docker PostgreSQL and Redis.
-2.  **Staging (`.env.staging`)**:
-    - Used for QA and UAT hosted on **IDCloudHost VPS**.
-    - Mimics Production but with test data.
-3.  **Production (`.env.production`)**:
-    - The live environment for enterprise customers on **Modern AWS**.
-    - `DEBUG=False` for security.
+2.  **QA (`.env.qa`)**:
+    - Targets `harilibur.web.id` on **IDCloudHost**.
+    - Used for functional UAT and quality assurance.
+3.  **Staging (`.env.staging`)**:
+    - Targets `harikerja.web.id` on **Enterprise AWS**.
+    - Identical to production to support 1M user stress testing.
+4.  **Production (`.env.production`)**:
+    - Targets `harikerja.com` on **Enterprise AWS**.
+    - Official high-availability production workloads.
 
 ## New Management Tools
 

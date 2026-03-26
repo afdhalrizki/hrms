@@ -23,28 +23,28 @@ Unified scripts to manage **Development**, **Staging**, and **Production** envir
 
 ### Windows (PowerShell)
 ```powershell
-# Format: .\up.ps1 [dev|staging|prod] [flags]
+# Format: .\up.ps1 [dev|qa|staging|prod] [flags]
 .\up.ps1 dev -build    # Start local dev
-.\up.ps1 staging       # Start staging
-.\up.ps1 prod -logs    # Start production and tail logs
-.\up.ps1 dev -down     # Stop local dev
+.\up.ps1 qa            # Start QA (IDCloudHost)
+.\up.ps1 staging       # Start Staging (AWS - 1M user test)
+.\up.ps1 prod -logs    # Start Production (AWS)
 ```
 
 ### Linux/macOS (Make)
 ```bash
 make dev               # Start local dev
+make qa                # Start QA
 make staging           # Start staging
 make prod              # Start production
-make down              # Stop containers
 ```
 
-**Access Points (Local):**
+**Access Points (Local Dev):**
 - **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
 - **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
 - **Backend API Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
 
 > [!NOTE]
-> For detailed deployment instructions to **IDCloudHost** (Staging) or **AWS** (Production), see the [**Deployment Guide**](./deployment/README.md).
+> For cloud deployments (**harilibur.web.id**, **harikerja.web.id**, or **harikerja.com**), see the [**Deployment Guide**](./deployment/README.md).
 
 ---
 
@@ -76,12 +76,12 @@ make down              # Stop containers
 
 The platform is architected for seamless transition from dev to enterprise scale:
 
-| Environment | Hosting Platform | Domain | Purpose |
+| Environment | Domain | Hosting Platform | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Development** | Local Docker | `localhost` | Rapid prototyping & local testing. |
-| **QA** | **IDCloudHost VPS** | `harilibur.web.id` | Functional UAT and QA testing. |
-| **Staging** | **Enterprise AWS** | `harikerja.web.id` | 1M User stress test (Identical to Prod). |
-| **Production** | **Enterprise AWS** | `harikerja.com` | Official high-availability enterprise scale. |
+| **Development** | `localhost` | Local Docker | Rapid prototyping & local testing. |
+| **QA** | `harilibur.web.id` | **IDCloudHost VPS** | Functional UAT and QA testing. |
+| **Staging** | `harikerja.web.id` | **Enterprise AWS** | 1M User stress test (Identical to Production). |
+| **Production** | `harikerja.com` | **Enterprise AWS** | Official high-availability enterprise workloads. |
 
 ---
 

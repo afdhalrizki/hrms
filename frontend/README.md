@@ -18,15 +18,15 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 ## 🖼 UI Previews
 
 ### Admin Dashboard
-![Dashboard Preview](../docs/assets/dashboard_preview.png)
+![Dashboard Preview](./docs/assets/dashboard_preview.png)
 *Modern, glassmorphism-based dashboard with real-time analytics indicators.*
 
 ### Premium Signup
-![Signup Preview](../docs/assets/signup_page_premium_harikerja.png)
+![Signup Preview](./docs/assets/signup_page_premium_harikerja.png)
 *Seamless tenant onboarding with instant domain validation.*
 
 ### Admin Provisioning
-![Provisioning Preview](../docs/assets/add_employee_modal_before_submit_1773638661925.png)
+![Provisioning Preview](./docs/assets/add_employee_modal_before_submit_1773638661925.png)
 *Employee creation form integrated securely with organizational RBAC toggles.*
 
 ## 🛠 Tech Stack
@@ -120,6 +120,16 @@ Functional verification of full user journeys (Attendance, Payroll, Performance,
 ## 5. Troubleshooting
 - **Failed to Fetch**: Ensure `NEXT_PUBLIC_API_PORT=3000` is set in `.env.local` to match the Playwright mocking origin.
 - **Subdomain Resolution**: Add `company1.localhost` and `company2.localhost` to your OS `hosts` file for local multi-tenant testing.
+
+
+---
+
+## 📚 Technical Documentation
+
+For in-depth technical details, please refer to the internal documentation:
+- [**Implementation Plan**](./docs/implementation_plan.md)
+- [**Walkthrough & Results**](./docs/walkthrough.md)
+- [**Development Roadmap**](./docs/task.md)
 
 ---
 **Status**: 🏆 **ESS Frontend Hardening & UX Optimization (March 24, 2026)**

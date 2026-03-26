@@ -16,13 +16,12 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Reimbursement Claims**: Easy expense submission with category-based validation and status tracking.
 - **Account Settings**: App personalization, language preferences, and secure logout management.
 
-## 🖼 UI Previews
-### Employee Dashboard
-![Mobile Dashboard](../docs/assets/mobile_preview.png)
-*Premium glassmorphism dashboard with real-time shift and attendance tracking.*
+### 📱 Flutter UI Previews
+
+| ![Mobile Dashboard](./docs/assets/mobile_preview.png) | ![Face ID Verification](./docs/assets/mobile_face_id.png) |
 
 ### Face ID Attendance
-![Face ID Verification](../docs/assets/mobile_face_id.png)
+![Face ID Verification](./docs/assets/mobile_face_id.png)
 *AI-powered face recognition with liveness detection for secure clock-in.*
 
 ## 🛠 Tech Stack
@@ -96,6 +95,16 @@ Run Mobile E2E user flow test (Real Backend):
 pwsh .\mobile\run_e2e.ps1
 ```
 **Status**: ✅ **100% test coverage** for all core modules. All tests are configured to communicate directly with the local development server for end-to-end verification.
+
+
+---
+
+## 📚 Technical Documentation
+
+For in-depth technical details, please refer to the internal documentation:
+- [**Implementation Plan**](./docs/implementation_plan.md)
+- [**Walkthrough & Results**](./docs/walkthrough.md)
+- [**Development Roadmap**](./docs/task.md)
 
 ---
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.

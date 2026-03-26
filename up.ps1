@@ -1,6 +1,6 @@
 param (
     [Parameter(Mandatory=$true, Position=0)]
-    [ValidateSet("dev", "staging", "prod")]
+    [ValidateSet("dev", "qa", "staging", "prod")]
     $env_name,
 
     [switch]$down,
@@ -10,7 +10,9 @@ param (
 
 # 1. Environment File Selection
 $env_file = "environments/.env.local"
-if ($env_name -eq "staging") {
+if ($env_name -eq "qa") {
+    $env_file = "environments/.env.qa"
+} elseif ($env_name -eq "staging") {
     $env_file = "environments/.env.staging"
 } elseif ($env_name -eq "prod") {
     $env_file = "environments/.env.production"
