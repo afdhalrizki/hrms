@@ -34,13 +34,52 @@ Write-Host "Seeding test database..." -ForegroundColor Cyan
 
 # 3. Run Pytest with E2E marker
 Write-Host "Running E2E tests targetting localhost:8000..." -ForegroundColor Green
-& $PytestExec -m e2e tests_e2e/
 
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "`n✅ E2E TESTS PASSED" -ForegroundColor Green
-} else {
-    Write-Host "`n❌ E2E TESTS FAILED" -ForegroundColor Red
-    exit 1
+# Create a temporary file to capture output for parsing
+$tempFile = [System.IO.Path]::GetTempFileName()
+try {
+    # Dynamically detect terminal width for better alignment when piped
+    $termWidth = if ($Host.UI.RawUI.WindowSize.Width -gt 0) { $Host.UI.RawUI.WindowSize.Width } else { 120 }
+
+    # Force color output and pass detected terminal width
+    & $PytestExec --color=yes -o "terminal_width=$termWidth" -m e2e tests_e2e/ | Tee-Object -FilePath $tempFile
+    $exitCode = $LASTEXITCODE
+
+    # 4. Final Summary Parsing
+    $finalLines = Get-Content $tempFile -Tail 10
+    $summaryLine = $finalLines | Where-Object { $_ -match "==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*" }
+    
+    Write-Host "`n" + ("=" * 60) -ForegroundColor Gray
+    Write-Host "                E2E TEST RUN SUMMARY" -ForegroundColor Cyan -NoNewline
+    Write-Host " (Exit: $exitCode)" -ForegroundColor Gray
+    Write-Host ("=" * 60) -ForegroundColor Gray
+    
+    if ($summaryLine) {
+        # Clean up the summary line for display
+        $cleanSummary = $summaryLine.Trim(' =')
+        Write-Host " DETAILS : $cleanSummary" -ForegroundColor White
+        
+        # Determine Status and Color
+        if ($cleanSummary -match "failed|error") {
+            Write-Host " STATUS  : ❌ E2E TESTS FAILED" -ForegroundColor Red
+        } elseif ($cleanSummary -match "warning") {
+            Write-Host " STATUS  : ⚠️ E2E PASSED WITH WARNINGS" -ForegroundColor Yellow
+        } elseif ($exitCode -eq 0) {
+            Write-Host " STATUS  : ✅ E2E TESTS PASSED" -ForegroundColor Green
+        } else {
+            Write-Host " STATUS  : ❌ UNKNOWN FAILURE (Exit Code: $exitCode)" -ForegroundColor Red
+        }
+    } else {
+        if ($exitCode -eq 0) {
+            Write-Host " STATUS  : ✅ E2E TESTS PASSED" -ForegroundColor Green
+        } else {
+            Write-Host " STATUS  : ❌ E2E EXECUTION FAILED" -ForegroundColor Red
+        }
+    }
+    Write-Host ("=" * 60) -ForegroundColor Gray
+} finally {
+    if (Test-Path $tempFile) { Remove-Item $tempFile -Force }
 }
 
 Pop-Location
+exit $exitCode
