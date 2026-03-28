@@ -91,3 +91,131 @@ def test_leave_request_workflow(base_url, tenant1_domain, client):
     )
     assert res_approve.status_code == 200, f"Approval failed! Status: {res_approve.status_code}, Body: {res_approve.text}"
     assert res_approve.json()["status"] == "APPROVED"
+
+
+@pytest.mark.e2e
+def test_payroll_generation_and_employee_payslip_visibility(base_url, tenant1_domain, client):
+    """
+    Test: Create payroll period, generate payslip, and verify visibility for employee.
+    """
+    # 1. Login as Admin
+    login_resp = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "admin@company1.com", "password": "password123"},
+        headers=get_auth_headers(tenant1_domain)
+    )
+    assert login_resp.status_code == 200
+    admin_token = login_resp.json()["access"]
+
+    # 2. Create payroll period
+    period_payload = {
+        "month": 3,
+        "year": 2026,
+        "start_date": "2026-03-01",
+        "end_date": "2026-03-31"
+    }
+    rep_period = client.post(
+        f"{base_url}/payroll-periods/",
+        json=period_payload,
+        headers=get_auth_headers(tenant1_domain, admin_token)
+    )
+    assert rep_period.status_code == 201, f"Create payroll period failed: {rep_period.text}"
+    period_id = rep_period.json()["id"]
+
+    # 3. Generate payslips for all employees
+    gen_resp = client.post(
+        f"{base_url}/payslips/generate/",
+        json={"period_id": period_id},
+        headers=get_auth_headers(tenant1_domain, admin_token)
+    )
+    assert gen_resp.status_code == 200, f"Generate payslips failed: {gen_resp.text}"
+    assert gen_resp.json()["message"].startswith("Successfully generated")
+    assert len(gen_resp.json().get("payslips", [])) >= 1
+
+    # 4. Login as regular employee and verify they can see only own payslip
+    employee_login = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "employee1@company1.com", "password": "password123"},
+        headers=get_auth_headers(tenant1_domain)
+    )
+    assert employee_login.status_code == 200
+    emp_token = employee_login.json()["access"]
+
+    payslip_list = client.get(
+        f"{base_url}/payslips/?period_id={period_id}",
+        headers=get_auth_headers(tenant1_domain, emp_token)
+    )
+    assert payslip_list.status_code == 200
+    assert len(payslip_list.json()) >= 1
+
+
+@pytest.mark.e2e
+def test_checkin_blocked_when_approved_leave_exists(base_url, tenant1_domain, client):
+    """
+    Test: An employee on approved leave cannot clock in for that date.
+    """
+    from datetime import date, timedelta
+
+    # 1. Login as Employee
+    login_resp = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "employee1@company1.com", "password": "password123"},
+        headers=get_auth_headers(tenant1_domain)
+    )
+    assert login_resp.status_code == 200
+    token = login_resp.json()["access"]
+
+    me_resp = client.get(f"{base_url}/users/me/", headers=get_auth_headers(tenant1_domain, token))
+    assert me_resp.status_code == 200
+    employee_id = me_resp.json().get("employee_id")
+    assert employee_id
+
+    # 2. Create and approve leave for tomorrow
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+
+    # Use admin user to approve
+    admin_login = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "admin@company1.com", "password": "password123"},
+        headers=get_auth_headers(tenant1_domain)
+    )
+    assert admin_login.status_code == 200
+    admin_token = admin_login.json()["access"]
+
+    leave_resp = client.post(
+        f"{base_url}/leave-requests/",
+        json={
+            "employee": employee_id,
+            "start_date": tomorrow,
+            "end_date": tomorrow,
+            "leave_type": "SAKIT",
+            "reason": "E2E approved leave"
+        },
+        headers=get_auth_headers(tenant1_domain, token)
+    )
+    assert leave_resp.status_code == 201
+    leave_id = leave_resp.json()["id"]
+
+    patch_leave = client.patch(
+        f"{base_url}/leave-requests/{leave_id}/",
+        json={"status": "APPROVED"},
+        headers=get_auth_headers(tenant1_domain, admin_token)
+    )
+    assert patch_leave.status_code == 200
+    assert patch_leave.json()["status"] == "APPROVED"
+
+    # 3. Try to clock in for the approved-leave date
+    clockin_resp = client.post(
+        f"{base_url}/attendance/",
+        json={
+            "employee": employee_id,
+            "date": tomorrow,
+            "check_in": "08:00:00",
+            "latitude_in": -6.2088,
+            "longitude_in": 106.8456
+        },
+        headers=get_auth_headers(tenant1_domain, token)
+    )
+    assert clockin_resp.status_code == 400
+    assert "APPROVED leave" in (clockin_resp.json().get("detail", "") or "")
+

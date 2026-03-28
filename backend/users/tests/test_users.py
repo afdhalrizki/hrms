@@ -136,13 +136,29 @@ class MiddlewareTestCase(TenantTestCase):
         self.middleware.get_response.assert_called_with(request)
 
     @patch('users.middleware.logout')
-    @patch('users.middleware.redirect')
-    def test_middleware_denies_unassigned_tenant(self, mock_redirect, mock_logout):
-        user = User.objects.create_user(email='denied@test.com', password='password')
-        # User NOT in self.tenant
-        
+    def test_middleware_denies_unassigned_tenant_api(self, mock_logout):
+        """Verify 403 JsonResponse for API paths when tenant access is denied."""
+        user = User.objects.create_user(email='denied_api@test.com', password='password')
         request = self.create_mock_request(user, self.tenant)
+        request.path = '/api/some-endpoint/'
+        
         response = self.middleware(request)
+        
+        self.assertEqual(response.status_code, 403)
+        import json
+        data = json.loads(response.content)
+        self.assertIn('Akses ditolak', data['detail'])
+        mock_logout.assert_not_called() # We return directly for API
+
+    @patch('users.middleware.logout')
+    @patch('users.middleware.redirect')
+    def test_middleware_denies_unassigned_tenant_web(self, mock_redirect, mock_logout):
+        """Verify 302 redirect for non-API paths when tenant access is denied."""
+        user = User.objects.create_user(email='denied_web@test.com', password='password')
+        request = self.create_mock_request(user, self.tenant)
+        request.path = '/some-web-page/'
+        
+        self.middleware(request)
         
         mock_logout.assert_called_with(request)
         mock_redirect.assert_called()

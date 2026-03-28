@@ -35,13 +35,18 @@ class TenantAccessMiddleware:
             if current_tenant and current_tenant.schema_name == 'public':
                 if request.path.startswith('/admin/'):
                     logout(request)
-                    messages.error(request, "Akses ditolak. Portal ini hanya untuk akun internal.")
+                    if not request.path.startswith('/api/'):
+                        messages.error(request, "Akses ditolak. Portal ini hanya untuk akun internal.")
                     return redirect('/admin/login/')
 
             # 4. Tenant Admin Restriction: Ensure user is mapped to the current tenant
             if current_tenant and current_tenant.schema_name != 'public':
                 if not request.user.tenants.filter(id=current_tenant.id).exists():
                     # Unauthorized access attempt
+                    if request.path.startswith('/api/'):
+                        from django.http import JsonResponse
+                        return JsonResponse({"detail": f"Akses ditolak. Anda tidak terdaftar di tenant {current_tenant.name}."}, status=403)
+
                     messages.error(request, f"Akses ditolak. Anda tidak terdaftar di tenant {current_tenant.name}.")
                     logout(request)
                     

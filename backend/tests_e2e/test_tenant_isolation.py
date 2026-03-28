@@ -47,3 +47,51 @@ def test_data_isolation_employees(base_url, tenant1_domain, tenant2_domain, clie
     employees = resp_emp.json()
     for emp in employees:
         assert "company2" not in emp.get("email", "")
+
+
+@pytest.mark.e2e
+def test_cross_tenant_payslip_invisibility(base_url, tenant1_domain, tenant2_domain, client):
+    """
+    Ensure that payslips created in Tenant 1 are not visible in Tenant 2.
+    """
+    # 1. Generate at least one payslip in tenant1
+    login_resp = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "admin@company1.com", "password": "password123"},
+        headers=get_auth_headers(tenant1_domain)
+    )
+    assert login_resp.status_code == 200
+    admin_token = login_resp.json()["access"]
+
+    # Ensure a payroll period exists or create one
+    period_resp = client.post(
+        f"{base_url}/payroll-periods/",
+        json={"month": 3, "year": 2026, "start_date": "2026-03-01", "end_date": "2026-03-31"},
+        headers=get_auth_headers(tenant1_domain, admin_token)
+    )
+    assert period_resp.status_code in [200, 201]
+    period_id = period_resp.json()["id"]
+
+    generate_resp = client.post(
+        f"{base_url}/payslips/generate/",
+        json={"period_id": period_id},
+        headers=get_auth_headers(tenant1_domain, admin_token)
+    )
+    assert generate_resp.status_code == 200
+
+    # 2. Tenant 2 admin should not see those payslips
+    login_resp2 = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "admin@company2.com", "password": "password123"},
+        headers=get_auth_headers(tenant2_domain)
+    )
+    assert login_resp2.status_code == 200
+    admin2_token = login_resp2.json()["access"]
+
+    payslips_t2 = client.get(
+        f"{base_url}/payslips/",
+        headers=get_auth_headers(tenant2_domain, admin2_token)
+    )
+    assert payslips_t2.status_code == 200
+    assert len(payslips_t2.json()) == 0
+

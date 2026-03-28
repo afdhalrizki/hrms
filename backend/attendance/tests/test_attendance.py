@@ -453,3 +453,111 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             
             att = Attendance.objects.get(id=res.data['id'])
             self.assertEqual(att.check_out, time(6, 5))
+
+    def test_attendance_geofence_zero_radius(self):
+        """Verify that radius_meters=0 requires exact coordinate match."""
+        with schema_context(self.tenant.schema_name):
+            self.branch_jakarta.radius_meters = 0
+            self.branch_jakarta.save()
+            
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        
+        # 1. Exact match -> PRESENT
+        payload_at = {
+            'date': str(self.today + timedelta(days=15)),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+        }
+        res_at = self.client.post(url, payload_at, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(res_at.data['status'], 'PRESENT')
+        
+        # 2. Slight mismatch (even 1 meter) -> OFF_SITE
+        payload_near = {
+            'date': str(self.today + timedelta(days=16)),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2089, # Slightly different
+            'longitude_in': 106.8456,
+        }
+        res_near = self.client.post(url, payload_near, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(res_near.data['status'], 'OFF_SITE')
+
+    def test_attendance_invalid_coordinate_type(self):
+        """Ensure that non-numeric coordinates raise ValidationError."""
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        payload = {
+            'date': str(self.today + timedelta(days=17)),
+            'check_in': '08:00:00',
+            'latitude_in': 'INVALID_LAT',
+            'longitude_in': 106.8456,
+        }
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Invalid coordinate format', str(response.data))
+
+    def test_attendance_pending_leave_not_blocking(self):
+        """Verify that a PENDING leave does NOT block clock-in."""
+        with schema_context(self.tenant.schema_name):
+            leave_date = self.today + timedelta(days=21)
+            LeaveRequest.objects.create(
+                employee=self.employee,
+                start_date=leave_date,
+                end_date=leave_date,
+                leave_type='CUTI',
+                status='PENDING' # Not approved
+            )
+            
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        payload = {
+            'date': str(leave_date),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+        }
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        # Should succeed because leave is only PENDING
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['status'], 'PRESENT')
+
+    def test_attendance_flexible_late_night(self):
+        """Clocking in at 23:59 on a flexible shift should remain PRESENT."""
+        with schema_context(self.tenant.schema_name):
+            shift_flex = Shift.objects.create(name='Late Night Flex', start_time=time(20, 0), end_time=time(4, 0), is_flexible=True)
+            flex_date = self.today + timedelta(days=22)
+            Schedule.objects.create(employee=self.employee, shift=shift_flex, date=flex_date)
+            
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        payload = {
+            'date': str(flex_date),
+            'check_in': '23:59:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+        }
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['status'], 'PRESENT')
+
+    def test_process_clock_in_duplicate_reject(self):
+        """Ensure that two rapid sequential clock-in requests for the same day fail correctly (Integrity)."""
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        test_date = self.today + timedelta(days=25)
+        payload = {
+            'date': str(test_date),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+        }
+        
+        # 1. First request succeeds
+        res1 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(res1.status_code, status.HTTP_201_CREATED)
+        
+        # 2. Second request fails (handled by unique constraint)
+        res2 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('already recorded', str(res2.data))

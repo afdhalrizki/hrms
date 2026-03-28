@@ -30,12 +30,20 @@ class AttendanceService:
         if not employee.branch:
             return True, 0 # No branch assigned, no fencing
 
+        try:
+            lat = float(latitude)
+            lon = float(longitude)
+        except (ValueError, TypeError, AttributeError):
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': 'Invalid coordinate format.'})
+
         branch = employee.branch
         distance = AttendanceService.calculate_distance(
-            latitude, longitude, 
+            lat, lon, 
             branch.latitude, branch.longitude
         )
         
+        # If radius is 0, employee must be exactly at the coordinate (rare but possible boundary)
         is_in_bounds = distance <= branch.radius_meters
         return is_in_bounds, distance
 

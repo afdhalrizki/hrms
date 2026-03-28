@@ -71,6 +71,8 @@ test_users = [
     {'email': 'admin@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
     {'email': 'manager1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
     {'email': 'employee1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
+    # Company 2
+    {'email': 'admin@company2.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant2},
 ]
 
 for user_data in test_users:
@@ -209,13 +211,33 @@ with schema_context('company1'):
         defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'DRAFT'}
     )
 
-# Clean up company2 schema as well
 with schema_context('company2'):
     from attendance.models import Attendance, LeaveRequest, Overtime
-    from core.models import Employee
+    from core.models import Employee, Department, Role, Golongan
     Attendance.objects.all().delete()
     LeaveRequest.objects.all().delete()
     Overtime.objects.all().delete()
     Employee.objects.all().delete()
+    Department.objects.all().delete()
+    Role.objects.all().delete()
+    Golongan.objects.all().delete()
+
+    # Create minimal master data for company2 admin
+    dept2, _ = Department.objects.get_or_create(name="Management")
+    role2, _ = Role.objects.get_or_create(name="Regional Manager", department=dept2)
+    gol2, _ = Golongan.objects.get_or_create(name="4A", defaults={'base_salary': 10000000})
+
+    Employee.objects.get_or_create(
+        email='admin@company2.com',
+        defaults={
+            'nik': 'ADM002',
+            'fullname': 'Admin Two',
+            'department': dept2,
+            'role': role2,
+            'golongan': gol2,
+            'join_date': date(2025, 1, 1),
+            'ktp_number': 'ADM456'
+        }
+    )
 
 print("Successfully seeded all test users and employee records.")

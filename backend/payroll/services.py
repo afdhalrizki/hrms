@@ -12,6 +12,7 @@ class BPJSManager:
 
     @staticmethod
     def calculate_health(wage: Decimal) -> Dict[str, Decimal]:
+        wage = max(Decimal('0'), wage)
         cap_wage = min(wage, BPJSManager.KESEHATAN_MAX_WAGE)
         return {
             'company': (cap_wage * Decimal('0.04')).quantize(Decimal('1')),
@@ -20,7 +21,16 @@ class BPJSManager:
 
     @staticmethod
     def calculate_employment(wage: Decimal, jkk_rate: Decimal = Decimal('0.0024')) -> Dict[str, Dict[str, Decimal]]:
-        jkk_rate = Decimal(str(jkk_rate))  # Ensure Decimal even if a float is passed
+        wage = max(Decimal('0'), wage)
+        try:
+            # Handle None or invalid types by forcing a default
+            if jkk_rate is None:
+                jkk_rate = Decimal('0.0024')
+            else:
+                jkk_rate = Decimal(str(jkk_rate))
+        except (ValueError, TypeError, Exception): # Broad catch for Decimal conversion failure
+            jkk_rate = Decimal('0.0024')
+            
         jp_wage = min(wage, BPJSManager.KETENAGAKERJAAN_JP_MAX_WAGE)
         return {
             'jkk': {'company': (wage * jkk_rate).quantize(Decimal('1')), 'employee': Decimal('0')},
@@ -82,6 +92,7 @@ class TaxEngine:
 
     @staticmethod
     def calculate_monthly_pph21(employee: Employee, gross_salary: Decimal) -> Decimal:
+        gross_salary = max(Decimal('0'), gross_salary)
         category = TaxEngine.CATEGORY_MAPPING.get(employee.ptkp_status, 'A')
         rate = TaxEngine.get_ter_rate(category, gross_salary)
         return (gross_salary * rate).quantize(Decimal('1'))
@@ -98,9 +109,11 @@ class PayrollCalculator:
         self.gross_pay = Decimal('0')
         self.total_deductions = Decimal('0')
 
+    from django.db import transaction
+    @transaction.atomic
     def run(self) -> Payslip:
         # 1. Base Salary from Golongan
-        basic = self.employee.golongan.base_salary
+        basic = self.employee.golongan.base_salary if self.employee.golongan else Decimal('0')
         self.gross_pay += basic
         self.details.append({
             'description': 'Gaji Pokok',
@@ -151,6 +164,7 @@ class PayrollCalculator:
                 hourly_rate = Decimal(str(tenant.overtime_rate))
             else:
                 divisor = Decimal(str(getattr(tenant, 'payroll_overtime_divisor', 173)))
+                if divisor <= 0: divisor = Decimal('173') # Safety fallback
                 hourly_rate = basic / divisor
             
             overtime_pay = (hourly_rate * Decimal(str(total_overtime_hours))).quantize(Decimal('1'))

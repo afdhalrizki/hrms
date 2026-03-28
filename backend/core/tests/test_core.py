@@ -356,3 +356,47 @@ class MultiTenancyIsolationTestCase(TenantTestCase):
                 cursor.execute("SELECT count(*) FROM information_schema.tables WHERE table_name = 'core_department' AND table_schema = 'public'")
                 count = cursor.fetchone()[0]
                 self.assertEqual(count, 0)
+
+    def test_cross_tenant_api_isolation(self):
+        """Hardening: Ensure Tenant B cannot see Tenant A's data even if authenticated (schema mismatch)."""
+        from django_tenants.utils import get_tenant_model
+        TenantModel = get_tenant_model()
+        
+        # 1. Create Tenant B with UNIQUE schema
+        import uuid
+        unique_b = f"tb{uuid.uuid4().hex[:6]}"
+        with schema_context('public'):
+            tenant_b = TenantModel.objects.create(schema_name=unique_b, name='Tenant B Isolation')
+            from django_tenants.utils import get_tenant_domain_model
+            get_tenant_domain_model().objects.create(domain=f'{unique_b}.localhost', tenant=tenant_b, is_primary=True)
+        
+        # 2. Create data in Tenant A (already done in setUp if we use a new test case, but let's be explicit)
+        with schema_context(self.tenant.schema_name):
+            dept_a = Department.objects.create(name="Dept A Only")
+            user_a = User.objects.create_user(email='user_a@test.com', password='password', is_staff=True)
+            user_a.tenants.add(self.tenant)
+            domain_a = self.tenant.domains.first().domain
+
+        # 3. Create user in Tenant B
+        with schema_context(tenant_b.schema_name):
+            user_b = User.objects.create_user(email='user_b@test.com', password='password', is_staff=True)
+            user_b.tenants.add(tenant_b)
+            # Dept in B with same name to test if they are distinct
+            Department.objects.create(name="Dept B Only")
+
+        self.client.force_login(user_b)
+        
+        # 4. Attempt to access Tenant A's domain with Tenant B's credentials
+        # Most multi-tenant setups will block this via Middleware (403 or 404 because user is not in tenant)
+        url = reverse('department-list')
+        response = self.client.get(url, SERVER_NAME=domain_a)
+        
+        # Expected: Forbidden because user_b doesn't belong to tenant_a
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        # 5. Verify query isolation via schema_context
+        with schema_context(tenant_b.schema_name):
+            qs = Department.objects.all()
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(qs.first().name, "Dept B Only")
+            self.assertFalse(qs.filter(name="Dept A Only").exists())

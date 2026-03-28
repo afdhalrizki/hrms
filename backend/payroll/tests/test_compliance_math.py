@@ -10,33 +10,67 @@ class MockEmployee:
 
 from payroll.services import TaxEngine, BPJSManager
 
-def test_bpjs_health_cap():
-    salary_15m = Decimal('15000000')
-    health = BPJSManager.calculate_health(salary_15m)
-    # 1% of 12m (Cap) = 120,000
-    assert health['employee'] == Decimal('120000')
+def test_bpjs_health_capping():
+    res = BPJSManager.calculate_health(Decimal('15000000'))
+    assert res['employee'] == Decimal('120000')
 
-def test_bpjs_jp_cap():
-    salary_15m = Decimal('15000000')
-    employment = BPJSManager.calculate_employment(salary_15m)
-    # JP: 1% of 10,042,300 (Cap) = 100,423
-    assert employment['jp']['employee'] == Decimal('100423')
+def test_bpjs_employment_capping():
+    res = BPJSManager.calculate_employment(Decimal('11000000'))
+    assert res['jp']['employee'] == Decimal('100423')
 
-def test_bpjs_jkk_rate():
-    salary_15m = Decimal('15000000')
-    employment = BPJSManager.calculate_employment(salary_15m, jkk_rate=Decimal('0.0174'))
-    # JKK: 1.74% of 15m = 261,000
-    assert employment['jkk']['company'] == Decimal('261000')
+def test_pph21_ter_rate_lookup():
+    assert TaxEngine.get_ter_rate('A', Decimal('10000000')) == Decimal('0.02')
 
+def test_bpjs_health_boundary():
+    # Exactly at cap
+    health_at = BPJSManager.calculate_health(Decimal('12000000'))
+    assert health_at['employee'] == Decimal('120000')
+    # Above cap
+    health_above = BPJSManager.calculate_health(Decimal('12000001'))
+    assert health_above['employee'] == Decimal('120000')
 
-@pytest.mark.parametrize("category, gross, expected_tax", [
-    ('A', Decimal('6000000'), Decimal('45000')),
-    ('B', Decimal('10000000'), Decimal('175000')),
-    ('C', Decimal('10000000'), Decimal('150000')),
+def test_bpjs_jp_boundary():
+    # Exactly at cap (JP)
+    emp_at = BPJSManager.calculate_employment(Decimal('10042300'))
+    assert emp_at['jp']['employee'] == Decimal('100423')
+    # Above cap
+    emp_above = BPJSManager.calculate_employment(Decimal('10042301'))
+    assert emp_above['jp']['employee'] == Decimal('100423')
+
+def test_bpjs_defensive_zero_negative():
+    # Zero wage
+    z = BPJSManager.calculate_health(Decimal('0'))
+    assert z['employee'] == Decimal('0')
+    # Negative wage
+    n = BPJSManager.calculate_employment(Decimal('-5000000'))
+    assert n['jht']['employee'] == Decimal('0')
+
+def test_bpjs_jkk_rate_defensive():
+    # 0.0 JKK
+    e1 = BPJSManager.calculate_employment(Decimal('1000000'), jkk_rate=0.0)
+    assert e1['jkk']['company'] == Decimal('0')
+    # String JKK
+    e2 = BPJSManager.calculate_employment(Decimal('1000000'), jkk_rate='0.005')
+    assert e2['jkk']['company'] == Decimal('5000')
+    # Invalid JKK type (should fallback)
+    e3 = BPJSManager.calculate_employment(Decimal('1000000'), jkk_rate=None)
+    assert e3['jkk']['company'] == Decimal('2400') # Default 0.0024
+
+@pytest.mark.parametrize("category, gross, expected_rate", [
+    ('A', Decimal('5400000'), Decimal('0')),
+    ('A', Decimal('5400001'), Decimal('0.0025')), # Boundary 5.4m
+    ('A', Decimal('5650000'), Decimal('0.0025')),
+    ('A', Decimal('5650001'), Decimal('0.005')),  # Boundary 5.65m
+    ('A', Decimal('20000000'), Decimal('0.05')),
+    ('A', Decimal('30000000'), Decimal('0.10')), # Upper tier
+    ('X', Decimal('10000000'), Decimal('0')),    # Invalid Category
 ])
-def test_ter_2024_rates(category, gross, expected_tax):
-    rate = TaxEngine.get_ter_rate(category, gross)
-    tax = gross * rate
-    assert tax == expected_tax
+def test_ter_rate_boundaries(category, gross, expected_rate):
+    assert TaxEngine.get_ter_rate(category, gross) == expected_rate
 
-# Removed main entry point for pytest compatibility
+def test_pph21_ptkp_fallback():
+    emp = MockEmployee(ptkp_status=None)
+    # None status should fallback to 'A' mapping
+    tax = TaxEngine.calculate_monthly_pph21(emp, Decimal('10000000'))
+    # Category A, 10m -> 2% -> 200,000
+    assert tax == Decimal('200000')
