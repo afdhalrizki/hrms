@@ -1,21 +1,13 @@
-import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/api_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 
 void main() {
-  initRealBackendTest();
-  late ApiService apiService;
+  group('Phase M4: Strategic Performance Tests (Mocked)', () {
+    late ApiService apiService;
 
-  setUpAll(() {
-    setupSecureStorageMock();
-  });
-
-  group('Phase M4: Strategic Performance Tests', () {
     setUp(() async {
-      ApiService.reset();
-      SharedPreferences.setMockInitialValues({});
+      await setupMockApiService();
       apiService = ApiService();
     });
 
@@ -25,19 +17,15 @@ void main() {
       expect(list, isA<List>());
     });
 
-    test('submitAppraisalReview sends POST with correct payload', () async {
+    test('submitAppraisalReview sends POST successfully', () async {
       await loginForTest();
-      try {
-        await apiService.submitAppraisalReview({
-          'appraisal': 1,
-          'reviewer': 1,
-          'reviewer_type': 'SELF',
-          'ratings': {'quality': 4},
-          'comments': 'Integration Test',
-        });
-      } catch (e) {
-        print('Performance Submit Info: $e');
-      }
+      await apiService.submitAppraisalReview({
+        'appraisal': 1,
+        'reviewer': 1,
+        'reviewer_type': 'SELF',
+        'ratings': {'quality': 4},
+        'comments': 'Integration Test',
+      });
     });
   });
 }

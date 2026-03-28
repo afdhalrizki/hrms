@@ -1,24 +1,16 @@
-import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/api_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 
 void main() {
-  initRealBackendTest();
-  late ApiService apiService;
+  group('Reimbursement Logic Tests (Mocked)', () {
+    late ApiService apiService;
 
-  setUpAll(() {
-    setupSecureStorageMock();
-  });
+    setUp(() async {
+      await setupMockApiService();
+      apiService = ApiService();
+    });
 
-  setUp(() async {
-    ApiService.reset();
-    SharedPreferences.setMockInitialValues({});
-    apiService = ApiService();
-  });
-
-  group('Reimbursement Logic Tests', () {
     test('getReimbursementCategories returns categories list', () async {
       await loginForTest();
       final data = await apiService.getReimbursementCategories();
@@ -43,16 +35,12 @@ void main() {
         "category": 1
       };
 
-      try {
-        await apiService.applyReimbursement(payload);
-      } catch (e) {
-        print('Reimbursement Apply Info: $e');
-      }
+      await apiService.applyReimbursement(payload);
     });
 
     test('applyReimbursement throws on failure', () async {
       await loginForTest();
-      expect(() => apiService.applyReimbursement({}), throwsException);
+      expect(apiService.applyReimbursement({}), throwsException);
     });
   });
 }

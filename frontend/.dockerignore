@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+.env*
+! .env.example
+.git/
+*.log
+test-results/
+playwright-report/
+.nyc_output/
+.cache/

@@ -32,76 +32,39 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 
 ---
 
-## 1. Setup & Installation
+## 📦 Getting Started
 
-### Virtual Environment
+### 1. Setup & Installation
 ```bash
 python -m venv venv
 # Windows:
 venv\Scripts\activate
 # Linux/Mac:
 source venv/bin/activate
-```
-
-### Install Dependencies
-```bash
 pip install -r requirements.txt
 ```
 
-### Environment Config
-Map your environment variables in a `.env` file or local settings:
-- `TENANT_DOMAIN_SUFFIX`: The suffix for tenant domains (default: `harikerja.com`).
-- `DATABASE_URL`: Your PostgreSQL connection string.
-
----
-
-## 2. Database Initialization
-
+### 2. Database Initialization
 The system uses a two-step migration process for multi-tenancy:
-
 ```bash
-# 1. Migrate shared (public) tables (Tenants, Users, Registration)
 python manage.py migrate_schemas --shared
-
-# 2. Migrate tenant-specific tables (HR, Payroll, Attendance)
 python manage.py migrate_schemas --tenant
-```
-
-### Creating the Foundation
-Use the bootstrap command to initialize the public schema and a sample tenant:
-```bash
 python manage.py bootstrap_tenants
 ```
 
----
-
-## 3. Running the Application
+## 🚀 Running the Platform
 
 ### Start Development Server
-Enable your virtual environment and run the following:
-
 ```bash
-# Windows (Standard)
-.\venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
-
 # Windows (Automated Local Dev - RECOMMENDED)
-# This script handles Docker, env loading, and migrations automatically:
 .\run_dev.ps1
-```
-
-# Linux/Mac
-```bash
-source venv/bin/activate
-python manage.py runserver
 ```
 
 **Verify Backend**:
 - **API Status**: [http://localhost:8000/api/users/me/](http://localhost:8000/api/users/me/)
 - **Swagger Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
 
----
-
-## 🌐 5. Deployment Hierarchy & Infrastructure
+## 🌐 Deployment & Infrastructure
 
 The harikerja platform follows a strict 4-tier promotion path:
 
@@ -109,31 +72,22 @@ The harikerja platform follows a strict 4-tier promotion path:
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
 | **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test (Identical to Production). |
-| **Production** | `harikerja.com` | **AWS Enterprise** | Official high-availability enterprise workloads. |
+| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
+| **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 
-### Environment Configuration
-The backend uses environment-specific files in the `environments/` directory:
-- `.env.qa`: Targets `harilibur.web.id`.
-- `.env.staging`: Targets `harikerja.web.id` (Stress Test Mode).
-- `.env.production`: Targets `harikerja.com`.
+## 🧪 Testing Standard
 
-Update your `TENANT_DOMAIN_SUFFIX` accordingly in your deployment CI/CD.
+The backend uses `pytest` with **100% pass rate** across 168+ mission-critical scenarios.
 
-### Running Tests
-The backend uses `pytest` and `manage.py test` with **100% pass rate** across 155+ mission-critical scenarios.
-
-Run normal unit/integration tests (uses temporary DB):
+Run logic/unit tests:
 ```powershell
 pwsh ./run_tests.ps1
 ```
 
-Run E2E tests (requires running server):
-1. Start server: `pwsh ./run_dev.ps1`
-2. In a new terminal, run: `pwsh ./run_e2e.ps1`
-
-
----
+Run E2E tests:
+```powershell
+pwsh ./run_e2e.ps1
+```
 
 ## 📚 Technical Documentation
 

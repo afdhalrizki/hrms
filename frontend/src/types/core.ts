@@ -55,6 +55,7 @@ export interface Attendance {
   longitude_in?: number;
   photo_in?: string;
   is_out_of_bounds: boolean;
+  is_late: boolean;
   distance_from_branch?: number;
 }
 

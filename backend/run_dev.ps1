@@ -21,6 +21,16 @@ if (-not (Test-Path $EnvFile)) {
 # 3. Handle Docker Services (DB, Redis, PgBouncer)
 Write-Host "[1/5] Ensuring Docker services (db, redis, pgbouncer) are running..." -ForegroundColor Yellow
 
+# Defensive Port Checks
+$RequiredPorts = @(5432, 6379, 6432, 8000)
+foreach ($Port in $RequiredPorts) {
+    if (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue) {
+        $Process = Get-Process -Id (Get-NetTCPConnection -LocalPort $Port -State Listen).OwningProcess
+        Write-Host "WARNING: Port $Port is already in use by process: $($Process.Name) (PID: $($Process.Id))" -ForegroundColor Yellow
+        Write-Host "This might cause Docker to fail to bind ports." -ForegroundColor Gray
+    }
+}
+
 # Check if Docker is running
 docker info >$null 2>&1
 if ($LASTEXITCODE -ne 0) {

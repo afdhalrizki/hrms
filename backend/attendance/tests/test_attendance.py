@@ -97,6 +97,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'PRESENT')
+        self.assertFalse(response.data['is_late'])
         
         attendance_id = response.data['id']
         
@@ -126,6 +127,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'LATE')
+        self.assertTrue(response.data['is_late'])
 
     def test_double_check_in_prevention(self):
         """Should not allow two attendance records for same employee/date."""
@@ -291,6 +293,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Should be PRESENT because shift is flexible
         self.assertEqual(response.data['status'], 'PRESENT')
+        self.assertFalse(response.data['is_late'])
 
     def test_rbac_attendance_hardening(self):
         """Verify that employees cannot modify status or others' attendance."""

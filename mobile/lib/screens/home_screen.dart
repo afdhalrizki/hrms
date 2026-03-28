@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 import 'payslip_screen.dart';
 import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
@@ -120,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
     final fullName = _userData?['fullname'] ?? 'User';
@@ -139,22 +140,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 delegate: SliverChildListDelegate([
                   _buildWeatherDate(dateStr),
                   const SizedBox(height: 32),
-                  _buildAttendanceCard(context, _userData?['employee_id']),
+                  _buildAttendanceCard(context, _userData?['employee_id'], l10n),
                   const SizedBox(height: 32),
-                  _buildSectionHeader(AppLocalizations.of(context)!.quickAccess),
+                  _buildSectionHeader(l10n.quickAccess),
                   const SizedBox(height: 16),
-                  _buildQuickAccessGrid(context),
+                  _buildQuickAccessGrid(context, l10n),
                   const SizedBox(height: 32),
-                  _buildSectionHeader(AppLocalizations.of(context)!.recentActivities),
+                  _buildSectionHeader(l10n.recentActivities),
                   const SizedBox(height: 16),
-                  _buildRecentActivity(),
+                  _buildRecentActivity(l10n),
                 ]),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, l10n),
     );
   }
 
@@ -211,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildAttendanceCard(BuildContext context, int? employeeId) {
+  Widget _buildAttendanceCard(BuildContext context, int? employeeId, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Text(
-                    AppLocalizations.of(context)!.clockInTime,
+                    AppLocalizations.of(context)!.clockInTime, // keep as is if context is needed or change to l10n
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
@@ -263,9 +264,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const Icon(Icons.location_on, color: Colors.white, size: 14),
               const SizedBox(width: 4),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  AppLocalizations.of(context)!.headOffice,
+                  l10n.headOffice,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
@@ -276,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(AppLocalizations.of(context)!.onTime, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                child: Text(l10n.onTime, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -329,8 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Text(
               _latestAttendance != null && _latestAttendance!['check_out'] == null 
-                ? AppLocalizations.of(context)!.clockOut
-                : AppLocalizations.of(context)!.clockIn,
+                ? l10n.clockOut
+                : l10n.clockIn,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -350,15 +351,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildQuickAccessGrid(BuildContext context) {
+  Widget _buildQuickAccessGrid(BuildContext context, AppLocalizations l10n) {
     final items = [
-      {'icon': Icons.calendar_today, 'label': AppLocalizations.of(context)!.leaves, 'color': const Color(0xFFEF4444)},
-      {'icon': Icons.receipt, 'label': AppLocalizations.of(context)!.payslip, 'color': const Color(0xFF10B981)},
-      {'icon': Icons.payments, 'label': AppLocalizations.of(context)!.reimbursement, 'color': const Color(0xFFF59E0B)},
-      {'icon': Icons.person, 'label': AppLocalizations.of(context)!.myProfile, 'color': const Color(0xFF6366F1)},
-      {'icon': Icons.badge, 'label': AppLocalizations.of(context)!.documents, 'color': const Color(0xFF8B5CF6)},
-      {'icon': Icons.edit_calendar, 'label': AppLocalizations.of(context)!.correction, 'color': const Color(0xFFF43F5E)},
-      {'icon': Icons.trending_up, 'label': AppLocalizations.of(context)!.performance, 'color': const Color(0xFF10B981)},
+      {'icon': Icons.calendar_today, 'label': l10n.leaves, 'color': const Color(0xFFEF4444)},
+      {'icon': Icons.receipt, 'label': l10n.payslip, 'color': const Color(0xFF10B981)},
+      {'icon': Icons.payments, 'label': l10n.reimbursement, 'color': const Color(0xFFF59E0B)},
+      {'icon': Icons.person, 'label': l10n.myProfile, 'color': const Color(0xFF6366F1)},
+      {'icon': Icons.badge, 'label': l10n.documents, 'color': const Color(0xFF8B5CF6)},
+      {'icon': Icons.edit_calendar, 'label': l10n.correction, 'color': const Color(0xFFF43F5E)},
+      {'icon': Icons.trending_up, 'label': l10n.performance, 'color': const Color(0xFF10B981)},
     ];
 
     return GridView.builder(
@@ -426,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRecentActivity() {
+  Widget _buildRecentActivity(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -434,12 +435,12 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              AppLocalizations.of(context)!.recentActivities,
+              l10n.recentActivities,
               style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
               onPressed: () {},
-              child: Text(AppLocalizations.of(context)!.viewAll, style: const TextStyle(color: Colors.blueAccent)),
+              child: Text(l10n.viewAll, style: const TextStyle(color: Colors.blueAccent)),
             ),
           ],
         ),
@@ -503,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
+  Widget _buildBottomNavigation(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.only(top: 16, bottom: 32),
       decoration: BoxDecoration(

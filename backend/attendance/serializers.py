@@ -3,10 +3,14 @@ from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBa
 
 class AttendanceSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
+    is_late = serializers.SerializerMethodField()
     
     class Meta:
         model = Attendance
         fields = '__all__'
+
+    def get_is_late(self, obj):
+        return obj.status == 'LATE'
 
 class LeaveBalanceSerializer(serializers.ModelSerializer):
     remaining_days = serializers.ReadOnlyField()
@@ -44,6 +48,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 class ScheduleSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
     shift_name = serializers.ReadOnlyField(source='shift.name')
+    shift_detail = ShiftSerializer(source='shift', read_only=True)
     
     class Meta:
         model = Schedule

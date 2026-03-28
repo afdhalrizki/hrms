@@ -16,10 +16,10 @@ prod:
 	docker-compose --env-file environments/.env.production up -d
 
 down:
-	docker-compose down
+	docker-compose --env-file $(ENV_FILE) down
 
 ps:
-	docker-compose ps
+	docker-compose --env-file $(ENV_FILE) ps
 
 logs:
-	docker-compose logs -f
+	docker-compose --env-file $(ENV_FILE) logs -f

@@ -90,22 +90,24 @@ for user_data in test_users:
 # Now ensure Employee records exist in company1 schema
 with schema_context('company1'):
     # Cleanup mutated state from previous test runs
-    from attendance.models import Attendance, LeaveRequest, Overtime
+    from attendance.models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
     from payroll.models import PayrollPeriod, Payslip
     from performance.models import AppraisalReview, Appraisal
     from core.models import WorkflowConfig, WorkflowStage
-    from reimbursement.models import Reimbursement
+    from reimbursement.models import Reimbursement, ReimbursementCategory
     
     Attendance.objects.all().delete()
     LeaveRequest.objects.all().delete()
     Overtime.objects.all().delete()
     Reimbursement.objects.all().delete()
+    ReimbursementCategory.objects.all().delete()
     Payslip.objects.all().delete()
     PayrollPeriod.objects.all().delete()
     AppraisalReview.objects.all().delete()
     Appraisal.objects.all().delete()
     WorkflowStage.objects.all().delete()
     WorkflowConfig.objects.all().delete()
+    Shift.objects.all().delete()
     
     # Cleanup core master data to avoid unique constraint violations
     Employee.objects.all().delete()
@@ -114,40 +116,21 @@ with schema_context('company1'):
     Golongan.objects.all().delete()
     AccessRole.objects.all().delete()
 
-    # Reset branding settings if they exist to prevent text match failure on 'Tenant Branding' vs whatever it changes to
-    if hasattr(tenant, 'settings'):
-        tenant.settings.primary_color = '#6366f1'
-        tenant.settings.save()
-
     dept, _ = Department.objects.get_or_create(name="Engineering")
     role_se, _ = Role.objects.get_or_create(name="Software Engineer", department=dept)
     gol, _ = Golongan.objects.get_or_create(name="3A", defaults={'base_salary': 5000000})
     
-    # Manager
-    manager_role, _ = AccessRole.objects.get_or_create(
-        name="Manager",
-        defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'view_payroll': True}}
-    )
-    manager_emp, _ = Employee.objects.get_or_create(
-        email='manager1@company1.com',
-        defaults={
-            'nik': 'MGR001',
-            'fullname': 'Manager One',
-            'department': dept,
-            'role': role_se,
-            'golongan': gol,
-            'join_date': date(2025, 1, 1),
-            'ktp_number': 'MGR123'
-        }
-    )
-    manager_emp.access_role = manager_role
-    manager_emp.save()
-
-    # Admin (Employee record)
+    # Roles
     admin_role, _ = AccessRole.objects.get_or_create(
         name="Admin",
         defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'manage_payroll': True, 'manage_branding': True}}
     )
+    manager_role, _ = AccessRole.objects.get_or_create(
+        name="Manager",
+        defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'view_payroll': True}}
+    )
+
+    # Admin (Employee record) - Seeded first for ID 1
     admin_emp, _ = Employee.objects.get_or_create(
         email='admin@company1.com',
         defaults={
@@ -162,7 +145,23 @@ with schema_context('company1'):
     )
     admin_emp.access_role = admin_role
     admin_emp.save()
-
+    
+    # Manager
+    manager_emp, _ = Employee.objects.get_or_create(
+        email='manager1@company1.com',
+        defaults={
+            'nik': 'MGR001',
+            'fullname': 'Manager One',
+            'department': dept,
+            'role': role_se,
+            'golongan': gol,
+            'join_date': date(2025, 1, 1),
+            'ktp_number': 'MGR123'
+        }
+    )
+    manager_emp.access_role = manager_role
+    manager_emp.save()
+    
     # Employee
     employee_emp, _ = Employee.objects.get_or_create(
         email='employee1@company1.com',
@@ -177,8 +176,23 @@ with schema_context('company1'):
             'supervisor': manager_emp
         }
     )
-    employee_emp.supervisor = manager_emp
-    employee_emp.save()
+    
+    # Reimbursement Categories
+    med_cat, _ = ReimbursementCategory.objects.get_or_create(name="Medical", defaults={'max_amount': 1000000})
+    travel_cat, _ = ReimbursementCategory.objects.get_or_create(name="Travel", defaults={'max_amount': 5000000})
+    
+    # Shifts & Schedules
+    shift, _ = Shift.objects.get_or_create(
+        name="Standard", 
+        defaults={'start_time': "09:00:00", 'end_time': "18:00:00", 'work_days': [0,1,2,3,4]}
+    )
+    # Seed schedules for both admin and employee
+    Schedule.objects.get_or_create(employee=admin_emp, shift=shift, date=date.today())
+    Schedule.objects.get_or_create(employee=employee_emp, shift=shift, date=date.today())
+    
+    # Leave Balance
+    LeaveBalance.objects.get_or_create(employee=admin_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
+    LeaveBalance.objects.get_or_create(employee=employee_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
 
     # Add Appraisal Data for performance test
     from performance.models import KPI, KPITarget, Appraisal
@@ -189,10 +203,10 @@ with schema_context('company1'):
         period=date(2026, 1, 1),
         defaults={'target_value': 1000000, 'actual_value': 0}
     )
-    Appraisal.objects.get_or_create(
+    appraisal, _ = Appraisal.objects.get_or_create(
         employee=employee_emp,
         period_name="Q1 2026",
-        defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'SUBMITTED'}
+        defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'DRAFT'}
     )
 
 # Clean up company2 schema as well

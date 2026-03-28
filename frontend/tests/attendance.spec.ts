@@ -51,10 +51,10 @@ test.describe.serial('Attendance Management', () => {
         const today = new Date().toISOString().split('T')[0];
         if (method === 'GET') {
           responseBody = [
-            { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: null, status: "PRESENT", liveness_verified: true, verification_method: 'LIVENESS' }
+            { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: null, status: "PRESENT", is_late: false, liveness_verified: true, verification_method: 'LIVENESS' }
           ];
         } else {
-          responseBody = { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: "17:00", status: "PRESENT", liveness_verified: true, verification_method: 'LIVENESS' };
+          responseBody = { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: "17:00", status: "PRESENT", is_late: false, liveness_verified: true, verification_method: 'LIVENESS' };
           status = 201;
         }
       }

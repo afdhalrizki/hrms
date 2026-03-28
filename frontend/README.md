@@ -46,29 +46,23 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 
 ---
 
-## 1. Setup & Installation
+## 📦 Getting Started
 
 ### Install Dependencies
 ```bash
-cd frontend
 npm install
 ```
 
-### Development
+### 🚀 Running the Platform
 ```bash
 npm run dev
 ```
 
 **Verify Frontend**:
-- **Public Portal**: [http://localhost:3000](http://localhost:3000) (For signup/login)
-- **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000) (For HR operations)
+- **Public Portal**: [http://localhost:3000](http://localhost:3000)
+- **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
 
-> [!IMPORTANT]
-> To access tenant subdomains locally (e.g., `company1.localhost`), ensure your `hosts` file is configured correctly.
-
----
-
-## 🌐 5. Deployment Hierarchy & Infrastructure
+## 🌐 Deployment & Infrastructure
 
 The harikerja platform follows a strict 4-tier promotion path:
 
@@ -76,53 +70,22 @@ The harikerja platform follows a strict 4-tier promotion path:
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
 | **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test (Identical to Production). |
-| **Production** | `harikerja.com` | **AWS Enterprise** | Official high-availability enterprise workloads. |
+| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
+| **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 
-### Local Multi-Tenancy Setup
-To test tenant-specific dashboards locally (e.g., `company1`), update your OS `hosts` file:
-```text
-127.0.0.1 company1.localhost
+## 🧪 Testing Standard
+
+The frontend uses a dual-layer strategy with **100% pass rate** across all scenarios.
+
+### Unit Testing (Vitest)
+```powershell
+.\run_tests.ps1
 ```
-Then access [http://company1.localhost:3000](http://company1.localhost:3000).
 
----
-
-## 3. Testing Infrastructure
-
-The frontend uses a professional, dual-layer testing strategy to ensure 100% reliability across critical HRMS workflows.
-
-### 🧪 Unit Testing (Vitest)
-Comprehensive logic and component verification using **Vitest** and **React Testing Library**.
-- **100% Pass Rate**: 18 spec files (61 tests) covering Auth, Tenant, ESS Profile, and individual modules.
-- **Automation**: Use the one-click script for dependency checks and coverage:
-  ```powershell
-  .\run_tests.ps1
-  ```
-
-### 🎭 End-to-End Testing (Playwright)
-Functional verification of full user journeys (Attendance, Payroll, Performance, Reimbursements, Profile, Workflows, Analytics).
-- **100% Pass Rate**: 12 spec files (21 tests) validated on Chromium, achieving zero flakiness.
-- **Same-Origin Mocking**: Tests run on port 3000 to bypass CORS complexity and ensure high-fidelity request interception.
-- **Automation**: Use the centralized automation script:
-  ```powershell
-  .\run_e2e.ps1
-  ```
-
----
-
-## 4. UI/UX Excellence (Phase 71)
-- **Interactive Analytics**: Dashboard includes `AttendanceChart` for real-time visualization of work patterns.
-- **Zero-CLS Rendering**: Systematic use of `Skeleton` loaders across Home and Performance modules.
-
----
-
-## 5. Troubleshooting
-- **Failed to Fetch**: Ensure `NEXT_PUBLIC_API_PORT=3000` is set in `.env.local` to match the Playwright mocking origin.
-- **Subdomain Resolution**: Add `company1.localhost` and `company2.localhost` to your OS `hosts` file for local multi-tenant testing.
-
-
----
+### End-to-End Testing (Playwright)
+```powershell
+.\run_e2e.ps1
+```
 
 ## 📚 Technical Documentation
 

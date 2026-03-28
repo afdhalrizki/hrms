@@ -1,5 +1,4 @@
 
-
 services:
   db:
     image: postgres:15-alpine
@@ -10,6 +9,48 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hrms_user -d hrms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  pgbouncer:
+    image: brainsam/pgbouncer:latest
+    env_file:
+      - ./environments/.env.local
+    ports:
+      - "6432:6432"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
 
   backend:
     build:
@@ -20,29 +61,22 @@ services:
     volumes:
       - ./backend:/app
     env_file:
-      - ./environments/.env.local # Default for straight docker-compose up, overridden by --env-file
-    depends_on:
-      - db
-      - redis
-      - pgbouncer
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-
-  pgbouncer:
-    image: brainsam/pgbouncer:latest
-    env_file:
       - ./environments/.env.local
-    ports:
-      - "6432:6432"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition:
+          service_started
     restart: unless-stopped
- 
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
   frontend:
     build:
       context: ./frontend
@@ -56,8 +90,15 @@ services:
     env_file:
       - ./environments/.env.local
     depends_on:
-      - backend
+      backend:
+        condition:
+          service_started
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2048M
 
 volumes:
   postgres_data:

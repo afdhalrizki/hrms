@@ -15,38 +15,24 @@ A next-generation, multi-tenant Human Resource Management System (HRMS) built fo
 </p>
 *Biometric face verification and real-time ESS (Employee Self-Service) for modern workforces.*
 
----
-
-## 🚀 Quick Start
+## 📦 Getting Started
 
 Unified scripts to manage **Development**, **Staging**, and **Production** environments seamlessly.
 
 ### Windows (PowerShell)
 ```powershell
-# Format: .\up.ps1 [dev|qa|staging|prod] [flags]
-.\up.ps1 dev -build    # Start local dev
-.\up.ps1 qa            # Start QA (IDCloudHost)
-.\up.ps1 staging       # Start Staging (AWS - 1M user test)
-.\up.ps1 prod -logs    # Start Production (AWS)
+.\up.ps1 dev -build
 ```
 
 ### Linux/macOS (Make)
 ```bash
-make dev               # Start local dev
-make qa                # Start QA
-make staging           # Start staging
-make prod              # Start production
+make dev
 ```
 
 **Access Points (Local Dev):**
 - **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
 - **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
 - **Backend API Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
-
-> [!NOTE]
-> For cloud deployments (**harilibur.web.id**, **harikerja.web.id**, or **harikerja.com**), see the [**Deployment Guide**](./deployment/README.md).
-
----
 
 ## 📁 Project Modules
 
@@ -55,42 +41,46 @@ make prod              # Start production
 | **Backend** | Django REST API & Multi-tenant Core | [**README**](./backend/README.md) |
 | **Frontend** | Next.js Premium Admin Dashboard | [**README**](./frontend/README.md) |
 | **Mobile** | Flutter Employee Self-Service App | [**README**](./mobile/README.md) |
-| **Docs** | Architecture & Project History | [**Walkthrough**](./docs/walkthrough.md) |
 
----
-
-## 💎 Premium Features
+## 🚀 Key Features
 
 - **Multi-Tenant Foundation**: Complete data isolation using PostgreSQL schemas per customer.
-- **Tenant Customization**: Administrators can securely upload custom company logos and contact details dynamically mapped across the UI.
 - **Biometric Security**: AI-powered Face ID with liveness check using Google ML Kit.
-- **Admin Provisioning**: Centralized creation logic mapping employees instantly to global User accounts with optional Tenant Admin rights (Limited to 5 per company by default).
-- **Dynamic Approvals**: Multi-stage approval workflows for Leave, Overtime, and **Reimbursements**, allowing per-tenant customization (Supervisor, HR, or Both).
-- **Expense Claim Management**: Automated reimbursement system with digital receipt tracking and direct integration into monthly payroll processing.
-- **SaaS Tiering & Quotas**: Graduated feature access (Basic, Professional, Enterprise) with resource-based quotas (e.g., max employees, max admins).
-- **Payroll Engine**: Fully compliant Indonesian PPh 21 (TER 2024), BPJS calculation engine, and automated overtime compensation integration.
-- **Auto-Onboarding**: Commercial-ready self-service registration and schema provisioning workflow.
-- **Analytics**: High-performance executive dashboards with real-time HR metrics.
+- **Indonesian Payroll Compliance**: Fully compliant **TER 2024 PPh 21** and BPJS engine.
+- **Strategic Performance**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
+- **ESS Profile Management**: Self-service portal for employees to update personal info and upload documents.
+- **Auto-Onboarding**: Commercial-ready self-service registration and schema provisioning.
 
-## 🌐 Deployment Environments
+## 🌐 Deployment & Infrastructure
 
-The platform is architected for seamless transition from dev to enterprise scale:
-
-| Environment | Domain | Hosting Platform | Purpose |
+| Tier | Domain | Hosting Platform | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Development** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `harilibur.web.id` | **IDCloudHost VPS** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.web.id` | **Enterprise AWS** | 1M User stress test (Identical to Production). |
-| **Production** | `harikerja.com` | **Enterprise AWS** | Official high-availability enterprise workloads. |
+| **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
+| **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
+| **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 
----
+## 🧪 Testing Standard
+
+The platform achieves a unified **100% test pass rate** across all layers of the stack.
+
+- **Backend**: 168 Logic tests (Pytest).
+- **Frontend**: 61 Unit tests (Vitest) + 25 E2E tests (Playwright).
+- **Mobile**: 25 Logic tests verified against a live backend.
+
+## 📚 Technical Documentation
+
+For in-depth technical details, please refer to the platform-wide internal documentation:
+- [**Implementation Plan**](./docs/implementation_plan.md)
+- [**Walkthrough & Results**](./docs/walkthrough.md)
+- [**Development Roadmap**](./docs/task.md)
 
 ## 🛠 Tech Stack
 
-- **Backend**: Python 3.12+, Django 5.0, Django-Tenants (Schema-based Multi-tenancy), Django REST Framework, DRF Spectacular (OpenAPI 3.1).
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion (Animations), Vitest.
-- **Mobile**: Flutter 3.19+, Dart, Google ML Kit (Face Biometrics), Flutter Secure Storage.
-- **Infrastructure**: PostgreSQL 15, Redis 7 (Caching & Async), PgBouncer (Connection Pooling), Docker Compose (Local & Staging), AWS (Production).
+- **Backend**: Python 3.12+, Django 6.0, Django-Tenants, DRF.
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion.
+- **Mobile**: Flutter 3.19+, Dart, Google ML Kit (Biometrics).
+- **Infrastructure**: PostgreSQL 15, Redis 7, PgBouncer, AWS (EKS/RDS/S3).
 
 ---
-**Status**: Milestone 🎉 Phases 65-69 (Audit Logs, Appraisal Lifecycle, SaaS Branding, E2E Hardening, and Modular Tiering) 100% Complete. All backend unit tests passing (86/86). Rebranded to **harikerja** on March 19, 2026.
+**Status**: 🏆 **Platform Gold Release v1.2.0 (March 27, 2026)**. 100% Verified.

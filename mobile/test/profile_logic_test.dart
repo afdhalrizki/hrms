@@ -1,46 +1,24 @@
-import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/api_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 
 void main() {
-  initRealBackendTest();
-  late ApiService apiService;
+  group('Phase M2: Profile & Documents Tests (Mocked)', () {
+    late ApiService apiService;
 
-  setUpAll(() {
-    setupSecureStorageMock();
-  });
-
-  group('Phase M2: Profile & Documents Tests', () {
     setUp(() async {
-      ApiService.reset();
-      SharedPreferences.setMockInitialValues({});
+      await setupMockApiService();
       apiService = ApiService();
     });
 
-    test('updateProfile sends PATCH request to real backend', () async {
+    test('updateProfile sends PATCH successfully', () async {
       await loginForTest();
-      final profile = await apiService.getUserProfile();
-      final employeeId = profile['employee_id'];
-
-      try {
-        await apiService.updateProfile(employeeId, {'phone': '08123456789'});
-      } catch (e) {
-        print('Profile Update Info: $e');
-      }
+      await apiService.updateProfile(101, {'phone': '08123456789'});
     });
 
-    test('uploadDocument sends multipart request to real backend', () async {
+    test('uploadDocument sends multipart request successfully', () async {
       await loginForTest();
-      final profile = await apiService.getUserProfile();
-      final employeeId = profile['employee_id'];
-
-      try {
-        await apiService.uploadDocument(employeeId, 'ktp_image', [1, 2, 3], 'test.jpg');
-      } catch (e) {
-        print('Document Upload Info: $e');
-      }
+      await apiService.uploadDocument(101, 'ktp_image', [1, 2, 3], 'test.jpg');
     });
   });
 }

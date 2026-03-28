@@ -90,22 +90,22 @@ class ApiService {
     final headers = _headers(tenant);
     print('DEBUG MOBILE: Headers: $headers');
     
+    final url = Uri.parse("$baseUrl/auth/login/");
     final response = await _client.post(
-      Uri.parse("$baseUrl/auth/login/"), 
+      url,
       headers: headers,
       body: jsonEncode({
         'email': email,
         'password': password,
       }),
-    );
+    ).timeout(const Duration(seconds: 10));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       // Backend returns 'access' and 'refresh' keys now
       await _storage.write(key: 'jwt_token', value: data['access'] ?? data['token']);
-      if (data['refresh'] != null) {
-        await _storage.write(key: 'refresh_token', value: data['refresh']);
-      }
+      await _storage.write(key: 'refresh_token', value: data['refresh']);
+      await _storage.write(key: 'tenant', value: tenant);
       await setTenant(tenant);
       return data;
     } else {
@@ -230,7 +230,7 @@ class ApiService {
   Future<List<Schedule>> getMySchedules() async {
     final tenant = await getTenant();
     final response = await _authenticatedRequest((token) => _client.get(
-      Uri.parse("$baseUrl/attendance/schedule/my-schedule/"),
+      Uri.parse("$baseUrl/schedules/"),
       headers: _headers(tenant, token),
     ));
 

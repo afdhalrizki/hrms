@@ -21,11 +21,37 @@ if (-not (Test-Path $EnvFile)) {
 # 3. Handle Docker Services (DB, Redis, PgBouncer)
 Write-Host "[1/3] Ensuring Docker services (db, redis, pgbouncer) are running..." -ForegroundColor Yellow
 
-# Check if Docker is running
+# Check if Docker is running, if not try to start it
 docker info >$null 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Docker daemon is not running. Please start Docker Desktop first!" -ForegroundColor Red
-    exit 1
+    Write-Host "⚠️ Docker daemon is not running. Attempting to start Docker Desktop..." -ForegroundColor Yellow
+    
+    $dockerPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    if (Test-Path $dockerPath) {
+        Start-Process $dockerPath
+        Write-Host "🚀 Starting Docker Desktop... Please wait." -ForegroundColor Gray
+        
+        $maxWait = 24 # 24 * 5 seconds = 2 minutes
+        $waited = 0
+        while ($waited -lt $maxWait) {
+            Start-Sleep -Seconds 5
+            docker info >$null 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "`n✅ Docker is now running!" -ForegroundColor Green
+                break
+            }
+            Write-Host "." -NoNewline -ForegroundColor Gray
+            $waited++
+        }
+        
+        if ($waited -eq $maxWait) {
+            Write-Host "`n❌ ERROR: Docker did not start in time. Please check Docker Desktop manually." -ForegroundColor Red
+            exit 1
+        }
+    } else {
+        Write-Host "❌ ERROR: Docker Desktop not found at $dockerPath. Please start it manually!" -ForegroundColor Red
+        exit 1
+    }
 }
 
 try {
@@ -69,7 +95,7 @@ Write-Host "Waiting for database to be ready on localhost:5432..." -ForegroundCo
 $maxTries = 20
 $tryCount = 0
 while ($tryCount -lt $maxTries) {
-    $test = Test-NetConnection -ComputerName "localhost" -Port 5432 -InformationLevel Quiet
+    $test = Test-NetConnection -ComputerName "127.0.0.1" -Port 5432 -InformationLevel Quiet
     if ($test) {
         Write-Host "Database is ready!" -ForegroundColor Green
         break
@@ -93,6 +119,7 @@ if (-not (Test-Path $PytestExec)) {
 
 # 6. Run Pytest
 Write-Host "--- Running HRMS Backend Unit Tests ---" -ForegroundColor Green
+Write-Host "Tip: You can pass specific test paths as arguments (e.g., .\run_tests.ps1 users/)" -ForegroundColor Gray
 
 # Create a temporary file to capture output for parsing
 $tempFile = [System.IO.Path]::GetTempFileName()
