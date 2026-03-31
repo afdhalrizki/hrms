@@ -92,11 +92,12 @@ pwsh ./run_e2e_tests.ps1
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the internal documentation:
+- [**Internal Support Blueprint**](../docs/plans/future_support_ai.md)
 - [**Implementation Plan**](./docs/implementation_plan.md)
 - [**Walkthrough & Results**](./docs/walkthrough.md)
 - [**Development Roadmap**](./docs/task.md)
 
 ---
-**Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**. 100% Tests Passed (155/155).
+**Project Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Backend Core Standardized.
 **Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.
 

@@ -150,7 +150,7 @@ Once all containers are active, enter the `backend` container and run migrations
 ```bash
 docker compose exec backend bash
 python manage.py migrate_schemas --shared
-python manage.py create_tenant --schema_name=public --name="Harilibur QA Master" --domain-domain=qa.harikerja.com --is_primary=True
+python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=qa.harikerja.com --is_primary=True
 ```
 
 ---

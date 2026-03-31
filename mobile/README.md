@@ -89,10 +89,12 @@ pwsh .\run_e2e_tests.ps1
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the internal documentation:
+- [**Internal Support Blueprint**](../docs/plans/future_support_ai.md)
 - [**Implementation Plan**](./docs/implementation_plan.md)
 - [**Walkthrough & Results**](./docs/walkthrough.md)
 - [**Development Roadmap**](./docs/task.md)
 
 ---
+**Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Mobile Experience Standardized.
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
 

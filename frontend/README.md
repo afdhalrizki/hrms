@@ -90,11 +90,12 @@ The frontend uses a dual-layer strategy with **100% pass rate** across all scena
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the internal documentation:
+- [**Internal Support Blueprint**](../docs/plans/future_support_ai.md)
 - [**Implementation Plan**](./docs/implementation_plan.md)
 - [**Walkthrough & Results**](./docs/walkthrough.md)
 - [**Development Roadmap**](./docs/task.md)
 
 ---
-**Status**: 🏆 **ESS Frontend Hardening & UX Optimization (March 24, 2026)**
+**Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Frontend Experience Standardized.
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
 

@@ -43,8 +43,12 @@ Standardized across all stacks to ensure reliable delivery from local dev to ent
 - **Frontend Logic**: 61 Vitest + 25 Playwright scenarios passed.
 - **Mobile Logic**: 25 Logic tests passed against live backend.
 
-### Documentation Standard (DONE)
-- Standardized `README.md` and `docs/` structure (Implementation Plan, Task Roadmap, Walkthrough) implemented in Backend, Frontend, and Mobile modules.
+## 🚀 5. Scaling & Support Roadmap (Upcoming)
 
-**Final Status**: 🏆 **Platform Gold Standard v1.2.0 (March 27, 2026)**.
+As the platform targets **1 million concurrent users**, the implementation plan expands into high-availability and AI-driven operations:
+- **Infrastructure**: Horizontal pod autoscaling (HPA) via AWS EKS and Read-Replicas for PostgreSQL.
+- **AI Support**: Implementation of the [**Internal Support Blueprint**](./plans/future_support_ai.md), leveraging an AI Assistant for policy-based inquiries.
+- **Global Compliance**: Preparing the PPh 21 engine for multi-regional taxation beyond Indonesian TER 2024.
+
+**Final Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Global Documentation Standardized.
 
