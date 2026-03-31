@@ -34,8 +34,8 @@ The harikerja platform is architected for a seamless promotion path from local d
 | Tier | Domain | Hosting Provider | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Development** | `localhost` | Local Docker | Rapid prototyping & regional local testing. |
-| **QA** | `harilibur.web.id` | **IDCloudHost VPS** | Functional UAT and quality assurance testing. |
-| **Staging** | `harikerja.web.id` | **Enterprise AWS** | 1M User stress testing (Identical to Production). |
+| **QA** | `qa.harikerja.web.id` | **IDCloudHost VPS** | Functional UAT and quality assurance testing. |
+| **Staging** | `staging.harikerja.web.id` | **Enterprise AWS** | 1M User stress testing (Identical to Production). |
 | **Production** | `harikerja.com` | **Enterprise AWS** | Official high-availability enterprise workloads. |
 
 ### Infrastructure Synchronization
@@ -47,7 +47,7 @@ The harikerja platform is architected for a seamless promotion path from local d
 
 - **Local Dev**: `.\run_dev.ps1` (Backend) maps environments and databases automatically.
 - **Deployment**: `.\up.ps1 [dev|qa|staging|prod]` (Root) orchestrates the entire stack.
-- **Testing**: Centralized `run_tests.ps1` scripts in each module for CI/CD integration.
+- **Testing**: Centralized `run_unit_tests.ps1` scripts in each module for CI/CD integration.
 
 ## 📚 Documentation Hardening (Phase M12)
 
@@ -60,3 +60,4 @@ Verified and standardized technical documentation across the entire harikerja ec
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.2.0-Standardized (March 27, 2026)**. All documentation and verification results are synchronized across the 4-tier infrastructure.
+

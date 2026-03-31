@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Admin Payroll Management', () => {
-  const adminUrl = 'http://company1.localhost:3000';
+  const adminUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -62,15 +62,15 @@ test.describe.serial('Admin Payroll Management', () => {
       }
     });
 
-    await page.goto(`${adminUrl}/login`);
-    await page.locator('input[type="email"]').fill('admin@company1.net');
-    await page.locator('input[type="password"]').fill('password123');
+    await page.goto(`${adminUrl}/en/login?test_tenant=company1`);
+    await page.locator('input[id="email"]').fill('admin@company1.net');
+    await page.locator('input[id="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
   });
 
   test('should allow admin to generate payroll for a period', async ({ page }) => {
-    await page.goto(`${adminUrl}/payroll`);
+    await page.goto(`${adminUrl}/en/payroll?test_tenant=company1`);
     
     // 1. Verify Stats are visible (using .first() to avoid strict mode violations if multiple)
     await expect(page.getByText('Rp 11,500,000').first()).toBeVisible({ timeout: 15000 });
@@ -99,7 +99,7 @@ test.describe.serial('Admin Payroll Management', () => {
   });
 
   test('should allow admin to view payslip details', async ({ page }) => {
-    await page.goto(`${adminUrl}/payroll`);
+    await page.goto(`${adminUrl}/en/payroll?test_tenant=company1`);
     
     // Find the view button in the table row
     const row = page.locator('tr').filter({ hasText: 'John Doe' });

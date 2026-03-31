@@ -39,7 +39,7 @@ This roadmap documents the evolution of the **harikerja HRMS** mobile applicatio
     - [x] Add transparent `401` refresh interceptor in `lib/api.ts`.
     - [x] Synchronize Vitest and Playwright mock endpoints.
 - [x] **M10: Frontend E2E Automation Hardening**
-    - [x] Update `run_e2e.ps1` with port 3000 cleanup logic.
+    - [x] Update `run_e2e_tests.ps1` with port 3000 cleanup logic.
     - [x] Update `playwright.config.ts` with increased timeouts.
     - [x] Final E2E verification (25/25 passing).
 - [x] **M11: Real-Backend Mobile Logic Verification**

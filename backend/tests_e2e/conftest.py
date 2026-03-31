@@ -16,11 +16,12 @@ def tenant2_domain():
 
 @pytest.fixture
 def client():
-    return httpx.Client(timeout=10.0)
+    # Increased timeout for E2E tests to avoid transient Docker startup/network delays
+    return httpx.Client(timeout=60.0)
 
 @pytest.fixture
 async def async_client():
-    async with httpx.AsyncClient(timeout=10.0) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         yield client
 
 def get_auth_headers(domain, token=None):

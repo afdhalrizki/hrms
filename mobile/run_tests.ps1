@@ -1,124 +1,62 @@
-# Run all Flutter unit tests with detailed reporting
-Write-Host "🚀 Starting Mobile Unit Test Suite (Detailed Reporting)..." -ForegroundColor Cyan
+# HARIKERJA Mobile Master Test Runner
+# This script executes both Flutter unit tests and Flutter E2E tests for the mobile app.
 
-# Ensure we are in the script's directory (Flutter project root)
-Push-Location $PSScriptRoot
-
-$testFiles = @(
-    "test/api_service_test.dart",
-    "test/attendance_logic_test.dart",
-    "test/correction_logic_test.dart",
-    "test/leave_logic_test.dart",
-    "test/models_test.dart",
-    "test/payslip_logic_test.dart",
-    "test/performance_logic_test.dart",
-    "test/profile_logic_test.dart",
-    "test/reimbursement_logic_test.dart"
+param (
+    [switch]$SkipE2E,      # Skip Flutter E2E tests
+    [switch]$SkipUnit      # Skip Flutter Unit tests
 )
 
-$globalPassed = 0
-$globalFailed = 0
-$globalErrors = 0
-$globalWarnings = 0
-$failedFiles = @()
+$ErrorActionPreference = "Stop"
+$ScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+Push-Location $ScriptDir
 
-foreach ($file in $testFiles) {
-    Write-Host "`n[RUNNING] $file" -ForegroundColor Yellow
-    
-    # Run flutter test with JSON reporter to capture granular results
-    $rawOutput = & flutter test --reporter json $file 2>&1
-    
-    $filePassed = 0
-    $fileFailed = 0
-    $fileErrors = 0
-    $fileReasons = @()
-    $hasWarning = $false
-    $foundResults = $false
-    
-    # Track test names by ID
-    $testNames = @{}
+# Ensuring log directory exists
+$LogDir = Join-Path $ScriptDir "logs"
+if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+$LogFile = Join-Path $LogDir ("master_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
-    foreach ($line in $rawOutput) {
-        $lineStr = $line.ToString().Trim()
-        
-        # Detect Warnings
-        if ($lineStr -match "(?i)warning") { 
-            $hasWarning = $true; 
-            if ($lineStr -notmatch '^{.*}$') {
-                $fileReasons += "    ⚠️ $lineStr"
-            }
-        }
+# Start capturing all output for this orchestration run
+Start-Transcript -Path $LogFile -Append
+try {
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "🏆 HARIKERJA MOBILE TEST ORCHESTRATOR" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
 
-        # Parse JSON events
-        if ($lineStr.StartsWith("{") -and $lineStr.EndsWith("}")) {
-            try {
-                $evt = $lineStr | ConvertFrom-Json -ErrorAction SilentlyContinue
-                if (!$evt) { continue }
+$allPassed = $true
 
-                if ($evt.type -eq "testStart" -and $evt.test.name) {
-                    $testNames[$evt.test.id] = $evt.test.name
-                }
-
-                if ($evt.type -eq "error") {
-                    $name = if ($testNames.ContainsKey($evt.testID)) { $testNames[$evt.testID] } else { "Unknown Test" }
-                    $fileReasons += "    ❌ [$name]: $($evt.error)"
-                }
-
-                if ($evt.type -eq "testDone") {
-                    # Ignore the 'loading' test (test ID 0)
-                    if ($evt.testID -eq 0) { continue }
-                    
-                    $foundResults = $true
-                    if ($evt.result -eq "success") { $filePassed++ }
-                    elseif ($evt.result -eq "failure") { $fileFailed++ }
-                    elseif ($evt.result -eq "error") { $fileErrors++ }
-                }
-            } catch { }
-        }
-    }
-
-    $globalPassed += $filePassed
-    $globalFailed += $fileFailed
-    $globalErrors += $fileErrors
-    if ($hasWarning) { $globalWarnings++ }
-
-    if ($fileFailed -gt 0 -or $fileErrors -gt 0 -or $foundResults -eq $false) {
-        $failedFiles += $file
-        if ($foundResults) {
-            Write-Host "  ❌ Result: FAILED ($filePassed passed, $fileFailed failed, $fileErrors errors)" -ForegroundColor Red
-        } else {
-             Write-Host "  ❌ Result: ERROR (No tests found or build failed)" -ForegroundColor Red
-             $globalErrors++
-        }
-        # Display Reasons
-        foreach ($reason in $fileReasons) {
-            Write-Host $reason -ForegroundColor Gray
-        }
+# 1. Run Unit Tests (Flutter)
+if (-not $SkipUnit) {
+    Write-Host "`n🧪 [1/2] Running Unit Tests (Flutter)..." -ForegroundColor Yellow
+    & ".\run_unit_tests.ps1"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ Unit Tests Failed." -ForegroundColor Red
+        $allPassed = $false
     } else {
-        $warnText = if ($hasWarning) { " (⚠️ with warnings)" } else { "" }
-        Write-Host "  ✅ Result: PASSED ($filePassed passed)$warnText" -ForegroundColor Green
-        if ($hasWarning) {
-            foreach ($reason in $fileReasons) { Write-Host $reason -ForegroundColor Gray }
-        }
+        Write-Host "✅ Unit Tests Passed." -ForegroundColor Green
     }
 }
 
-Write-Host "`n========================================" -ForegroundColor White
-Write-Host "🏁 FINAL TEST SUMMARY" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor White
-Write-Host "✅ TOTAL PASSED:   $globalPassed" -ForegroundColor Green
-Write-Host "❌ TOTAL FAILED:   $globalFailed" -ForegroundColor Red
-Write-Host "⚠️ TOTAL ERRORS:   $globalErrors" -ForegroundColor Magenta
-Write-Host "🔍 TOTAL WARNINGS: $globalWarnings" -ForegroundColor Yellow
-Write-Host "========================================" -ForegroundColor White
+# 2. Run E2E Tests (Flutter)
+if ($allPassed -and -not $SkipE2E) {
+    Write-Host "`n🌐 [2/2] Running E2E Tests (Flutter)..." -ForegroundColor Yellow
+    & ".\run_e2e_tests.ps1"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ E2E Tests Failed." -ForegroundColor Red
+        $allPassed = $false
+    } else {
+        Write-Host "✅ E2E Tests Passed." -ForegroundColor Green
+    }
+}
 
-Pop-Location
+} finally {
+    Stop-Transcript
+    Pop-Location
+}
 
-if ($failedFiles.Count -eq 0 -and $globalErrors -eq 0) {
-    Write-Host "🏆 100% SUCCESS" -ForegroundColor Green
+if ($allPassed) {
+    Write-Host "`n🏆 ALL HARIKERJA MOBILE TESTS PASSED." -ForegroundColor Green
     exit 0
 } else {
-    Write-Host "💀 SOME TESTS FAILED IN THE FOLLOWING FILES:" -ForegroundColor Red
-    foreach ($f in $failedFiles) { Write-Host "  - $f" }
+    Write-Host "`n💀 SOME HARIKERJA MOBILE TESTS FAILED." -ForegroundColor Red
     exit 1
 }

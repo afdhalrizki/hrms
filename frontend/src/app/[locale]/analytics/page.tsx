@@ -81,10 +81,10 @@ export default function AnalyticsPage() {
   const fmt = (n: number) => `Rp ${(n / 1_000_000).toFixed(1)}jt`;
 
   const kpis = [
-    { label: t('totalPayroll'), value: fmt(stats?.payroll_summary.total_net_pay || 0), icon: CreditCard, color: '#3B82F6' },
-    { label: t('totalHeadcount'), value: `${stats?.total_employees || 0}`, icon: Users, color: '#10B981' },
-    { label: t('overtimeCost'), value: fmt(stats?.payroll_summary.total_overtime || 0), icon: Clock, color: '#F59E0B' },
-    { label: t('costPerEmployee'), value: fmt((stats?.payroll_summary.total_net_pay || 0) / (stats?.total_employees || 1)), icon: TrendingUp, color: '#8B5CF6' },
+    { key: 'totalPayroll', label: t('totalPayroll'), value: fmt(stats?.payroll_summary.total_net_pay || 0), icon: CreditCard, color: '#3B82F6' },
+    { key: 'totalHeadcount', label: t('totalHeadcount'), value: `${stats?.total_employees || 0}`, icon: Users, color: '#10B981' },
+    { key: 'overtimeCost', label: t('overtimeCost'), value: fmt(stats?.payroll_summary.total_overtime || 0), icon: Clock, color: '#F59E0B' },
+    { key: 'costPerEmployee', label: t('costPerEmployee'), value: fmt((stats?.payroll_summary.total_net_pay || 0) / (stats?.total_employees || 1)), icon: TrendingUp, color: '#8B5CF6' },
   ];
 
   return (
@@ -117,8 +117,8 @@ export default function AnalyticsPage() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {kpis.map((k, i) => (
-            <div key={i} className="glass-card p-6 rounded-[2rem] border border-white/10 bg-white/5 relative overflow-hidden group">
+          {kpis.map((k) => (
+            <div key={k.key} data-testid={`kpi-${k.key}`} className="glass-card p-6 rounded-[2rem] border border-white/10 bg-white/5 relative overflow-hidden group">
               <div 
                 className="absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-20 transition-opacity group-hover:opacity-40"
                 style={{ background: k.color }}
@@ -128,8 +128,8 @@ export default function AnalyticsPage() {
                   <k.icon size={20} />
                 </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">{k.label}</p>
-              <p className="text-3xl font-black text-white">{k.value}</p>
+              <p data-testid={`kpi-${k.key}-label`} className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">{k.label}</p>
+              <p data-testid={`kpi-${k.key}-value`} className="text-3xl font-black text-white">{k.value}</p>
             </div>
           ))}
         </div>

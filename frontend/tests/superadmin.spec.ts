@@ -62,7 +62,7 @@ test.describe.serial('Superadmin Registration Management', () => {
     });
 
     // Login as Superadmin
-    await page.goto(`${superadminUrl}/login/portal-admin`);
+    await page.goto(`${superadminUrl}/en/login/portal-admin`);
     await page.locator('input[type="email"]').fill('superadmin@harikerja.com');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -70,7 +70,7 @@ test.describe.serial('Superadmin Registration Management', () => {
   });
 
   test('should allow superadmin to review and approve registration requests', async ({ page }) => {
-    await page.goto(`${superadminUrl}/admin/registrations`);
+    await page.goto(`${superadminUrl}/en/admin/registrations`);
     
     // 1. Verify Header and Stats
     await expect(page.getByRole('heading', { name: /Registration Requests/i })).toBeVisible();
@@ -95,7 +95,7 @@ test.describe.serial('Superadmin Registration Management', () => {
   });
 
   test('should allow superadmin to reject registration requests', async ({ page }) => {
-    await page.goto(`${superadminUrl}/admin/registrations`);
+    await page.goto(`${superadminUrl}/en/admin/registrations`);
     
     const pendingRow = page.locator('tr').filter({ hasText: 'Pending Corp' });
     const rejectBtn = pendingRow.getByRole('button', { name: /Reject/i });

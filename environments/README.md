@@ -9,10 +9,10 @@ This directory contains template configuration files for different stages of the
     - `DEBUG=True` to show detailed errors.
     - Points to local Docker PostgreSQL and Redis.
 2.  **QA (`.env.qa`)**:
-    - Targets `harilibur.web.id` on **IDCloudHost**.
+    - Targets `qa.harikerja.web.id` on **IDCloudHost**.
     - Used for functional UAT and quality assurance.
 3.  **Staging (`.env.staging`)**:
-    - Targets `harikerja.web.id` on **Enterprise AWS**.
+    - Targets `staging.harikerja.web.id` on **Enterprise AWS**.
     - Identical to production to support 1M user stress testing.
 4.  **Production (`.env.production`)**:
     - Targets `harikerja.com` on **Enterprise AWS**.
@@ -41,3 +41,4 @@ This folder is intended for sensitive files that cannot be stored as text in `.e
 1.  Select your target environment.
 2.  Run the switch script: `python scripts/switch_env.py staging`
 3.  Fill in the sensitive values in the newly created root `.env`.
+

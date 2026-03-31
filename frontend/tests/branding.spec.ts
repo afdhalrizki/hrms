@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Branding and Identity', () => {
-  const adminUrl = 'http://company1.localhost:3000';
+  const adminUrl = 'http://localhost:3000';
 
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== testInfo.expectedStatus) {
@@ -35,7 +35,7 @@ test.describe('Branding and Identity', () => {
       await route.continue();
     });
 
-    await page.goto(`${adminUrl}/login`);
+    await page.goto(`${adminUrl}/en/login?test_tenant=company1`);
     await page.locator('input[type="email"]').fill('admin@company1.net');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -45,7 +45,7 @@ test.describe('Branding and Identity', () => {
   });
 
   test('should update company branding and apply theme instantly', async ({ page }) => {
-    await page.goto(`${adminUrl}/settings/branding`);
+    await page.goto(`${adminUrl}/en/settings/branding?test_tenant=company1`);
     await expect(page.getByText(/Tenant Branding/i)).toBeVisible();
     await page.locator('input[type="color"]').first().fill('#ff0000');
     await page.getByRole('button', { name: /Apply Changes/i }).click();

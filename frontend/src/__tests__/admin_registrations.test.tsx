@@ -79,4 +79,38 @@ describe('RegistrationsPage Component', () => {
       });
     });
   });
+
+  it('updates status in UI after Approve click and refresh', async () => {
+    let callCount = 0;
+    vi.mocked(api.apiFetch).mockImplementation(async (endpoint: string, opts?: any) => {
+      if (endpoint === '/internal/registrations') {
+        callCount += 1;
+        if (callCount === 1) {
+          return mockRequests;
+        }
+        return [
+          { ...mockRequests[0], status: 'APPROVED' },
+          mockRequests[1],
+        ];
+      }
+      if (endpoint === '/internal/registrations/1/approve') {
+        return {};
+      }
+      return [];
+    });
+
+    render(<RegistrationsPage />);
+
+    await waitFor(() => screen.getByText('Pending Corp'));
+
+    fireEvent.click(screen.getAllByText('Approve')[0]);
+
+    await waitFor(() => {
+      expect(api.apiFetch).toHaveBeenCalledWith('/internal/registrations/1/approve', { method: 'POST' });
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText('APPROVED').length).toBeGreaterThanOrEqual(2);
+    });
+  });
 });

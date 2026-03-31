@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Attendance Management', () => {
-  const tenantUrl = 'http://company1.localhost:3000';
+  const tenantUrl = 'http://localhost:3000';
   
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -66,16 +66,16 @@ test.describe.serial('Attendance Management', () => {
       }
     });
 
-    await page.goto(`${tenantUrl}/login`);
-    await page.locator('input[type="email"]').fill('employee1@company1.net');
-    await page.locator('input[type="password"]').fill('password123');
+    await page.goto(`${tenantUrl}/en/login?test_tenant=company1`);
+    await page.locator('input[id="email"]').fill('employee1@company1.net');
+    await page.locator('input[id="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
     await expect(page.getByText(/Workspace Portal/i)).toBeVisible({ timeout: 15000 });
   });
 
   test('should verify attendance dashboard and perform actions', async ({ page }) => {
-    await page.goto(`${tenantUrl}/attendance`);
+    await page.goto(`${tenantUrl}/en/attendance?test_tenant=company1`);
     await page.waitForLoadState('networkidle');
     
     // 1. Verify Stats

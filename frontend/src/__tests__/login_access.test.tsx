@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import LoginPage from '@/app/[locale]/login/page';
 import { useTenant } from '@/context/TenantContext';
+import { useAuth } from '@/context/AuthContext';
 
 // Mock dependencies
 vi.mock('@/context/TenantContext', () => ({
@@ -28,9 +29,16 @@ vi.mock('next-intl', () => ({
   },
 }));
 
+const mockPush = vi.fn();
+const mockRefresh = vi.fn();
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    refresh: mockRefresh,
   }),
   useSearchParams: () => ({
     get: vi.fn(),
@@ -82,5 +90,29 @@ describe('LoginPage Access Restrictions', () => {
     expect(await screen.findByLabelText(/emailLabel/i)).toBeDefined();
     expect(await screen.findByLabelText(/passwordLabel/i)).toBeDefined();
     expect(screen.queryByText(/restrictedTitle/i)).toBeNull();
+  });
+
+  it('submits login form and navigates home', async () => {
+    const mockLogin = vi.fn().mockResolvedValue(undefined);
+
+    (useTenant as any).mockReturnValue({ isPublic: false, tenantName: 'Acme Corp' });
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      error: null,
+      login: mockLogin,
+      logout: vi.fn(),
+      refreshProfile: vi.fn(),
+    });
+
+    render(<LoginPage />);
+
+    fireEvent.change(screen.getByLabelText(/emailLabel/i), { target: { value: 'a@b.com' } });
+    fireEvent.change(screen.getByLabelText(/passwordLabel/i), { target: { value: 'pass123' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /signIn/i }));
+
+    await waitFor(() => expect(mockLogin).toHaveBeenCalledWith('a@b.com', 'pass123'));
+    expect(mockPush).toHaveBeenCalledWith('/');
   });
 });

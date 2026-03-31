@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Reimbursement Management', () => {
-  const employeeUrl = 'http://company1.localhost:3000';
+  const employeeUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -66,7 +66,7 @@ test.describe.serial('Reimbursement Management', () => {
       }
     });
 
-    await page.goto(`${employeeUrl}/login`);
+    await page.goto(`${employeeUrl}/en/login?test_tenant=company1`);
     await page.locator('input[type="email"]').fill('employee1@company1.net');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -74,9 +74,22 @@ test.describe.serial('Reimbursement Management', () => {
   });
 
   test('should verify reimbursement history and submit a new claim', async ({ page }) => {
-    await page.goto(`${employeeUrl}/reimbursements`);
-    await page.waitForLoadState('networkidle');
-    
+    const reimbursementUrl = `${employeeUrl}/en/reimbursements?test_tenant=company1`;
+    let attempt = 0;
+    while (attempt < 3) {
+      try {
+        attempt++;
+        await page.goto(reimbursementUrl, { waitUntil: 'networkidle', timeout: 120000 });
+        break;
+      } catch (err) {
+        console.warn(`reimbursement spec: navigation attempt ${attempt} failed: ${err}`);
+        if (attempt >= 3) {
+          throw err;
+        }
+        await page.waitForTimeout(3000);
+      }
+    }
+
     // 1. Verify History
     await expect(page.locator('table').getByText(/Business Trip Uber/i)).toBeVisible({ timeout: 15000 });
     

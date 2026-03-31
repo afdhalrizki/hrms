@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       // Navigate to home logic here
       if (mounted) {
+        debugPrint('LOGIN: successful, navigating to HomeScreen');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );

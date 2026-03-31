@@ -1,5 +1,5 @@
 # Playwright E2E Master Script
-# Usage: .\run_e2e.ps1 [-Live] [-SkipInstall] [-SkipSeed]
+# Usage: .\run_e2e_tests.ps1 [-Live] [-SkipInstall] [-SkipSeed]
 
 param (
     [switch]$Live,         # Run against real backend (requires Docker)
@@ -15,11 +15,49 @@ Push-Location $ScriptDir
 
 Write-Host "--- HRMS Playwright Automation ---" -ForegroundColor Cyan
 
+# Ensuring log directory exists
+$LogDir = Join-Path $ScriptDir "logs"
+if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+$LogFile = Join-Path $LogDir ("e2e_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
+
 # 1. Dependency Check
 if (-not $SkipInstall) {
     Write-Host "[1/3] Checking Frontend Dependencies..." -ForegroundColor Yellow
     npm install
     npx playwright install chromium
+}
+
+Write-Host "Logging output to: $LogFile" -ForegroundColor Gray
+
+function Wait-ForPort {
+    param(
+        [string]$HostName = '127.0.0.1',
+        [int]$Port,
+        [int]$TimeoutSeconds = 120,
+        [int]$IntervalSeconds = 2
+    )
+
+    $waited = 0
+    while ($waited -lt $TimeoutSeconds) {
+        if (Test-NetConnection -ComputerName $HostName -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue) {
+            return $true
+        }
+        Start-Sleep -Seconds $IntervalSeconds
+        $waited += $IntervalSeconds
+    }
+    return $false
+}
+
+function Test-BackendHealth {
+    try {
+        $health = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+        return $true
+    } catch {
+        if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
+            return $true
+        }
+        return $false
+    }
 }
 
 # 2. Environment Setup
@@ -32,8 +70,24 @@ if ($Live) {
         Push-Location $RootDir
         .\up.ps1 dev
         Pop-Location
-        # Wait for DB
+
+        Write-Host "Waiting for backend port 8000 (max 120s)..." -ForegroundColor Gray
+        if (-not (Wait-ForPort -Port 8000 -TimeoutSeconds 180)) {
+            Write-Host "ERROR: Backend port 8000 did not become available." -ForegroundColor Red
+            Pop-Location
+            exit 1
+        }
+
+        if (-not (Test-BackendHealth)) {
+            Write-Host "ERROR: Backend health check failed after startup." -ForegroundColor Red
+            Pop-Location
+            exit 1
+        }
+
+        # Wait for DB to settle
         Start-Sleep -Seconds 5
+    } else {
+        Write-Host "Warning: up.ps1 not found, continuing with existing backend state..." -ForegroundColor Yellow
     }
 }
 
@@ -60,7 +114,7 @@ if (-not $SkipSeed) {
         Pop-Location
     }
     else {
-        Write-Host "Warning: Seed script not found at backend/scripts/seed_test_.py" -ForegroundColor Yellow
+        Write-Host "Warning: Seed script not found at backend/scripts/seed_test_db.py" -ForegroundColor Yellow
     }
 }
 else {
@@ -82,10 +136,24 @@ if ($Port3000Line) {
 # 4. Execution
 Write-Host "[4/4] Launching Playwright Tests..." -ForegroundColor Cyan
 $env:PORT = "3000"
-# workers=1 for stability, grep-invert to skip heavy diagnostic tests
-npx playwright test --grep-invert "diagnostic|Instrumentation" --workers=1
+
+# Note: Playwright's webServer config handles starting and waiting for the Next.js dev server.
+
+$workersArg = 2
+if ($env:CI -eq 'true') { $workersArg = 1 } # keep stable in CI by default
+$playwrightCmd = "npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=$workersArg --retries=2 --timeout=120000"
+Write-Host "Executing: $playwrightCmd" -ForegroundColor Gray
+Invoke-Expression "$playwrightCmd | Tee-Object -FilePath '$LogFile'"
 
 $ExitCode = $LASTEXITCODE
+
+# Extra retry for transient ci/environment failures
+if ($ExitCode -ne 0) {
+    Write-Host "Transient failure detected, retrying Playwright suite once more..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 5
+    Invoke-Expression $playwrightCmd
+    $ExitCode = $LASTEXITCODE
+}
 
 if ($ExitCode -eq 0) {
     Write-Host "`nWINNER! All tests passed." -ForegroundColor Green

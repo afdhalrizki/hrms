@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Core Configurations (Branches & Workflows)', () => {
-  const adminUrl = 'http://company1.localhost:3000';
+  const adminUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -87,7 +87,7 @@ test.describe.serial('Core Configurations (Branches & Workflows)', () => {
       }
     });
 
-    await page.goto(`${adminUrl}/login`);
+    await page.goto(`${adminUrl}/en/login?test_tenant=company1`);
     await page.locator('input[type="email"]').fill('admin@company1.net');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -95,7 +95,7 @@ test.describe.serial('Core Configurations (Branches & Workflows)', () => {
   });
 
   test('should allow admin to manage branches', async ({ page }) => {
-    await page.goto(`${adminUrl}/branches`);
+    await page.goto(`${adminUrl}/en/branches?test_tenant=company1`);
     
     // Verify initial load
     await expect(page.getByText('Headquarters')).toBeVisible();
@@ -122,7 +122,7 @@ test.describe.serial('Core Configurations (Branches & Workflows)', () => {
   });
 
   test('should allow admin to configure workflows', async ({ page }) => {
-    await page.goto(`${adminUrl}/workflows`);
+    await page.goto(`${adminUrl}/en/workflows?test_tenant=company1`);
 
     // Verify initial workflow loads. The UI renders config.model_type in the list.
     await expect(page.getByText('LEAVE')).toBeVisible();

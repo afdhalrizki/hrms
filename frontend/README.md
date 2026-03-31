@@ -69,8 +69,8 @@ The harikerja platform follows a strict 4-tier promotion path:
 | Tier | Domain | Hosting Provider | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
+| **QA** | `qa.harikerja.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **Staging** | `staging.harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
 | **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 
 ## 🧪 Testing Standard
@@ -79,12 +79,12 @@ The frontend uses a dual-layer strategy with **100% pass rate** across all scena
 
 ### Unit Testing (Vitest)
 ```powershell
-.\run_tests.ps1
+.\run_unit_tests.ps1
 ```
 
 ### End-to-End Testing (Playwright)
 ```powershell
-.\run_e2e.ps1
+.\run_e2e_tests.ps1
 ```
 
 ## 📚 Technical Documentation
@@ -97,3 +97,4 @@ For in-depth technical details, please refer to the internal documentation:
 ---
 **Status**: 🏆 **ESS Frontend Hardening & UX Optimization (March 24, 2026)**
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
+

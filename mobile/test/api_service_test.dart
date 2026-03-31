@@ -66,5 +66,11 @@ void main() {
       final list = await apiService.getReimbursements();
       expect(list, isA<List>());
     });
+
+    test('ApiService static paths and env conversion', () {
+      expect(ApiService.baseUrl, isNotNull);
+      expect(ApiService.domainSuffix, isNotNull);
+      expect(ApiService.hostSuffix, isNotNull);
+    });
   });
 }

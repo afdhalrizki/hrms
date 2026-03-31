@@ -1,36 +1,35 @@
-# Run Flutter E2E tests with detailed reporting
-Write-Host "`n🚀 Running Mobile End-to-End Tests (Detailed Reporting)..." -ForegroundColor Cyan
+# Run all Flutter unit tests at once to reduce process startup overhead
+Write-Host "🚀 Starting Mobile Unit Test Suite (Merged) ..." -ForegroundColor Cyan
 
-# Ensure we are in the mobile directory
 Push-Location $PSScriptRoot
 
-Write-Host "📦 Generating localizations..." -ForegroundColor Gray
-& flutter gen-l10n 2>$null
+# Ensuring log directory exists
+$LogDir = Join-Path $PSScriptRoot "logs"
+if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+$LogFile = Join-Path $LogDir ("unit_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
-# Hybrid VM mode is the most reliable for real-backend integration in this environment.
-$file = "test/e2e_test.dart"
-Write-Host "[RUNNING] $file" -ForegroundColor Yellow
-
-$rawOutput = & flutter test --reporter json $file 2>&1
+Write-Host "Running flutter test with JSON reporter (single pass)..." -ForegroundColor Yellow
+Write-Host "Logging output to: $LogFile" -ForegroundColor Gray
+$rawOutput = & flutter test --reporter json 2>&1 | Tee-Object -FilePath $LogFile
 
 $filePassed = 0
 $fileFailed = 0
 $fileErrors = 0
-$fileReasons = @()
 $hasWarning = $false
 $foundResults = $false
 $testNames = @{}
+$fileReasons = @()
 
 foreach ($line in $rawOutput) {
     $lineStr = $line.ToString().Trim()
-    
-    # Detect Warnings
-    if ($lineStr -match "(?i)warning") { 
-        $hasWarning = $true; 
-        if ($lineStr -notmatch '^{.*}$') { $fileReasons += "    ⚠️ $lineStr" }
+
+    if ($lineStr -match "(?i)warning") {
+        $hasWarning = $true
+        if ($lineStr -notmatch '^{.*}$') {
+            $fileReasons += "    ⚠️ $lineStr"
+        }
     }
 
-    # Parse JSON events
     if ($lineStr.StartsWith("{") -and $lineStr.EndsWith("}")) {
         try {
             $evt = $lineStr | ConvertFrom-Json -ErrorAction SilentlyContinue
@@ -57,25 +56,22 @@ foreach ($line in $rawOutput) {
 }
 
 Write-Host "`n========================================" -ForegroundColor White
-Write-Host "🏁 E2E TEST SUMMARY" -ForegroundColor Cyan
+Write-Host "🏁 FINAL MOBILE UNIT SUMMARY" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor White
 Write-Host "✅ TOTAL PASSED:   $filePassed" -ForegroundColor Green
 Write-Host "❌ TOTAL FAILED:   $fileFailed" -ForegroundColor Red
 Write-Host "⚠️ TOTAL ERRORS:   $fileErrors" -ForegroundColor Magenta
-Write-Host "🔍 TOTAL WARNINGS: $(if ($hasWarning) { 1 } else { 0 })" -ForegroundColor Yellow
+Write-Host "🔍 WARNINGS:       $(if ($hasWarning) { 1 } else { 0 })" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor White
 
-if ($fileFailed -gt 0 -or $fileErrors -gt 0) {
-    # Display Reasons
-    foreach ($reason in $fileReasons) { Write-Host $reason -ForegroundColor Gray }
-}
+foreach ($reason in $fileReasons) { Write-Host $reason -ForegroundColor Gray }
 
 Pop-Location
 
 if ($fileFailed -eq 0 -and $fileErrors -eq 0 -and $foundResults) {
-    Write-Host "🏆 E2E SUCCESS" -ForegroundColor Green
+    Write-Host "🏆 100% SUCCESS" -ForegroundColor Green
     exit 0
 } else {
-    Write-Host "💀 E2E TEST FAILED" -ForegroundColor Red
+    Write-Host "💀 SOME TESTS FAILED" -ForegroundColor Red
     exit 1
 }

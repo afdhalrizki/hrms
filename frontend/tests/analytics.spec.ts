@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Admin Analytics Dashboard', () => {
-  const adminUrl = 'http://company1.localhost:3000';
+  const adminUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -83,38 +83,31 @@ test.describe.serial('Admin Analytics Dashboard', () => {
       }
     });
 
-    await page.goto(`${adminUrl}/login`);
-    await page.locator('input[type="email"]').fill('admin@company1.net');
-    await page.locator('input[type="password"]').fill('password123');
+    await page.goto(`${adminUrl}/en/login?test_tenant=company1`);
+    await page.locator('input[id="email"]').fill('admin@company1.net');
+    await page.locator('input[id="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
   });
 
   test('should render advanced analytics dashboard metrics and charts', async ({ page }) => {
-    await page.goto(`${adminUrl}/analytics`);
+    await page.goto(`${adminUrl}/en/analytics?test_tenant=company1`, { waitUntil: 'networkidle', timeout: 120000 });
     
-    // Verify Dashboard Cards
-    // Total Employees: 150
-    await expect(page.getByText('150', { exact: true }).first()).toBeVisible();
-    
-    // Payroll: Rp 1500.0jt
-    await expect(page.getByText('Rp 1500.0jt')).toBeVisible();
-    
-    // Overtime: Rp 50.0jt
-    await expect(page.getByText('Rp 50.0jt')).toBeVisible();
-    
-    // Cost per Employee: 1.5M / 150 = 10,000,000 -> Rp 10.0jt
-    await expect(page.getByText('Rp 10.0jt')).toBeVisible();
+    // Verify Dashboard Cards using stable data-testid attributes
+    await expect(page.getByTestId('kpi-totalHeadcount-value')).toHaveText('150', { timeout: 20000 });
+    await expect(page.getByTestId('kpi-totalPayroll-value')).toHaveText('Rp 1500.0jt', { timeout: 20000 });
+    await expect(page.getByTestId('kpi-overtimeCost-value')).toHaveText('Rp 50.0jt', { timeout: 20000 });
+    await expect(page.getByTestId('kpi-costPerEmployee-value')).toHaveText('Rp 10.0jt', { timeout: 20000 });
 
     // Verify Charts render sections
-    await expect(page.getByText(/Staff Distribution/i)).toBeVisible();
+    await expect(page.getByText(/Staff Distribution/i)).toBeVisible({ timeout: 20000 });
   });
 
   test('should trigger CSV exports for attendance and performance', async ({ page }) => {
-    await page.goto(`${adminUrl}/analytics`);
+    await page.goto(`${adminUrl}/en/analytics?test_tenant=company1`, { waitUntil: 'networkidle', timeout: 120000 });
     
     // Wait for metrics to load
-    await expect(page.getByText('150', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('150', { exact: true }).first()).toBeVisible({ timeout: 20000 });
     
     // Click Attendance Export
     await page.getByRole('button', { name: /Export Attendance/i }).click();

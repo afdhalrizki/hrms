@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Leaves Management', () => {
-  const employeeUrl = 'http://company1.localhost:3000';
+  const employeeUrl = 'http://localhost:3000';
 
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== testInfo.expectedStatus) {
@@ -48,7 +48,7 @@ test.describe.serial('Leaves Management', () => {
       await route.continue();
     });
 
-    await page.goto(`${employeeUrl}/login`);
+    await page.goto(`${employeeUrl}/en/login?test_tenant=company1`);
     await page.locator('input[type="email"]').fill('employee1@company1.net');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -56,7 +56,7 @@ test.describe.serial('Leaves Management', () => {
   });
 
   test('should display leave balances and history', async ({ page }) => {
-    await page.goto(`${employeeUrl}/leaves`);
+    await page.goto(`${employeeUrl}/en/leaves?test_tenant=company1`);
     
     // Check remaining days
     await expect(page.getByText('10')).toBeVisible();
@@ -67,7 +67,7 @@ test.describe.serial('Leaves Management', () => {
   });
 
   test('should submit a new leave request', async ({ page }) => {
-    await page.goto(`${employeeUrl}/leaves`);
+    await page.goto(`${employeeUrl}/en/leaves?test_tenant=company1`);
     
     // Wait for table to load
     const table = page.locator('table');

@@ -14,7 +14,7 @@ test.describe('Login Access Restrictions', () => {
 
   test('should hide login form and show notice on public domain', async ({ page }) => {
     // Navigate explicitly to public domain root
-    await page.goto(`${publicUrl}/login`);
+    await page.goto(`${publicUrl}/en/login`);
 
     // Verify restricted access message is visible
     await expect(page.getByText(/Restricted Access/i)).toBeVisible({ timeout: 15000 });
@@ -28,7 +28,7 @@ test.describe('Login Access Restrictions', () => {
 
   test('should show login form on secret portal route even on public domain', async ({ page }) => {
     // Navigate to the secret portal route
-    await page.goto(`${publicUrl}/login/portal-admin`);
+    await page.goto(`${publicUrl}/en/login/portal-admin`);
 
     // Verify "Portal Admin Global" badge is visible
     await expect(page.getByText(/Global Admin Portal/i)).toBeVisible({ timeout: 15000 });
@@ -44,10 +44,21 @@ test.describe('Login Access Restrictions', () => {
 
   test('should redirect unauthenticated public visitors to /signup from root', async ({ page }) => {
     // Navigate to root
-    await page.goto(`${publicUrl}/`);
+    await page.goto(`${publicUrl}/en`);
 
     // Should be redirected to /signup (with locale prefix)
-    await expect(page).toHaveURL(/.*\/signup/);
+    await expect(page).toHaveURL(/.*\/signup/, { timeout: 15000 });
     await expect(page.getByText(/Create your account/i)).toBeVisible({ timeout: 15000 });
+  });
+
+  test('should auto-redirect un-localized paths to /en locale', async ({ page }) => {
+    // Navigate explicitly without any language prefix
+    await page.goto(`${publicUrl}/login`);
+    
+    // next-intl middleware should intercept and redirect the browser
+    await expect(page).toHaveURL(/.*\/en\/login/, { timeout: 15000 });
+    
+    // Verify the page loads successfully after redirect
+    await expect(page.getByText(/Restricted Access/i)).toBeVisible({ timeout: 15000 });
   });
 });

@@ -14,8 +14,8 @@ class ApiService {
     const String env = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
     
     switch (env) {
-      case 'qa': return "https://harilibur.web.id/api";
-      case 'staging': return "https://harikerja.web.id/api";
+      case 'qa': return "https://qa.harikerja.web.id/api";
+      case 'staging': return "https://staging.harikerja.web.id/api";
       case 'prod': return "https://harikerja.com/api";
       default:
         if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
@@ -28,8 +28,8 @@ class ApiService {
   static String get domainSuffix {
     const String env = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
     switch (env) {
-      case 'qa': return "harilibur.web.id";
-      case 'staging': return "harikerja.web.id";
+      case 'qa': return "qa.harikerja.web.id";
+      case 'staging': return "staging.harikerja.web.id";
       case 'prod': return "harikerja.com";
       default: return "localhost";
     }

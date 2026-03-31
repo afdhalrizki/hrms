@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Performance & Appraisal Lifecycle', () => {
-  const employeeUrl = 'http://company1.localhost:3000';
+  const employeeUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -83,7 +83,7 @@ test.describe.serial('Performance & Appraisal Lifecycle', () => {
       }
     });
 
-    await page.goto(`${employeeUrl}/login`);
+    await page.goto(`${employeeUrl}/en/login?test_tenant=company1`);
     await page.locator('input[type="email"]').fill('employee1@company1.net');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -91,7 +91,7 @@ test.describe.serial('Performance & Appraisal Lifecycle', () => {
   });
 
   test('should verify KPI dashboard and submit an appraisal review', async ({ page }) => {
-    await page.goto(`${employeeUrl}/performance`);
+    await page.goto(`${employeeUrl}/en/performance?test_tenant=company1`);
     
     // 1. Check Dashboard Stats
     await expect(page.getByRole('heading', { name: /Quality of Work/i }).first()).toBeVisible({ timeout: 30000 });

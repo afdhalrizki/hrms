@@ -1,171 +1,68 @@
-# HRMS Backend Test Runner (PowerShell)
-# This script ensures Docker services are running and then executes pytest.
+# HARIKERJA Backend Master Test Runner
+# This script executes both Unit tests and E2E tests for the backend.
+
+param(
+    [switch]$SkipE2E,      # Skip E2E tests
+    [switch]$SkipUnit,     # Skip Unit tests
+    [switch]$DockerOnly,   # Only prepare Docker for Unit tests
+    [switch]$ResetDocker   # Reset Docker containers
+)
 
 $ErrorActionPreference = "Stop"
-
-# 1. Setup Paths
 $BackendDir = $PSScriptRoot
 Push-Location $BackendDir
-$RootDir = Split-Path -Parent $BackendDir
-$EnvFile = Join-Path $RootDir "environments\.env.local"
-$VenvDir = Join-Path $BackendDir "venv"
-$PytestExec = Join-Path $VenvDir "Scripts\pytest.exe"
 
-Write-Host "--- HRMS Backend Test Environment Setup ---" -ForegroundColor Cyan
+# Ensure log directory exists
+$LogDir = Join-Path $BackendDir "logs"
+if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+$LogFile = Join-Path $LogDir ("master_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
-# 2. Check for .env.local
-if (-not (Test-Path $EnvFile)) {
-    Write-Error "Could not find environment file at $EnvFile. Please ensure it exists."
-}
+$allPassed = $true
 
-# 3. Handle Docker Services (DB, Redis, PgBouncer)
-Write-Host "[1/3] Ensuring Docker services (db, redis, pgbouncer) are running..." -ForegroundColor Yellow
-
-# Check if Docker is running, if not try to start it
-docker info >$null 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "⚠️ Docker daemon is not running. Attempting to start Docker Desktop..." -ForegroundColor Yellow
-    
-    $dockerPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-    if (Test-Path $dockerPath) {
-        Start-Process $dockerPath
-        Write-Host "🚀 Starting Docker Desktop... Please wait." -ForegroundColor Gray
-        
-        $maxWait = 24 # 24 * 5 seconds = 2 minutes
-        $waited = 0
-        while ($waited -lt $maxWait) {
-            Start-Sleep -Seconds 5
-            docker info >$null 2>&1
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "`n✅ Docker is now running!" -ForegroundColor Green
-                break
-            }
-            Write-Host "." -NoNewline -ForegroundColor Gray
-            $waited++
-        }
-        
-        if ($waited -eq $maxWait) {
-            Write-Host "`n❌ ERROR: Docker did not start in time. Please check Docker Desktop manually." -ForegroundColor Red
-            exit 1
-        }
-    } else {
-        Write-Host "❌ ERROR: Docker Desktop not found at $dockerPath. Please start it manually!" -ForegroundColor Red
-        exit 1
-    }
-}
-
+# Start capturing all output for this orchestration run
+Start-Transcript -Path $LogFile -Append
 try {
-    Push-Location $RootDir
-    $dockerCmd = "docker-compose"
-    if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
-        $dockerCmd = "docker compose"
-    }
-    
-    Write-Host "Using: $dockerCmd" -ForegroundColor Gray
-    & $dockerCmd --env-file $EnvFile up -d db redis pgbouncer
-    
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "🏆 HARIKERJA BACKEND TEST ORCHESTRATOR" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+
+# 1. Run Unit Tests
+if (-not $SkipUnit) {
+    Write-Host "`n🧪 [1/2] Running Unit Tests (Pytest)..." -ForegroundColor Yellow
+    $unitArgs = @()
+    if ($DockerOnly) { $unitArgs += "-DockerOnly" }
+    if ($ResetDocker) { $unitArgs += "-ResetDocker" }
+
+    & ".\run_unit_tests.ps1" @unitArgs
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Failed to start Docker services via $dockerCmd." -ForegroundColor Red
-        exit 1
-    }
-    Pop-Location
-} catch {
-    Write-Host "Failed to start Docker services. Error: $_" -ForegroundColor Red
-    exit 1
-}
-
-# 4. Sourcing Environment Variables & Overriding for Local
-Write-Host "[2/3] Loading environment variables..." -ForegroundColor Yellow
-$content = Get-Content $EnvFile
-foreach ($line in $content) {
-    if ($line -match "^([^#=]+)=(.*)$") {
-        $key = $matches[1].Trim()
-        $val = $matches[2].Trim()
-        [System.Environment]::SetEnvironmentVariable($key, $val, "Process")
-    }
-}
-
-# Override container-local hosts to localhost for native execution
-$env:DB_HOST = "127.0.0.1"
-$env:REDIS_URL = "redis://localhost:6379/1"
-$env:DATABASE_URL = "postgres://hrms_user:hrms_password@localhost:6432/hrms"
-
-# Wait for DB to be ready
-Write-Host "Waiting for database to be ready on localhost:5432..." -ForegroundColor Gray
-$maxTries = 20
-$tryCount = 0
-while ($tryCount -lt $maxTries) {
-    $test = Test-NetConnection -ComputerName "127.0.0.1" -Port 5432 -InformationLevel Quiet
-    if ($test) {
-        Write-Host "Database is ready!" -ForegroundColor Green
-        break
-    }
-    $tryCount++
-    Start-Sleep -Seconds 2
-    Write-Host "." -NoNewline -ForegroundColor Gray
-}
-
-if ($tryCount -eq $maxTries) {
-    Write-Host "`nERROR: Database did not become ready in time." -ForegroundColor Red
-    exit 1
-}
-
-# 5. Virtual Environment Check
-Write-Host "[3/3] Checking pytest in virtual environment..." -ForegroundColor Yellow
-if (-not (Test-Path $PytestExec)) {
-    Write-Host "pytest not found in $VenvDir. Please ensure venv is setup and dependencies are installed." -ForegroundColor Red
-    exit 1
-}
-
-# 6. Run Pytest
-Write-Host "--- Running HRMS Backend Unit Tests ---" -ForegroundColor Green
-Write-Host "Tip: You can pass specific test paths as arguments (e.g., .\run_tests.ps1 users/)" -ForegroundColor Gray
-
-# Create a temporary file to capture output for parsing
-$tempFile = [System.IO.Path]::GetTempFileName()
-try {
-    # Dynamically detect terminal width for better alignment when piped
-    $termWidth = if ($Host.UI.RawUI.WindowSize.Width -gt 0) { $Host.UI.RawUI.WindowSize.Width } else { 120 }
-    
-    # Force color output and pass detected terminal width
-    & $PytestExec --color=yes -o "terminal_width=$termWidth" @args | Tee-Object -FilePath $tempFile
-    $exitCode = $LASTEXITCODE
-
-    # 7. Final Summary Parsing
-    $finalLines = Get-Content $tempFile -Tail 10
-    $summaryLine = $finalLines | Where-Object { $_ -match "==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*" }
-    
-    Write-Host "`n" + ("=" * 60) -ForegroundColor Gray
-    Write-Host "                TEST RUN SUMMARY" -ForegroundColor Cyan -NoNewline
-    Write-Host " (Exit: $exitCode)" -ForegroundColor Gray
-    Write-Host ("=" * 60) -ForegroundColor Gray
-    
-    if ($summaryLine) {
-        # Clean up the summary line for display
-        $cleanSummary = $summaryLine.Trim(' =')
-        Write-Host " DETAILS : $cleanSummary" -ForegroundColor White
-        
-        # Determine Status and Color
-        if ($cleanSummary -match "failed|error") {
-            Write-Host " STATUS  : ❌ TESTS FAILED OR ENCOUNTERED ERRORS" -ForegroundColor Red
-        } elseif ($cleanSummary -match "warning") {
-            Write-Host " STATUS  : ⚠️ PASSED WITH WARNINGS" -ForegroundColor Yellow
-        } elseif ($exitCode -eq 0) {
-            Write-Host " STATUS  : ✅ ALL TESTS PASSED" -ForegroundColor Green
-        } else {
-            Write-Host " STATUS  : ❌ UNKNOWN FAILURE (Exit Code: $exitCode)" -ForegroundColor Red
-        }
+        Write-Host "❌ Unit Tests Failed." -ForegroundColor Red
+        $allPassed = $false
     } else {
-        if ($exitCode -eq 0) {
-            Write-Host " STATUS  : ✅ ALL TESTS PASSED" -ForegroundColor Green
-        } else {
-            Write-Host " STATUS  : ❌ EXECUTION FAILED" -ForegroundColor Red
-        }
+        Write-Host "✅ Unit Tests Passed." -ForegroundColor Green
     }
-    Write-Host ("=" * 60) -ForegroundColor Gray
-} finally {
-    if (Test-Path $tempFile) { Remove-Item $tempFile -Force }
 }
 
-Pop-Location
-exit $exitCode
+# 2. Run E2E Tests
+if ($allPassed -and -not $SkipE2E -and -not $DockerOnly) {
+    Write-Host "`n🌐 [2/2] Running E2E Tests (Pytest)..." -ForegroundColor Yellow
+    & ".\run_e2e_tests.ps1"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ E2E Tests Failed." -ForegroundColor Red
+        $allPassed = $false
+    } else {
+        Write-Host "✅ E2E Tests Passed." -ForegroundColor Green
+    }
+}
+
+} finally {
+    Stop-Transcript
+    Pop-Location
+}
+
+if ($allPassed) {
+    Write-Host "`n🏆 ALL HARIKERJA BACKEND TESTS PASSED." -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "`n💀 SOME HARIKERJA BACKEND TESTS FAILED." -ForegroundColor Red
+    exit 1
+}

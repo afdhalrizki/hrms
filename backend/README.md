@@ -71,8 +71,8 @@ The harikerja platform follows a strict 4-tier promotion path:
 | Tier | Domain | Hosting Provider | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
+| **QA** | `qa.harikerja.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **Staging** | `staging.harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
 | **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 
 ## 🧪 Testing Standard
@@ -81,12 +81,12 @@ The backend uses `pytest` with **100% pass rate** across 168+ mission-critical s
 
 Run logic/unit tests:
 ```powershell
-pwsh ./run_tests.ps1
+pwsh ./run_unit_tests.ps1
 ```
 
 Run E2E tests:
 ```powershell
-pwsh ./run_e2e.ps1
+pwsh ./run_e2e_tests.ps1
 ```
 
 ## 📚 Technical Documentation
@@ -99,3 +99,4 @@ For in-depth technical details, please refer to the internal documentation:
 ---
 **Project Status**: 🏆 **Stable Release v1.1.0-Hardened (March 21, 2026)**. 100% Tests Passed (155/155).
 **Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.
+

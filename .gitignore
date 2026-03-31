@@ -2,6 +2,7 @@
 .DS_Store
 Thumbs.db
 *.log
+logs/
 *.tmp
 *.bak
 .idea/
@@ -66,6 +67,7 @@ frontend/test-results/
 frontend/playwright-report/
 frontend/blob-report/
 frontend/playwright/.cache/
+frontend/coverage/
 
 # Mobile (Flutter/Dart)
 mobile/.dart_tool/
@@ -80,6 +82,7 @@ mobile/*.sync-conflict.*
 mobile/doc/api/
 mobile/.temp/
 mobile/local/
+mobile/coverage/
 
 # Android-specific
 mobile/android/local.properties
@@ -113,3 +116,6 @@ tools/jdk17/
 tools/*.zip
 tools/*.7z
 tools/*.tar.gz
+
+# Test Artifacts
+*-failure.png

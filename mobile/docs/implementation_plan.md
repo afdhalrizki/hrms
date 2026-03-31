@@ -46,8 +46,8 @@ The mobile application is synchronized with the harikerja 4-tier environment hie
 | Tier | Purpose | Domain | Hosting |
 | :--- | :--- | :--- | :--- |
 | **Dev** | Prototyping | `localhost` | Docker |
-| **QA** | Functional UAT | `harilibur.web.id` | IDCloudHost |
-| **Staging** | 1M Stress Test | `harikerja.web.id` | AWS |
+| **QA** | Functional UAT | `qa.harikerja.web.id` | IDCloudHost |
+| **Staging** | 1M Stress Test | `staging.harikerja.web.id` | AWS |
 | **Prod** | Enterprise | `harikerja.com` | AWS |
 
 ## ✅ 6. Roadmap Completion Summary
@@ -67,3 +67,4 @@ The mobile application is synchronized with the harikerja 4-tier environment hie
 - JWT Refresh token flow and transparent 401 interceptor.
 
 **Status**: ✅ **COMPLETED**. The mobile application is now in full synchronization with the harikerja stack.
+

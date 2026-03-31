@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('Employee Management', () => {
-  const adminUrl = 'http://company1.localhost:3000';
+  const adminUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -68,7 +68,7 @@ test.describe.serial('Employee Management', () => {
       }
     });
 
-    await page.goto(`${adminUrl}/login`);
+    await page.goto(`${adminUrl}/en/login?test_tenant=company1`);
     await page.locator('input[type="email"]').fill('admin@company1.net');
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -76,7 +76,7 @@ test.describe.serial('Employee Management', () => {
   });
 
   test('should display employee list and support searching', async ({ page }) => {
-    await page.goto(`${adminUrl}/employees`);
+    await page.goto(`${adminUrl}/en/employees?test_tenant=company1`);
     await expect(page.getByText('John Doe')).toBeVisible({ timeout: 15000 });
     
     const searchInput = page.getByPlaceholder(/Search by name/i);
@@ -85,7 +85,7 @@ test.describe.serial('Employee Management', () => {
   });
 
   test('should provision a new employee successfully', async ({ page }) => {
-    await page.goto(`${adminUrl}/employees`);
+    await page.goto(`${adminUrl}/en/employees?test_tenant=company1`);
     await page.getByRole('button', { name: /Add Employee/i }).click();
     await expect(page.getByText(/Provision New Employee/i)).toBeVisible({ timeout: 15000 });
     

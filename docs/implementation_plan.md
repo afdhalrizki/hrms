@@ -22,8 +22,8 @@ Standardized across all stacks to ensure reliable delivery from local dev to ent
 | Tier | Purpose | Domain | Hosting Platform | Tools |
 | :--- | :--- | :--- | :--- | :--- |
 | **Dev** | Prototyping | `localhost` | Local Docker | `.\up.ps1 dev` |
-| **QA** | Functional UAT | `harilibur.web.id` | IDCloudHost VPS | `.\up.ps1 qa` |
-| **Staging** | 1M Stress Test | `harikerja.web.id` | AWS Enterprise | `.\up.ps1 staging`|
+| **QA** | Functional UAT | `qa.harikerja.web.id` | IDCloudHost VPS | `.\up.ps1 qa` |
+| **Staging** | 1M Stress Test | `staging.harikerja.web.id` | AWS Enterprise | `.\up.ps1 staging`|
 | **Prod** | Enterprise | `harikerja.com` | AWS Enterprise | `.\up.ps1 prod` |
 
 ### Detailed Global Infrastructure
@@ -47,3 +47,4 @@ Standardized across all stacks to ensure reliable delivery from local dev to ent
 - Standardized `README.md` and `docs/` structure (Implementation Plan, Task Roadmap, Walkthrough) implemented in Backend, Frontend, and Mobile modules.
 
 **Final Status**: 🏆 **Platform Gold Standard v1.2.0 (March 27, 2026)**.
+

@@ -38,6 +38,38 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       
       // Get the configured domain suffix from env, fallback to 'localhost'
       const domainSuffix = process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'localhost';
+      const testTenantEnv = process.env.NEXT_PUBLIC_TEST_TENANT;
+      
+      // Check for URL parameter override (more precise for E2E)
+      const urlParams = new URLSearchParams(window.location.search);
+      const testTenantUrl = urlParams.get('test_tenant');
+      const testTenant = testTenantUrl || testTenantEnv;
+
+      // Special override for E2E testing on localhost
+      if (testTenant && (hostname === 'localhost' || hostname === '127.0.0.1')) {
+        const initialName = testTenant.charAt(0).toUpperCase() + testTenant.slice(1);
+        setTenant(prev => ({
+          ...prev,
+          tenantName: initialName,
+          subdomain: testTenant,
+          isPublic: false,
+          isLoading: true,
+        }));
+
+        apiFetch('/tenant/settings')
+          .then((data) => {
+            setTenant(prev => ({
+              ...prev,
+              tenantName: data.name || initialName,
+              logo: data.logo,
+              enabledModules: data.enabled_modules,
+              isSubscriptionActive: data.is_subscription_active,
+              isLoading: false,
+            }));
+          })
+          .catch(() => setTenant(prev => ({ ...prev, isLoading: false })));
+        return;
+      }
       
       // If hostname is exactly the domain suffix or localhost, it's public
       if (hostname === domainSuffix || hostname === 'localhost' || hostname === '127.0.0.1') {

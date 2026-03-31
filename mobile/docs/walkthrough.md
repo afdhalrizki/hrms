@@ -46,7 +46,8 @@ Executed the complete mobile logic suite against the local Docker development en
 
 ## 3. Deployment Evidence (Dev -> Prod)
 - **Dev**: Verified functional on Android Emulator and Windows Desktop.
-- **QA**: Synchronized with `harilibur.web.id` (IDCloudHost).
+- **QA**: Synchronized with `qa.harikerja.web.id` (IDCloudHost).
 - **Staging/Prod**: Environment-aware builds verified using compiled-time defines.
 
 **Conclusion**: The harikerja mobile application is 100% verified and production-ready.
+

@@ -56,8 +56,8 @@ make dev
 | Tier | Domain | Hosting Platform | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `harilibur.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
+| **QA** | `qa.harikerja.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **Staging** | `staging.harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
 | **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 
 ## 🧪 Testing Standard
@@ -84,3 +84,4 @@ For in-depth technical details, please refer to the platform-wide internal docum
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.2.0 (March 27, 2026)**. 100% Verified.
+

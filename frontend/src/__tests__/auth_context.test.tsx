@@ -84,4 +84,67 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('user-email').textContent).toBe('');
     });
   });
+
+  it('login sets tokens and user data', async () => {
+    const loginUser = {
+      id: 99,
+      email: 'newuser@example.com',
+      fullname: 'New User',
+      is_staff: false,
+      is_global_admin: false,
+      employee_id: null,
+      employee_nik: null,
+      role_name: null,
+      department_name: null,
+      access: 'new-access-token',
+      refresh: 'new-refresh-token'
+    };
+
+    (api.apiFetch as any).mockResolvedValueOnce({
+      id: 99,
+      email: 'newuser@example.com',
+      fullname: 'New User',
+      employee_nik: null
+    });
+
+    const ActionsConsumer = () => {
+      const { user, login, logout } = useAuth();
+      return (
+        <div>
+          <div data-testid="user-email">{user?.email || ''}</div>
+          <button data-testid="do-login" onClick={() => login('newuser@example.com', 'pass123')}>
+            Login
+          </button>
+          <button data-testid="do-logout" onClick={() => logout()}>
+            Logout
+          </button>
+        </div>
+      );
+    };
+
+    (api.apiFetch as any).mockResolvedValueOnce(loginUser);
+
+    render(
+      <AuthProvider>
+        <ActionsConsumer />
+      </AuthProvider>
+    );
+
+    const loginButton = screen.getByTestId('do-login');
+    loginButton.click();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('user-email').textContent).toBe('newuser@example.com');
+      expect(localStorage.getItem('access_token')).toBe('new-access-token');
+      expect(localStorage.getItem('refresh_token')).toBe('new-refresh-token');
+    });
+
+    const logoutButton = screen.getByTestId('do-logout');
+    logoutButton.click();
+
+    await waitFor(() => {
+      expect(localStorage.getItem('access_token')).toBeNull();
+      expect(localStorage.getItem('refresh_token')).toBeNull();
+    });
+  });
 });

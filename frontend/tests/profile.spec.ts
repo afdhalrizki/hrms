@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe.serial('ESS Profile Management', () => {
-  const employeeUrl = 'http://company1.localhost:3000';
+  const employeeUrl = 'http://localhost:3000';
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://company1.localhost:3000',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
     'Access-Control-Allow-Credentials': 'true'
@@ -88,15 +88,15 @@ test.describe.serial('ESS Profile Management', () => {
       }
     });
 
-    await page.goto(`${employeeUrl}/login`);
-    await page.locator('input[type="email"]').fill('emp70@company1.net');
-    await page.locator('input[type="password"]').fill('password123');
+    await page.goto(`${employeeUrl}/en/login?test_tenant=company1`);
+    await page.locator('input[id="email"]').fill('emp70@company1.net');
+    await page.locator('input[id="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
   });
 
   test('should verify administrative fields are read-only', async ({ page }) => {
-    await page.goto(`${employeeUrl}/profile`);
+    await page.goto(`${employeeUrl}/en/profile?test_tenant=company1`);
     
     // Wait for data to load
     await expect(page.getByText('EMP-70-001')).toBeVisible();
@@ -112,7 +112,7 @@ test.describe.serial('ESS Profile Management', () => {
   });
 
   test('should allow employee to update self-service fields', async ({ page }) => {
-    await page.goto(`${employeeUrl}/profile`);
+    await page.goto(`${employeeUrl}/en/profile?test_tenant=company1`);
     
     // Wait for the form to be interactive
     const phoneInput = page.locator('input[placeholder="+62..."]');
@@ -136,7 +136,7 @@ test.describe.serial('ESS Profile Management', () => {
   });
 
   test('should allow document upload for KTP and face reference', async ({ page }) => {
-    await page.goto(`${employeeUrl}/profile`);
+    await page.goto(`${employeeUrl}/en/profile?test_tenant=company1`);
     
     await expect(page.getByText('EMP-70-001')).toBeVisible();
 

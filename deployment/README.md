@@ -8,10 +8,10 @@ This directory contains the necessary documentation to deploy the HRMS platform 
    Quick start guide using `docker-compose` for rapid iteration and testing on your local machine.
 
 2. **[QA (IDCloudHost VPS)](./qa.md)**
-   Deployment strategy for Quality Assurance on `harilibur.web.id`, ideal for functional testing.
+   Deployment strategy for Quality Assurance on `qa.harikerja.web.id`, ideal for functional testing.
 
 3. **[Staging (AWS - Stress Test)](./staging.md)**
-   Identical to production infrastructure on `harikerja.web.id`, designed for 1M user stress testing.
+   Identical to production infrastructure on `staging.harikerja.web.id`, designed for 1M user stress testing.
 
 4. **[Production (Enterprise AWS)](./production.md)**
    Scalable, high-availability architecture on `harikerja.com` (EKS/RDS) for enterprise workloads.
@@ -34,3 +34,4 @@ Regardless of the environment, the platform requires the following core services
 - **PostgreSQL Database** (with schemas enabled)
 - **PgBouncer** (Connection Pooler)
 - **Redis** (Caching & Sessions)
+

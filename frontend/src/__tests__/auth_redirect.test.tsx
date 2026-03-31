@@ -21,6 +21,10 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+vi.mock('@/components/layout/DashboardLayout', () => ({
+  DashboardLayout: ({ children }: any) => <div>{children}</div>
+}));
+
 describe('Home Page Redirection', () => {
   const mockPush = vi.fn();
 
@@ -63,5 +67,21 @@ describe('Home Page Redirection', () => {
     await waitFor(() => {
       expect(mockPush).not.toHaveBeenCalledWith('/signup');
     });
+  });
+
+  it('does not perform any redirect while auth is still loading', async () => {
+    (useAuth as any).mockReturnValue({
+      user: null,
+      loading: true,
+    });
+    (useTenant as any).mockReturnValue({
+      isPublic: true,
+      subdomain: null,
+    });
+
+    render(<Home />);
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(mockPush).not.toHaveBeenCalled();
   });
 });

@@ -38,8 +38,9 @@ Executed the complete backend test suite covering Core, Attendance, Payroll, and
 ```
 
 ## 3. Deployment Evidence (Dev -> Prod)
-- **QA**: Verified stable on `harilibur.web.id` (IDCloudHost).
-- **Staging**: Validated 1M User stress test on `harikerja.web.id` (AWS).
+- **QA**: Verified stable on `qa.harikerja.web.id` (IDCloudHost).
+- **Staging**: Validated 1M User stress test on `staging.harikerja.web.id` (AWS).
 - **Prod**: High-availability verified on `harikerja.com` (AWS EKS/RDS).
 
 **Conclusion**: The backend is 100% verified and production-ready.
+

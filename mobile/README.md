@@ -68,8 +68,8 @@ The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 | Tier | API URL / Domain | Purpose |
 | :--- | :--- | :--- |
 | **Dev** | `http://10.0.2.2:8000/api` | Local Development |
-| **QA** | `https://harilibur.web.id/api` | IDCloudHost |
-| **Staging** | `https://harikerja.web.id/api` | AWS Stress Test |
+| **QA** | `https://qa.harikerja.web.id/api` | IDCloudHost |
+| **Staging** | `https://staging.harikerja.web.id/api` | AWS Stress Test |
 | **Production** | `https://harikerja.com/api` | AWS Enterprise |
 
 ## 🧪 Testing Standard
@@ -78,12 +78,12 @@ The mobile application has a comprehensive test suite covering core logic and E2
 
 ### Unit & Logic Tests
 ```powershell
-pwsh .\run_tests.ps1
+pwsh .\run_unit_tests.ps1
 ```
 
 ### End-to-End Testing (E2E)
 ```powershell
-pwsh .\run_e2e.ps1
+pwsh .\run_e2e_tests.ps1
 ```
 
 ## 📚 Technical Documentation
@@ -95,3 +95,4 @@ For in-depth technical details, please refer to the internal documentation:
 
 ---
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
+

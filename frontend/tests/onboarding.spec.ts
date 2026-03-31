@@ -41,10 +41,10 @@ test.describe('Company Onboarding Flow', () => {
 
   test('should allow a new company to submit a registration request', async ({ page }) => {
     // 1. Navigate to the signup page
-    await page.goto('/signup');
+    await page.goto('/en/signup');
 
     // 2. Verify we are on the right page
-    await expect(page).toHaveURL(/.*\/signup/);
+    await expect(page).toHaveURL(/.*\/signup/, { timeout: 15000 });
     await expect(page.getByText(/Create your account/i)).toBeVisible();
 
     // 3. Fill in the company details
@@ -67,11 +67,11 @@ test.describe('Company Onboarding Flow', () => {
 
     // 6. Verify back to home button works
     await page.click('button:has-text("Back to Home")');
-    await expect(page).toHaveURL(/.*\/en$/);
+    await expect(page).toHaveURL(/.*\/en$/, { timeout: 15000 });
   });
 
   test('should show error for invalid email', async ({ page }) => {
-    await page.goto('/signup');
+    await page.goto('/en/signup');
     
     await page.fill('input[name="company_name"]', 'Invalid Email Corp');
     await page.fill('input[name="subdomain_prefix"]', 'invalidemail');

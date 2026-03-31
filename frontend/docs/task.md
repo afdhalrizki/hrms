@@ -23,6 +23,6 @@ This roadmap documents the UX and architectural evolution of the **harikerja HRM
     - [x] 100% Playwright E2E Pass Rate (25/25 scenarios).
 - [x] **Phase F7: Deployment & Optimization**
     - [x] 4-Tier Environment Hierarchy (Dev, QA, Staging, Production).
-    - [x] Fully automated `run_dev.ps1` and `run_e2e.ps1` orchestration scripts.
+    - [x] Fully automated `run_dev.ps1` and `run_e2e_tests.ps1` orchestration scripts.
 
 **Final Result**: ✅ All frontend UX and architectural phases 100% completed and verified.
