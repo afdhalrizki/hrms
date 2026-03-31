@@ -23,3 +23,13 @@ ps:
 
 logs:
 	docker-compose --env-file $(ENV_FILE) logs -f
+
+# --- Universal Test Suite (Windows/Mac/Ubuntu) ---
+test:
+	node scripts/test_runner.mjs
+
+test-all:
+	node scripts/test_runner.mjs
+
+test-skip-mobile:
+	node scripts/test_runner.mjs --skip-mobile
