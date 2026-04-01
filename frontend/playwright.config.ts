@@ -6,13 +6,13 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
-  fullyParallel: false, // Set to false to reduce load
+  fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 1, // At least 1 retry for flakey tests
   /* Opt out of parallel tests on CI. */
-  workers: 1, // Single worker for maximum stability
+  workers: process.env.CI ? 1 : undefined, // Auto-detect workers for local, 1 for CI stability
   /* Timeout for each test in milliseconds. */
   // timeout: 90000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -36,11 +36,12 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    // Using build and start for much faster test execution (no compilation lag during tests)
+    command: 'npm run build && npm run start',
     url: 'http://localhost:3000/en', // Match the localized route
     reuseExistingServer: true,
     stdout: 'pipe',
     stderr: 'pipe',
-    timeout: 180 * 1000,
+    timeout: 300 * 1000,
   },
 });

@@ -139,7 +139,7 @@ $env:PORT = "3000"
 
 # Note: Playwright's webServer config handles starting and waiting for the Next.js dev server.
 
-$workersArg = 2
+$workersArg = 4
 if ($env:CI -eq 'true') { $workersArg = 1 } # keep stable in CI by default
 $playwrightCmd = "npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=$workersArg --retries=2 --timeout=120000"
 Write-Host "Executing: $playwrightCmd" -ForegroundColor Gray

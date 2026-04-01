@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import LoginPage from '@/app/[locale]/login/page';
+import { LoginView } from '@/components/auth/LoginView';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -56,7 +56,7 @@ describe('LoginPage Access Restrictions', () => {
       tenantName: 'Public',
     });
 
-    render(<LoginPage />);
+    render(<LoginView />);
     
     expect(await screen.findByText(/restrictedTitle/i)).toBeDefined();
     expect(screen.queryByLabelText(/emailLabel/i)).toBeNull();
@@ -69,7 +69,7 @@ describe('LoginPage Access Restrictions', () => {
       tenantName: 'Public',
     });
 
-    render(<LoginPage forceShowForm={true} />);
+    render(<LoginView forceShowForm={true} />);
     
     expect(await screen.findByText(/portalBadge/i)).toBeDefined();
     expect(await screen.findByLabelText(/emailLabel/i)).toBeDefined();
@@ -83,7 +83,7 @@ describe('LoginPage Access Restrictions', () => {
       tenantName: 'Acme Corp',
     });
 
-    render(<LoginPage />);
+    render(<LoginView />);
     
     expect(await screen.findByText(/welcomePortal/i)).toBeDefined();
     expect(await screen.findByText(/Acme Corp/i)).toBeDefined();
@@ -105,7 +105,7 @@ describe('LoginPage Access Restrictions', () => {
       refreshProfile: vi.fn(),
     });
 
-    render(<LoginPage />);
+    render(<LoginView />);
 
     fireEvent.change(screen.getByLabelText(/emailLabel/i), { target: { value: 'a@b.com' } });
     fireEvent.change(screen.getByLabelText(/passwordLabel/i), { target: { value: 'pass123' } });

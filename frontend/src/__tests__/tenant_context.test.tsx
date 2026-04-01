@@ -106,9 +106,9 @@ describe('TenantContext', () => {
     });
   });
 
-  it('falls back to public mode when NEXT_PUBLIC_DOMAIN_SUFFIX is missing', async () => {
-    delete process.env.NEXT_PUBLIC_DOMAIN_SUFFIX;
-    vi.stubGlobal('location', { hostname: 'acme.harikerja.com' });
+  it('handles test_tenant override on localhost', async () => {
+    vi.stubGlobal('location', { hostname: 'localhost', search: '?test_tenant=company1' });
+    vi.mocked(apiFetch).mockResolvedValueOnce({ name: 'Company One', logo: '/logo1.png', enabled_modules: ['core'] });
 
     const { getByTestId } = render(
       <TenantProvider>
@@ -117,8 +117,9 @@ describe('TenantContext', () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId('tenant-name').textContent).toBe('Public');
-      expect(getByTestId('is-public').textContent).toBe('true');
+      expect(getByTestId('tenant-name').textContent).toBe('Company One');
+      expect(getByTestId('subdomain').textContent).toBe('company1');
+      expect(getByTestId('is-public').textContent).toBe('false');
     });
   });
 });

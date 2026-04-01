@@ -119,4 +119,42 @@ describe('LeavesPage', () => {
       expect(mockToast.error).toHaveBeenCalledWith('Quota exceeded');
     });
   });
+
+  it('handles input change for all form fields', async () => {
+    render(<LeavesPage />);
+    
+    // Open modal
+    fireEvent.click(screen.getByText('requestLeave'));
+
+    // Change Leave Type
+    const typeSelect = screen.getByLabelText(/form.type/i);
+    fireEvent.change(typeSelect, { target: { value: 'SAKIT' } });
+    expect((typeSelect as HTMLSelectElement).value).toBe('SAKIT');
+
+    // Change Dates - using direct selection and multiple events to ensure total coverage
+    const startDateInput = document.getElementById('start_date') as HTMLInputElement;
+    fireEvent.input(startDateInput, { target: { value: '2026-04-01' } });
+    fireEvent.change(startDateInput, { target: { value: '2026-04-01' } });
+    expect(startDateInput.value).toBe('2026-04-01');
+
+    const endDateInput = document.getElementById('end_date') as HTMLInputElement;
+    fireEvent.input(endDateInput, { target: { value: '2026-04-05' } });
+    fireEvent.change(endDateInput, { target: { value: '2026-04-05' } });
+    expect(endDateInput.value).toBe('2026-04-05');
+  });
+
+  it('closes modal when cancel is clicked', async () => {
+    render(<LeavesPage />);
+    
+    // Open modal
+    fireEvent.click(screen.getByText('requestLeave'));
+    expect(screen.getByText('form.annual')).toBeDefined();
+
+    // Click cancel
+    fireEvent.click(screen.getByText('cancel'));
+    
+    await waitFor(() => {
+      expect(screen.queryByText('form.annual')).toBeNull();
+    });
+  });
 });

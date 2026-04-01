@@ -34,3 +34,26 @@ vi.mock('@/i18n/routing', () => ({
     back: vi.fn(),
   }),
 }));
+
+// Mocking matchMedia (often required for UI components like Framer Motion)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+// Mocking next/image to avoid layout prop warnings in tests
+vi.mock('next/image', () => ({
+  default: (props: any) => {
+    // eslint-disable-next-line jsx-a11y/alt-text
+    return React.createElement('img', { ...props, priority: undefined, fetchPriority: undefined });
+  },
+}));

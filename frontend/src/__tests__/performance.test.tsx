@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import PerformancePage from '../app/[locale]/performance/page';
 import { apiFetch } from '@/lib/api';
 
@@ -55,12 +55,19 @@ describe('PerformancePage', () => {
       start_date: '2026-01-01', 
       end_date: '2026-12-31', 
       status: 'SUBMITTED', 
-      reviews: [] 
+      reviews: [
+        { id: 1, reviewer_type: 'SELF', reviewer_name: 'Self', ratings: { kpi1: 4, kpi2: 5 }, comments: 'Good' }
+      ] 
     }
   ];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    const { useTenant } = await import('@/context/TenantContext');
+    (useTenant as any).mockReturnValue({
+      enabledModules: ['performance', 'core', 'attendance', 'payroll'],
+      planType: 'ENTERPRISE',
+    });
     (apiFetch as any).mockImplementation((endpoint: string) => {
       if (endpoint === '/kpi-targets') return Promise.resolve(mockTargets);
       if (endpoint === '/appraisals') return Promise.resolve(mockAppraisals);
@@ -87,6 +94,19 @@ describe('PerformancePage', () => {
     });
   });
 
+  it('handles appraisals with no reviews gracefully', async () => {
+    (apiFetch as any).mockImplementation((endpoint: string) => {
+      if (endpoint === '/kpi-targets') return Promise.resolve(mockTargets);
+      if (endpoint === '/appraisals') return Promise.resolve([{ ...mockAppraisals[0], reviews: [] }]);
+      return Promise.resolve([]);
+    });
+    render(<PerformancePage />);
+    await waitFor(() => {
+      expect(screen.getByText('Annual Review 2026')).toBeInTheDocument();
+      expect(screen.getByText('No Reviews')).toBeInTheDocument();
+    });
+  });
+
   it('opens modal on button click', async () => {
     render(<PerformancePage />);
     
@@ -96,5 +116,30 @@ describe('PerformancePage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('mock-modal')).toBeInTheDocument();
     });
+
+    const closeBtn = screen.getByTestId('modal-close');
+    fireEvent.click(closeBtn);
+    
+    await waitFor(() => {
+      expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
+    });
+  });
+
+  it('renders nothing if module is disabled', async () => {
+    const { useTenant } = await import('@/context/TenantContext');
+    (useTenant as any).mockReturnValue({ enabledModules: [] });
+    
+    let domContainer: any = null;
+    await act(async () => {
+      const res = render(<PerformancePage />);
+      domContainer = res.container;
+    });
+    expect(domContainer?.firstChild).toBeNull();
+  });
+
+  it('calculates average score correctly', async () => {
+    render(<PerformancePage />);
+    const score = await screen.findByText('4.5');
+    expect(score).toBeInTheDocument();
   });
 });

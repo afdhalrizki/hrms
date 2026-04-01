@@ -1,7 +1,7 @@
 'use client';
 
-import LoginPage from '../page';
+import { LoginView } from '@/components/auth/LoginView';
 
 export default function PortalAdminPage() {
-  return <LoginPage forceShowForm={true} />;
+  return <LoginView forceShowForm={true} />;
 }

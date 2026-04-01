@@ -125,7 +125,7 @@ test.describe.serial('Core Configurations (Branches & Workflows)', () => {
     await page.goto(`${adminUrl}/en/workflows?test_tenant=company1`);
 
     // Verify initial workflow loads. The UI renders config.model_type in the list.
-    await expect(page.getByText('LEAVE')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'LEAVE', exact: true })).toBeVisible();
 
     // The current stage should be visible
     await expect(page.getByText(/Uses Employee's Direct Supervisor/i)).toBeVisible();

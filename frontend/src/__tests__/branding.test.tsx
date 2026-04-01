@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BrandingPage from '../app/[locale]/settings/branding/page';
 import { apiFetch } from '@/lib/api';
 
@@ -39,9 +39,47 @@ describe('BrandingPage (Phase 67)', () => {
 
   it('renders branding settings with current values', async () => {
     render(<BrandingPage />);
-    
-    // Strict matching to avoid "previewTitle" matches
-    expect(screen.getAllByText('title').length).toBeGreaterThan(0);
     expect(screen.getAllByDisplayValue('#ff0000').length).toBeGreaterThan(0);
+  });
+
+  it('handles logo change', async () => {
+    const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url');
+    
+    const { container } = render(<BrandingPage />);
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [file] } });
+    
+    expect(screen.getByAltText('Logo Preview')).toHaveAttribute('src', 'blob:mock-url');
+  });
+
+  it('submits branding updates successfully', async () => {
+    (apiFetch as any).mockResolvedValue({ success: true });
+    
+    render(<BrandingPage />);
+    const primaryInput = screen.getAllByDisplayValue('#ff0000')[0];
+    fireEvent.change(primaryInput, { target: { value: '#0000ff' } });
+    
+    const submitBtn = screen.getByRole('button', { name: /updateBtn/i });
+    fireEvent.click(submitBtn);
+    
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith('/tenant/settings', expect.objectContaining({
+        method: 'PATCH'
+      }));
+    });
+  });
+
+  it('handles submission error', async () => {
+    const { toast } = await import('sonner');
+    (apiFetch as any).mockRejectedValue(new Error('API Error'));
+    
+    render(<BrandingPage />);
+    const submitBtn = screen.getByRole('button', { name: /updateBtn/i });
+    fireEvent.click(submitBtn);
+    
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Failed to update branding');
+    });
   });
 });

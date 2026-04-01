@@ -25,6 +25,14 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: any) => <div>{children}</div>
 }));
 
+vi.mock('framer-motion', () => ({
+  motion: {
+    h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
+  },
+}));
+
 describe('Home Page Redirection', () => {
   const mockPush = vi.fn();
 
