@@ -69,7 +69,7 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
     def test_active_tenant_full_access(self):
         """Active tenant can perform POST requests."""
         with schema_context(self.tenant.schema_name):
-            url = '/api/core/departments/' # Assuming this exists
+            url = reverse('department-list')
             response = self.client.post(url, {'name': 'New Dept'}, format='json', SERVER_NAME=self.domain_name)
             # We don't care about success, just that it's not blocked by subscription
             self.assertNotEqual(response.status_code, 402)
@@ -80,7 +80,7 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         self.tenant.save()
         
         with schema_context(self.tenant.schema_name):
-            url = '/api/core/departments/'
+            url = reverse('department-list')
             # POST should be blocked
             response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=self.domain_name)
             self.assertEqual(response.status_code, 402)
@@ -97,7 +97,7 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         self.tenant.save()
         
         with schema_context(self.tenant.schema_name):
-            url = '/api/core/departments/'
+            url = reverse('department-list')
             # Both GET and POST should be blocked
             response = self.client.get(url, SERVER_NAME=self.domain_name)
             self.assertEqual(response.status_code, 402)

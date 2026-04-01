@@ -227,10 +227,11 @@ $LogFile = Join-Path $LogDir ("unit_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd
 try {
     # Dynamically detect terminal width for better alignment when piped
     $termWidth = if ($Host.UI.RawUI.WindowSize.Width -gt 0) { $Host.UI.RawUI.WindowSize.Width } else { 120 }
-    
-    # Force color output and pass detected terminal width
+    $env:COLUMNS = $termWidth
+
+    # Force color output
     # Removed -n auto (xdist) to prevent django-tenants schema creation clash
-    & $PythonExec -m pytest --color=yes -o "terminal_width=$termWidth" --maxfail=1 --durations=20 @RemainingArgs | Tee-Object -FilePath $LogFile
+    & $PythonExec -m pytest --color=yes --maxfail=1 --durations=20 @RemainingArgs | Tee-Object -FilePath $LogFile
     $exitCode = $LASTEXITCODE
 
     # 7. Final Summary Parsing

@@ -170,10 +170,10 @@ try {
         "--maxfail=1",
         "--durations=20",
         "--reuse-db",
-        "-o", "terminal_width=$termWidth",
         "-n", $workerCount
     )
 
+    $env:COLUMNS = $termWidth
     & $PythonExec -m pytest @pytestArgs 2>&1 | Tee-Object -FilePath $LogFile
     $exitCode = $LASTEXITCODE
 

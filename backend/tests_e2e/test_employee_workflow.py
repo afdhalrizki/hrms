@@ -33,9 +33,11 @@ def test_complete_attendance_workflow(base_url, tenant1_domain, client):
     }
     
     # Note: If record already exists from previous run, this might fail unless cleaned
-    # We'll use a unique date or check for existing
-    import datetime
-    unique_date = datetime.date.today().strftime("%Y-%m-%d")
+    # Use a random future date to avoid collisions when the test is re-run many times
+    import random
+    from datetime import date, timedelta
+    # Avoid date collisions with other tests that use today+1
+    unique_date = (date.today() + timedelta(days=random.randint(30, 365))).strftime("%Y-%m-%d")
     clock_in_data["date"] = unique_date
     
     res_in = client.post(attendance_url, json=clock_in_data, headers=get_auth_headers(tenant1_domain, token))
@@ -219,3 +221,41 @@ def test_checkin_blocked_when_approved_leave_exists(base_url, tenant1_domain, cl
     assert clockin_resp.status_code == 400
     assert "APPROVED leave" in (clockin_resp.json().get("detail", "") or "")
 
+
+@pytest.mark.e2e
+def test_employee_profile_update_restrictions(base_url, tenant1_domain, client):
+    """
+    Test: Employee can update phone but NOT salary or NIK.
+    """
+    # 1. Login as Employee
+    login_resp = client.post(
+        f"{base_url}/auth/login/",
+        json={"email": "employee1@company1.com", "password": "password123"},
+        headers=get_auth_headers(tenant1_domain)
+    )
+    assert login_resp.status_code == 200
+    token = login_resp.json()["access"]
+    
+    me_resp = client.get(f"{base_url}/users/me/", headers=get_auth_headers(tenant1_domain, token))
+    assert me_resp.status_code == 200
+    employee_id = me_resp.json()["employee_id"]
+    
+    # 2. Try to update restricted fields
+    profile_url = f"{base_url}/employees/{employee_id}/"
+    payload = {
+        "phone": "555-GET-HARDENED",
+        "nik": "HACKED_NIK",
+        "email": "hacked@test.com"
+    }
+    # Using PUT or PATCH. Our RBAC should block or ignore sensitive fields.
+    res_patch = client.patch(profile_url, json=payload, headers=get_auth_headers(tenant1_domain, token))
+    assert res_patch.status_code == 200
+    
+    # Verify phone is updated but NIK/Email remain same
+    # Note: If the backend ignores the fields, it still returns 200. 
+    # If the backend blocks the fields, it returns 403.
+    # Our RBAC `HasRBACPermission` + `allow_self_service` often allows the action but the serializer filters the fields.
+    data = res_patch.json()
+    assert data["phone"] == "555-GET-HARDENED"
+    assert data["nik"] != "HACKED_NIK"
+    assert data["email"] != "hacked@test.com"

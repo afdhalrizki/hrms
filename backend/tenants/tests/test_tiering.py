@@ -2,6 +2,7 @@ from rest_framework.test import APIClient
 from django_tenants.test.cases import TenantTestCase
 from django_tenants.utils import schema_context
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 from core.models import Employee, Department
 from tenants.models import Tenant
 
@@ -31,7 +32,7 @@ class TieringAccessTestCase(TenantTestCase):
     def test_basic_tier_restrictions(self):
         """BASIC tier should NOT have access to payroll."""
         with schema_context(self.tenant.schema_name):
-            url = '/api/payroll-periods/'
+            url = reverse('payrollperiod-list')
             response = self.client.get(url, SERVER_NAME=self.domain_name)
             # Should be forbidden because 'payroll' module is not enabled
             # Note: FeatureRequiredPermission returns False -> DRF returns 403
@@ -44,7 +45,7 @@ class TieringAccessTestCase(TenantTestCase):
         self.tenant.save()
         
         with schema_context(self.tenant.schema_name):
-            url = '/api/payroll-periods/'
+            url = reverse('payrollperiod-list')
             response = self.client.get(url, SERVER_NAME=self.domain_name)
             self.assertNotEqual(response.status_code, 403)
 
@@ -59,7 +60,7 @@ class TieringAccessTestCase(TenantTestCase):
             Employee.objects.create(fullname='Emp 1', email='emp1@test.com', nik='001', department=dept, join_date='2024-01-01')
             
             # 2. Try to create second employee via API (blocked)
-            url = '/api/employees/'
+            url = reverse('employee-list')
             payload = {
                 'fullname': 'Emp 2', 'email': 'emp2@test.com', 'nik': '002',
                 'department': dept.id, 'join_date': '2023-01-01'
@@ -73,8 +74,8 @@ class TieringAccessTestCase(TenantTestCase):
             dept = Department.objects.create(name='Mobile')
             Employee.objects.create(fullname='Emp Lite', email='lite@test.com', nik='LITE', department=dept, join_date='2024-01-01')
             
-            url = '/api/employees/?lite=true'
-            response = self.client.get(url, SERVER_NAME=self.domain_name)
+            url = reverse('employee-list')
+            response = self.client.get(url, {'lite': 'true'}, SERVER_NAME=self.domain_name)
             self.assertEqual(response.status_code, 200)
             data = response.json()
             if isinstance(data, list) and len(data) > 0:

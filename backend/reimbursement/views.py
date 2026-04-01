@@ -106,12 +106,22 @@ class ReimbursementViewSet(AuditModelMixin, viewsets.ModelViewSet):
         return response
 
     def _update_final_status(self, reimbursement):
-        from django.db import connection
+        reimbursement.refresh_from_db()
         tenant = connection.tenant
         
-        # Default behavior: Both Supervisor and Finance must approve
-        # Logic can follow Phase 38 settings if applied globally, 
-        # but for Reimbursement we usually want Finance to have the final say.
-        if reimbursement.supervisor_status == 'APPROVED' and reimbursement.finance_status == 'APPROVED':
+        # Determine if approval is complete based on tenant settings
+        # Default to BOTH if setting missing
+        level = getattr(tenant, 'reimbursement_approval_level', 'BOTH')
+        
+        is_fully_approved = False
+        if level == 'SUPERVISOR':
+            is_fully_approved = (reimbursement.supervisor_status == 'APPROVED')
+        elif level == 'HR': # In this context, HR acts as Finance
+            is_fully_approved = (reimbursement.finance_status == 'APPROVED')
+        else: # BOTH
+            is_fully_approved = (reimbursement.supervisor_status == 'APPROVED' and 
+                                 reimbursement.finance_status == 'APPROVED')
+        
+        if is_fully_approved:
             reimbursement.status = 'APPROVED'
             reimbursement.save()
