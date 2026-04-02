@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'screens/login_screen.dart';
+import 'utils/style_utils.dart';
 
 void main() {
   runApp(const HRMSApp());
 }
 
 class HRMSApp extends StatelessWidget {
-  const HRMSApp({super.key});
+  final ThemeData? theme;
+  const HRMSApp({super.key, this.theme});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'harikerja Mobile',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color(0xFF2563EB),
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-        useMaterial3: true,
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(
-          ThemeData.dark().textTheme,
-        ),
-      ),
+      theme: theme ?? AppTheme.darkTheme,
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

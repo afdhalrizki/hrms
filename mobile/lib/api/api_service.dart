@@ -141,6 +141,11 @@ class ApiService {
     return await _storage.read(key: 'jwt_token');
   }
 
+  Future<bool> hasValidToken() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
+  }
+
   Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');
   }

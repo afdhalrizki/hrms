@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import '../models/schedule_model.dart';
 
@@ -29,7 +29,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         elevation: 0,
         title: Text(
           'My Schedule',
-          style: GoogleFonts.plusJakartaSans(
+          style: AppTheme.plusJakartaSans(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -77,7 +77,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           const SizedBox(height: 16),
           Text(
             'No schedules assigned yet',
-            style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 16),
+            style: AppTheme.plusJakartaSans(color: Colors.white70, fontSize: 16),
           ),
         ],
       ),
@@ -114,7 +114,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               children: [
                 Text(
                   dayStr,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: AppTheme.plusJakartaSans(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

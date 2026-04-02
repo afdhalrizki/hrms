@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 
 class ProfileEditScreen extends StatefulWidget {
@@ -84,7 +84,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text('Edit Profile', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+        title: Text('Edit Profile', style: AppTheme.plusJakartaSans(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
@@ -139,7 +139,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title.toUpperCase(),
-      style: GoogleFonts.plusJakartaSans(
+      style: AppTheme.plusJakartaSans(
         color: Colors.white60,
         fontSize: 12,
         fontWeight: FontWeight.bold,

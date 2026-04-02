@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import 'self_appraisal_screen.dart';
 
@@ -29,11 +29,12 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
       final kpis = await api.getKPITargets();
       final appraisals = await api.getAppraisals();
       setState(() {
-        _kpiTargets = kpis;
-        _appraisals = appraisals;
+        _kpiTargets = List<dynamic>.from(kpis);
+        _appraisals = List<dynamic>.from(appraisals);
         _isLoading = false;
       });
     } catch (e) {
+      debugPrint('PerformanceDashboard Error: $e');
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -46,7 +47,7 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text('Performance', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+        title: Text('Performance', style: AppTheme.plusJakartaSans(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
@@ -63,14 +64,14 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
                 if (_kpiTargets.isEmpty)
                   _buildEmptyState('No active KPI targets assigned.')
                 else
-                  ..._kpiTargets.map((kpi) => _buildKPICard(kpi)).toList(),
+                  ..._kpiTargets.map((kpi) => _buildKPICard(kpi as Map<String, dynamic>)).toList(),
                 const SizedBox(height: 32),
                 _buildSectionHeader('Appraisal Periods'),
                 const SizedBox(height: 16),
                 if (_appraisals.isEmpty)
                   _buildEmptyState('No appraisals records found.')
                 else
-                  ..._appraisals.map((app) => _buildAppraisalCard(app)).toList(),
+                  ..._appraisals.map((app) => _buildAppraisalCard(app as Map<String, dynamic>)).toList(),
               ],
             ),
           ),
@@ -80,7 +81,7 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+      style: AppTheme.plusJakartaSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
     );
   }
 

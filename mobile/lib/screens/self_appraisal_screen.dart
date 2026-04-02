@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 
 class SelfAppraisalScreen extends StatefulWidget {
@@ -52,7 +52,7 @@ class _SelfAppraisalScreenState extends State<SelfAppraisalScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text('Self Appraisal', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+        title: Text('Self Appraisal', style: AppTheme.plusJakartaSans(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,

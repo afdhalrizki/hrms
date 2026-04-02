@@ -6,6 +6,7 @@ import 'package:mobile/api/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -13,10 +14,14 @@ class MyHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
+
+  @override
+  String findProxyFromEnvironment(Uri url, Map<String, String>? environment) {
+    return 'DIRECT';
+  }
 }
 
-void initRealBackendTest() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+void initTestHttpOverrides() {
   HttpOverrides.global = MyHttpOverrides();
 }
 
@@ -45,7 +50,46 @@ void setupSecureStorageMock() {
       return null;
     },
   );
+
+  const MethodChannel pathChannel = MethodChannel('plugins.flutter.io/path_provider');
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+    pathChannel,
+    (MethodCall methodCall) async {
+      if (methodCall.method == 'getApplicationDocumentsDirectory') {
+        return '.';
+      }
+      return null;
+    },
+  );
 }
+
+final Map<String, dynamic> mockAttendanceState = {
+  'activeRecord': null,
+  'records': [],
+};
+final Map<String, dynamic> mockKpiState = {
+  'targets': [],
+};
+final Map<String, dynamic> mockAppraisalState = {
+  'periods': [],
+};
+final Map<String, dynamic> mockCorrectionState = {
+  'requests': [],
+};
+final Map<String, dynamic> mockLeaveState = {
+  'requests': [],
+  'balances': [],
+};
+final Map<String, dynamic> mockPayslipState = {
+  'payslips': [],
+};
+final Map<String, dynamic> mockScheduleState = {
+  'schedules': [],
+};
+final Map<String, dynamic> mockReimbursementState = {
+  'requests': [],
+  'categories': [],
+};
 
 http.Client getMockClient() {
   return MockClient((request) async {
@@ -74,31 +118,80 @@ http.Client getMockClient() {
     }
     
     if (path.contains('/attendance/')) {
-      if (method == 'POST') {
-        Map<String, dynamic> body = {};
-        try {
-          body = jsonDecode(request.body);
-        } catch (_) {}
-        
-        // Simulation of Geofence: latitude -1.99 is "too far" in our mock logic
-        if (body['latitude_in'] != null && body['latitude_in'] > -5.0) {
-           return http.Response(jsonEncode({'error': 'Geofence failure'}), 400);
-        }
-        return http.Response(jsonEncode({'status': 'success', 'is_late': false}), 201);
-      }
-      return http.Response(jsonEncode([]), 200);
+       if (method == 'POST') {
+          // Toggle state for lifecycle test
+          if (mockAttendanceState['activeRecord'] == null) {
+            mockAttendanceState['activeRecord'] = {
+              'id': 1,
+              'date': '2026-04-01',
+              'check_in': '08:00:00',
+              'check_out': null,
+              'latitude_in': -6.2,
+              'longitude_in': 106.8
+            };
+          } else {
+            mockAttendanceState['activeRecord']!['check_out'] = '17:00:00';
+            // In a real app we'd move it to records or just mark it closed.
+            // For the test, we'll just keep it in activeRecord but with check_out set.
+          }
+          return http.Response(jsonEncode({'status': 'success', 'is_late': false}), 201);
+       }
+       
+       final List<Map<String, dynamic>> result = List.from(mockAttendanceState['records']);
+       if (mockAttendanceState['activeRecord'] != null) {
+         result.insert(0, mockAttendanceState['activeRecord']!);
+       }
+       return http.Response(jsonEncode(result), 200);
     }
 
-    if (path.contains('/leave-requests') || 
-        path.contains('/leave-balances') ||
-        path.contains('/payslips') || 
-        path.contains('/schedules') ||
-        path.contains('/reimbursement') ||
-        path.contains('/kpi-targets') ||
-        path.contains('/appraisal') ||
-        path.contains('/payroll') ||
-        path.contains('/employees') ||
-        path.contains('/attendance-correction-requests')) {
+    if (path.contains('kpi-targets')) {
+      if (method == 'POST') return http.Response(jsonEncode({'status': 'success'}), 201);
+      return http.Response(jsonEncode(mockKpiState['targets']), 200);
+    }
+
+    if (path.contains('appraisal')) {
+      if (method == 'POST') return http.Response(jsonEncode({'status': 'success'}), 201);
+      return http.Response(jsonEncode(mockAppraisalState['periods']), 200);
+    }
+
+    if (path.contains('/attendance-correction-requests')) {
+      if (method == 'POST') {
+        return http.Response(jsonEncode({'status': 'success'}), 201);
+      }
+      return http.Response(jsonEncode(mockCorrectionState['requests']), 200);
+    }
+
+    if (path.contains('/leave-requests')) {
+      if (method == 'POST') {
+        final body = jsonDecode(request.body);
+        if (body.isEmpty) return http.Response(jsonEncode({'error': 'Empty payload'}), 400);
+        return http.Response(jsonEncode({'id': 99, 'status': 'PENDING'}), 201);
+      }
+      return http.Response(jsonEncode(mockLeaveState['requests']), 200);
+    }
+    if (path.contains('/leave-balances')) {
+      return http.Response(jsonEncode(mockLeaveState['balances']), 200);
+    }
+    if (path.contains('/payslips')) {
+      return http.Response(jsonEncode(mockPayslipState['payslips']), 200);
+    }
+    if (path.contains('/schedules')) {
+      return http.Response(jsonEncode(mockScheduleState['schedules']), 200);
+    }
+    if (path.contains('/reimbursements')) {
+      if (method == 'POST') {
+        final body = jsonDecode(request.body);
+        if (body.isEmpty) return http.Response(jsonEncode({'error': 'Empty payload'}), 400);
+        return http.Response(jsonEncode({'status': 'success'}), 201);
+      }
+      return http.Response(jsonEncode(mockReimbursementState['requests']), 200);
+    }
+    if (path.contains('/reimbursement-categories')) {
+      return http.Response(jsonEncode(mockReimbursementState['categories']), 200);
+    }
+
+    if (path.contains('/payroll') ||
+        path.contains('/employees')) {
       
       if (method == 'POST' || method == 'PATCH') {
         Map<String, dynamic> body = {};
@@ -106,10 +199,7 @@ http.Client getMockClient() {
           if (request.body.isNotEmpty) {
             body = jsonDecode(request.body);
           }
-        } catch (_) {
-          // Non-JSON body (e.g. multipart), treat as success
-          return http.Response(jsonEncode({'status': 'success'}), method == 'PATCH' ? 200 : 201);
-        }
+        } catch (_) {}
         
         if (body.isEmpty && !(path.contains('/employees/') || path.contains('/profile/'))) {
           return http.Response(jsonEncode({'error': 'Empty payload'}), 400);
@@ -128,11 +218,29 @@ http.Client getMockClient() {
 
 Future<void> setupMockApiService() async {
   TestWidgetsFlutterBinding.ensureInitialized();
+  initTestHttpOverrides();
+  
+  // Disable GoogleFonts network fetching in all tests
+  GoogleFonts.config.allowRuntimeFetching = false;
+  
   ApiService.reset();
   ApiService(client: getMockClient());
   SharedPreferences.setMockInitialValues({});
   setupSecureStorageMock();
   mockSecureStorage.clear();
+  
+  // Reset all mock states
+  mockAttendanceState['activeRecord'] = null;
+  mockAttendanceState['records'] = [];
+  mockKpiState['targets'] = [];
+  mockAppraisalState['periods'] = [];
+  mockCorrectionState['requests'] = [];
+  mockLeaveState['requests'] = [];
+  mockLeaveState['balances'] = [];
+  mockPayslipState['payslips'] = [];
+  mockScheduleState['schedules'] = [];
+  mockReimbursementState['requests'] = [];
+  mockReimbursementState['categories'] = [];
 }
 
 Future<void> loginForTest() async {

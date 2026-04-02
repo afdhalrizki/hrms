@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/utils/style_utils.dart';
 import 'package:intl/intl.dart';
 import '../api/api_service.dart';
 
@@ -48,7 +48,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text('Attendance Correction', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+        title: Text('Attendance Correction', style: AppTheme.plusJakartaSans(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
@@ -197,7 +197,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Request Correction', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+              Text('Request Correction', style: AppTheme.plusJakartaSans(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Text('For date: ${record['date']}', style: const TextStyle(color: Colors.white60)),
               const SizedBox(height: 24),

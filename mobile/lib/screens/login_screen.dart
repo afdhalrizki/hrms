@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import 'package:mobile/utils/style_utils.dart';
 
 import '../api/api_service.dart';
 import 'home_screen.dart';
@@ -17,6 +17,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _tenantController = TextEditingController();
   bool _isLoading = false;
+  bool _isCheckingToken = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingToken();
+  }
+
+  Future<void> _checkExistingToken() async {
+    try {
+      final api = ApiService();
+      final hasToken = await api.hasValidToken();
+      if (hasToken && mounted) {
+        debugPrint('LOGIN: existing token found, auto-navigating to HomeScreen');
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (_) {
+      // Ignore errors on background check
+    } finally {
+      if (mounted) setState(() => _isCheckingToken = false);
+    }
+  }
 
   Future<void> _handleLogin() async {
     setState(() => _isLoading = true);
@@ -79,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       AppLocalizations.of(context)!.appTitle,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: AppTheme.plusJakartaSans(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -89,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       AppLocalizations.of(context)!.appSubtitle,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: AppTheme.plusJakartaSans(
                         fontSize: 16,
                         color: Colors.white70,
                       ),
@@ -170,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           label.toUpperCase(),
-          style: GoogleFonts.plusJakartaSans(
+          style: AppTheme.plusJakartaSans(
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.white38,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import 'package:mobile/utils/style_utils.dart';
 import 'payslip_screen.dart';
 import 'schedule_screen.dart';
 import 'face_verification_screen.dart';
@@ -198,14 +198,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.welcome + ",",
-                    style: GoogleFonts.plusJakartaSans(
+                    style: AppTheme.plusJakartaSans(
                       color: Colors.white60,
                       fontSize: 14,
                     ),
                   ),
                   Text(
                     name,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: AppTheme.plusJakartaSans(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -232,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(width: 8),
         Text(
           dateStr,
-          style: GoogleFonts.plusJakartaSans(
+          style: AppTheme.plusJakartaSans(
             color: Colors.white70,
             fontSize: 13,
           ),
@@ -273,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     _latestAttendance?['check_in'] ?? '--:--',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: AppTheme.plusJakartaSans(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -331,11 +331,14 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () async {
+              final latest = _latestAttendance;
+              final isCurrentlyClockedIn = latest != null && latest['check_out'] == null;
+              
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const FaceVerificationScreen(isClockIn: false),
+                      FaceVerificationScreen(isClockIn: !isCurrentlyClockedIn),
                 ),
               );
               if (result is Map && result['verified'] == true) {
@@ -411,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: GoogleFonts.plusJakartaSans(
+      style: AppTheme.plusJakartaSans(
         color: Colors.white,
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -435,11 +438,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.payments,
         'label': l10n.reimbursement,
         'color': const Color(0xFFF59E0B),
+        'key': 'qa_reimbursement',
       },
       {
         'icon': Icons.person,
         'label': l10n.myProfile,
         'color': const Color(0xFF6366F1),
+        'key': 'qa_profile',
       },
       {
         'icon': Icons.badge,
@@ -450,11 +455,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.edit_calendar,
         'label': l10n.correction,
         'color': const Color(0xFFF43F5E),
+        'key': 'qa_correction',
       },
       {
         'icon': Icons.trending_up,
         'label': l10n.performance,
         'color': const Color(0xFF10B981),
+        'key': 'qa_performance',
       },
     ];
 
@@ -532,6 +539,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           borderRadius: BorderRadius.circular(20),
           child: Container(
+            key: item['key'] != null ? Key(item['key'] as String) : null,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.05),
@@ -555,7 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 12),
                 Text(
                   item['label'] as String,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: AppTheme.plusJakartaSans(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
@@ -577,7 +585,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               l10n.recentActivities,
-              style: GoogleFonts.plusJakartaSans(
+              style: AppTheme.plusJakartaSans(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -727,6 +735,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Icon(
         icon,
+        key: icon == Icons.calendar_today ? const Key('nav_schedule') : 
+             icon == Icons.account_balance_wallet ? const Key('nav_payslip') :
+             icon == Icons.settings ? const Key('nav_settings') : null,
         color: isActive ? Colors.blueAccent : Colors.white24,
         size: 28,
       ),

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 
 class ProfileDocumentsScreen extends StatefulWidget {
@@ -92,7 +92,7 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text('Documents', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+        title: Text('Documents', style: AppTheme.plusJakartaSans(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
@@ -135,7 +135,7 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
                 const SizedBox(height: 32),
                 Text(
                   'Note: Position the document within the camera preview above before clicking capture.',
-                  style: GoogleFonts.plusJakartaSans(color: Colors.white60, fontSize: 12),
+                  style: AppTheme.plusJakartaSans(color: Colors.white60, fontSize: 12),
                   textAlign: TextAlign.center,
                 ),
               ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 
 class PayslipScreen extends StatefulWidget {
@@ -64,7 +64,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
           ),
           title: Text(
             AppLocalizations.of(context)!.payslip,
-            style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
+            style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         body: const Center(child: Text("No payslips found", style: TextStyle(color: Colors.white38))),
@@ -87,7 +87,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
         ),
         title: Text(
           AppLocalizations.of(context)!.payslip,
-          style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
+          style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: RefreshIndicator(
@@ -141,7 +141,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
             const Icon(Icons.calendar_today, size: 20, color: Colors.blueAccent),
             Text(
               _selectedPayslip?['period_name'] ?? 'Select Period',
-              style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w600),
+              style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             const Icon(Icons.expand_more, size: 20, color: Colors.white38),
           ],
@@ -184,7 +184,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
         children: [
           Text(
             'NET SALARY',
-            style: GoogleFonts.plusJakartaSans(
+            style: AppTheme.plusJakartaSans(
               color: Colors.white38,
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -194,7 +194,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
           const SizedBox(height: 12),
           Text(
             "Rp ${NumberFormat('#,###').format(netSalary)}",
-            style: GoogleFonts.plusJakartaSans(
+            style: AppTheme.plusJakartaSans(
               color: Colors.white,
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -215,7 +215,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
         title.toUpperCase(),
-        style: GoogleFonts.plusJakartaSans(
+        style: AppTheme.plusJakartaSans(
           color: Colors.white38,
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -234,7 +234,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
           Text(label, style: const TextStyle(color: Colors.white70, fontSize: 15)),
           Text(
             amount,
-            style: GoogleFonts.firaCode(
+            style: AppTheme.firaCode(
               color: isNegative ? const Color(0xFFEF4444) : Colors.white,
               fontSize: 15,
               fontWeight: FontWeight.w500,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import 'login_screen.dart';
 
@@ -17,7 +17,7 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         title: Text(
           'Settings',
-          style: GoogleFonts.plusJakartaSans(
+          style: AppTheme.plusJakartaSans(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -78,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: Text(
                 'Version 1.1.0-Hardened',
-                style: GoogleFonts.plusJakartaSans(
+                style: AppTheme.plusJakartaSans(
                   color: Colors.white24,
                   fontSize: 12,
                 ),
@@ -93,7 +93,7 @@ class SettingsScreen extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: GoogleFonts.plusJakartaSans(
+      style: AppTheme.plusJakartaSans(
         color: Colors.white60,
         fontSize: 14,
         fontWeight: FontWeight.w600,
@@ -124,7 +124,7 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   userData['fullname'] ?? 'User',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: AppTheme.plusJakartaSans(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -133,7 +133,7 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   userData['email'] ?? '',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: AppTheme.plusJakartaSans(
                     color: Colors.white54,
                     fontSize: 14,
                   ),
@@ -141,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'NIK: ${userData['employee_nik'] ?? 'N/A'}',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: AppTheme.plusJakartaSans(
                     color: Colors.blueAccent,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -179,7 +179,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: GoogleFonts.plusJakartaSans(
+          style: AppTheme.plusJakartaSans(
             color: Colors.white,
             fontSize: 15,
           ),

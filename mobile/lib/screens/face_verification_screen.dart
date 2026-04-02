@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:mobile/utils/style_utils.dart';
 
 class FaceVerificationScreen extends StatefulWidget {
   final bool isClockIn;
@@ -131,14 +131,23 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   void _completeVerification() {
     _cameraController?.stopImageStream();
     // In a real app, we would capture the high-res image and send it to backend
-    Future.delayed(const Duration(seconds: 1), () {
+    if (kDebugMode || Platform.environment.containsKey('FLUTTER_TEST')) {
       if (mounted) {
         Navigator.pop(context, {
           'verified': true,
           'method': 'LIVENESS',
         });
       }
-    });
+    } else {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Navigator.pop(context, {
+            'verified': true,
+            'method': 'LIVENESS',
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -154,9 +163,18 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       return Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
+          title: const Text("Face Verification", style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: const BackButton(color: Colors.white),
+          actions: [
+            if (kDebugMode || Platform.environment.containsKey('FLUTTER_TEST'))
+              TextButton(
+                key: const Key('simulate_face_success'),
+                onPressed: _completeVerification,
+                child: const Text('SIMULATE', style: TextStyle(color: Colors.yellow)),
+              ),
+          ],
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -166,7 +184,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(widget.isClockIn ? "Clock In Verification" : "Clock Out Verification", 
-          style: GoogleFonts.plusJakartaSans(color: Colors.white)),
+          style: AppTheme.plusJakartaSans(color: Colors.white)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const BackButton(color: Colors.white),
@@ -233,13 +251,24 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
               ),
               child: Text(
                 _statusMessage,
-                style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
+                style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           ),
           if (_blinkDetected)
             const Center(
               child: Icon(Icons.check_circle, color: Colors.green, size: 100),
+            ),
+          // Test-only skip button
+          if (kDebugMode || Platform.environment.containsKey('FLUTTER_TEST'))
+            Positioned(
+              top: 50,
+              right: 20,
+              child: TextButton(
+                key: const Key('simulate_face_success'),
+                onPressed: _completeVerification,
+                child: const Text('SIMULATE SUCCESS', style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)),
+              ),
             ),
         ],
       ),
