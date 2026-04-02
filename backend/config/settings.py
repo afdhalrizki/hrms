@@ -194,6 +194,10 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:3000$",
 ]
 CORS_ALLOW_CREDENTIALS = True
+from corsheaders.defaults import default_headers
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-tenant",
+]
 # Session and CSRF Cookie Settings for Multi-tenant support
 # Mapping: Dev (.localhost), Staging (.harikerja.web.id), Prod (.harikerja.com)
 SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', '.localhost')

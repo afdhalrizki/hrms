@@ -154,7 +154,7 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(appraisal['period_name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(appraisal['period_name'] ?? 'Unknown Period', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Text('${appraisal['start_date']} to ${appraisal['end_date']}', style: const TextStyle(color: Colors.white60, fontSize: 12)),
             ],

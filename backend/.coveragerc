@@ -1,0 +1,22 @@
+[run]
+branch = True
+source = .
+parallel = True
+omit =
+    */migrations/*
+    */tests/*
+    */tests_e2e/*
+    venv/*
+    manage.py
+    config/wsgi.py
+    config/asgi.py
+
+[report]
+show_missing = True
+precision = 2
+exclude_lines =
+    pragma: no cover
+    def __str__
+    def __repr__
+    if settings.DEBUG
+    if __name__ == .__main__.:

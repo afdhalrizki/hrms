@@ -148,7 +148,9 @@ export default function AuditLogsPage() {
                         <div className="flex items-center gap-2 text-sm text-gray-300">
                           <Database size={14} className="text-gray-600" />
                           <span className="font-mono">{log.model_name}</span>
-                          <span className="text-xs text-gray-600 font-bold tracking-tighter">#{log.object_id}</span>
+                          <span className="text-xs text-gray-600 font-bold tracking-tighter">
+                            {log.changed_fields.name || log.changed_fields.fullname || `#${log.object_id}`}
+                          </span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">

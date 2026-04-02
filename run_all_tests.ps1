@@ -140,8 +140,8 @@ function Start-BackendRunserver {
         Start-Sleep -Seconds 2
     }
 
-    Write-Host "[Backend] Starting run_dev.ps1 (including runserver) in background process..." -ForegroundColor Green
-    $BackendServerProcess = Start-Process -FilePath "pwsh" -ArgumentList @("-NoProfile", "-NoLogo", "-Command", "cd '$backendDir'; ./run_dev.ps1") -WorkingDirectory $backendDir -WindowStyle Hidden -PassThru
+    Write-Host "[Backend] Starting run_dev.ps1 (with Coverage collection) in background process..." -ForegroundColor Green
+    $BackendServerProcess = Start-Process -FilePath "pwsh" -ArgumentList @("-NoProfile", "-NoLogo", "-Command", "cd '$backendDir'; ./run_dev.ps1 -Coverage") -WorkingDirectory $backendDir -WindowStyle Hidden -PassThru
 
     return $BackendServerProcess
 }
@@ -361,6 +361,12 @@ try {
         } catch {
             # no-op if unable to stop
         }
+    }
+
+    # --- 4.5. Generate Backend E2E Coverage Report ---
+    if (Test-Path (Join-Path $RootDir "backend\report_e2e_coverage.ps1")) {
+        Write-Host "`n📊 Post-Processing Coverage Data..." -ForegroundColor Cyan
+        & pwsh -NoProfile -NoLogo -Command "cd '$(Join-Path $RootDir 'backend')'; ./report_e2e_coverage.ps1"
     }
 }
 

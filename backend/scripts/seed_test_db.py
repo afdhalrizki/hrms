@@ -53,11 +53,31 @@ except OperationalError:
     sys.exit(0)
 
 try:
-    tenant = Tenant.objects.get(schema_name='company1')
+    public_tenant = Tenant.objects.get(schema_name='public')
 except Tenant.DoesNotExist:
-    tenant = Tenant.objects.create(schema_name='company1', name='Company One')
+    public_tenant = Tenant.objects.create(schema_name='public', name='Public Tenant')
     from tenants.models import Domain
-    Domain.objects.create(domain='company1.localhost', tenant=tenant, is_primary=True)
+    Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
+    Domain.objects.get_or_create(domain='127.0.0.1', tenant=public_tenant, is_primary=False)
+
+try:
+    tenant = Tenant.objects.get(schema_name='company1')
+    tenant.plan_type = 'ENTERPRISE'
+    tenant.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+    tenant.save()
+except Tenant.DoesNotExist:
+    tenant = Tenant.objects.create(
+        schema_name='company1', 
+        name='Company One',
+        plan_type='ENTERPRISE',
+        enabled_modules=['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+    )
+
+from tenants.models import Domain
+# For E2E tests on local environment, map localhost and 127.0.0.1 to company1
+Domain.objects.update_or_create(domain='company1.localhost', defaults={'tenant': tenant, 'is_primary': True})
+Domain.objects.update_or_create(domain='localhost', defaults={'tenant': tenant, 'is_primary': False})
+Domain.objects.update_or_create(domain='127.0.0.1', defaults={'tenant': tenant, 'is_primary': False})
 
 try:
     tenant2 = Tenant.objects.get(schema_name='company2')
@@ -69,7 +89,7 @@ except Tenant.DoesNotExist:
 test_users = [
     # Company 1
     {'email': 'admin@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
-    {'email': 'manager1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
+    {'email': 'manager1@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
     {'email': 'employee1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
     # Company 2
     {'email': 'admin@company2.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant2},
@@ -125,11 +145,34 @@ with schema_context('company1'):
     # Roles
     admin_role, _ = AccessRole.objects.get_or_create(
         name="Admin",
-        defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'manage_payroll': True, 'manage_branding': True}}
+        defaults={'permissions': {
+            'manage_performance': True, 
+            'manage_attendance': True, 
+            'manage_payroll': True, 
+            'manage_branding': True,
+            'manage_settings': True,
+            'manage_hr': True,
+            'view_audit': True
+        }}
     )
     manager_role, _ = AccessRole.objects.get_or_create(
         name="Manager",
-        defaults={'permissions': {'manage_performance': True, 'manage_attendance': True, 'view_payroll': True}}
+        defaults={'permissions': {
+            'manage_performance': True, 
+            'manage_attendance': True, 
+            'view_payroll': True,
+            'view_performance': True
+        }}
+    )
+    staff_role, _ = AccessRole.objects.get_or_create(
+        name="Staff",
+        defaults={'permissions': {
+            'manage_performance': False, 
+            'manage_attendance': False, 
+            'view_payroll': False,
+            'manage_settings': False,
+            'manage_hr': False
+        }}
     )
 
     # Admin (Employee record) - Seeded first for ID 1
@@ -178,6 +221,8 @@ with schema_context('company1'):
             'supervisor': manager_emp
         }
     )
+    employee_emp.access_role = staff_role
+    employee_emp.save()
     
     # Reimbursement Categories
     med_cat, _ = ReimbursementCategory.objects.get_or_create(name="Medical", defaults={'max_amount': 1000000})
@@ -213,6 +258,11 @@ with schema_context('company1'):
 
 with schema_context('company2'):
     from attendance.models import Attendance, LeaveRequest, Overtime
+    # Ensure company2 tenant also has enterprise features
+    t2 = Tenant.objects.get(schema_name='company2')
+    t2.plan_type = 'ENTERPRISE'
+    t2.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+    t2.save()
     from core.models import Employee, Department, Role, Golongan
     Attendance.objects.all().delete()
     LeaveRequest.objects.all().delete()

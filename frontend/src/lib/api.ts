@@ -33,7 +33,9 @@ export const getBaseUrl = () => {
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const baseUrl = getBaseUrl();
-  const url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  // Ensure trailing slash for Django compatibility
+  const normalizedEndpoint = endpoint.endsWith('/') ? endpoint : `${endpoint}/`;
+  const url = `${baseUrl}${normalizedEndpoint.startsWith('/') ? '' : '/'}${normalizedEndpoint}`;
   
   const isFormData = options.body instanceof FormData;
 
@@ -60,6 +62,15 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const csrfToken = getCookie('csrftoken');
   if (csrfToken && typeof window !== 'undefined') {
     headers['X-CSRFToken'] = csrfToken;
+  }
+
+  // Multi-tenant check: if on localhost/127.0.0.1, we might need X-Tenant header for E2E
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const testTenant = sessionStorage.getItem('test_tenant_e2e');
+    if (testTenant && (hostname === 'localhost' || hostname === '127.0.0.1')) {
+      headers['X-Tenant'] = testTenant;
+    }
   }
 
   try {

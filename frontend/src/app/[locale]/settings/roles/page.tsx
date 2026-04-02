@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { getBaseUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 interface AccessRole {
   id: number;
@@ -49,8 +49,7 @@ export default function RolesPage() {
 
   const fetchRoles = async () => {
     try {
-      const res = await fetch(`${getBaseUrl()}/access-roles/`);
-      const data = await res.json();
+      const data = await apiFetch('/access-roles');
       setRoles(data);
     } catch (err) {
       console.error('Failed to fetch roles:', err);
@@ -91,19 +90,16 @@ export default function RolesPage() {
   const handleSave = async () => {
     const isNew = isEditing === 'new';
     const method = isNew ? 'POST' : 'PATCH';
-    const url = isNew ? `${getBaseUrl()}/access-roles/` : `${getBaseUrl()}/access-roles/${isEditing}/`;
+    const endpoint = isNew ? `/access-roles/` : `/access-roles/${isEditing}/`;
 
     try {
-      const res = await fetch(url, {
+      await apiFetch(endpoint, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm)
       });
 
-      if (res.ok) {
-        setIsEditing(null);
-        fetchRoles();
-      }
+      setIsEditing(null);
+      fetchRoles();
     } catch (err) {
       console.error('Save failed:', err);
     }
@@ -113,7 +109,7 @@ export default function RolesPage() {
     if (!confirm('Are you sure you want to delete this role?')) return;
     
     try {
-      await fetch(`${getBaseUrl()}/access-roles/${id}/`, { method: 'DELETE' });
+      await apiFetch(`/access-roles/${id}/`, { method: 'DELETE' });
       fetchRoles();
     } catch (err) {
       console.error('Delete failed:', err);

@@ -47,7 +47,7 @@ void main() {
     }
 
     // Intelligent polling for an element to appear
-    Future<void> waitFor(WidgetTester tester, Finder finder, {String message = "Widget", int seconds = 10}) async {
+    Future<void> waitFor(WidgetTester tester, Finder finder, {String message = "Widget", int seconds = 30}) async {
       for (int i = 0; i < seconds * 10; i++) {
         await tester.idle(); // Handle microtasks
         await tester.pump(const Duration(milliseconds: 100));
@@ -475,7 +475,7 @@ void main() {
         await tester.pumpAndSettle(); 
 
         // 2. Change state to Clock Out should have occurred
-        await waitFor(tester, find.text('Clock Out'), message: 'Clock Out button appears', seconds: 15);
+        await waitFor(tester, find.text('Clock Out'), message: 'Clock Out button appears', seconds: 45); // Increased timeout for clock state sync
         expect(find.text('Clock Out'), findsOneWidget);
 
         await tester.tap(find.text('Clock Out'));

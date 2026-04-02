@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiFetch('/auth/login', {
+      const data = await apiFetch('/auth/login/', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });

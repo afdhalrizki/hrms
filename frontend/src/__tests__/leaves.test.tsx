@@ -89,7 +89,6 @@ describe('LeavesPage', () => {
     
     await waitFor(() => {
       const calls = (apiFetch as any).mock.calls;
-      console.log('API CALLS:', JSON.stringify(calls.map((c: any) => c[0])));
       const postCall = calls.find((c: any) => c[0] === '/leave-requests' && c[1]?.method === 'POST');
       expect(postCall).toBeDefined();
       const body = JSON.parse(postCall[1].body);
@@ -127,7 +126,7 @@ describe('LeavesPage', () => {
     fireEvent.click(screen.getByText('requestLeave'));
 
     // Change Leave Type
-    const typeSelect = screen.getByLabelText(/form.type/i);
+    const typeSelect = await screen.findByLabelText(/form.type/i);
     fireEvent.change(typeSelect, { target: { value: 'SAKIT' } });
     expect((typeSelect as HTMLSelectElement).value).toBe('SAKIT');
 

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "start:backend:test": "pwsh -Command \"Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; pwsh ../backend/run_dev.ps1 -Seed -Coverage\""
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -32,9 +33,12 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.0",
+    "babel-plugin-istanbul": "^7.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "jsdom": "^29.0.0",
+    "monocart-reporter": "^2.10.0",
+    "nyc": "^18.0.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.0"

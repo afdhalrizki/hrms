@@ -59,7 +59,7 @@ describe('apiFetch', () => {
     const data = await apiFetch('/test-endpoint');
     
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:8000/api/test-endpoint',
+      'http://localhost:8000/api/test-endpoint/',
       expect.objectContaining({
         headers: expect.objectContaining({
           'Content-Type': 'application/json',

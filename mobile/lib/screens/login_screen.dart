@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print('LOGIN ERROR CAUGHT: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppLocalizations.of(context)!.error}: ${e.toString()}')),
+          SnackBar(content: Text('${AppLocalizations.of(context)?.error ?? 'Error'}: ${e.toString()}')),
         );
       }
     } finally {
@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Icon(Icons.business_center, size: 64, color: Colors.blueAccent),
                     const SizedBox(height: 24),
                     Text(
-                      AppLocalizations.of(context)!.appTitle,
+                      AppLocalizations.of(context)?.appTitle ?? 'HRMS Mobile',
                       textAlign: TextAlign.center,
                       style: AppTheme.plusJakartaSans(
                         fontSize: 32,
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      AppLocalizations.of(context)!.appSubtitle,
+                      AppLocalizations.of(context)?.appSubtitle ?? 'Human Resource Management System',
                       textAlign: TextAlign.center,
                       style: AppTheme.plusJakartaSans(
                         fontSize: 16,
@@ -123,23 +123,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Inputs
                     _buildInput(
                       controller: _tenantController,
-                      label: AppLocalizations.of(context)!.companySubdomain,
+                      label: AppLocalizations.of(context)?.companySubdomain ?? 'Company Subdomain',
                       icon: Icons.language,
-                      hint: AppLocalizations.of(context)!.subdomainHint,
+                      hint: AppLocalizations.of(context)?.subdomainHint ?? 'e.g. company1',
                     ),
                     const SizedBox(height: 16),
                     _buildInput(
                       controller: _emailController,
-                      label: AppLocalizations.of(context)!.email,
+                      label: AppLocalizations.of(context)?.email ?? 'Email Address',
                       icon: Icons.email,
-                      hint: AppLocalizations.of(context)!.emailHint,
+                      hint: AppLocalizations.of(context)?.emailHint ?? 'name@company.com',
                     ),
                     const SizedBox(height: 16),
                     _buildInput(
                       controller: _passwordController,
-                      label: AppLocalizations.of(context)!.password,
+                      label: AppLocalizations.of(context)?.password ?? 'Password',
                       icon: Icons.lock,
-                      hint: AppLocalizations.of(context)!.passwordHint,
+                      hint: AppLocalizations.of(context)?.passwordHint ?? '••••••••',
                       isPassword: true,
                     ),
                     const SizedBox(height: 32),
@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             )
                           : Text(
-                              AppLocalizations.of(context)!.signIn,
+                              AppLocalizations.of(context)?.signIn ?? 'Sign In',
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                     ),

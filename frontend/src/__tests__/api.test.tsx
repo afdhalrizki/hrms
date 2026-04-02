@@ -79,7 +79,7 @@ describe('lib/api', () => {
     const result = await apiFetch('/test');
 
     expect(result).toEqual({ message: 'ok' });
-    expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/api/test', expect.objectContaining({
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/api/test/', expect.objectContaining({
       credentials: 'include',
       headers: expect.objectContaining({
         Authorization: 'Bearer abc123',

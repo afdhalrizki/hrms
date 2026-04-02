@@ -289,7 +289,7 @@ class AuditLog(models.Model):
     # e.g. {"salary": {"old": 5000, "new": 6000}}
     changed_fields = models.JSONField(default=dict)
     
-    actor = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True)
+    actor = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True, db_constraint=False)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 

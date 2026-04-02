@@ -35,18 +35,24 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
+      const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
       
       // Get the configured domain suffix from env, fallback to 'localhost'
       const domainSuffix = process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'localhost';
-      const testTenantEnv = process.env.NEXT_PUBLIC_TEST_TENANT;
       
       // Check for URL parameter override (more precise for E2E)
       const urlParams = new URLSearchParams(window.location.search);
       const testTenantUrl = urlParams.get('test_tenant');
-      const testTenant = testTenantUrl || testTenantEnv;
+      
+      // Try to recover from sessionStorage for E2E persistence across navigation
+      const storedTestTenant = isLocal ? sessionStorage.getItem('test_tenant_e2e') : null;
+      const testTenant = testTenantUrl || storedTestTenant;
 
       // Special override for E2E testing on localhost
-      if (testTenant && (hostname === 'localhost' || hostname === '127.0.0.1')) {
+      if (testTenant && isLocal) {
+        // Persist for next navigation
+        sessionStorage.setItem('test_tenant_e2e', testTenant);
+        
         const initialName = testTenant.charAt(0).toUpperCase() + testTenant.slice(1);
         setTenant(prev => ({
           ...prev,
@@ -65,6 +71,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
               enabledModules: data.enabled_modules,
               isSubscriptionActive: data.is_subscription_active,
               isLoading: false,
+              planType: data.plan_type,
             }));
           })
           .catch(() => setTenant(prev => ({ ...prev, isLoading: false })));
@@ -72,7 +79,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       }
       
       // If hostname is exactly the domain suffix or localhost, it's public
-      if (hostname === domainSuffix || hostname === 'localhost' || hostname === '127.0.0.1') {
+      if (hostname === domainSuffix || isLocal) {
         setTenant({
           tenantName: 'Public',
           subdomain: '',

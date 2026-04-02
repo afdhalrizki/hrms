@@ -29,6 +29,24 @@ export default function BrandingPage() {
   const [secondaryColor, setSecondaryColor] = React.useState(tenant.themeSecondaryColor || '#4f46e5');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const userData = await apiFetch('/users/me');
+        // Strictly check for ADMIN role, ignoring is_staff (which managers have for portal login)
+        setIsAdmin(userData.role === 'ADMIN');
+      } catch (error) {
+        console.error('Failed to check branding access');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAccess();
+  }, []);
+
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -50,17 +68,42 @@ export default function BrandingPage() {
       await apiFetch('/tenant/settings', {
         method: 'PATCH',
         body: formData,
-        // FormData doesn't need JSON content type, apiFetch handles it
       });
       
       toast.success(t('success'));
-      // In a real app, we might want to window.location.reload() to apply CSS vars globally
     } catch (error) {
       toast.error('Failed to update branding');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="animate-spin text-primary" size={40} />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center px-4">
+          <div className="h-20 w-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mb-4">
+            <Palette size={40} />
+          </div>
+          <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic">Restricted Access</h1>
+          <p className="text-gray-500 max-w-sm mx-auto font-medium">
+            You do not have the required permissions to access Corporate Branding settings. 
+            Please contact your system administrator.
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

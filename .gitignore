@@ -41,6 +41,7 @@ yarn-error.log*
 # Backend (Django/Python)
 backend/db.sqlite3
 backend/db.sqlite3-journal
+backend/.venv_requirements.hash
 backend/staticfiles/
 backend/media/
 backend/.venv/
@@ -68,6 +69,8 @@ frontend/playwright-report/
 frontend/blob-report/
 frontend/playwright/.cache/
 frontend/coverage/
+frontend/e2e/*/coverage/
+frontend/e2e/*/test-results/
 
 # Mobile (Flutter/Dart)
 mobile/.dart_tool/
@@ -119,3 +122,6 @@ tools/*.tar.gz
 
 # Test Artifacts
 *-failure.png
+
+# E2E Reports & Coverage
+/e2e/

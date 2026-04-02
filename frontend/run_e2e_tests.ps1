@@ -50,7 +50,7 @@ function Wait-ForPort {
 
 function Test-BackendHealth {
     try {
-        $health = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+        Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop | Out-Null
         return $true
     } catch {
         if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
@@ -121,27 +121,38 @@ else {
     Write-Host "[2/3] Skipping Seed..." -ForegroundColor Gray
 }
 
-# 3. Port Cleanup (Ensure 3000 is available for Playwright)
-Write-Host "[3/4] Ensuring port 3000 is available..." -ForegroundColor Yellow
-$Port3000Line = netstat -ano | findstr :3000 | select-string "LISTENING" | Select-Object -First 1
-if ($Port3000Line) {
-    $PidMatch = [regex]::Match($Port3000Line.ToString(), "\d+$")
-    if ($PidMatch.Success) {
-        $ActivePid = $PidMatch.Value
-        Write-Host "Found process $ActivePid on port 3000. Cleaning up..." -ForegroundColor Gray
-        Stop-Process -Id $ActivePid -Force -ErrorAction SilentlyContinue
+# 3. Port Cleanup (Ensure 3000 and 8000 are available/managed)
+Write-Host "[3/4] Ensuring ports are available..." -ForegroundColor Yellow
+$Ports = @(3000, 8000)
+foreach ($Port in $Ports) {
+    $PortLine = netstat -ano | findstr ":$Port" | select-string "LISTENING" | Select-Object -First 1
+    if ($PortLine) {
+        $PidMatch = [regex]::Match($PortLine.ToString(), "\d+$")
+        if ($PidMatch.Success) {
+            $ActivePid = $PidMatch.Value
+            Write-Host "Found process $ActivePid on port $Port. Cleaning up..." -ForegroundColor Gray
+            Stop-Process -Id $ActivePid -Force -ErrorAction SilentlyContinue
+        }
     }
+}
+
+# 3.5. Build Frontend (Ensure clean production build once)
+Write-Host "[3.5/4] Building Frontend Production Bundle..." -ForegroundColor Yellow
+npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERROR: Frontend build failed. Aborting tests." -ForegroundColor Red
+    exit 1
 }
 
 # 4. Execution
 Write-Host "[4/4] Launching Playwright Tests..." -ForegroundColor Cyan
 $env:PORT = "3000"
+$env:PLAYWRIGHT_JSON_OUTPUT_NAME = "logs/e2e_results.json"
 
 # Note: Playwright's webServer config handles starting and waiting for the Next.js dev server.
 
-$workersArg = 4
-if ($env:CI -eq 'true') { $workersArg = 1 } # keep stable in CI by default
-$playwrightCmd = "npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=$workersArg --retries=2 --timeout=120000"
+$workersArg = 1
+$playwrightCmd = "npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=$workersArg --retries=2 --timeout=120000 --reporter=list,json"
 Write-Host "Executing: $playwrightCmd" -ForegroundColor Gray
 Invoke-Expression "$playwrightCmd | Tee-Object -FilePath '$LogFile'"
 

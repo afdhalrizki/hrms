@@ -95,7 +95,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    record['date'],
+                    record['date'] ?? 'Unknown Date',
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
@@ -142,7 +142,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(req['attendance_date'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text(req['attendance_date'] ?? 'Unknown Date', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   _buildStatusBadge(req['status'], statusColor),
                 ],
               ),
@@ -182,8 +182,23 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
 
   void _showCorrectionForm(Map<String, dynamic> record) {
     final reasonController = TextEditingController();
-    TimeOfDay? requestedIn = record['check_in'] != null ? TimeOfDay.fromDateTime(DateTime.parse('2026-01-01 ${record['check_in']}')) : const TimeOfDay(hour: 8, minute: 0);
-    TimeOfDay? requestedOut = record['check_out'] != null ? TimeOfDay.fromDateTime(DateTime.parse('2026-01-01 ${record['check_out']}')) : const TimeOfDay(hour: 17, minute: 0);
+    TimeOfDay? requestedIn;
+    try {
+      requestedIn = record['check_in'] != null 
+        ? TimeOfDay.fromDateTime(DateFormat('HH:mm:ss').parse(record['check_in']))
+        : const TimeOfDay(hour: 8, minute: 0);
+    } catch (_) {
+      requestedIn = const TimeOfDay(hour: 8, minute: 0);
+    }
+    
+    TimeOfDay? requestedOut;
+    try {
+      requestedOut = record['check_out'] != null 
+        ? TimeOfDay.fromDateTime(DateFormat('HH:mm:ss').parse(record['check_out']))
+        : const TimeOfDay(hour: 17, minute: 0);
+    } catch (_) {
+      requestedOut = const TimeOfDay(hour: 17, minute: 0);
+    }
 
     showModalBottomSheet(
       context: context,

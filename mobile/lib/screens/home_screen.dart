@@ -139,7 +139,13 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0F172A),
+        body: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+      );
+    }
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
     final fullName = _userData?['fullname'] ?? 'User';
@@ -197,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.welcome + ",",
+                    (AppLocalizations.of(context)?.welcome ?? 'Welcome') + ",",
                     style: AppTheme.plusJakartaSans(
                       color: Colors.white60,
                       fontSize: 14,
@@ -280,9 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.clockInTime, // keep as is if context is needed or change to l10n
+                    l10n.clockInTime,
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],

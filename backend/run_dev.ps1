@@ -4,7 +4,9 @@
 param(
     [switch]$NoDeps,
     [switch]$ForceDeps,
-    [switch]$NoServer
+    [switch]$NoServer,
+    [switch]$Seed,
+    [switch]$Coverage
 )
 
 $ErrorActionPreference = "Stop"
@@ -161,13 +163,27 @@ try {
     Write-Host "Migration failed. You might need to run 'python manage.py bootstrap_tenants' if this is first run." -ForegroundColor Red
 }
 
+if ($Seed) {
+    Write-Host "[5+/5] Seeding test data..." -ForegroundColor Yellow
+    if (Test-Path (Join-Path $BackendDir "scripts/seed_test_db.py")) {
+        & $PythonExec scripts/seed_test_db.py
+    } else {
+        Write-Host "WARNING: scripts/seed_test_db.py not found. Skipping seed." -ForegroundColor Yellow
+    }
+}
+
 if (-not $NoServer) {
     # 8. Start Server
     if (Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue) {
         Write-Host "Port 8000 is already in use; assuming existing backend service is running. Skipping local runserver." -ForegroundColor Yellow
     } else {
         Write-Host "--- Starting Django Server at http://localhost:8000 ---" -ForegroundColor Green
-        & $PythonExec manage.py runserver 0.0.0.0:8000
+        if ($Coverage) {
+            Write-Host "Running WITH coverage collection..." -ForegroundColor Magenta
+            & $PythonExec -m coverage run manage.py runserver 0.0.0.0:8000 --noreload
+        } else {
+            & $PythonExec manage.py runserver 0.0.0.0:8000
+        }
     }
 } else {
     Write-Host "Skipping runserver due to --NoServer." -ForegroundColor Yellow

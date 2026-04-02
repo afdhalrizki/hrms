@@ -5,6 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  /* Directory for artifacts like screenshots and traces. */
+  outputDir: './logs/test-results',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -16,11 +18,23 @@ export default defineConfig({
   /* Timeout for each test in milliseconds. */
   // timeout: 90000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html', { open: 'never' }], ['list']],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: './logs/playwright-report' }],
+    ['monocart-reporter', {
+      name: 'HRMS Frontend E2E Coverage Report',
+      outputFile: './e2e/frontend/coverage/index.html',
+      coverage: {
+        entryFilter: (entry: any) => entry.url.includes('_next/static') && !entry.url.includes('vendor'),
+        sourceFilter: (sourcePath: string) => sourcePath.includes('src') && !sourcePath.includes('node_modules'),
+        reports: ['v8', 'console-summary', 'lcov', 'html'],
+      }
+    }]
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://127.0.0.1:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -34,14 +48,27 @@ export default defineConfig({
     },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    // Using build and start for much faster test execution (no compilation lag during tests)
-    command: 'npm run build && npm run start',
-    url: 'http://localhost:3000/en', // Match the localized route
-    reuseExistingServer: true,
-    stdout: 'pipe',
-    stderr: 'pipe',
-    timeout: 300 * 1000,
-  },
+  webServer: [
+    {
+      // Frontend server
+      command: 'npm run start',
+      url: 'http://127.0.0.1:3000/en/',
+      env: {
+        NODE_ENV: 'test',
+      },
+      reuseExistingServer: false,
+      stdout: 'pipe',
+      stderr: 'pipe',
+      timeout: 600 * 1000,
+    },
+    {
+      // Backend server (Django)
+      command: 'npm run start:backend:test',
+      url: 'http://127.0.0.1:8000/api/schema/',
+      reuseExistingServer: true,
+      stdout: 'pipe',
+      stderr: 'pipe',
+      timeout: 600 * 1000,
+    },
+  ],
 });

@@ -38,27 +38,38 @@ describe('BrandingPage (Phase 67)', () => {
   });
 
   it('renders branding settings with current values', async () => {
+    (apiFetch as any).mockResolvedValue({ role: 'ADMIN' });
     render(<BrandingPage />);
-    expect(screen.getAllByDisplayValue('#ff0000').length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(screen.getAllByDisplayValue('#ff0000').length).toBeGreaterThan(0);
+    });
   });
 
   it('handles logo change', async () => {
+    (apiFetch as any).mockResolvedValue({ role: 'ADMIN' });
     const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url');
     
     const { container } = render(<BrandingPage />);
+    await waitFor(() => {
+      expect(screen.queryByTestId('loader')).toBeNull(); // Wait for loader to go
+    });
+    
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [file] } });
     
-    expect(screen.getByAltText('Logo Preview')).toHaveAttribute('src', 'blob:mock-url');
+    await waitFor(() => {
+      expect(screen.getByAltText('Logo Preview')).toHaveAttribute('src', 'blob:mock-url');
+    });
   });
 
   it('submits branding updates successfully', async () => {
-    (apiFetch as any).mockResolvedValue({ success: true });
+    (apiFetch as any).mockResolvedValueOnce({ role: 'ADMIN' }) // Access check
+      .mockResolvedValueOnce({ success: true }); // Submit
     
     render(<BrandingPage />);
-    const primaryInput = screen.getAllByDisplayValue('#ff0000')[0];
-    fireEvent.change(primaryInput, { target: { value: '#0000ff' } });
+    const primaryInput = await screen.findAllByDisplayValue('#ff0000');
+    fireEvent.change(primaryInput[0], { target: { value: '#0000ff' } });
     
     const submitBtn = screen.getByRole('button', { name: /updateBtn/i });
     fireEvent.click(submitBtn);
@@ -72,10 +83,11 @@ describe('BrandingPage (Phase 67)', () => {
 
   it('handles submission error', async () => {
     const { toast } = await import('sonner');
-    (apiFetch as any).mockRejectedValue(new Error('API Error'));
+    (apiFetch as any).mockResolvedValueOnce({ role: 'ADMIN' }); // Access check
+    (apiFetch as any).mockRejectedValueOnce(new Error('API Error')); // Submit
     
     render(<BrandingPage />);
-    const submitBtn = screen.getByRole('button', { name: /updateBtn/i });
+    const submitBtn = await screen.findByRole('button', { name: /updateBtn/i });
     fireEvent.click(submitBtn);
     
     await waitFor(() => {

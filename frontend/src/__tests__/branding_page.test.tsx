@@ -31,11 +31,12 @@ describe('BrandingPage', () => {
   });
 
   it('submits the branding form successfully', async () => {
-    (apiFetch as any).mockResolvedValueOnce({});
+    (apiFetch as any).mockResolvedValueOnce({ role: 'ADMIN' }); // Access
+    (apiFetch as any).mockResolvedValueOnce({}); // Submit
 
     render(<BrandingPage />);
 
-    const colorInputs = screen.getAllByDisplayValue('#ff0000');
+    const colorInputs = await screen.findAllByDisplayValue('#ff0000');
     fireEvent.change(colorInputs[0], { target: { value: '#112233' } });
 
     const button = screen.getByRole('button', { name: /updateBtn/i });
@@ -47,11 +48,12 @@ describe('BrandingPage', () => {
   });
 
   it('shows error toast when update fails', async () => {
-    (apiFetch as any).mockRejectedValueOnce(new Error('Oops'));
+    (apiFetch as any).mockResolvedValueOnce({ role: 'ADMIN' }); // Access
+    (apiFetch as any).mockRejectedValueOnce(new Error('Oops')); // Submit
 
     render(<BrandingPage />);
 
-    const button = screen.getByRole('button', { name: /updateBtn/i });
+    const button = await screen.findByRole('button', { name: /updateBtn/i });
     fireEvent.click(button);
 
     await waitFor(() => {
