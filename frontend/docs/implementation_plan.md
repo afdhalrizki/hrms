@@ -2,7 +2,7 @@
 
 This document serves as the technical blueprint and record of accomplishment for the **harikerja HRMS** Next.js dashboard.
 
-## 🏗 1. Next.js 14 Architecture
+## 🏗 1. Next.js 16 Architecture
 The frontend leverages the latest App Router patterns for maximum performance and SEO.
 
 - **Routing & Layouts**:
@@ -13,10 +13,10 @@ The frontend leverages the latest App Router patterns for maximum performance an
     - `TenantContext`: Handles subdomain parsing and branding extraction.
 - **Shared Components**:
     - `src/components/ui/`: Atomic design system components (Glassmorphism).
-    - `src/components/ModuleGuard/`: Security layer for Tier-based feature masking (Basic/Pro/Ent).
+    - `src/components/shared/FeatureGuard.tsx`: Security layer for Tier-based feature masking (Basic/Pro/Ent).
 
 ## 🛠 2. Technical Stack & Standards
-- **Framework**: Next.js 14 (App Router) + TypeScript.
+- **Framework**: Next.js 16 (App Router) + TypeScript.
 - **Styling**: Tailwind CSS + Vanilla CSS Modules for granular control.
 - **Animations**: Framer Motion for premium micro-interactions.
 - **Testing**: Vitest for units, Playwright for E2E user journeys.
@@ -55,7 +55,7 @@ The frontend uses `environments/.env.*` templates to determine:
 ## ✅ 5. Roadmap Completion Summary
 
 ### Phase F1: Foundation & UI Archetype (DONE)
-- Next.js 14 setup and Glassmorphism design tokens.
+- Next.js 16 setup and Glassmorphism design tokens.
 - Cross-origin configuration and tenant mapping.
 
 ### Phase F2: Authentication & JWT Hardening (DONE)

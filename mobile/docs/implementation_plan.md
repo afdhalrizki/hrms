@@ -8,12 +8,12 @@ Standardizing the project structure for scalability and testability.
 ```bash
 lib/
 ├── api/             # API Service (Http) and 401 Refresh Interceptors
+├── l10n/            # Localization support files
 ├── models/          # Data Models (JSON Serializable)
 ├── providers/       # State Management (Provider)
 ├── screens/         # UI Screen widgets (Localized)
-├── widgets/         # Reusable atomic UI components
-├── services/        # Hardware services (GPS, Biometrics, Storage)
-└── utils/           # Formatters, Constants, and I18n helpers
+├── theme/           # Theme definitions and UI tokens
+└── utils/           # Formatters, Constants, and helpers
 ```
 
 ## 🔐 2. Biometric & Hardware Pipelines

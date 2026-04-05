@@ -1,6 +1,6 @@
 # harikerja HRMS SaaS Frontend (Next.js)
 
-The premium, high-performance admin dashboard for the **harikerja HRMS** ecosystem. Built with Next.js 14 and TypeScript, following the latest App Router patterns for optimal SEO and user experience.
+The premium, high-performance admin dashboard for the **harikerja HRMS** ecosystem. Built with Next.js 16 and TypeScript, following the latest App Router patterns for optimal SEO and user experience.
 
 ## ✨ High-End Features
 
@@ -31,7 +31,7 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 
 ## 🛠 Tech Stack
 
-- **Core**: Next.js 14 (App Router)
+- **Core**: Next.js 16 (App Router)
 - **Styling**: Tailwind CSS & Vanilla CSS (Design System)
 - **Animations**: Framer Motion
 - **Icons**: Lucide React

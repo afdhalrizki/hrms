@@ -3,7 +3,7 @@
 This roadmap documents the UX and architectural evolution of the **harikerja HRMS** dashboard.
 
 - [x] **Phase F1: Foundation & UI Archetype**
-    - [x] Next.js 14 App Router initialization and architecture.
+    - [x] Next.js 16 App Router initialization and architecture.
     - [x] Glassmorphism design system & component library (Tailwind + Vanilla CSS).
 - [x] **Phase F2: Tenant Context & Subdomain Routing**
     - [x] Automated subdomain parsing for multi-tenant identification.
@@ -17,7 +17,7 @@ This roadmap documents the UX and architectural evolution of the **harikerja HRM
     - [x] Strategic Performance & KPI tracking interface.
 - [x] **Phase F5: Workflow & Approval Logic**
     - [x] Multi-stage approval cycles for ESS requests (Leave, Overtime, Reimb).
-    - [x] `ModuleGuard` component for subscription-based feature gating.
+    - [x] `FeatureGuard` component for subscription-based feature gating.
 - [x] **Phase F6: Quality Assurance & Automation**
     - [x] 100% Vitest Unit Test coverage (60+ tests).
     - [x] 100% Playwright E2E Pass Rate (25/25 scenarios).

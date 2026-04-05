@@ -16,7 +16,7 @@ The system employs a shared-database, separate-schema architecture for optimal i
     - `performance.*`: KPI strategies and appraisal review lifecycles.
 
 ## 🛠 2. Technical Stack & Standards
-- **Framework**: Django 6.0.3 + Django Rest Framework (DRF).
+- **Framework**: Django 5.2.12 + Django Rest Framework (DRF).
 - **Database**: PostgreSQL 14+ with `django-tenants`.
 - **API Standards**: RESTful principles, JSON-API compatible, OpenAPI 3.0 (Spectacular).
 - **Authentication**: Dual-mode supporting Session (Web) and JWT Rotation (Mobile).
