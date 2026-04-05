@@ -185,7 +185,7 @@ export default function BranchesPage() {
                       <span className="font-semibold text-foreground">{branch.timezone}</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground/60 italic pt-1">
-                      <span>{branch.latitude.toFixed(4)}, {branch.longitude.toFixed(4)}</span>
+                      <span>{Number(branch.latitude || 0).toFixed(4)}, {Number(branch.longitude || 0).toFixed(4)}</span>
                     </div>
                   </div>
                 </motion.div>

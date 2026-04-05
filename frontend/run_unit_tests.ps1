@@ -27,11 +27,11 @@ if (-not $SkipInstall) {
 Write-Host "[2/2] Launching Vitest Suite..." -ForegroundColor Cyan
 Write-Host "Logging output to: $LogFile" -ForegroundColor Gray
 
-$TestCmd = "npx vitest run --pool=threads --maxWorkers 8 --reporter=default --reporter=json --outputFile=logs/unit_results.json"
+$TestCmd = "npx vitest run --pool=threads --maxWorkers 8 --reporter=verbose --reporter=json --outputFile=logs/unit_results.json"
 if ($Coverage) {
-    $TestCmd = "npx vitest run --coverage --pool=threads --maxWorkers 8 --reporter=default --reporter=json --outputFile=logs/unit_results.json"
+    $TestCmd = "npx vitest run --coverage --pool=threads --maxWorkers 8 --reporter=verbose --reporter=json --outputFile=logs/unit_results.json"
 } elseif ($Quick) {
-    $TestCmd = "npx vitest run --pool=threads --maxWorkers 4 --reporter=default --reporter=json --outputFile=logs/unit_results.json"
+    $TestCmd = "npx vitest run --pool=threads --maxWorkers 4 --reporter=verbose --reporter=json --outputFile=logs/unit_results.json"
 }
 
 Write-Host "Executing: $TestCmd" -ForegroundColor Gray

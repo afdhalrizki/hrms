@@ -149,7 +149,7 @@ export default function AuditLogsPage() {
                           <Database size={14} className="text-gray-600" />
                           <span className="font-mono">{log.model_name}</span>
                           <span className="text-xs text-gray-600 font-bold tracking-tighter">
-                            {log.changed_fields.name || log.changed_fields.fullname || `#${log.object_id}`}
+                            {log.changed_fields?.name || log.changed_fields?.fullname || `#${log.object_id}`}
                           </span>
                         </div>
                       </td>
@@ -174,7 +174,7 @@ export default function AuditLogsPage() {
                               <div className="p-8 space-y-4">
                                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Detailed Change Diff</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {Object.entries(log.changed_fields).map(([field, data]: [string, any]) => (
+                                  {Object.entries(log.changed_fields || {}).map(([field, data]: [string, any]) => (
                                     <div key={field} className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                                       <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">{field.replace('_', ' ')}</p>
                                       {typeof data === 'object' && data.old !== undefined ? (

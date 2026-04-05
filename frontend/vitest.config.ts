@@ -10,6 +10,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
     exclude: ['**/node_modules/**', '**/tests/**', '**/dist/**'],
+    reporters: ['verbose'],
   },
   resolve: {
     alias: {

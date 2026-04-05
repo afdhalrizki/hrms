@@ -17,7 +17,7 @@ test.describe('Audit Logs & Traceability', () => {
     await login(page, 'admin@company1.com');
 
     console.log('--- Navigating to Branches ---');
-    await page.goto('http://127.0.0.1:3000/en/branches');
+    await page.goto('http://127.0.0.1:3000/en/branches?test_tenant=company1');
     await page.click('button:has-text("Add Branch")');
     
     const branchName = `Audit Test Branch ${Date.now()}`;
@@ -27,14 +27,17 @@ test.describe('Audit Logs & Traceability', () => {
     const nameInput = page.locator('input[name="name"]');
     await expect(nameInput).toBeVisible({ timeout: 15000 });
     
-    await nameInput.fill(branchName);
-    await page.fill('textarea[name="address"]', 'Test Address for Audit');
-    await page.fill('input[name="latitude"]', '-6.2000');
-    await page.fill('input[name="longitude"]', '106.8166');
-    await page.fill('input[name="radius_meters"]', '100');
-    await page.selectOption('select[name="timezone"]', 'Asia/Jakarta');
+    // Wait for animation to settle completely to prevent "element not stable" timeout errors during fill/select
+    await page.waitForTimeout(1000);
+    
+    await nameInput.fill(branchName, { force: true });
+    await page.locator('textarea[name="address"]').fill('Test Address for Audit', { force: true });
+    await page.locator('input[name="latitude"]').fill('-6.2000', { force: true });
+    await page.locator('input[name="longitude"]').fill('106.8166', { force: true });
+    await page.locator('input[name="radius_meters"]').fill('100', { force: true });
+    await page.locator('select[name="timezone"]').selectOption('Asia/Jakarta', { force: true });
     // Use force: true to avoid "element not stable" issues in slow CI/Dev environments
-    await page.click('button[type="submit"]', { force: true });
+    await page.locator('button[type="submit"]').click({ force: true });
     
     // 2. Verification: Check Audit Logs as Admin
     console.log('--- Waiting for modal to close and log to persist ---');
@@ -44,7 +47,7 @@ test.describe('Audit Logs & Traceability', () => {
     await page.waitForTimeout(2000);
     
     console.log('--- Navigating to Audit Logs ---');
-    await page.goto('http://127.0.0.1:3000/en/settings/audit-logs');
+    await page.goto('http://127.0.0.1:3000/en/settings/audit-logs?test_tenant=company1');
     
     // Wait for table to load and be visible
     const table = page.locator('table');
