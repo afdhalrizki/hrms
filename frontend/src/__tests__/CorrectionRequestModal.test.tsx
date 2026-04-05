@@ -42,6 +42,7 @@ const mockAttendance: Attendance = {
   check_out: '17:00:00',
   status: 'PRESENT',
   is_out_of_bounds: false,
+  is_late: false,
 };
 
 describe('CorrectionRequestModal', () => {

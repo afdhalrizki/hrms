@@ -31,8 +31,17 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    _cameras = await availableCameras();
-    if (_cameras == null || _cameras!.isEmpty) return;
+    if (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST')) {
+      return;
+    }
+    
+    try {
+      _cameras = await availableCameras();
+      if (_cameras == null || _cameras!.isEmpty) return;
+    } catch (e) {
+      debugPrint("Camera initialization error: $e");
+      return;
+    }
 
     // Use front camera
     final frontCamera = _cameras!.firstWhere(
@@ -131,7 +140,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   void _completeVerification() {
     _cameraController?.stopImageStream();
     // In a real app, we would capture the high-res image and send it to backend
-    if (kDebugMode || Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (kDebugMode || const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST')) {
       if (mounted) {
         Navigator.pop(context, {
           'verified': true,
@@ -153,7 +162,9 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   @override
   void dispose() {
     _cameraController?.dispose();
-    _faceDetector?.close();
+    if (!const bool.fromEnvironment('INTEGRATED_TEST') && !Platform.environment.containsKey('FLUTTER_TEST')) {
+      _faceDetector?.close();
+    }
     super.dispose();
   }
 
@@ -168,7 +179,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
           elevation: 0,
           leading: const BackButton(color: Colors.white),
           actions: [
-            if (kDebugMode || Platform.environment.containsKey('FLUTTER_TEST'))
+            if (kDebugMode || const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST'))
               TextButton(
                 key: const Key('simulate_face_success'),
                 onPressed: _completeVerification,
@@ -260,7 +271,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
               child: Icon(Icons.check_circle, color: Colors.green, size: 100),
             ),
           // Test-only skip button
-          if (kDebugMode || Platform.environment.containsKey('FLUTTER_TEST'))
+          if (kDebugMode || const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST'))
             Positioned(
               top: 50,
               right: 20,

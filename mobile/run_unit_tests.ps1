@@ -20,8 +20,12 @@ $foundResults = $false
 $testNames = @{}
 $fileReasons = @()
 
-foreach ($line in $rawOutput) {
-    $lineStr = $line.ToString().Trim()
+$foundResults = $false
+$testNames = @{}
+$fileReasons = @()
+
+& flutter test --reporter json 2>&1 | Tee-Object -FilePath $LogFile | ForEach-Object {
+    $lineStr = $_.ToString().Trim()
 
     if ($lineStr -match "(?i)warning") {
         $hasWarning = $true
@@ -33,23 +37,37 @@ foreach ($line in $rawOutput) {
     if ($lineStr.StartsWith("{") -and $lineStr.EndsWith("}")) {
         try {
             $evt = $lineStr | ConvertFrom-Json -ErrorAction SilentlyContinue
-            if (!$evt) { continue }
+            if (!$evt) { return }
 
             if ($evt.type -eq "testStart" -and $evt.test.name) {
                 $testNames[$evt.test.id] = $evt.test.name
+                if ($evt.test.name -notmatch "loading") {
+                    # Print without newline for test name, will add result later
+                    Write-Host "🧪 $($evt.test.name) ... " -NoNewline
+                }
             }
 
             if ($evt.type -eq "error") {
                 $name = if ($testNames.ContainsKey($evt.testID)) { $testNames[$evt.testID] } else { "Unknown Test" }
+                Write-Host "❌ ERROR" -ForegroundColor Red
                 $fileReasons += "    ❌ [$name]: $($evt.error)"
             }
 
             if ($evt.type -eq "testDone") {
-                if ($evt.testID -eq 0) { continue }
+                if ($evt.testID -eq 0) { return }
+                if ($evt.result -eq "success") { 
+                    $filePassed++ 
+                    Write-Host "✅" -ForegroundColor Green
+                }
+                elseif ($evt.result -eq "failure") { 
+                    $fileFailed++ 
+                    Write-Host "❌" -ForegroundColor Red
+                }
+                elseif ($evt.result -eq "error") { 
+                    $fileErrors++ 
+                    Write-Host "⚠️" -ForegroundColor Magenta
+                }
                 $foundResults = $true
-                if ($evt.result -eq "success") { $filePassed++ }
-                elseif ($evt.result -eq "failure") { $fileFailed++ }
-                elseif ($evt.result -eq "error") { $fileErrors++ }
             }
         } catch { }
     }

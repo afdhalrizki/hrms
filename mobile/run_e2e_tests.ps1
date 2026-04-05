@@ -1,19 +1,33 @@
+param(
+    [switch]$Integrated
+)
+
 # Run Flutter E2E tests with detailed reporting
 Write-Host "`n🚀 Running Mobile End-to-End Tests (Detailed Reporting)..." -ForegroundColor Cyan
+if ($Integrated) { Write-Host "🔗 INTEGRATED MODE: Using real backend and database." -ForegroundColor Yellow }
+
+Push-Location $PSScriptRoot
 
 function Wait-ForPort {
     param(
-        [string]$HostName = '127.0.0.1',
+        [string]$HostName,
         [int]$Port,
-        [int]$TimeoutSeconds = 120,
-        [int]$IntervalSeconds = 2
+        [int]$TimeoutSeconds = 30,
+        [int]$IntervalSeconds = 1
     )
 
     $waited = 0
     while ($waited -lt $TimeoutSeconds) {
-        if (Test-NetConnection -ComputerName $HostName -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue) {
-            return $true
-        }
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $wait = $client.BeginConnect($HostName, $Port, $null, $null)
+            if ($wait.AsyncWaitHandle.WaitOne(500, $false)) {
+                $client.EndConnect($wait)
+                $client.Close()
+                return $true
+            }
+            $client.Close()
+        } catch { }
         Start-Sleep -Seconds $IntervalSeconds
         $waited += $IntervalSeconds
     }
@@ -32,8 +46,10 @@ function Test-BackendHealth {
     }
 }
 
-# Ensure we are in the mobile directory
-Push-Location $PSScriptRoot
+# Ensuring log directory exists
+$LogDir = Join-Path $PSScriptRoot "logs"
+if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+$LogFile = Join-Path $LogDir ("e2e_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
 function Ensure-BackendStarted {
     param(
@@ -41,39 +57,74 @@ function Ensure-BackendStarted {
     )
 
     $root = Split-Path -Parent -Path $PSScriptRoot
-    $upScript = Join-Path $root "up.ps1"
-
-    # If backend port already available and health passes, we are good.
-    if ((Wait-ForPort -HostName '127.0.0.1' -Port 8000 -TimeoutSeconds 10 -IntervalSeconds 2) -and (Test-BackendHealth)) {
-        Write-Host "Backend already available." -ForegroundColor Green
-        return $true
+    
+    # Check if backend is already healthy
+    if ((Wait-ForPort -HostName '127.0.0.1' -Port 8000 -TimeoutSeconds 5) -and (Test-BackendHealth)) {
+        Write-Host "✅ Backend is already available and healthy." -ForegroundColor Green
+    } else {
+        Write-Host "🚀 Backend not ready. Starting via run_dev.ps1..." -ForegroundColor Yellow
+        # Start backend in a NEW background process so it persists
+        $backendDir = Join-Path $root "backend"
+        Start-Process -FilePath "pwsh" -ArgumentList "-NoProfile", "-NoLogo", "-Command", "cd '$backendDir'; ./run_dev.ps1 -NoDeps" -WindowStyle Hidden
+        
+        Write-Host "Waiting for backend port 8000 (max $StartTimeoutSeconds s)..." -ForegroundColor Gray
+        if (-not (Wait-ForPort -HostName '127.0.0.1' -Port 8000 -TimeoutSeconds $StartTimeoutSeconds -IntervalSeconds 5)) {
+            Write-Host "ERROR: Timeout waiting for backend port 8000" -ForegroundColor Red
+            return $false
+        }
     }
 
-    if (-not (Test-Path $upScript)) {
-        Write-Host "up.ps1 not found at $upScript. Cannot auto-start backend." -ForegroundColor Yellow
-        return $false
+    if ($Integrated) {
+        Write-Host "🔗 Integrated mode: Bootstrapping tenants and seeding demo data..." -ForegroundColor Yellow
+        Push-Location (Join-Path $root "backend")
+        
+        # Set environment for the current process so the next commands work
+        $env:DB_HOST = "127.0.0.1" 
+        $env:DB_PORT = "6432"
+        $env:DB_USER = "hrms_user"
+        $env:DB_PASSWORD = "hrms_password"
+        $env:DB_NAME = "hrms"
+        $env:REDIS_URL = "redis://localhost:6379/1"
+        $env:DATABASE_URL = "postgres://hrms_user:hrms_password@127.0.0.1:6432/hrms"
+        
+        $SetupLog = Join-Path $LogDir "integrated_setup.log"
+        Write-Host "🔗 Running bootstrap_tenants (Logging to $SetupLog)..." -ForegroundColor Gray
+        & ./venv/Scripts/python.exe manage.py bootstrap_tenants > $SetupLog 2>&1
+        Write-Host "🔗 Running seed_test_db.py (Logging to $SetupLog)..." -ForegroundColor Gray
+        & ./venv/Scripts/python.exe scripts/seed_test_db.py >> $SetupLog 2>&1
+        Pop-Location
+
+
+        # Pre-flight smoke test
+        Write-Host "💨 Running pre-flight smoke test (Login check)..." -ForegroundColor Yellow
+        try {
+            $headers = @{ 
+                "X-Tenant-Domain" = "company1.localhost"
+                "Host" = "company1.localhost:8000"
+                "Content-Type" = "application/json"
+            }
+            $body = @{ "email" = "admin@company1.com"; "password" = "password123" } | ConvertTo-Json
+            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/auth/login/" -Method Post -Headers $headers -Body $body -TimeoutSec 30 -UseBasicParsing
+
+            if ($resp.StatusCode -eq 200) {
+                Write-Host "✅ Smoke test passed: Backend is reachable and login works." -ForegroundColor Green
+            } else {
+                Write-Host "⚠️ Smoke test failed with status: $($resp.StatusCode)" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "❌ Smoke test ERROR: $($_.Exception.Message)" -ForegroundColor Red
+            if ($_.Exception.Response) {
+                $errBody = [System.Text.Encoding]::UTF8.GetString($_.Exception.Response.GetResponseStream().ToArray())
+                Write-Host "   Response Body: $errBody" -ForegroundColor Gray
+            }
+        }
     }
 
-    Write-Host "[Pre-check] Starting backend with up.ps1 dev ..." -ForegroundColor Yellow
-    Push-Location $root
-    .\up.ps1 dev
-    Pop-Location
 
-    Write-Host "Waiting for backend port 8000 (max $StartTimeoutSeconds s)..." -ForegroundColor Gray
-    if (-not (Wait-ForPort -HostName '127.0.0.1' -Port 8000 -TimeoutSeconds $StartTimeoutSeconds -IntervalSeconds 2)) {
-        Write-Host "ERROR: Timeout waiting for backend port 8000" -ForegroundColor Red
-        return $false
-    }
 
-    Write-Host "Performing backend API health check..." -ForegroundColor Gray
-    if (-not (Test-BackendHealth)) {
-        Write-Host "ERROR: Backend health endpoint not healthy." -ForegroundColor Red
-        return $false
-    }
-
-    Start-Sleep -Seconds 5
-    return $true
+    return (Test-BackendHealth)
 }
+
 
 # Check backend service before e2e run
 Write-Host "[Pre-check] Ensuring backend is reachable on http://127.0.0.1:8000 ..." -ForegroundColor Yellow
@@ -86,17 +137,13 @@ if (-not (Ensure-BackendStarted -StartTimeoutSeconds 180)) {
 Write-Host "📦 Generating localizations..." -ForegroundColor Gray
 & flutter gen-l10n 2>$null
 
-# Ensuring log directory exists
-$LogDir = Join-Path $PSScriptRoot "logs"
-if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
-$LogFile = Join-Path $LogDir ("e2e_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
-
 # Hybrid VM mode is the most reliable for real-backend integration in this environment.
 $file = "test/e2e_test.dart"
 Write-Host "[RUNNING] $file" -ForegroundColor Yellow
 Write-Host "Logging output to: $LogFile" -ForegroundColor Gray
 
-$rawOutput = & flutter test --reporter json $file 2>&1 | Tee-Object -FilePath $LogFile
+$dartDefines = if ($Integrated) { "--dart-define=INTEGRATED_TEST=true" } else { "" }
+$rawOutput = & flutter test --reporter json $dartDefines $file 2>&1 | Tee-Object -FilePath $LogFile
 
 $filePassed = 0
 $fileFailed = 0
@@ -106,8 +153,8 @@ $hasWarning = $false
 $foundResults = $false
 $testNames = @{}
 
-foreach ($line in $rawOutput) {
-    $lineStr = $line.ToString().Trim()
+& flutter test --reporter json $dartDefines $file 2>&1 | Tee-Object -FilePath $LogFile | ForEach-Object {
+    $lineStr = $_.ToString().Trim()
     
     # Detect Warnings
     if ($lineStr -match "(?i)warning") { 
@@ -119,23 +166,42 @@ foreach ($line in $rawOutput) {
     if ($lineStr.StartsWith("{") -and $lineStr.EndsWith("}")) {
         try {
             $evt = $lineStr | ConvertFrom-Json -ErrorAction SilentlyContinue
-            if (!$evt) { continue }
+            if (!$evt) { return }
 
             if ($evt.type -eq "testStart" -and $evt.test.name) {
                 $testNames[$evt.test.id] = $evt.test.name
+                if ($evt.test.name -notmatch "loading") {
+                    Write-Host "`n🏃 Testing: $($evt.test.name)" -ForegroundColor Cyan
+                }
+            }
+
+            if ($evt.type -eq "print") {
+                if ($evt.message -match "(?i)(TEST:|DEBUG MOBILE:|HTTP REQUEST|LOGIN:)") {
+                    Write-Host "   $($evt.message)" -ForegroundColor Gray
+                }
             }
 
             if ($evt.type -eq "error") {
                 $name = if ($testNames.ContainsKey($evt.testID)) { $testNames[$evt.testID] } else { "Unknown Test" }
+                Write-Host "   ❌ ERROR: $($evt.error)" -ForegroundColor Red
                 $fileReasons += "    ❌ [$name]: $($evt.error)"
             }
 
             if ($evt.type -eq "testDone") {
-                if ($evt.testID -eq 0) { continue }
+                if ($evt.testID -eq 0) { return }
                 $foundResults = $true
-                if ($evt.result -eq "success") { $filePassed++ }
-                elseif ($evt.result -eq "failure") { $fileFailed++ }
-                elseif ($evt.result -eq "error") { $fileErrors++ }
+                if ($evt.result -eq "success") { 
+                    $filePassed++ 
+                    Write-Host "   ✅ PASSED" -ForegroundColor Green
+                }
+                elseif ($evt.result -eq "failure") { 
+                    $fileFailed++ 
+                    Write-Host "   ❌ FAILED" -ForegroundColor Red
+                }
+                elseif ($evt.result -eq "error") { 
+                    $fileErrors++ 
+                    Write-Host "   ⚠️ ERROR" -ForegroundColor Magenta
+                }
             }
         } catch { }
     }

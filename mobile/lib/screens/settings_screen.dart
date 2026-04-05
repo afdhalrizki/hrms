@@ -193,6 +193,7 @@ class SettingsScreen extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
+        key: const Key('qa_logout_btn'),
         onPressed: () => _handleLogout(context),
         icon: const Icon(Icons.logout),
         label: const Text('Logout'),
@@ -219,10 +220,12 @@ class SettingsScreen extends StatelessWidget {
         content: const Text('Are you sure you want to logout?', style: TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
+            key: const Key('qa_logout_cancel'),
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel', style: TextStyle(color: Colors.white38)),
           ),
           TextButton(
+            key: const Key('qa_logout_confirm'),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Logout', style: TextStyle(color: Colors.redAccent)),
           ),

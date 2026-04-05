@@ -31,19 +31,24 @@ class _ReimbursementApplyScreenState extends State<ReimbursementApplyScreen> {
 
   Future<void> _fetchCategories() async {
     try {
-      final data = await _apiService.getReimbursementCategories();
-      setState(() {
-        _categories = (data as List).map((c) => ReimbursementCategory.fromJson(c)).toList();
-        if (_categories.isNotEmpty) _selectedCategory = _categories.first;
-        _isLoading = false;
-      });
+      final categories = await _apiService.getReimbursementCategories();
+      if (mounted) {
+        setState(() {
+          _categories = (categories as List).map((c) => ReimbursementCategory.fromJson(c)).toList();
+          if (_categories.isNotEmpty) {
+            _selectedCategory = _categories.first;
+          }
+          _isLoading = false;
+        });
+        debugPrint('DIAGNOSTIC: Loaded ${_categories.length} reimbursement categories');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading categories: $e')),
         );
+        setState(() => _isLoading = false);
       }
-      setState(() => _isLoading = false);
     }
   }
 
@@ -117,6 +122,7 @@ class _ReimbursementApplyScreenState extends State<ReimbursementApplyScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      key: const Key('reimb_amount'),
                       controller: _amountController,
                       decoration: const InputDecoration(labelText: 'Amount (IDR)', border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
@@ -124,6 +130,7 @@ class _ReimbursementApplyScreenState extends State<ReimbursementApplyScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      key: const Key('reimb_description'),
                       controller: _descController,
                       decoration: const InputDecoration(labelText: 'Description', border: OutlineInputBorder()),
                       maxLines: 2,

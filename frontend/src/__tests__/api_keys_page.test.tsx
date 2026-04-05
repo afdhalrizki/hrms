@@ -43,7 +43,7 @@ describe('ApiKeysPage', () => {
 
     const card = screen.getByText(/ERP Sync/i).closest('.glass-card');
     expect(card).toBeTruthy();
-    const deleteButton = within(card!).getByRole('button');
+    const deleteButton = within(card as HTMLElement).getByRole('button');
     expect(deleteButton).toBeTruthy();
     fireEvent.click(deleteButton);
 

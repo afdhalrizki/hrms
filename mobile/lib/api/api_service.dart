@@ -90,15 +90,19 @@ class ApiService {
     final headers = _headers(tenant);
     print('DEBUG MOBILE: Headers: $headers');
     
-    final url = Uri.parse("$baseUrl/auth/login/");
+    debugPrint('HTTP REQUEST: POST $baseUrl/auth/login/');
+    debugPrint('HTTP HEADERS: $headers');
+    
     final response = await _client.post(
-      url,
+      Uri.parse("$baseUrl/auth/login/"),
       headers: headers,
       body: jsonEncode({
         'email': email,
         'password': password,
       }),
-    ).timeout(const Duration(seconds: 10));
+    ).timeout(const Duration(seconds: 30));
+
+    debugPrint('HTTP RESPONSE: ${response.statusCode}');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -177,17 +181,34 @@ class ApiService {
     final tenant = await getTenant();
     var token = await getToken();
     
-    var response = await requestBuilder(token);
+    debugPrint('AUTHENTICATED REQUEST START: $token');
+    debugPrint('HTTP REQUEST URL: ${requestBuilder.toString()}'); 
+    
+    var response = await requestBuilder(token).timeout(
+      const Duration(seconds: 30),
+      onTimeout: () {
+        debugPrint('TIMEOUT ERROR: Request timed out after 30s');
+        throw Exception('Request timed out after 30 seconds');
+      },
+    );
+    
+    debugPrint('AUTHENTICATED REQUEST RESPONSE: ${response.statusCode}');
+    if (response.statusCode >= 400) {
+      debugPrint('HTTP ERROR BODY: ${response.body}');
+    }
     
     if (response.statusCode == 401) {
+      debugPrint('GOT 401, ATTEMPTING TOKEN REFRESH');
       final success = await refreshToken();
       if (success) {
         token = await getToken();
         response = await requestBuilder(token);
+        debugPrint('REFRESHED REQUEST RESPONSE: ${response.statusCode}');
       }
     }
     
     return response;
+
   }
 
   Future<Map<String, dynamic>> getUserProfile() async {
@@ -201,6 +222,28 @@ class ApiService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to fetch user profile: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getEmployeeProfile() async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.get(
+      Uri.parse("$baseUrl/employees/"),
+      headers: _headers(tenant, token),
+    ));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        // Return the first record (self-filtered by backend queryset)
+        final employee = data.first;
+        // Map 'id' to 'employee_id' for consistency in the app
+        employee['employee_id'] = employee['id'];
+        return employee;
+      }
+      throw Exception('No employee profile found');
+    } else {
+      throw Exception('Failed to fetch employee profile: ${response.body}');
     }
   }
 
@@ -364,7 +407,7 @@ class ApiService {
   Future<List<dynamic>> getCorrectionRequests() async {
     final tenant = await getTenant();
     final response = await _authenticatedRequest((token) => _client.get(
-      Uri.parse("$baseUrl/attendance-correction-requests/"),
+      Uri.parse("$baseUrl/attendance-corrections/"),
       headers: _headers(tenant, token),
     ));
     if (response.statusCode == 200) return jsonDecode(response.body);
@@ -374,7 +417,7 @@ class ApiService {
   Future<void> submitCorrectionRequest(Map<String, dynamic> data) async {
     final tenant = await getTenant();
     final response = await _authenticatedRequest((token) => _client.post(
-      Uri.parse("$baseUrl/attendance-correction-requests/"),
+      Uri.parse("$baseUrl/attendance-corrections/"),
       headers: _headers(tenant, token),
       body: jsonEncode(data),
     ));

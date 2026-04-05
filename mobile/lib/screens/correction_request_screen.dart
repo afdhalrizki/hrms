@@ -239,6 +239,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
               
               const SizedBox(height: 24),
               TextField(
+                key: const Key('correction_reason'),
                 controller: reasonController,
                 maxLines: 3,
                 style: const TextStyle(color: Colors.white),

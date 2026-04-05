@@ -238,23 +238,68 @@ with schema_context('company1'):
     Schedule.objects.get_or_create(employee=employee_emp, shift=shift, date=date.today())
     
     # Leave Balance
-    LeaveBalance.objects.get_or_create(employee=admin_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
-    LeaveBalance.objects.get_or_create(employee=employee_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
+    lb1, _ = LeaveBalance.objects.get_or_create(employee=admin_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
+    lb2, _ = LeaveBalance.objects.get_or_create(employee=employee_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
+    print(f"Seeded LeaveBalances for {admin_emp.email} and {employee_emp.email}")
 
     # Add Appraisal Data for performance test
     from performance.models import KPI, KPITarget, Appraisal
     kpi, _ = KPI.objects.get_or_create(name="Sales Target", unit=KPI.Unit.CURRENCY)
-    KPITarget.objects.get_or_create(
+    print(f"Seeded KPI: {kpi.name}")
+    
+    # Employee Appraisal
+    kt, _ = KPITarget.objects.get_or_create(
         employee=employee_emp,
         kpi=kpi,
         period=date(2026, 1, 1),
         defaults={'target_value': 1000000, 'actual_value': 0}
     )
-    appraisal, _ = Appraisal.objects.get_or_create(
+    print(f"Seeded KPITarget for {employee_emp.email}")
+    app, _ = Appraisal.objects.get_or_create(
         employee=employee_emp,
         period_name="Q1 2026",
         defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'DRAFT'}
     )
+    print(f"Seeded Appraisal for {employee_emp.email}")
+    
+    # Admin Appraisal
+    kt2, _ = KPITarget.objects.get_or_create(
+        employee=admin_emp,
+        kpi=kpi,
+        period=date(2026, 1, 1),
+        defaults={'target_value': 5000000, 'actual_value': 0}
+    )
+    print(f"Seeded KPITarget for {admin_emp.email}")
+    app2, _ = Appraisal.objects.get_or_create(
+        employee=admin_emp,
+        period_name="Q1 2026",
+        defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'PUBLISHED'}
+    )
+    print(f"Seeded Appraisal for {admin_emp.email}")
+    
+    # Payslips for Admin
+    from payroll.models import PayrollPeriod, Payslip
+    
+    period, _ = PayrollPeriod.objects.get_or_create(
+        month=3,
+        year=2026,
+        defaults={'start_date': date(2026, 3, 1), 'end_date': date(2026, 3, 31), 'is_closed': True}
+    )
+    print(f"Seeded PayrollPeriod: {period}")
+    
+    ps, _ = Payslip.objects.get_or_create(
+        employee=admin_emp,
+        period=period,
+        defaults={
+            'basic_salary': 15000000.00,
+            'total_allowance': 2000000.00,
+            'total_deduction': 500000.00,
+            'net_pay': 16500000.00,
+            'payment_date': date(2026, 3, 31)
+        }
+    )
+    print(f"Seeded Payslip for {admin_emp.email}")
+
 
 with schema_context('company2'):
     from attendance.models import Attendance, LeaveRequest, Overtime

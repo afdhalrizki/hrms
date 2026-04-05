@@ -99,6 +99,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               _buildSectionHeader('Personal Information'),
               const SizedBox(height: 16),
               _buildGlassInputField(
+                key: const Key('profile_phone'),
                 label: 'Phone Number',
                 controller: _phoneController,
                 icon: Icons.phone,
@@ -106,6 +107,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               const SizedBox(height: 16),
               _buildGlassInputField(
+                key: const Key('profile_address'),
                 label: 'Address',
                 controller: _addressController,
                 icon: Icons.location_on,
@@ -115,12 +117,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               _buildSectionHeader('Tax & Identity'),
               const SizedBox(height: 16),
               _buildGlassInputField(
+                key: const Key('profile_ktp'),
                 label: 'KTP Number',
                 controller: _ktpNumberController,
                 icon: Icons.badge,
               ),
               const SizedBox(height: 16),
               _buildGlassInputField(
+                key: const Key('profile_npwp'),
                 label: 'NPWP Number',
                 controller: _npwpNumberController,
                 icon: Icons.account_balance,
@@ -149,6 +153,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   Widget _buildGlassInputField({
+    Key? key,
     required String label,
     required TextEditingController controller,
     required IconData icon,
@@ -162,6 +167,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         border: Border.all(color: Colors.white10),
       ),
       child: TextFormField(
+        key: key,
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
@@ -210,6 +216,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   Widget _buildSaveButton() {
     return ElevatedButton(
+      key: const Key('profile_save_btn'),
       onPressed: _isSaving ? null : _saveProfile,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,

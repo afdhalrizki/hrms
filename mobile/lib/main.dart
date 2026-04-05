@@ -10,7 +10,8 @@ void main() {
 
 class HRMSApp extends StatelessWidget {
   final ThemeData? theme;
-  const HRMSApp({super.key, this.theme});
+  final Locale? locale;
+  const HRMSApp({super.key, this.theme, this.locale});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +19,7 @@ class HRMSApp extends StatelessWidget {
       title: 'harikerja Mobile',
       debugShowCheckedModeBanner: false,
       theme: theme ?? AppTheme.darkTheme,
+      locale: locale,
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

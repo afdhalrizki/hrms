@@ -103,6 +103,7 @@ class _LeaveApplyScreenState extends State<LeaveApplyScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('qa_leave_reason'),
                 controller: _reasonController,
                 decoration: const InputDecoration(labelText: 'Reason', border: OutlineInputBorder()),
                 maxLines: 3,
@@ -112,7 +113,7 @@ class _LeaveApplyScreenState extends State<LeaveApplyScreen> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submit,
                 style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-                child: _isSubmitting ? const CircularProgressIndicator() : const Text('Submit Request'),
+                child: _isSubmitting ? const CircularProgressIndicator() : const Text('Apply Leave'),
               ),
             ],
           ),

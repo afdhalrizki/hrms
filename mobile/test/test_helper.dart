@@ -6,7 +6,9 @@ import 'package:mobile/api/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -154,7 +156,7 @@ http.Client getMockClient() {
       return http.Response(jsonEncode(mockAppraisalState['periods']), 200);
     }
 
-    if (path.contains('/attendance-correction-requests')) {
+    if (path.contains('/attendance-corrections')) {
       if (method == 'POST') {
         return http.Response(jsonEncode({'status': 'success'}), 201);
       }
@@ -207,7 +209,11 @@ http.Client getMockClient() {
         return http.Response(jsonEncode({'status': 'success'}), method == 'PATCH' ? 200 : 201);
       }
       if (method == 'GET' && path.contains('/employees/')) {
-         return http.Response(jsonEncode({'id': 101, 'employee_id': 101}), 200);
+         return http.Response(jsonEncode([{
+           'id': 101, 
+           'employee_id': 101,
+           'fullname': 'Admin One',
+         }]), 200);
       }
       return http.Response(jsonEncode([]), 200);
     }
@@ -231,17 +237,69 @@ Future<void> setupMockApiService() async {
   
   // Reset all mock states
   mockAttendanceState['activeRecord'] = null;
-  mockAttendanceState['records'] = [];
+  mockAttendanceState['records'] = [{
+    'id': 100,
+    'date': '2026-03-31',
+    'check_in': '08:00:00',
+    'check_out': '17:00:00',
+    'latitude_in': -6.2,
+    'longitude_in': 106.8
+  }];
   mockKpiState['targets'] = [];
   mockAppraisalState['periods'] = [];
-  mockCorrectionState['requests'] = [];
+  mockCorrectionState['requests'] = [{
+    'id': 1,
+    'date': '2026-04-01',
+    'status': 'PENDING',
+    'reason': 'GPS Glitch',
+    'latitude': -6.2,
+    'longitude': 106.8
+  }];
   mockLeaveState['requests'] = [];
   mockLeaveState['balances'] = [];
-  mockPayslipState['payslips'] = [];
+  mockPayslipState['payslips'] = [{
+    'id': 1,
+    'period_name': 'March 2026',
+    'net_pay': 5000000.0,
+    'basic_salary': 4500000.0,
+    'payment_date': '2026-03-31',
+  }];
   mockScheduleState['schedules'] = [];
-  mockReimbursementState['requests'] = [];
-  mockReimbursementState['categories'] = [];
+  mockReimbursementState['requests'] = [{
+    'id': 1,
+    'category_name': 'Transport',
+    'amount': 150000.0,
+    'description': 'Taxi home',
+    'status': 'PENDING',
+    'date': '2026-04-01',
+  }];
+  mockReimbursementState['categories'] = [
+    {'id': 1, 'name': 'Transport'},
+    {'id': 2, 'name': 'Meals'},
+  ];
 }
+
+Future<void> setupIntegratedApiService() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  initTestHttpOverrides();
+  
+  // Disable GoogleFonts network fetching in all tests
+  GoogleFonts.config.allowRuntimeFetching = false;
+  
+  ApiService.reset();
+  // Using real http.Client instead of MockClient for integration tests
+  // Note: Standard http.Client in flutter_test environment uses platform channels.
+  // We use direct HttpClient with IO to reach localhost on host machine.
+  ApiService(client: http.Client());
+  
+  debugPrint('🔗 INTEGRATED TEST: ApiService configured with REAL client.');
+  
+  SharedPreferences.setMockInitialValues({});
+  setupSecureStorageMock();
+  mockSecureStorage.clear();
+}
+
+
 
 Future<void> loginForTest() async {
   mockSecureStorage['jwt_token'] = 'mock_access';

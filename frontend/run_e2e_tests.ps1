@@ -138,6 +138,11 @@ foreach ($Port in $Ports) {
 
 # 3.5. Build Frontend (Ensure clean production build once)
 Write-Host "[3.5/4] Building Frontend Production Bundle..." -ForegroundColor Yellow
+
+# Force SWC disablement to avoid native binding errors on Node 24
+$env:NEXT_DISABLE_SWC = "1"
+$env:NEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK = "1"
+
 npm run build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Frontend build failed. Aborting tests." -ForegroundColor Red

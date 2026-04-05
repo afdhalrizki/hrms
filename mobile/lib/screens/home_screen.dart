@@ -38,18 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadProfile() async {
     try {
       final api = ApiService();
-      final user = await api.getUserProfile();
+      final user = await api.getEmployeeProfile();
 
-      // Fetch concurrent data
-      final results = await Future.wait([
-        api.getAttendanceRecords(),
-        api.getLeaveRequests(),
-        api.getPayslips(),
-      ]);
+      // Fetch data sequentially to avoid connection bottlenecks on runserver
+      final attendance = await api.getAttendanceRecords();
+      final leaves = await api.getLeaveRequests();
+      final payslips = await api.getPayslips();
 
-      final List<dynamic> attendance = results[0];
-      final List<dynamic> leaves = results[1];
-      final List<dynamic> payslips = results[2];
 
       List<Activity> activities = [];
 
@@ -334,6 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
+            key: const Key('qa_clock_in'),
             onPressed: () async {
               final latest = _latestAttendance;
               final isCurrentlyClockedIn = latest != null && latest['check_out'] == null;
@@ -432,11 +428,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.calendar_today,
         'label': l10n.leaves,
         'color': const Color(0xFFEF4444),
+        'key': 'qa_leaves',
       },
       {
         'icon': Icons.receipt,
         'label': l10n.payslip,
         'color': const Color(0xFF10B981),
+        'key': 'qa_payslip',
       },
       {
         'icon': Icons.payments,
