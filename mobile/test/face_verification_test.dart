@@ -23,7 +23,7 @@ Widget createWidgetUnderTest(Widget home) {
 
 void main() {
   setUp(() async {
-    await setupMockApiService();
+    await setupMockApiService(isWidgetTest: true);
   });
 
   testWidgets('FaceVerificationScreen renders correctly and can be skipped in tests', (tester) async {

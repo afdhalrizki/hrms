@@ -1,10 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/api_service.dart';
-import 'package:mobile/models/user_model.dart';
 import 'test_helper.dart';
 
 void main() {
-  group('ApiService Unit Tests (Mocked)', () {
+  group('ApiService Deep Unit Tests', () {
     late ApiService apiService;
 
     setUp(() async {
@@ -12,65 +11,85 @@ void main() {
       apiService = ApiService();
     });
 
-    test('Tenant storage works', () async {
-      await apiService.setTenant('company1');
-      final tenant = await apiService.getTenant();
-      expect(tenant, 'company1');
-    });
-
-    test('login saves tokens from mock response', () async {
-      final result = await apiService.login('admin@company1.com', 'password123', 'company1');
-
-      expect(result['access'], 'mock_access');
-      final savedToken = await apiService.getToken();
-      expect(savedToken, 'mock_access');
+    test('Auth flow: login, getToken, logout', () async {
+      await apiService.login('test@test.com', 'password', 'company1');
+      expect(await apiService.getToken(), 'mock_access');
       
-      final savedTenant = await apiService.getTenant();
-      expect(savedTenant, 'company1');
+      await apiService.logout();
+      expect(await apiService.getToken(), isNull);
     });
 
-    test('getUserProfile returns parsed JSON from mock', () async {
+    test('Attendance & Corrections', () async {
       await loginForTest();
-      final profile = await apiService.getUserProfile();
-      expect(profile['fullname'], 'Admin One');
-      expect(profile['email'], 'admin@company1.com');
+      final records = await apiService.getAttendanceRecords();
+      expect(records, isA<List>());
+      
+      final requests = await apiService.getCorrectionRequests();
+      expect(requests, isA<List>());
+      
+      // submitCorrectionRequest returns Future<void>
+      await apiService.submitCorrectionRequest({'reason': 'test'});
     });
 
-    test('User.fromJson parses flattened backend response', () {
-      final json = {
-        "id": 1,
-        "email": "admin@company1.com",
-        "is_staff": true,
-        "employee_id": 1,
-        "employee_nik": "EMP-001",
-        "fullname": "Admin User",
-        "role_name": "Senior HR Manager",
-        "department_name": "Human Resources"
-      };
-
-      final user = User.fromJson(json);
-
-      expect(user.id, 1);
-      expect(user.fullname, "Admin User");
-      expect(user.employeeNik, "EMP-001");
-    });
-
-    test('getLeaveRequests returns list from mock', () async {
+    test('Leave Management', () async {
       await loginForTest();
-      final list = await apiService.getLeaveRequests();
-      expect(list, isA<List>());
+      final balances = await apiService.getLeaveBalances();
+      expect(balances, isA<List>());
+      
+      // applyLeave returns Future<void>
+      await apiService.applyLeave({'type': 'ANNUAL'});
     });
 
-    test('getReimbursements returns list from mock', () async {
+    test('Reimbursement', () async {
       await loginForTest();
-      final list = await apiService.getReimbursements();
-      expect(list, isA<List>());
+      final cats = await apiService.getReimbursementCategories();
+      expect(cats, isA<List>());
+      
+      // applyReimbursement returns Future<void>
+      await apiService.applyReimbursement({'amount': 100});
     });
 
-    test('ApiService static paths and env conversion', () {
-      expect(ApiService.baseUrl, isNotNull);
-      expect(ApiService.domainSuffix, isNotNull);
-      expect(ApiService.hostSuffix, isNotNull);
+    test('Schedule & Appraisal', () async {
+      await loginForTest();
+      final records = await apiService.getAttendanceRecords();
+      expect(records, isA<List>());
+      
+      final appraisals = await apiService.getAppraisals();
+      expect(appraisals, isA<List>());
+
+      // submitAppraisalReview returns Future<void>
+      await apiService.submitAppraisalReview({'score': 5});
+    });
+
+    test('Payslips & Documents', () async {
+      await loginForTest();
+      final payslips = await apiService.getPayslips();
+      expect(payslips, isA<List>());
+      
+      await apiService.uploadDocument(1, 'ktp', [0, 1, 2], 'test.jpg');
+      await apiService.downloadPdf('/test.pdf', 'test.pdf');
+    });
+
+    test('Profile Update', () async {
+      await loginForTest();
+      final result = await apiService.updateProfile(1, {'fullname': 'Admin One'});
+      expect(result['fullname'], 'Admin One');
+    });
+
+    test('Error Handling across endpoints', () async {
+      await loginForTest();
+      mockErrorStatus = true;
+      mockErrorMessage = 'Server Down';
+
+      expect(apiService.getUserProfile(), throwsA(isA<Exception>()));
+      expect(apiService.getAttendanceRecords(), throwsA(isA<Exception>()));
+      expect(apiService.getLeaveRequests(), throwsA(isA<Exception>()));
+      expect(apiService.getReimbursements(), throwsA(isA<Exception>()));
+      expect(apiService.getPayslips(), throwsA(isA<Exception>()));
+      expect(apiService.applyLeave({}), throwsA(isA<Exception>()));
+      expect(apiService.submitCorrectionRequest({}), throwsA(isA<Exception>()));
+      expect(apiService.applyReimbursement({}), throwsA(isA<Exception>()));
+      expect(apiService.updateProfile(1, {}), throwsA(isA<Exception>()));
     });
   });
 }

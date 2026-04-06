@@ -20,4 +20,16 @@ class Activity {
     required this.timestamp,
     required this.type,
   });
+
+  factory Activity.fromJson(Map<String, dynamic> json) {
+    return Activity(
+      title: json['title'] ?? '',
+      subtitle: json['subtitle'] ?? '',
+      time: json['time'] ?? '',
+      icon: Icons.notifications,
+      color: Colors.blue,
+      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      type: ActivityType.attendance,
+    );
+  }
 }

@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final api = ApiService();
       final user = await api.getEmployeeProfile();
+      print('HOMESCREEN LOADED USER: $user');
 
       // Fetch data sequentially to avoid connection bottlenecks on runserver
       final attendance = await api.getAttendanceRecords();
@@ -114,10 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
     } catch (e) {
+      print('HOMESCREEN EXCEPTION: $e');
       if (mounted) {
         setState(() => _isLoading = false);
+        final errorText = AppLocalizations.of(context)?.error ?? 'Error';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppLocalizations.of(context)!.error}: $e')),
+          SnackBar(content: Text('$errorText: $e')),
         );
       }
     }
@@ -452,6 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.badge,
         'label': l10n.documents,
         'color': const Color(0xFF8B5CF6),
+        'key': 'qa_documents',
       },
       {
         'icon': Icons.edit_calendar,

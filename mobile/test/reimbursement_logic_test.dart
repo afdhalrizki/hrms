@@ -40,7 +40,8 @@ void main() {
 
     test('applyReimbursement throws on failure', () async {
       await loginForTest();
-      expect(apiService.applyReimbursement({}), throwsException);
+      mockErrorStatus = true;
+      expect(apiService.applyReimbursement({}), throwsA(isA<Exception>()));
     });
   });
 }

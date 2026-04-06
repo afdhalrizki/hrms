@@ -7,8 +7,9 @@ import 'package:mobile/utils/style_utils.dart';
 
 class FaceVerificationScreen extends StatefulWidget {
   final bool isClockIn;
+  final dynamic mockController;
 
-  const FaceVerificationScreen({super.key, required this.isClockIn});
+  const FaceVerificationScreen({super.key, required this.isClockIn, this.mockController});
 
   @override
   State<FaceVerificationScreen> createState() => _FaceVerificationScreenState();
@@ -22,6 +23,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   bool _faceDetected = false;
   bool _blinkDetected = false;
   List<CameraDescription>? _cameras;
+  bool _isCameraInitialized = false;
 
   @override
   void initState() {
@@ -31,6 +33,13 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   }
 
   Future<void> _initializeCamera() async {
+    if (widget.mockController != null) {
+      _cameraController = widget.mockController;
+      _isCameraInitialized = true;
+      if (mounted) setState(() {});
+      return;
+    }
+
     if (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST')) {
       return;
     }
@@ -203,13 +212,10 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       body: Stack(
         alignment: Alignment.center,
         children: [
-          Transform.scale(
-            scale: 1.0,
-            child: AspectRatio(
-              aspectRatio: _cameraController!.value.aspectRatio,
-              child: CameraPreview(_cameraController!),
-            ),
-          ),
+          if (widget.mockController != null)
+            Container(key: const Key('mock_camera_preview'), color: Colors.blue[900], child: const Center(child: Icon(Icons.camera, color: Colors.white, size: 100)))
+          else
+            CameraPreview(_cameraController!),
           // Face Oval Overlay
           _buildFaceOverlay(),
           // Scanning Line Animation

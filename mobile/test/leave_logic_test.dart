@@ -39,8 +39,8 @@ void main() {
 
     test('applyLeave throws on failure', () async {
       await loginForTest();
-      // MockClient returns 404 for unknown paths or errors, check if ApiService throws correctly
-      expect(apiService.applyLeave({}), throwsException);
+      mockErrorStatus = true;
+      expect(apiService.applyLeave({}), throwsA(isA<Exception>()));
     });
   });
 }

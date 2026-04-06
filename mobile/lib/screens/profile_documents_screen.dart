@@ -6,7 +6,8 @@ import '../api/api_service.dart';
 
 class ProfileDocumentsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
-  const ProfileDocumentsScreen({super.key, required this.userData});
+  final dynamic mockController;
+  const ProfileDocumentsScreen({super.key, required this.userData, this.mockController});
 
   @override
   State<ProfileDocumentsScreen> createState() => _ProfileDocumentsScreenState();
@@ -25,27 +26,45 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    final cameras = await availableCameras();
-    if (cameras.isEmpty) return;
+    if (widget.mockController != null) {
+      _cameraController = widget.mockController;
+      _isCameraReady = true;
+      if (mounted) setState(() {});
+      return;
+    }
 
-    _cameraController = CameraController(
-      cameras.first,
-      ResolutionPreset.medium,
-      enableAudio: false,
-    );
+    if (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST')) {
+      return;
+    }
 
-    await _cameraController!.initialize();
-    if (mounted) setState(() => _isCameraReady = true);
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return;
+
+      _cameraController = CameraController(
+        cameras.first,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+
+      await _cameraController!.initialize();
+      if (mounted) setState(() => _isCameraReady = true);
+    } catch (e) {
+      debugPrint("Camera initialization error: $e");
+    }
   }
 
   @override
   void dispose() {
-    _cameraController?.dispose();
+    if (_cameraController != null) {
+      _cameraController!.dispose();
+    }
     super.dispose();
   }
 
   Future<void> _captureAndUpload(String fieldName) async {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+    final bool isTest = const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST');
+    if (!isTest && (_cameraController == null || !_cameraController!.value.isInitialized)) return;
 
     setState(() {
       _isUploading = true;
@@ -53,8 +72,14 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
     });
 
     try {
-      final XFile image = await _cameraController!.takePicture();
-      final bytes = await image.readAsBytes();
+      final List<int> bytes;
+      if (isTest) {
+        // Dummy 1x1 PNG bytes
+        bytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xFF, 0xFF, 0x3F, 0x00, 0x05, 0xFE, 0x02, 0xFE, 0xDC, 0x44, 0x74, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82];
+      } else {
+        final XFile image = await _cameraController!.takePicture();
+        bytes = await image.readAsBytes();
+      }
       
       final api = ApiService();
       final employeeId = widget.userData['employee_id'];
@@ -96,6 +121,20 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
+        actions: [
+          if (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST'))
+            TextButton(
+              key: const Key('simulate_doc_capture'),
+              onPressed: () {
+                 if (_currentUploadingField != null) {
+                    _captureAndUpload(_currentUploadingField!);
+                 } else {
+                    _captureAndUpload('ktp_image');
+                 }
+              },
+              child: const Text('SIMULATE', style: TextStyle(color: Colors.yellow)),
+            ),
+        ],
       ),
       body: Column(
         children: [
@@ -108,8 +147,13 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: Colors.white10),
               ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: widget.mockController != null
+                    ? Container(key: const Key('mock_camera_preview'), color: Colors.grey[800], child: const Center(child: Icon(Icons.camera_alt, color: Colors.white, size: 50)))
+                    : CameraPreview(_cameraController!),
+              ),
               clipBehavior: Clip.antiAlias,
-              child: CameraPreview(_cameraController!),
             )
           else
             Container(

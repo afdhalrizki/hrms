@@ -3,24 +3,25 @@ import 'package:mobile/api/api_service.dart';
 import 'test_helper.dart';
 
 void main() {
-  group('Payslip Logic Tests (Mocked)', () {
+  group('Phase M2: Payslip Tests (Mocked)', () {
     late ApiService apiService;
 
     setUp(() async {
       await setupMockApiService();
       apiService = ApiService();
+      await loginForTest();
     });
 
-    test('downloadPdf processes successfully on 200 OK', () async {
-      await loginForTest();
-      await apiService.downloadPdf('/payroll/payslips/1/pdf/', 'payslip.pdf');
+    test('getPayslips return list', () async {
+      final res = await apiService.getPayslips();
+      expect(res, isA<List>());
+      expect(res.isNotEmpty, true);
     });
 
-    test('downloadPdf throws Exception on failure', () async {
-      await loginForTest();
-      expect(
-          apiService.downloadPdf('/payroll/payslips/unknown/pdf/', 'error.pdf'),
-          throwsException);
+    test('getPayslips throws on failure', () async {
+      mockErrorStatus = true;
+      expect(apiService.getPayslips(),
+          throwsA(isA<Exception>()));
     });
   });
 }

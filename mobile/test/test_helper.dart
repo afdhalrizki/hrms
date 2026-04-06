@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/api_service.dart';
@@ -8,304 +9,250 @@ import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 
+void initTestHttpOverrides() {}
 
-class MyHttpOverrides extends HttpOverrides {
+class FakeCameraController extends Fake {
   @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-  }
-
-  @override
-  String findProxyFromEnvironment(Uri url, Map<String, String>? environment) {
-    return 'DIRECT';
-  }
+  dynamic get value => _FakeValue();
+  Future<void> initialize() async {}
+  Future<void> startImageStream(dynamic onAvailable) async {}
+  Future<void> stopImageStream() async {}
+  Future<void> dispose() async {}
+  Future<dynamic> takePicture() async => null;
+  void debugCheckIsDisposed() {}
+  bool get wasDisposed => false;
 }
 
-void initTestHttpOverrides() {
-  HttpOverrides.global = MyHttpOverrides();
+class _FakeValue {
+  bool get isInitialized => true;
+  bool get isReady => true;
+  double get aspectRatio => 1.0;
 }
 
-final Map<String, String> mockSecureStorage = {};
+Map<String, String> mockSecureStorage = {};
+bool mockErrorStatus = false;
+bool mockEmptyResponse = false;
+String mockErrorMessage = 'Error';
 
-void setupSecureStorageMock() {
-  const MethodChannel channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+void setupSystemChannelMocks() {
+  const MethodChannel secureStorageChannel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  const MethodChannel pathProviderChannel = MethodChannel('plugins.flutter.io/path_provider');
+  const MethodChannel textInputChannel = MethodChannel('flutter/textinput', JSONMethodCodec());
+  const MethodChannel platformViewsChannel = MethodChannel('flutter/platform_views');
 
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-    channel,
-    (MethodCall methodCall) async {
-      if (methodCall.method == 'write') {
-        mockSecureStorage[methodCall.arguments['key']] = methodCall.arguments['value'];
-        return null;
-      } else if (methodCall.method == 'read') {
-        return mockSecureStorage[methodCall.arguments['key']];
-      } else if (methodCall.method == 'delete') {
-        mockSecureStorage.remove(methodCall.arguments['key']);
-        return null;
-      } else if (methodCall.method == 'readAll') {
-        return mockSecureStorage;
-      } else if (methodCall.method == 'deleteAll') {
-        mockSecureStorage.clear();
-        return null;
-      }
-      return null;
-    },
-  );
+  final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
-  const MethodChannel pathChannel = MethodChannel('plugins.flutter.io/path_provider');
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-    pathChannel,
-    (MethodCall methodCall) async {
-      if (methodCall.method == 'getApplicationDocumentsDirectory') {
-        return '.';
-      }
-      return null;
-    },
-  );
+  messenger.setMockMethodCallHandler(secureStorageChannel, (call) async {
+    if (call.method == 'read') {
+      return Future.value(mockSecureStorage[call.arguments['key']]);
+    } else if (call.method == 'write') {
+      mockSecureStorage[call.arguments['key']] = call.arguments['value'];
+    } else if (call.method == 'delete') {
+      mockSecureStorage.remove(call.arguments['key']);
+    } else if (call.method == 'deleteAll') {
+      mockSecureStorage.clear();
+    }
+    return Future.value(null);
+  });
+
+  messenger.setMockMethodCallHandler(pathProviderChannel, (call) async {
+    if (call.method == 'getApplicationDocumentsDirectory') return Future.value('.');
+    return Future.value(null);
+  });
+
+  messenger.setMockMethodCallHandler(textInputChannel, (call) async => Future.value(null));
+  messenger.setMockMethodCallHandler(platformViewsChannel, (call) async => Future.value(null));
 }
 
-final Map<String, dynamic> mockAttendanceState = {
-  'activeRecord': null,
-  'records': [],
-};
-final Map<String, dynamic> mockKpiState = {
-  'targets': [],
-};
-final Map<String, dynamic> mockAppraisalState = {
-  'periods': [],
-};
-final Map<String, dynamic> mockCorrectionState = {
-  'requests': [],
-};
-final Map<String, dynamic> mockLeaveState = {
-  'requests': [],
-  'balances': [],
-};
-final Map<String, dynamic> mockPayslipState = {
-  'payslips': [],
-};
-final Map<String, dynamic> mockScheduleState = {
-  'schedules': [],
-};
-final Map<String, dynamic> mockReimbursementState = {
-  'requests': [],
-  'categories': [],
-};
-
+/// Route a URL to the correct mock response with proper status codes.
+/// 
+/// Key status code mapping (from ApiService source):
+///   - login:                  POST → 200
+///   - submitAttendance:       POST → 201
+///   - applyLeave:             POST → 201
+///   - applyReimbursement:     POST → 201
+///   - submitCorrectionRequest:POST → 201
+///   - submitAppraisalReview:  POST → 201
+///   - updateProfile:          PATCH → 200
+///   - uploadDocument:         PATCH (multipart) → 200
+///   - All GET endpoints:      → 200
 http.Client getMockClient() {
   return MockClient((request) async {
-    final path = request.url.path;
-    final method = request.method;
+    final method = request.method.toUpperCase();
+    final url = request.url.toString().toLowerCase();
+    final h = {'content-type': 'application/json'};
 
-    if (path.contains('unknown') || path.contains('error')) {
-      return http.Response(jsonEncode({'error': 'Not Found'}), 404);
+    if (mockErrorStatus) {
+      return http.Response(jsonEncode({'error': mockErrorMessage}), 500, headers: h);
     }
 
-    if (path.contains('/auth/login/')) {
+    // --- Auth ---
+    if (url.contains('login')) {
+      final body = request is http.Request ? request.body : '';
+      if (body.contains('wrong@company1.com')) {
+        return http.Response(jsonEncode({'detail': 'Invalid credentials'}), 401, headers: h);
+      }
+      return http.Response(jsonEncode({'access': 'mock_access', 'refresh': 'mock_refresh'}), 200, headers: h);
+    }
+    if (url.contains('/auth/token/refresh')) {
+      return http.Response(jsonEncode({'access': 'mock_refreshed_access'}), 200, headers: h);
+    }
+
+    // --- User Profile ---
+    if (url.contains('/users/me')) {
       return http.Response(jsonEncode({
-        'access': 'mock_access',
-        'refresh': 'mock_refresh',
-      }), 200);
-    }
-    
-    if (path.contains('/users/me/')) {
-      return http.Response(jsonEncode({
-        'id': 1,
-        'email': 'admin@company1.com',
-        'fullname': 'Admin One',
-        'role_name': 'Admin',
-        'employee_id': 101,
-      }), 200);
-    }
-    
-    if (path.contains('/attendance/')) {
-       if (method == 'POST') {
-          // Toggle state for lifecycle test
-          if (mockAttendanceState['activeRecord'] == null) {
-            mockAttendanceState['activeRecord'] = {
-              'id': 1,
-              'date': '2026-04-01',
-              'check_in': '08:00:00',
-              'check_out': null,
-              'latitude_in': -6.2,
-              'longitude_in': 106.8
-            };
-          } else {
-            mockAttendanceState['activeRecord']!['check_out'] = '17:00:00';
-            // In a real app we'd move it to records or just mark it closed.
-            // For the test, we'll just keep it in activeRecord but with check_out set.
-          }
-          return http.Response(jsonEncode({'status': 'success', 'is_late': false}), 201);
-       }
-       
-       final List<Map<String, dynamic>> result = List.from(mockAttendanceState['records']);
-       if (mockAttendanceState['activeRecord'] != null) {
-         result.insert(0, mockAttendanceState['activeRecord']!);
-       }
-       return http.Response(jsonEncode(result), 200);
+        'id': 1, 'fullname': 'Admin One', 'email': 'admin@company1.com', 'role_name': 'Employee'
+      }), 200, headers: h);
     }
 
-    if (path.contains('kpi-targets')) {
-      if (method == 'POST') return http.Response(jsonEncode({'status': 'success'}), 201);
-      return http.Response(jsonEncode(mockKpiState['targets']), 200);
+    // --- Attendance Corrections (must be before /attendance) ---
+    if (url.contains('/attendance-corrections')) {
+      if (method == 'POST') return http.Response(jsonEncode({'id': 1, 'status': 'PENDING'}), 201, headers: h);
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'attendance_date': '2026-04-06', 'status': 'PENDING',
+         'requested_check_in': '08:00:00', 'requested_check_out': '17:00:00', 'reason': 'Test'}
+      ]), 200, headers: h);
     }
 
-    if (path.contains('appraisal')) {
-      if (method == 'POST') return http.Response(jsonEncode({'status': 'success'}), 201);
-      return http.Response(jsonEncode(mockAppraisalState['periods']), 200);
+    // --- Attendance ---
+    if (url.contains('/attendance')) {
+      if (method == 'POST') return http.Response(jsonEncode({'id': 1, 'status': 'success'}), 201, headers: h);
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'date': '2026-04-06', 'check_in': '08:00:10', 'check_out': null,
+         'latitude_in': -6.2, 'longitude_in': 106.8}
+      ]), 200, headers: h);
     }
 
-    if (path.contains('/attendance-corrections')) {
-      if (method == 'POST') {
-        return http.Response(jsonEncode({'status': 'success'}), 201);
-      }
-      return http.Response(jsonEncode(mockCorrectionState['requests']), 200);
+    // --- Leave Requests: POST must return 201 ---
+    if (url.contains('/leave-requests')) {
+      if (method == 'POST') return http.Response(jsonEncode({'id': 2, 'status': 'PENDING'}), 201, headers: h);
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'status': 'APPROVED', 'leave_type_name': 'Annual Leave',
+         'start_date': '2026-04-01', 'end_date': '2026-04-02',
+         'created_at': '2026-04-01T08:00:00Z'}
+      ]), 200, headers: h);
     }
 
-    if (path.contains('/leave-requests')) {
-      if (method == 'POST') {
-        final body = jsonDecode(request.body);
-        if (body.isEmpty) return http.Response(jsonEncode({'error': 'Empty payload'}), 400);
-        return http.Response(jsonEncode({'id': 99, 'status': 'PENDING'}), 201);
-      }
-      return http.Response(jsonEncode(mockLeaveState['requests']), 200);
-    }
-    if (path.contains('/leave-balances')) {
-      return http.Response(jsonEncode(mockLeaveState['balances']), 200);
-    }
-    if (path.contains('/payslips')) {
-      return http.Response(jsonEncode(mockPayslipState['payslips']), 200);
-    }
-    if (path.contains('/schedules')) {
-      return http.Response(jsonEncode(mockScheduleState['schedules']), 200);
-    }
-    if (path.contains('/reimbursements')) {
-      if (method == 'POST') {
-        final body = jsonDecode(request.body);
-        if (body.isEmpty) return http.Response(jsonEncode({'error': 'Empty payload'}), 400);
-        return http.Response(jsonEncode({'status': 'success'}), 201);
-      }
-      return http.Response(jsonEncode(mockReimbursementState['requests']), 200);
-    }
-    if (path.contains('/reimbursement-categories')) {
-      return http.Response(jsonEncode(mockReimbursementState['categories']), 200);
+    // --- Leave Balances ---
+    if (url.contains('/leave-balances')) {
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'leave_type': 'Annual', 'balance': 12}
+      ]), 200, headers: h);
     }
 
-    if (path.contains('/payroll') ||
-        path.contains('/employees')) {
-      
-      if (method == 'POST' || method == 'PATCH') {
-        Map<String, dynamic> body = {};
-        try {
-          if (request.body.isNotEmpty) {
-            body = jsonDecode(request.body);
-          }
-        } catch (_) {}
-        
-        if (body.isEmpty && !(path.contains('/employees/') || path.contains('/profile/'))) {
-          return http.Response(jsonEncode({'error': 'Empty payload'}), 400);
-        }
-        return http.Response(jsonEncode({'status': 'success'}), method == 'PATCH' ? 200 : 201);
-      }
-      if (method == 'GET' && path.contains('/employees/')) {
-         return http.Response(jsonEncode([{
-           'id': 101, 
-           'employee_id': 101,
-           'fullname': 'Admin One',
-         }]), 200);
-      }
-      return http.Response(jsonEncode([]), 200);
+    // --- Reimbursement Categories ---
+    if (url.contains('/reimbursement-categories')) {
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'name': 'Transport'}
+      ]), 200, headers: h);
     }
-    
-    return http.Response(jsonEncode({'error': 'Not Found'}), 404);
+
+    // --- Reimbursements: POST must return 201 ---
+    if (url.contains('/reimbursements')) {
+      if (method == 'POST') return http.Response(jsonEncode({'id': 2, 'status': 'PENDING'}), 201, headers: h);
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'amount': 50000, 'status': 'PENDING'}
+      ]), 200, headers: h);
+    }
+
+    // --- Payslips ---
+    if (url.contains('/payslips')) {
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'period_name': 'April 2026', 'net_salary': '5000000',
+         'paid_at': '2026-04-01'}
+      ]), 200, headers: h);
+    }
+
+    // --- KPI Targets ---
+    if (url.contains('/kpi-targets')) {
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'kpi_name': 'Target KPI', 'target_value': 100.0, 'actual_value': 85.0}
+      ]), 200, headers: h);
+    }
+
+    // --- Appraisal Reviews: POST must return 201 ---
+    if (url.contains('/appraisal-reviews')) {
+      return http.Response(jsonEncode({'id': 1, 'status': 'submitted'}), 201, headers: h);
+    }
+
+    // --- Appraisals ---
+    if (url.contains('/appraisals')) {
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'period_name': 'Q1 2026', 'status': 'DRAFT',
+         'start_date': '2026-01-01', 'end_date': '2026-03-31'}
+      ]), 200, headers: h);
+    }
+
+    // --- Employees: PATCH must return 200, GET returns list ---
+    if (url.contains('/employees')) {
+      final employeeData = {
+        'id': 1, 'employee_id': 1, 'fullname': 'Admin One',
+        'ktp_image': null, 'npwp_image': null, 'ptkp_status': 'TK/0'
+      };
+      if (method == 'PATCH') return http.Response(jsonEncode(employeeData), 200, headers: h);
+      if (method == 'POST') return http.Response(jsonEncode(employeeData), 201, headers: h);
+      return http.Response(jsonEncode([employeeData]), 200, headers: h);
+    }
+
+    // --- Schedules ---
+    if (url.contains('/schedules')) {
+      return http.Response(jsonEncode(mockEmptyResponse ? [] : [
+        {'id': 1, 'date': '2026-04-01', 'employee_name': 'Admin One',
+         'shift_detail': {'id': 1, 'name': 'Morning Shift',
+          'start_time': '08:00:00', 'end_time': '17:00:00'}}
+      ]), 200, headers: h);
+    }
+
+    // --- Catch-all ---
+    return http.Response(jsonEncode([]), 200, headers: h);
   });
 }
 
-Future<void> setupMockApiService() async {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  initTestHttpOverrides();
-  
-  // Disable GoogleFonts network fetching in all tests
-  GoogleFonts.config.allowRuntimeFetching = false;
-  
+Future<void> setupMockApiService({bool isWidgetTest = false}) async {
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+  if (isWidgetTest) {
+    binding.platformDispatcher.views.first.physicalSize = const Size(1080, 2400);
+    binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
+  }
+
+  // Reset singleton and inject mock client
   ApiService.reset();
   ApiService(client: getMockClient());
+
+  // SharedPreferences is used by getTenant() — must set tenant_subdomain here
   SharedPreferences.setMockInitialValues({});
-  setupSecureStorageMock();
+  setupSystemChannelMocks();
+  GoogleFonts.config.allowRuntimeFetching = false;
   mockSecureStorage.clear();
-  
-  // Reset all mock states
-  mockAttendanceState['activeRecord'] = null;
-  mockAttendanceState['records'] = [{
-    'id': 100,
-    'date': '2026-03-31',
-    'check_in': '08:00:00',
-    'check_out': '17:00:00',
-    'latitude_in': -6.2,
-    'longitude_in': 106.8
-  }];
-  mockKpiState['targets'] = [];
-  mockAppraisalState['periods'] = [];
-  mockCorrectionState['requests'] = [{
-    'id': 1,
-    'date': '2026-04-01',
-    'status': 'PENDING',
-    'reason': 'GPS Glitch',
-    'latitude': -6.2,
-    'longitude': 106.8
-  }];
-  mockLeaveState['requests'] = [];
-  mockLeaveState['balances'] = [];
-  mockPayslipState['payslips'] = [{
-    'id': 1,
-    'period_name': 'March 2026',
-    'net_pay': 5000000.0,
-    'basic_salary': 4500000.0,
-    'payment_date': '2026-03-31',
-  }];
-  mockScheduleState['schedules'] = [];
-  mockReimbursementState['requests'] = [{
-    'id': 1,
-    'category_name': 'Transport',
-    'amount': 150000.0,
-    'description': 'Taxi home',
-    'status': 'PENDING',
-    'date': '2026-04-01',
-  }];
-  mockReimbursementState['categories'] = [
-    {'id': 1, 'name': 'Transport'},
-    {'id': 2, 'name': 'Meals'},
-  ];
+  mockEmptyResponse = mockErrorStatus = false;
+}
+
+Future<void> tearDownMockApiService() async {
+  if (TestWidgetsFlutterBinding.instance.platformDispatcher.views.isNotEmpty) {
+    TestWidgetsFlutterBinding.instance.platformDispatcher.views.first.resetPhysicalSize();
+    TestWidgetsFlutterBinding.instance.platformDispatcher.views.first.resetDevicePixelRatio();
+  }
 }
 
 Future<void> setupIntegratedApiService() async {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  initTestHttpOverrides();
-  
-  // Disable GoogleFonts network fetching in all tests
-  GoogleFonts.config.allowRuntimeFetching = false;
-  
   ApiService.reset();
-  // Using real http.Client instead of MockClient for integration tests
-  // Note: Standard http.Client in flutter_test environment uses platform channels.
-  // We use direct HttpClient with IO to reach localhost on host machine.
-  ApiService(client: http.Client());
-  
-  debugPrint('🔗 INTEGRATED TEST: ApiService configured with REAL client.');
-  
+  // Initializes ApiService with a real http.Client
+  ApiService();
   SharedPreferences.setMockInitialValues({});
-  setupSecureStorageMock();
+  setupSystemChannelMocks();
+  GoogleFonts.config.allowRuntimeFetching = false;
   mockSecureStorage.clear();
 }
 
-
-
+/// Simulate a logged-in user by setting JWT token in secure storage
+/// AND tenant_subdomain in SharedPreferences (which getTenant() reads).
 Future<void> loginForTest() async {
   mockSecureStorage['jwt_token'] = 'mock_access';
-  mockSecureStorage['refresh_token'] = 'mock_refresh';
   mockSecureStorage['tenant'] = 'company1';
+
+  // getTenant() reads from SharedPreferences, NOT secure storage
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('tenant_subdomain', 'company1');
 }
-

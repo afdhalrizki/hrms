@@ -1,0 +1,1 @@
+import 'package:flutter_test/flutter_test.dart'; import 'package:flutter/material.dart'; void main() { setUp(() { TestWidgetsFlutterBinding.instance.platformDispatcher.views.first.physicalSize = const Size(1080, 2400); }); testWidgets('test', (tester) async { print(tester.view.physicalSize); }); }

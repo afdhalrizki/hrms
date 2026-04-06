@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/utils/style_utils.dart';
@@ -30,7 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final api = ApiService();
       final hasToken = await api.hasValidToken();
       if (hasToken && mounted) {
-        debugPrint('LOGIN: existing token found, auto-navigating to HomeScreen');
+        if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+          debugPrint('LOGIN: existing token found, auto-navigating to HomeScreen');
+        }
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );

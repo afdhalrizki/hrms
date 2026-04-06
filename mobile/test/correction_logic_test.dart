@@ -19,12 +19,14 @@ void main() {
 
     test('submitCorrectionRequest sends POST successfully', () async {
       await loginForTest();
-      await apiService.submitCorrectionRequest({
+      final result = await apiService.submitCorrectionRequest({
         'attendance': 1,
         'requested_check_in': '08:00:00',
         'requested_check_out': '17:00:00',
         'reason': 'Integration Test',
       });
+      // Verification is implicit by the lack of exception, 
+      // but we ensure the Future is fully awaited.
     });
   });
 }

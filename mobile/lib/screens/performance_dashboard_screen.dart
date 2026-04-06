@@ -28,17 +28,18 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
       final api = ApiService();
       final kpis = await api.getKPITargets();
       final appraisals = await api.getAppraisals();
-      setState(() {
-        _kpiTargets = List<dynamic>.from(kpis);
-        _appraisals = List<dynamic>.from(appraisals);
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _kpiTargets = List<dynamic>.from(kpis);
+          _appraisals = List<dynamic>.from(appraisals);
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint('PerformanceDashboard Error: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        }
     }
   }
 

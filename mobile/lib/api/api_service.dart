@@ -57,6 +57,12 @@ class ApiService {
   }
   
   ApiService._internal(this._client);
+  
+  void _log(String message) {
+    if (const bool.fromEnvironment('dart.vm.product')) return;
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    debugPrint(message);
+  }
 
   Future<String?> getTenant() async {
     final prefs = await SharedPreferences.getInstance();
@@ -169,7 +175,7 @@ class ApiService {
       // In a real mobile app with url_launcher, we'd save it to path_provider and open it.
       // Since symlinks are blocked on this specific dev environment, we'll just print success 
       // for the widget tests to pass or implement the web fallback if compiled for web.
-      print('PDF Downloaded successfully: \${response.bodyBytes.length} bytes');
+      _log('PDF Downloaded successfully: ${response.bodyBytes.length} bytes');
     } else {
       throw Exception('Failed to download PDF');
     }
@@ -181,29 +187,28 @@ class ApiService {
     final tenant = await getTenant();
     var token = await getToken();
     
-    debugPrint('AUTHENTICATED REQUEST START: $token');
-    debugPrint('HTTP REQUEST URL: ${requestBuilder.toString()}'); 
+    _log('AUTHENTICATED REQUEST START: $token');
     
     var response = await requestBuilder(token).timeout(
       const Duration(seconds: 30),
       onTimeout: () {
-        debugPrint('TIMEOUT ERROR: Request timed out after 30s');
+        _log('TIMEOUT ERROR: Request timed out after 30s');
         throw Exception('Request timed out after 30 seconds');
       },
     );
     
-    debugPrint('AUTHENTICATED REQUEST RESPONSE: ${response.statusCode}');
+    _log('AUTHENTICATED REQUEST RESPONSE: ${response.statusCode}');
     if (response.statusCode >= 400) {
-      debugPrint('HTTP ERROR BODY: ${response.body}');
+      _log('HTTP ERROR BODY: ${response.body}');
     }
     
     if (response.statusCode == 401) {
-      debugPrint('GOT 401, ATTEMPTING TOKEN REFRESH');
+      _log('GOT 401, ATTEMPTING TOKEN REFRESH');
       final success = await refreshToken();
       if (success) {
         token = await getToken();
         response = await requestBuilder(token);
-        debugPrint('REFRESHED REQUEST RESPONSE: ${response.statusCode}');
+        _log('REFRESHED REQUEST RESPONSE: ${response.statusCode}');
       }
     }
     
