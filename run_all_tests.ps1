@@ -88,7 +88,17 @@ function Test-BackendHealth {
 }
 
 function Is-BackendServerReady {
-    $portOpen = Test-NetConnection -ComputerName "127.0.0.1" -Port 8000 -InformationLevel Quiet
+    $portOpen = $false
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $waitTask = $client.BeginConnect("127.0.0.1", 8000, $null, $null)
+        if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+            $client.EndConnect($waitTask)
+            $portOpen = $true
+        }
+        $client.Close()
+    } catch { }
+
     if (-not $portOpen) { return $false }
 
     return Test-BackendHealth
@@ -161,7 +171,17 @@ function Wait-ForBackendReady {
 
     $waited = 0
     while ($waited -lt $MaxWaitSeconds) {
-        $portOpen = Test-NetConnection -ComputerName "127.0.0.1" -Port 8000 -InformationLevel Quiet
+        $portOpen = $false
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $waitTask = $client.BeginConnect("127.0.0.1", 8000, $null, $null)
+            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+                $client.EndConnect($waitTask)
+                $portOpen = $true
+            }
+            $client.Close()
+        } catch { }
+
         if ($portOpen -and (Test-BackendHealth)) {
             Write-Host "`n✅ Backend Server is READY (health check passed)." -ForegroundColor Green
             return $true

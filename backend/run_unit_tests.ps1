@@ -186,7 +186,16 @@ Write-Host "Waiting for database to be ready on localhost:5432..." -ForegroundCo
 $maxTries = 20
 $tryCount = 0
 while ($tryCount -lt $maxTries) {
-    $test = Test-NetConnection -ComputerName "127.0.0.1" -Port 5432 -InformationLevel Quiet
+    $test = $false
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $waitTask = $client.BeginConnect("127.0.0.1", 5432, $null, $null)
+        if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+            $client.EndConnect($waitTask)
+            $test = $true
+        }
+        $client.Close()
+    } catch { }
     if ($test) {
         Write-Host "Database is ready!" -ForegroundColor Green
         break

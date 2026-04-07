@@ -27,7 +27,17 @@ function Wait-BackendHealth {
 
     $waited = 0
     while ($waited -lt $MaxWaitSeconds) {
-        $portOpen = Test-NetConnection -ComputerName "127.0.0.1" -Port 8000 -InformationLevel Quiet -WarningAction SilentlyContinue
+        $portOpen = $false
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $waitTask = $client.BeginConnect("127.0.0.1", 8000, $null, $null)
+            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+                $client.EndConnect($waitTask)
+                $portOpen = $true
+            }
+            $client.Close()
+        } catch { }
+
         if ($portOpen) {
             try {
                 $health = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
@@ -71,7 +81,18 @@ function Wait-ForPort {
 
     $waited = 0
     while ($waited -lt $TimeoutSeconds) {
-        if (Test-NetConnection -ComputerName $HostName -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue) {
+        $portOpen = $false
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $waitTask = $client.BeginConnect($HostName, $Port, $null, $null)
+            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+                $client.EndConnect($waitTask)
+                $portOpen = $true
+            }
+            $client.Close()
+        } catch { }
+
+        if ($portOpen) {
             return $true
         }
         Start-Sleep -Seconds $IntervalSeconds
