@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile/utils/style_utils.dart';
 import 'package:intl/intl.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 
 class CorrectionRequestScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -25,11 +27,13 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final api = ApiService();
       final history = await api.getAttendanceRecords();
       final requests = await api.getCorrectionRequests();
+      if (!mounted) return;
       setState(() {
         _attendanceHistory = history;
         _correctionRequests = requests;
@@ -62,7 +66,9 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
         ),
       ),
       body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: AppLoadingIndicator(color: Colors.white),
+          )
         : TabBarView(
             controller: _tabController,
             children: [
@@ -110,6 +116,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
               ),
               const Spacer(),
               IconButton(
+                key: Key('qa_edit_record_$index'),
                 icon: const Icon(Icons.edit_calendar, color: Colors.blueAccent),
                 onPressed: () => _showCorrectionForm(record),
               ),

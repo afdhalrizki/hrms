@@ -14,6 +14,7 @@ import 'performance_dashboard_screen.dart';
 import 'settings_screen.dart';
 import '../api/api_service.dart';
 import '../api/location_service.dart';
+import '../widgets/loading_indicator.dart';
 import '../models/activity_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -108,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // Sort by timestamp desc
       activities.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
+      if (!mounted) return;
       setState(() {
         _userData = user;
         _activities = activities.take(5).toList();
@@ -132,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Scaffold(
         backgroundColor: Color(0xFF0F172A),
         body: Center(
-          child: CircularProgressIndicator(color: Colors.blueAccent),
+          child: AppLoadingIndicator(color: Colors.blueAccent),
         ),
       );
     }
@@ -141,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (l10n == null) {
       return const Scaffold(
         backgroundColor: Color(0xFF0F172A),
-        body: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+        body: Center(child: AppLoadingIndicator(color: Colors.blueAccent)),
       );
     }
     final now = DateTime.now();

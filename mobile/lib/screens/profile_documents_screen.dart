@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 
 class ProfileDocumentsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -158,7 +159,7 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
           else
             Container(
               height: 300,
-              child: const Center(child: CircularProgressIndicator()),
+              child: const Center(child: AppLoadingIndicator()),
             ),
           
           Expanded(
@@ -238,7 +239,7 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: isThisUploading 
-              ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              ? const SizedBox(height: 16, width: 16, child: AppLoadingIndicator(strokeWidth: 2, color: Colors.white))
               : const Text('Capture'),
           ),
         ],

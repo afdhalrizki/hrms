@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 import '../models/reimbursement_model.dart';
 import 'reimbursement_apply_screen.dart';
 
@@ -22,9 +24,11 @@ class _ReimbursementListScreenState extends State<ReimbursementListScreen> {
   }
 
   Future<void> _fetchClaims() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final data = await _apiService.getReimbursements();
+      if (!mounted) return;
       setState(() {
         _claims = (data as List).map((r) => Reimbursement.fromJson(r)).toList();
         _isLoading = false;
@@ -34,8 +38,8 @@ class _ReimbursementListScreenState extends State<ReimbursementListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
+        setState(() => _isLoading = false);
       }
-      setState(() => _isLoading = false);
     }
   }
 
@@ -52,7 +56,9 @@ class _ReimbursementListScreenState extends State<ReimbursementListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('My Reimbursements')),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: AppLoadingIndicator(color: Colors.blue),
+            )
           : RefreshIndicator(
               onRefresh: _fetchClaims,
               child: _claims.isEmpty

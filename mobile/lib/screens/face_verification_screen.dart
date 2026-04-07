@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:mobile/utils/style_utils.dart';
+import '../widgets/loading_indicator.dart';
 
 class FaceVerificationScreen extends StatefulWidget {
   final bool isClockIn;
@@ -82,7 +83,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   }
 
   Future<void> _processCameraImage(CameraImage image) async {
-    if (_isBusy || _faceDetector == null) return;
+    if (_isBusy || _faceDetector == null || _blinkDetected || _statusMessage.contains("failed")) return;
     _isBusy = true;
 
     try {
@@ -189,14 +190,40 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
           leading: const BackButton(color: Colors.white),
           actions: [
             if (kDebugMode || const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST'))
-              TextButton(
-                key: const Key('simulate_face_success'),
-                onPressed: _completeVerification,
-                child: const Text('SIMULATE', style: TextStyle(color: Colors.yellow)),
+              Row(
+                children: [
+                  TextButton(
+                    key: const Key('simulate_face_failure'),
+                    onPressed: () => setState(() => _statusMessage = "Verification failed"),
+                    child: const Text('FAIL', style: TextStyle(color: Colors.redAccent)),
+                  ),
+                  TextButton(
+                    key: const Key('simulate_face_success'),
+                    onPressed: _completeVerification,
+                    child: const Text('SIMULATE', style: TextStyle(color: Colors.yellow)),
+                  ),
+                ],
               ),
           ],
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AppLoadingIndicator(color: Colors.white),
+              if (Platform.environment.containsKey('FLUTTER_TEST'))
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    _statusMessage,
+                    key: const Key('face_status_msg'),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -266,10 +293,14 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                 color: Colors.black54,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(
-                _statusMessage,
-                style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
+              child: Builder(builder: (context) {
+                print('DEBUG E2E: Status update: $_statusMessage');
+                return Text(
+                  _statusMessage,
+                  key: const Key('face_status_msg'),
+                  style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold),
+                );
+              }),
             ),
           ),
           if (_blinkDetected)
@@ -281,10 +312,23 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
             Positioned(
               top: 50,
               right: 20,
-              child: TextButton(
-                key: const Key('simulate_face_success'),
-                onPressed: _completeVerification,
-                child: const Text('SIMULATE SUCCESS', style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextButton(
+                    key: const Key('simulate_face_failure'),
+                    onPressed: () => setState(() {
+                      _faceDetected = true;
+                      _statusMessage = "Verification failed";
+                    }),
+                    child: const Text('SIMULATE FAILURE', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                  ),
+                  TextButton(
+                    key: const Key('simulate_face_success'),
+                    onPressed: _completeVerification,
+                    child: const Text('SIMULATE SUCCESS', style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
             ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 import 'self_appraisal_screen.dart';
 
 class PerformanceDashboardScreen extends StatefulWidget {
@@ -54,7 +55,7 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
         foregroundColor: Colors.white,
       ),
       body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(child: AppLoadingIndicator())
         : RefreshIndicator(
             onRefresh: _loadData,
             child: ListView(

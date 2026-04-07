@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 import '../models/schedule_model.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -43,7 +44,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         future: _schedulesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.blueAccent));
+            return const Center(child: AppLoadingIndicator(color: Colors.blueAccent));
           } else if (snapshot.hasError) {
             return Center(
               child: Text(

@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 import '../models/leave_model.dart';
 import 'leave_apply_screen.dart';
 
@@ -24,13 +26,16 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
   }
 
   Future<void> _fetchData() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final leaveData = await _apiService.getLeaveRequests();
       final balanceData = await _apiService.getLeaveBalances();
 
+      if (!mounted) return;
       setState(() {
         _leaves = (leaveData as List).map((l) => LeaveRequest.fromJson(l)).toList();
+        print('DEBUG E2E: Fetched leaves: ${_leaves.length}');
         if ((balanceData as List).isNotEmpty) {
           _balance = LeaveBalance.fromJson(balanceData.first);
         }
@@ -41,8 +46,8 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
+        setState(() => _isLoading = false);
       }
-      setState(() => _isLoading = false);
     }
   }
 
@@ -59,7 +64,9 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('My Leaves')),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: AppLoadingIndicator(color: Colors.blue),
+            )
           : RefreshIndicator(
               onRefresh: _fetchData,
               child: Column(
@@ -67,7 +74,10 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
                   if (_balance != null) _buildBalanceCard(),
                   Expanded(
                     child: _leaves.isEmpty
-                        ? const Center(child: Text('No leave requests found'))
+                        ? Builder(builder: (context) {
+                            print('DEBUG E2E: Showing empty state: No leave requests found');
+                            return const Center(child: Text('No leave requests found'));
+                          })
                         : ListView.builder(
                             itemCount: _leaves.length,
                             itemBuilder: (context, index) {

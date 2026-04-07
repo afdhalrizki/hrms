@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 import '../models/reimbursement_model.dart';
 
 class ReimbursementApplyScreen extends StatefulWidget {
@@ -98,7 +99,7 @@ class _ReimbursementApplyScreenState extends State<ReimbursementApplyScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('New Reimbursement Claim')),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoadingIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -145,7 +146,7 @@ class _ReimbursementApplyScreenState extends State<ReimbursementApplyScreen> {
                     ElevatedButton(
                       onPressed: _isSubmitting ? null : _submit,
                       style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-                      child: _isSubmitting ? const CircularProgressIndicator() : const Text('Submit Claim'),
+                      child: _isSubmitting ? const AppLoadingIndicator() : const Text('Submit Claim'),
                     ),
                   ],
                 ),

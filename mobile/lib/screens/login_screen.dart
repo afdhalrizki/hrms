@@ -4,6 +4,7 @@ import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/utils/style_utils.dart';
 
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -165,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(
+                              child: AppLoadingIndicator(
                                 strokeWidth: 2,
                                 color: Colors.white,
                               ),

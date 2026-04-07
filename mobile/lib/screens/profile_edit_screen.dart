@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -226,7 +227,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         elevation: 0,
       ),
       child: _isSaving 
-        ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+        ? const SizedBox(height: 24, width: 24, child: AppLoadingIndicator(color: Colors.white, strokeWidth: 2))
         : const Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
     );
   }

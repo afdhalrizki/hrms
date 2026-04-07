@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 
 class LeaveApplyScreen extends StatefulWidget {
   const LeaveApplyScreen({super.key});
@@ -113,7 +114,7 @@ class _LeaveApplyScreenState extends State<LeaveApplyScreen> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submit,
                 style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-                child: _isSubmitting ? const CircularProgressIndicator() : const Text('Apply Leave'),
+                child: _isSubmitting ? const AppLoadingIndicator() : const Text('Apply Leave'),
               ),
             ],
           ),

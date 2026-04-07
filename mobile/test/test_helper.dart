@@ -34,6 +34,7 @@ class _FakeValue {
 Map<String, String> mockSecureStorage = {};
 bool mockErrorStatus = false;
 bool mockEmptyResponse = false;
+bool mockTokenExpired = false;
 String mockErrorMessage = 'Error';
 
 void setupSystemChannelMocks() {
@@ -86,6 +87,11 @@ http.Client getMockClient() {
 
     if (mockErrorStatus) {
       return http.Response(jsonEncode({'error': mockErrorMessage}), 500, headers: h);
+    }
+
+    if (mockTokenExpired && !url.contains('/auth/token/refresh')) {
+      mockTokenExpired = false; // Only fail once to test refresh & retry
+      return http.Response(jsonEncode({'detail': 'Token expired'}), 401, headers: h);
     }
 
     // --- Auth ---
@@ -226,7 +232,7 @@ Future<void> setupMockApiService({bool isWidgetTest = false}) async {
   setupSystemChannelMocks();
   GoogleFonts.config.allowRuntimeFetching = false;
   mockSecureStorage.clear();
-  mockEmptyResponse = mockErrorStatus = false;
+  mockEmptyResponse = mockErrorStatus = mockTokenExpired = false;
 }
 
 Future<void> tearDownMockApiService() async {

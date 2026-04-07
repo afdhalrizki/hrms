@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 
 class SelfAppraisalScreen extends StatefulWidget {
   final Map<String, dynamic> appraisal;
@@ -92,7 +93,7 @@ class _SelfAppraisalScreenState extends State<SelfAppraisalScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               child: _isSaving 
-                ? const CircularProgressIndicator(color: Colors.white)
+                ? const AppLoadingIndicator(color: Colors.white)
                 : const Text('Submit Self Review', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],

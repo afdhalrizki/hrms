@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
+import '../widgets/loading_indicator.dart';
 
 class PayslipScreen extends StatefulWidget {
   const PayslipScreen({super.key});
@@ -26,6 +27,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
     try {
       final api = ApiService();
       final data = await api.getPayslips();
+      if (!mounted) return;
       setState(() {
         _payslips = data;
         if (_payslips.isNotEmpty) {
@@ -48,7 +50,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: Color(0xFF0F172A),
-        body: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+        body: Center(child: AppLoadingIndicator(color: Colors.blueAccent)),
       );
     }
 

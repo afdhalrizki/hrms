@@ -130,8 +130,9 @@ class ApiService {
     if (refreshToken == null) return false;
 
     try {
+      print('DEBUG E2E: Refreshing token...');
       final response = await _client.post(
-        Uri.parse("$baseUrl/auth/token/refresh/"),
+        Uri.parse('$baseUrl/auth/token/refresh/'),
         headers: _headers(tenant),
         body: jsonEncode({'refresh': refreshToken}),
       );
@@ -394,6 +395,7 @@ class ApiService {
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode != 200) {
+      print('DEBUG E2E: Response error for getLeaveRequests: ${response.statusCode} - ${response.body}');
       throw Exception('Failed to upload document: ${response.body}');
     }
   }
