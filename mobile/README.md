@@ -31,7 +31,8 @@ For a detailed audit of implemented vs. mocked features, see [**Feature Audit & 
 
 ### 📱 Flutter UI Previews
 
-| ![Mobile Dashboard](./docs/assets/mobile_preview.png) | ![Face ID Verification](./docs/assets/mobile_face_id.png) |
+
+| ![Mobile Dashboard](../docs/assets/mobile_preview.png) | ![Face ID Verification](../docs/assets/mobile_face_id.png) |
 
 ## 🛠 Tech Stack
 
