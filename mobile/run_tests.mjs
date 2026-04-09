@@ -9,6 +9,7 @@ async function main() {
   const args = process.argv.slice(2);
   const skipE2E = args.includes('--skip-e2e');
   const skipUnit = args.includes('--skip-unit');
+  const integrated = args.includes('--integrated');
 
   log("========================================", COLORS.cyan);
   log("🏆 HARIKERJA MOBILE TEST ORCHESTRATOR", COLORS.cyan);
@@ -31,7 +32,10 @@ async function main() {
   // 2. Run E2E Tests (Flutter)
   if (allPassed && !skipE2E) {
     log("\n🌐 [2/2] Running E2E Tests (Flutter)...", COLORS.yellow);
-    const exitCode = await spawnStream('node', [join(MobileDir, 'run_e2e_tests.mjs')], { cwd: MobileDir });
+    const e2eArgs = [join(MobileDir, 'run_e2e_tests.mjs')];
+    if (integrated) e2eArgs.push('--integrated');
+    
+    const exitCode = await spawnStream('node', e2eArgs, { cwd: MobileDir });
     if (exitCode !== 0) {
       log("❌ E2E Tests Failed.", COLORS.red);
       allPassed = false;

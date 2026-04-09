@@ -16,6 +16,12 @@ async function main() {
   log("🏆 HARIKERJA BACKEND TEST ORCHESTRATOR", COLORS.cyan);
   log("========================================", COLORS.cyan);
 
+  const logDir = join(BackendDir, 'logs');
+  await ensureDir(logDir);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+  const masterLogFile = join(logDir, `master_test_${timestamp}.log`);
+  log(`Master log: ${masterLogFile}`, COLORS.gray);
+
   let allPassed = true;
 
   // 1. Run Unit Tests
@@ -25,7 +31,10 @@ async function main() {
     if (dockerOnly) unitArgs.push('--docker-only');
     if (resetDocker) unitArgs.push('--reset-docker');
     
-    const exitCode = await spawnStream('node', [join(BackendDir, 'run_unit_tests.mjs'), ...unitArgs], { cwd: BackendDir });
+    const exitCode = await spawnStream('node', [join(BackendDir, 'run_unit_tests.mjs'), ...unitArgs], { 
+      cwd: BackendDir, 
+      logFile: masterLogFile 
+    });
     if (exitCode !== 0) {
       log("❌ Unit Tests Failed.", COLORS.red);
       allPassed = false;
@@ -37,7 +46,10 @@ async function main() {
   // 2. Run E2E Tests
   if (allPassed && !skipE2E && !dockerOnly) {
     log("\n🌐 [2/2] Running E2E Tests (Pytest)...", COLORS.yellow);
-    const exitCode = await spawnStream('node', [join(BackendDir, 'run_e2e_tests.mjs')], { cwd: BackendDir });
+    const exitCode = await spawnStream('node', [join(BackendDir, 'run_e2e_tests.mjs')], { 
+      cwd: BackendDir, 
+      logFile: masterLogFile 
+    });
     if (exitCode !== 0) {
       log("❌ E2E Tests Failed.", COLORS.red);
       allPassed = false;

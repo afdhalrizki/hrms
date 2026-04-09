@@ -1,4 +1,5 @@
-import { spawn } from 'node:child_process';
+import { spawn, exec } from 'node:child_process';
+import { promisify } from 'node:util';
 import { createWriteStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
@@ -7,6 +8,7 @@ import http from 'node:http';
 import net from 'node:net';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const execAsync = promisify(exec);
 
 export const COLORS = {
   reset: "\x1b[0m",
@@ -19,8 +21,8 @@ export const COLORS = {
   magenta: "\x1b[35m",
 };
 
-export function log(msg, color = COLORS.white) {
-  process.stdout.write(`${color}${msg}${COLORS.reset}\n`);
+export function log(msg, color = COLORS.white, noNewLine = false) {
+  process.stdout.write(`${color}${msg}${COLORS.reset}${noNewLine ? '' : '\n'}`);
 }
 
 export async function ensureDir(dir) {
@@ -102,6 +104,10 @@ export function stripAnsi(str) {
   return str.replace(/\x1b\[[0-9;]*m/g, '');
 }
 
+export function getTimestamp() {
+  return new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+}
+
 export async function waitForPort(port, host = '127.0.0.1', timeoutMs = 60000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
@@ -129,7 +135,8 @@ export async function waitForHttp(url, timeoutMs = 60000, label = 'service') {
     try {
       const ok = await new Promise((resolve) => {
         const req = http.get(url, (res) => {
-          // Accept any response that isn't a server error
+          // Accept any response that isn't a server error (5xx)
+          // 404 is often acceptable as "the server is up, but this specific route isn't ready"
           resolve(res.statusCode >= 200 && res.statusCode < 500);
         });
         req.on('error', () => resolve(false));
@@ -141,7 +148,7 @@ export async function waitForHttp(url, timeoutMs = 60000, label = 'service') {
       }
     } catch (e) {}
     await new Promise(r => setTimeout(r, 2000));
-    process.stdout.write(COLORS.gray + "." + COLORS.reset);
+    log(".", COLORS.gray, true);
   }
   log(`\n❌ Timeout waiting for ${label} after ${timeoutMs}ms`, COLORS.red);
   return false;
@@ -208,4 +215,127 @@ export function parseMetrics(logContent, suiteName) {
     }
   }
   return { p, f, e, w };
+}
+
+export async function getDockerComposeCommand() {
+  try {
+    await execAsync('docker-compose --version');
+    return 'docker-compose';
+  } catch (e) {
+    try {
+      await execAsync('docker compose version');
+      return 'docker compose';
+    } catch (e2) {
+      return null;
+    }
+  }
+}
+
+export async function checkDockerDaemon() {
+  try {
+    await execAsync('docker info');
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function ensureDockerRunning() {
+  if (await checkDockerDaemon()) return true;
+
+  if (process.platform === 'win32') {
+    log("⚠️ Docker daemon is not running. Attempting to start Docker Desktop...", COLORS.yellow);
+    const dockerPath = "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe";
+    try {
+      // Start process without waiting in JS is tricky, we'll use spawn with detached
+      const child = spawn(dockerPath, [], { detached: true, stdio: 'ignore' });
+      child.unref();
+
+      log("🚀 Starting Docker Desktop... Please wait.", COLORS.gray);
+      let maxWait = 24; // 2 minutes
+      while (maxWait > 0) {
+        await new Promise(r => setTimeout(r, 5000));
+        if (await checkDockerDaemon()) {
+          log("\n✅ Docker is now running!", COLORS.green);
+          return true;
+        }
+        process.stdout.write(COLORS.gray + "." + COLORS.reset);
+        maxWait--;
+      }
+    } catch (e) {
+      log(`❌ ERROR: Failed to start Docker Desktop: ${e.message}`, COLORS.red);
+    }
+  }
+
+  log("\n❌ ERROR: Docker daemon is not running and could not be started automatically.", COLORS.red);
+  return false;
+}
+
+export async function isPortInUse(port, host = '127.0.0.1') {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    socket.setTimeout(500);
+    socket.on('connect', () => { socket.destroy(); resolve(true); });
+    socket.on('error', () => { socket.destroy(); resolve(false); });
+    socket.on('timeout', () => { socket.destroy(); resolve(false); });
+    socket.connect(port, host);
+  });
+}
+
+export async function killPortProcess(port) {
+  if (process.platform !== 'win32') return; // Simplified for this environment
+
+  try {
+    const { stdout } = await execAsync(`netstat -ano | findstr :${port} | findstr LISTENING`);
+    const lines = stdout.split('\n').filter(l => l.trim().length > 0);
+    for (const line of lines) {
+      const parts = line.trim().split(/\s+/);
+      const pid = parts[parts.length - 1];
+      if (pid && pid !== '0') {
+        log(`Terminating process ${pid} on port ${port}...`, COLORS.yellow);
+        await execAsync(`taskkill /F /PID ${pid}`);
+      }
+    }
+  } catch (e) {
+    // If findstr fails (no process), it's okay
+  }
+}
+
+export async function saveDockerLogs(suffix, logDir, rootDir) {
+  const composeCmd = await getDockerComposeCommand();
+  if (!composeCmd) return;
+
+  const timestamp = getTimestamp();
+  const cleanSuffix = suffix.replace(/[^a-z0-9]/gi, '_');
+  const outFile = join(logDir, `docker_compose_logs_${cleanSuffix}_${timestamp}.log`);
+  const envFile = join(rootDir, 'environments', '.env.local');
+
+  log(`📦 Capturing docker compose logs to ${outFile}`, COLORS.yellow);
+  try {
+    const cmd = `${composeCmd} --env-file "${envFile}" logs --no-color --tail 200`;
+    const { stdout, stderr } = await execAsync(cmd, { cwd: rootDir });
+    const { writeFileSync } = await import('node:fs');
+    writeFileSync(outFile, stdout + stderr);
+  } catch (e) {
+    log(`⚠️ Failed to capture docker compose logs: ${e.message}`, COLORS.yellow);
+  }
+}
+
+export async function moveFailureScreenshots(dir) {
+  const { readdir, rename } = await import('node:fs/promises');
+  const logDir = join(dir, 'logs');
+  await ensureDir(logDir);
+
+  try {
+    const files = await readdir(dir);
+    const failureImages = files.filter(f => f.endsWith('-failure.png'));
+    for (const file of failureImages) {
+      await rename(join(dir, file), join(logDir, file));
+    }
+    if (failureImages.length > 0) {
+      log(`   📸 Moved ${failureImages.length} failure screenshots to ${logDir}`, COLORS.yellow);
+    }
+  } catch (e) {
+    // No-op if failed to search/move
+  }
 }

@@ -2,7 +2,10 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import crypto from 'node:crypto';
-import { ensureDir, log, COLORS, spawnStream, waitForPort, waitForHttp } from '../scripts/lib.mjs';
+import { 
+  ensureDir, log, COLORS, spawnStream, waitForPort, waitForHttp,
+  isPortInUse, getDockerComposeCommand, ensureDockerRunning 
+} from '../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BackendDir = resolve(__dirname);
@@ -20,6 +23,8 @@ async function main() {
   const noServer = args.includes('--no-server');
   const noDeps = args.includes('--no-deps');
   const forceDeps = args.includes('--force-deps');
+  const seed = args.includes('--seed') || args.includes('--Seed');
+  const coverage = args.includes('--coverage') || args.includes('--Coverage');
 
   log("--- HRMS Backend Local Dev Setup (Node.js) ---", COLORS.cyan);
 
@@ -31,9 +36,27 @@ async function main() {
 
   // 2. Docker Setup
   log("[1/5] Ensuring Docker services are running...", COLORS.yellow);
-  const composeCmd = 'docker-compose';
-  // We assume docker-compose is in path or use 'docker compose'
-  await spawnStream('docker-compose', ['--env-file', EnvFile, 'up', '-d', 'db', 'redis', 'pgbouncer'], { cwd: RootDir });
+  
+  // Defensive Port Checks
+  const requiredPorts = [5432, 6379, 6432, 8000];
+  for (const port of requiredPorts) {
+    if (await isPortInUse(port)) {
+      log(`WARNING: Port ${port} is already in use. This might cause Docker or Local Server to fail.`, COLORS.yellow);
+    }
+  }
+
+  if (!(await ensureDockerRunning())) {
+    process.exit(1);
+  }
+
+  const composeCmd = await getDockerComposeCommand();
+  if (!composeCmd) {
+    log("❌ ERROR: Neither docker-compose nor docker compose found.", COLORS.red);
+    process.exit(1);
+  }
+
+  log(`Using: ${composeCmd}`, COLORS.gray);
+  await spawnStream(composeCmd, ['--env-file', EnvFile, 'up', '-d', 'db', 'redis', 'pgbouncer'], { cwd: RootDir });
 
   // 3. Env Vars & DB Health
   log("[2/5] Loading environment variables...", COLORS.yellow);
@@ -89,13 +112,32 @@ async function main() {
     await spawnStream(pythonPath, ['manage.py', 'migrate_schemas', '--shared', '--noinput'], { cwd: BackendDir });
     await spawnStream(pythonPath, ['manage.py', 'migrate_schemas', '--tenant', '--noinput'], { cwd: BackendDir });
   } catch (e) {
-    log("Migration failed. Initial bootstrap might be needed.", COLORS.yellow);
+    log("Migration failed. You might need to run 'python manage.py bootstrap_tenants' if this is first run.", COLORS.red);
+  }
+
+  if (seed) {
+    log("[5+/5] Seeding test data...", COLORS.yellow);
+    const seedScript = join(BackendDir, 'scripts', 'seed_test_db.py');
+    if (existsSync(seedScript)) {
+      await spawnStream(pythonPath, [seedScript], { cwd: BackendDir });
+    } else {
+      log("WARNING: scripts/seed_test_db.py not found. Skipping seed.", COLORS.yellow);
+    }
   }
 
   // 7. Start Server
   if (!noServer) {
-    log("--- Starting Django Server at http://localhost:8000 ---", COLORS.green);
-    await spawnStream(pythonPath, ['manage.py', 'runserver', '0.0.0.0:8000'], { cwd: BackendDir });
+    if (await isPortInUse(8000)) {
+      log("Port 8000 is already in use; assuming existing backend service is running. Skipping local runserver.", COLORS.yellow);
+    } else {
+      log("--- Starting Django Server at http://localhost:8000 ---", COLORS.green);
+      if (coverage) {
+        log("Running WITH coverage collection...", COLORS.magenta);
+        await spawnStream(pythonPath, ['-m', 'coverage', 'run', 'manage.py', 'runserver', '0.0.0.0:8000', '--noreload'], { cwd: BackendDir });
+      } else {
+        await spawnStream(pythonPath, ['manage.py', 'runserver', '0.0.0.0:8000'], { cwd: BackendDir });
+      }
+    }
   } else {
     log("Skipping runserver due to --no-server.", COLORS.yellow);
   }

@@ -1,7 +1,10 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, existsSync } from 'node:fs';
-import { ensureDir, log, COLORS, spawnStream, waitForPort, stripAnsi } from '../scripts/lib.mjs';
+import { 
+  ensureDir, log, COLORS, spawnStream, waitForPort, stripAnsi,
+  getDockerComposeCommand, ensureDockerRunning 
+} from '../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BackendDir = resolve(__dirname);
@@ -24,15 +27,23 @@ async function main() {
 
   // 2. Docker Setup
   log("[1/3] Ensuring Docker services are running...", COLORS.yellow);
-  const dockerCmd = 'docker';
-  const composeCmd = 'docker-compose'; // or 'docker compose' as fallback in spawnStream
+  
+  if (!(await ensureDockerRunning())) {
+    process.exit(1);
+  }
+
+  const composeCmd = await getDockerComposeCommand();
+  if (!composeCmd) {
+    log("❌ ERROR: Neither docker-compose nor docker compose found.", COLORS.red);
+    process.exit(1);
+  }
 
   if (resetDocker) {
     log("[Docker] Reset requested: packing down and re-creating containers...", COLORS.cyan);
-    await spawnStream('docker-compose', ['--env-file', EnvFile, 'down', '--remove-orphans']);
+    await spawnStream(composeCmd, ['--env-file', EnvFile, 'down', '--remove-orphans']);
   }
 
-  await spawnStream('docker-compose', ['--env-file', EnvFile, 'up', '-d', 'db', 'redis', 'pgbouncer']);
+  await spawnStream(composeCmd, ['--env-file', EnvFile, 'up', '-d', 'db', 'redis', 'pgbouncer']);
 
   // 3. Env Vars & DB Health
   log("[2/3] Loading environment variables and checking DB...", COLORS.yellow);
@@ -77,12 +88,43 @@ async function main() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
   const logFile = join(logDir, `unit_test_${timestamp}.log`);
 
-  const exitCode = await spawnStream(pythonPath, ['-m', 'pytest', '--color=yes', ...pytestArgs], { 
+  const exitCode = await spawnStream(pythonPath, ['-m', 'pytest', '--color=yes', '--maxfail=1', '--durations=20', ...pytestArgs], { 
     cwd: BackendDir,
     logFile
   });
 
-  log(`\nTEST RUN SUMMARY (Exit: ${exitCode})`, COLORS.cyan);
+  // 6. Summary
+  log("\n" + "=".repeat(60), COLORS.gray);
+  log("                TEST RUN SUMMARY", COLORS.cyan);
+  log(" (Exit: " + exitCode + ")", COLORS.gray);
+  log("=".repeat(60), COLORS.gray);
+
+  const logContent = readFileSync(logFile, 'utf8');
+  const finalLines = logContent.split(/\r?\n/).slice(-10).join('\n');
+  const summaryMatch = finalLines.match(/==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*/);
+
+  if (summaryMatch) {
+    const cleanSummary = summaryMatch[0].replace(/[= ]/g, ' ').trim();
+    log(" DETAILS : " + cleanSummary, COLORS.white);
+    
+    if (cleanSummary.match(/failed|error/)) {
+      log(" STATUS  : ❌ TESTS FAILED OR ENCOUNTERED ERRORS", COLORS.red);
+    } else if (cleanSummary.match(/warning/)) {
+      log(" STATUS  : ⚠️ PASSED WITH WARNINGS", COLORS.yellow);
+    } else if (exitCode === 0) {
+      log(" STATUS  : ✅ ALL TESTS PASSED", COLORS.green);
+    } else {
+      log(" STATUS  : ❌ UNKNOWN FAILURE (Exit Code: " + exitCode + ")", COLORS.red);
+    }
+  } else {
+    if (exitCode === 0) {
+      log(" STATUS  : ✅ ALL TESTS PASSED", COLORS.green);
+    } else {
+      log(" STATUS  : ❌ EXECUTION FAILED", COLORS.red);
+    }
+  }
+  log("=".repeat(60), COLORS.gray);
+
   process.exit(exitCode);
 }
 
