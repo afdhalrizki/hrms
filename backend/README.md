@@ -13,6 +13,7 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - [x] **Strategic HR**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
 - [x] **ESS Profile Management**: Restricted self-service API allowing employees to update personal contact info and upload KTP/NPWP documents without compromising HR master data.
 - [x] **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Basic, Professional, Enterprise).
+- [x] **Cloud-Native Storage**: Ready for Amazon S3 or AWS-compatible storage via `django-storages` for multi-node scalability.
 
 ## 📁 Core Modules
 

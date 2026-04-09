@@ -47,6 +47,7 @@ SHARED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'storages',
 ]
 
 TENANT_APPS = [
@@ -168,6 +169,46 @@ STATIC_URL = 'static/'
 # Media files (Logos, Uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# S3 / Cloud Storage Settings
+USE_S3 = os.environ.get('USE_S3', 'False').lower() == 'true'
+
+if USE_S3:
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
+    AWS_S3_FILE_OVERWRITE = False
+    
+    # Static files storage
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    
+    # Media files storage (Django 4.2+ STORAGES dictionary)
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+        },
+    }
+    
+    if AWS_S3_CUSTOM_DOMAIN:
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    else:
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 # Redis Caching for High-Frequency Traffic
 CACHES = {
