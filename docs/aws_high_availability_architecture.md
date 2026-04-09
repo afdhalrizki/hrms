@@ -9,115 +9,157 @@ flowchart TD
     User([User / Mobile App / Browser])
     
     subgraph Edge[AWS Edge Network]
+        WAF[AWS WAF\nOWASP Protection]
         R53[Amazon Route 53]
         CF[Amazon CloudFront]
     end
     
-    subgraph Storage[Storage Services]
-        S3[Amazon S3\nStatic Files & Media]
-    end
-
-    subgraph VPC[Public & Private Subnets - VPC]
+    subgraph VPC[VPC - Multi-AZ Deployment]
         ALB[Application Load Balancer]
         
-        subgraph EKS[Amazon EKS - Fargate]
-            Django1[Django Pod 1]
-            Django2[Django Pod 2]
-            DjangoN[Django Pod N]
-            Worker1[Celery Worker 1]
-            Worker2[Celery Worker 2]
+        subgraph PublicSubnets[Public Subnets]
+            ALB
+            NAT[NAT Gateways]
         end
-        
-        subgraph Data[Data Layer]
-            Redis[(ElastiCache Redis\nSession & Queue)]
-            
-            subgraph Aurora[Amazon Aurora PostgreSQL]
-                Proxy[RDS Proxy]
-                Master[(Primary Writer)]
-                Replica1[(Read Replica 1)]
-                Replica2[(Read Replica 2)]
+
+        subgraph PrivateSubnets[Private Subnets - Compute]
+            subgraph EKS[Amazon EKS Cluster]
+                Django[Django App Pods\nHorizontal Pod Autoscaler]
+                Worker[Celery Workers\nScale by Queue Depth]
+            end
+        end
+
+        subgraph IsolatedSubnets[Isolated Subnets - Data Layer]
+            subgraph Data[Data & Security]
+                Redis[(ElastiCache Redis\nSession & Queue)]
+                RDS[RDS Proxy]
+                
+                subgraph Aurora[Amazon Aurora PostgreSQL]
+                    Master[(Primary Writer)]
+                    Replica[(Read Replicas)]
+                end
+                
+                Sec[AWS Secrets Manager]
+                KMS[AWS KMS\nEncryption Keys]
             end
         end
     end
 
-    User -->|DNS / Routing| R53
-    R53 -->|CDN / Static Request| CF
-    R53 -->|API Request| ALB
-    CF <--> S3
-    ALB --> Django1
-    ALB --> Django2
-    ALB --> DjangoN
+    subgraph Observability[Observability Stack]
+        CW[Amazon CloudWatch]
+        Prom[Prometheus]
+        Graf[Grafana Dashboards]
+        ELK[ELK Stack\nLogging]
+    end
+
+    User -->|HTTPS| WAF
+    WAF --> R53
+    R53 -->|DNS| CF
+    CF --> ALB
     
-    Django1 <--> Redis
-    Django2 <--> Redis
-    DjangoN <--> Redis
+    ALB --> Django
+    Django <--> Redis
+    Django --> RDS
+    Worker --> RDS
+    RDS --> Master
+    Master -.-> Replica
     
-    Redis <--> Worker1
-    Redis <--> Worker2
+    Django --> Sec
+    Sec --> KMS
     
-    Django1 -->|Read & Write| Proxy
-    Django2 -->|Read & Write| Proxy
-    DjangoN -->|Read & Write| Proxy
-    Worker1 -->|Read & Write| Proxy
-    Worker2 -->|Read & Write| Proxy
-    
-    Proxy --> Master
-    
-    Django1 -.->|SQL Report Analytics| Replica1
-    Worker1 -.->|Heavy Read Tasks| Replica2
-    
-    Master -.->|Replication| Replica1
-    Master -.->|Replication| Replica2
-    
-    Worker1 -->|Upload/Download| S3
-    Django1 -->|Pre-signed URL Generates| S3
+    %% Monitoring Flows
+    EKS -.-> CW
+    EKS -.-> Prom
+    Prom --> Graf
+    Django -.-> ELK
 ```
 
 ## Core Infrastructure Components
 
 | Layer | Service | Description | Key Details |
 |---|---|---|---|
-| Compute | **AWS EKS (Kubernetes)** | Handles application scaling and runs Django containers without manual EC2 management. | **Auto-scaling:** Spins up pods during 08:00 AM spikes.<br>**AWS Fargate:** Serverless compute for containers. |
-| Database | **Amazon RDS Multi-AZ + Read Replicas** | The multi-tenant heart of the system supporting intense queries. | **Primary:** Write transactions.<br>**Read Replicas:** 2-3 replicas for Dashboard Analytics.<br>**Aurora PostgreSQL:** Auto-scaling storage without downtime.<br>**RDS Proxy:** Crucial connection pooling for concurrent traffic. |
-| Storage & CDN | **Amazon S3 + CloudFront** | Offloads media and delivers static front-end assets globally. | **S3:** Central lake for biometric photos and PDF slips.<br>**CloudFront (CDN):** Delivers Next.js build caches and media with low latency. |
-| Traffic | **Application Load Balancer (ALB)** | Routes API requests and handles SSL natively. | Distributes traffic evenly to EKS pods and unloads decryption CPU overhead. |
-| Caching & Queue | **ElastiCache (Redis)** | High-concurrency in-memory cache and message broker. | **Session Management:** Stateless authentication (prevents logouts).<br>**Queue (Celery):** Background processing for tax rules and payrolls. |
+| **Security** | **AWS WAF & KMS** | Protects endpoints and encrypts sensitive HR data. | **WAF:** Blocks SQLi/XSS.<br>**KMS/Secrets:** Secure rotation of DB credentials & PII encryption. |
+| **Compute** | **AWS EKS (Fargate)** | Managed Kubernetes for elastic scaling. | **HPA:** Scales pods based on CPU/RAM.<br>**Fargate:** No server management required. |
+| **Database** | **Aurora PostgreSQL** | Multi-AZ database with automatic failover. | **RDS Proxy:** Prevents connection exhaustion during 08:00 AM spikes.<br>**Read Replicas:** Offloads reporting query load. |
+| **Observability** | **Prometheus & Grafana** | Real-time monitoring and alerting. | **CloudWatch:** Infrastructure metrics.<br>**ELK:** Centralized log analysis for audit trails. |
+| **Caching** | **ElastiCache Redis** | High-performance session & queue manager. | **Multi-AZ:** Global session persistence even during AZ failure. |
+| **Storage & CDN**| **S3 + CloudFront** | Secure asset storage and global delivery. | **Lifecycle:** Auto-archive old payslips to Glacier after 6 months. |
 
 ---
 
 ## Data Flow Summary
 
-| Step | Action | Main Service Route | Detailed Operation |
+| Step | Action | Operational Detail |
+|---|---|---|
+| 1 | **Entry & Filter** | Traffic hits **CloudFront** and is filtered by **AWS WAF** to block malicious bots. |
+| 2 | **Routing** | **ALB** forwards traffic to active **EKS Pods** across multiple Availability Zones. |
+| 3 | **Secret Retrieval** | Django retrieves DB credentials from **Secrets Manager** (decrypted via **KMS**) at runtime. |
+| 4 | **Processing** | Django checks **Redis** for sessions; if MISS, it queries **Aurora** via **RDS Proxy**. |
+| 5 | **Async Tasks** | Heavy payroll/PDF tasks are sent to **Redis Queue** and processed by **Celery Workers**. |
+
+---
+
+## Cost-Efficiency & Scaling Roadmap
+
+To ensure the project remains affordable during launch while being "future-proof," we recommend a phased implementation approach.
+
+### Phase 1: MVP (Launch & Early Beta)
+*   **Goal:** Minimize baseline costs and DevOps overhead while verifying core features.
+*   **Compute:** **AWS App Runner** (Highly recommended for Solo Devs; handles Load Balancing/SSL automatically) or ECS Fargate.
+*   **Database:** RDS PostgreSQL Single-AZ (t4g.small instance).
+*   **Networking:** Public Subnets with strict Security Groups (saves $32/mo/AZ for NAT Gateways).
+
+### Phase 2: Growth (Institutional Rollout)
+*   **Goal:** Increase reliability and performance for the first 10k-50k users.
+*   **Compute:** Migrate to EKS (Kubernetes) for unified orchestration.
+*   **Database:** Aurora PostgreSQL (Single Instance or Serverless v2).
+*   **Networking:** Private Subnets + 1 shared NAT Gateway.
+
+### Phase 3: Enterprise Scale (1 Million Users)
+*   **Goal:** Maximum availability, security, and global responsiveness.
+*   **Compute:** EKS with HPA + Multi-AZ Fargate.
+*   **Database:** Aurora Multi-AZ + RDS Proxy + Read Replicas.
+*   **Networking:** Fully isolated subnets + Multi-AZ NAT Gateways.
+*   **Security:** AWS WAF Enforcement + Secrets Manager Automation.
+
+---
+
+## Infrastructure Right-Sizing Comparison
+
+| Service | Phase 1: MVP | Phase 3: Enterprise Scale | Impact on Cost |
 |---|---|---|---|
-| 1 | **User Request** | Route 53 → CloudFront / ALB | Traffic initiates via DNS and routes to CDN (for UI/Static) or ALB (for API queries). |
-| 2 | **API Routing** | ALB → EKS (Django) | ALB balances the HTTP proxies to optimal pods inside the Kubernetes cluster. |
-| 3 | **Optimized Lookups** | Django → Redis & Aurora | Django checks Redis cache first. If void, it hits PostgreSQL exclusively passing through RDS Proxy. |
-| 4 | **Asynchronous Hand-off** | Django → Redis Queue → Celery | Payrolls and heavy operations are pushed to the Queue, immediately freeing up the UI, while Celery crunches tasks. |
-| 5 | **Direct Storage Routing** | Django → S3 | Biometric uploads request signed URLs from Django, then directly upload massive image payloads to S3 bucket edges. |
+| **Cluster Fee** | $0 (App Runner/ECS) | $73 / month (EKS Control Plane) | High |
+| **Networking** | $0 (Public Subnet) | $96+ / month (3x NAT Gateways) | Very High |
+| **Database** | ~$25 / month (RDS t4g.small) | ~$300+ / month (Aurora Multi-AZ) | High |
+| **WAF** | $0 (Disabled) | $20+ / month (Base fee + Requests) | Low |
+| **Baseline Total** | **~$45 - $70 / month** | **~$500 - $800 / month** | **10x Efficiency** |
 
 ---
 
-## Cost Optimization & Efficiency Strategies
+## Operational Excellence & Reliability
 
-| Strategy | Target | Impact & Benefit |
-|---|---|---|
-| **Reserved Instances (RI)** | Aurora DB & Fargate | Committing upfront for 1-3 years yields roughly ~40% discount versus on-demand options. |
-| **S3 Lifecycle Policies** | Amazon S3 & Glacier | Automatically archives old biometric photos and docs (>6 months) to much cheaper Glacier storage retainment. |
-| **AWS Compute Optimizer** | EKS Pods & DB Memory | Intelligent ML evaluation to right-size global architectures, ensuring nothing is wastefully oversized. |
+### Disaster Recovery (DR)
+*   **Target RPO (Recovery Point Objective):** 5 Minutes (Max data loss).
+*   **Target RTO (Recovery Time Objective):** 15 Minutes (Max downtime).
+*   **Backups:** Automated Aurora snapshots replicated to a secondary region.
+
+### Scaling Strategy
+*   **Vertical:** Right-sizing pods via **AWS Compute Optimizer**.
+*   **Horizontal:** **HPA (Horizontal Pod Autoscaler)** doubles pod count 10 minutes before 08:00 AM based on cron-predictive scaling.
+
+### Security Enforcement
+*   **Encryption:** TLS 1.3 for all traffic. AES-256 encryption at rest for RDS and S3.
+*   **Network:** Data layer in **Isolated Subnets** with no egress/ingress to the public internet.
+*   **Audit:** All administrative actions logged to **CloudTrail** and **ELK**.
 
 ---
 
-## Essential Django Backend Libraries Integration
+## Essential Django Integration Libraries
 
-To properly support the cloud infrastructure above, the codebase requires the following critical packages:
+| Library | Purpose |
+|---|---|
+| `django-prometheus` | Exports application metrics to Prometheus for Grafana dashboards. |
+| `boto3` & `django-storages` | Managed S3 integration with IAM Roles (no hardcoded keys). |
+| `django-health-check` | Provides `/health/` probes for EKS Liveness/Readiness. |
+| `django-db-geventpool` | Optimizes connection pooling for high-concurrency environments. |
 
-| Library | Purpose Description | Key Configuration Focus |
-|---|---|---|
-| `boto3` & `django-storages` | Integrates native AWS S3 routing logic for overriding dynamic media files storage locations. | Explicitly mapping `DEFAULT_FILE_STORAGE` and `STATICFILES_STORAGE` via environment constants safely replacing local machine directories. |
-| `django-redis` | Exposes connections allocating Redis nodes as primary cache and robust session framework backends. | Setting core settings variables `SESSION_ENGINE = 'django.contrib.sessions.backends.cache'` alongside establishing internal `CACHES` structures. |
-| `celery` & `redis` | Establishes queue workers ecosystems capable to digest extensive procedures isolated from HTTP web threads. | Establishing explicit `CELERY_BROKER_URL` routing strictly aiming at ElastiCache VPC nodes. |
-| `psycopg2-binary` | Production-grade C wrappers ensuring optimal Postgres server integration pipelines natively. | Setting `DATABASES['default']` blocks explicitly towards `django.db.backends.postgresql` targets bridging RDS Proxy instances. |
-| `gunicorn` / `uvicorn` | WSGI / ASGI runners maximizing scalable concurrent threads capacity safely encapsulated inside worker spaces. | Designing robust CMD instructions within standard Dockerfiles dynamically utilizing variable worker boundaries limits. |
-| `django-health-check` | Yielding internal system heartbeat routes instructing external load balancers and node autoscalers. | Adding `/health/` view sets confirming functional states ensuring no bad or degraded pods operate web transactions internally. |
-| `django-environ` | Structuring secure and strict deployment environment injections parsing dynamically hidden key sets variables accurately. | Unlocking straightforward mapping mechanisms resolving external systems strictly without establishing vulnerable hardcoded configurations layouts. |
-| `django-db-geventpool` | *(Optional module)* Enables pooling algorithms safely inside Django layer threads accommodating intense blocking instances specifically resolving external proxies configurations optimally. | Configured primarily internally inside specialized Gunicorn settings layouts natively serving high density network connections efficiently. |

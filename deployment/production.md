@@ -1,55 +1,91 @@
-# Production Deployment (Enterprise AWS)
+# Production Deployment Guide - AWS Phase 1 (Solo-Dev Simple)
 
-This guide outlines the steps to deploy the harikerja HRMS to the **Production environment** on **AWS**.
+This document provides a simplified, step-by-step guide for a **Solo Developer** to launch the HRMS platform to Production using **AWS App Runner**.
 
-## Environment Details
-- **Domain:** `harikerja.com`
-- **Hosting:** AWS (EKS / RDS / Elasticache).
-- **Purpose:** Official enterprise production environment.
+## Prerequisites
+- Domain: `harikerja.com` (Managed in Route 53).
+- AWS Account with Billing alerts enabled.
+- All code tested and verified in Staging.
 
-## Architecture Overview
+---
 
-At enterprise scale, the platform uses distributed Cloud Native services:
+## Stage 1: The Production Database (RDS)
 
-1. **Load Balancing & Ingress**: 
-   - AWS ALB with Nginx Ingress Controller.
-   - Wildcard SSL via AWS Certificate Manager (ACM).
-2. **Compute Layer**:
-   - Managed Kubernetes (Amazon EKS).
-   - Horizontal Pod Autoscaler (HPA) for Backend and Frontend.
-3. **Database Layer**:
-   - Managed PostgreSQL (Amazon RDS) - Multi-AZ for High Availability.
-   - PgBouncer sidecars for connection pooling.
-4. **Caching**:
-   - Managed Redis (Amazon ElastiCache).
+1.  **Search for "RDS"** in the AWS Console.
+2.  Click **Create database** -> **Standard create** -> **PostgreSQL**.
+3.  **Templates:** Choose **Production** (This enables standard safety features).
+4.  **Settings:**
+    *   DB instance identifier: `hrms-production-db`.
+    *   Master username: `hrmsadmin`.
+    *   Master password: *(Store this securely in AWS Secrets Manager later!)*.
+5.  **Instance configuration:**
+    *   Start with `db.t4g.small` (You can upgrade this later without losing data).
+6.  **Connectivity:**
+    *   Public access: **No**.
+    *   VPC Security Group: Create new, name it `rds-prod-sg`.
+7.  **Maintenance:** Enable automated backups (7 days retention).
 
-## Step 1: Managed Database Provisioning
-1. Provision a PostgreSQL 15 instance via RDS.
-2. Ensure you select "Multi-AZ" for failover.
-3. Create the Database (`hrms`) and Master User.
+---
 
-## Step 2: Environment Configuration
-The platform uses `environments/.env.production`.
-- **Domain:** `TENANT_DOMAIN_SUFFIX=harikerja.com`
-- **Security:** Use AWS Secrets Manager for all sensitive keys.
+## Stage 2: Networking Bridge (VPC Connector)
 
-## Step 3: Deployment Manifests
-Use the provided Helm charts or Kubernetes manifests specifically for the production namespace.
+1.  **Search for "App Runner"** -> **VPC connectors** -> **Create VPC connector**.
+2.  **Name:** `hrms-prod-connector`.
+3.  **VPC:** Select the same VPC as your RDS instance.
+4.  **Security groups:** Select a group that allows outbound traffic.
 
-```bash
-make prod
-```
+> **CRITICAL**: Go to **RDS Security Group** (`rds-prod-sg`) and add an **Inbound Rule** allowing `PostgreSQL (5432)` from the Security Group used in your VPC Connector.
 
-## Step 4: Auto-Scaling
-Implement HPA to handle peak attendance hours:
-```yaml
-minReplicas: 10
-maxReplicas: 100
-targetCPUUtilizationPercentage: 70
-```
+---
 
-## Step 5: CI/CD Pipeline
-All production deployments must go through the automated pipeline after passing:
-1. Logic Coverage (100%).
-2. E2E Playwright tests.
-3. Security scanning.
+## Stage 3: Deploying the Application (App Runner)
+
+### 1. Deploy Frontend
+1.  **Click "Create service"** in App Runner.
+2.  **Source:** Choose **Container registry** -> **Amazon ECR**.
+3.  **Image URI:** Select `hrms-frontend-prod`.
+4.  **Service name:** `hrms-frontend-prod`.
+5.  **Environment variables:** Add variables from `environments/.env.production`.
+6.  Click **Create**.
+
+### 2. Deploy Backend
+Follow the same steps as Frontend but:
+1.  **Service name:** `hrms-backend-prod`.
+2.  **Port:** `8000`.
+3.  **Networking:** Choose **Custom VPC** and select the `hrms-prod-connector`.
+4.  **Environment variables:**
+    *   `DATABASE_URL`: `postgres://hrmsadmin:password@endpoint:5432/postgres`.
+    *   `SECRET_KEY`: Use a unique, long random string.
+
+---
+
+## Stage 4: Domain & SSL Setup
+
+1.  In App Runner (Frontend service) -> **Custom domains** tab -> **Link domain**.
+2.  Enter `harikerja.com`.
+3.  Copy the **CNAME records** to your **Route 53 Hosted Zone**.
+4.  Wait for the status to turn **Active** (usually 30-60 mins).
+
+---
+
+## Stage 5: Production Database Migration
+
+The safest way for a solo dev to run migrations is via a temporary "Public" window:
+
+1.  In RDS Console, temporarily set the DB to **Public access: Yes**.
+2.  In `rds-prod-sg`, allow your **Local IP**.
+3.  Run from your local terminal:
+    ```bash
+    export DATABASE_URL=postgres://hrmsadmin:password@prod-endpoint:5432/postgres
+    python manage.py migrate_schemas --shared
+    python manage.py create_tenant --schema_name=public --name="harikerja" --domain-domain=harikerja.com --is_primary=True
+    ```
+4.  **IMPORTANT**: Set RDS back to **Public access: No** immediately after success.
+
+---
+
+## Scaling for the Future
+- **Horizontal Scaling:** App Runner will automatically add more instances if the CPU usage is high.
+- **Microservices:** If you need more complex routing later, you can migrate from App Runner to **Amazon EKS** as documented in the [AWS High Availability Architecture](../docs/aws_high_availability_architecture.md).
+
+Production is now LIVE. 🚀

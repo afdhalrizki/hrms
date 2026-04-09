@@ -202,6 +202,11 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
+        # Security Headers
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options "nosniff";
+
         # WebSocket support for Next.js Hot Reload (Optional in QA)
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -239,7 +244,50 @@ Change the `listen 80;` port to the standard `443 ssl` (refer to the standard Ce
 
 If all steps are successful, validate from your Browser:
 1. Access `https://qa.harikerja.com` -> It should display the Next.js *Landing Page / Admin Panel Login*.
-2. Access `https://qa.harikerja.com/api/schema/swagger-ui/` -> It should display the Django API documentation without SSL errors.
-3. Create a new tenant in the system, then access `https://<tenantname>.qa.harikerja.com` to ensure the cross-company access protection runs without a 404 (Not Found) in the Next.js *routing*.
+2. Access `https://qa.harikerja.com/api/schema/swagger-ui/` -> It should display the Django API documentation tanpa SSL errors.
+
+---
+
+## Stage 7: Maintenance & Solo-Dev "Health Checks"
+
+Since you are managing this alone, use these commands to keep the server healthy:
+
+### 1. Simple Database Backup
+Run this once a week or before big updates:
+```bash
+docker exec hrms-db-1 pg_dump -U hrms_qa_user hrms_qa > qa_backup_$(date +%F).sql
+```
+
+### 2. Cleaning Disk Space (Docker)
+Docker can eat up your SSD quickly. Run this monthly:
+```bash
+# Remove unused images, containers, and networks
+docker system prune -a --volumes -f
+
+# Check which folders are heavy
+du -sh /var/lib/docker
+```
+
+### 3. Checking Resource Usage
+```bash
+# Live view of container CPU/RAM
+docker stats
+
+# Live view of server system
+htop
+```
+
+---
+
+## Stage 8: Troubleshooting (Cheat Sheet)
+
+| Issue | Likely Cause | Solution |
+|---|---|---|
+| **502 Bad Gateway** | Backend/Frontend container is DOWN. | Run `docker ps` to see if containers are running. If not, `docker compose up -d`. |
+| **403 Forbidden** | Nginx permission or Django CSRF. | Check `CSRF_TRUSTED_ORIGINS` in `.env.local`. |
+| **Disk Full** | Docker logs or build cache. | Run `docker system prune -f`. |
+| **SSL Errors** | Certificate expired or DNS changed. | Run `sudo certbot renew`. |
+
+---
 
 The **QA Deployment to Cloud Server** process is complete. The *Tester* team can begin running test scenarios! 🚀
