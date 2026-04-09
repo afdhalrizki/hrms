@@ -76,7 +76,7 @@ make dev
 | Tier | Domain | Hosting Platform | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `qa.harikerja.web.id` | **IDCloudHost** | Functional UAT and QA testing. |
+| **QA** | `qa.harikerja.web.id` | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing. |
 | **Staging** | `staging.harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
 | **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
 

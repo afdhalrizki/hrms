@@ -1,12 +1,23 @@
-# QA Deployment Guide - Biznet GIO (NEO Lite)
+# QA Deployment Guide - Cloud Providers
 
-This document contains a step-by-step (End-to-End) guide to deploy the harikerja HRMS application to the *QA Environment* using a VPS server from **Biznet GIO (NEO Lite)**.
+This document contains a step-by-step (End-to-End) guide to deploy the harikerja HRMS application to the *QA Environment*. We provide recommendations for three major providers: **Biznet GIO**, **IDCloudHost**, and **Hostinger**.
 
 ## Recommended Server Specifications
-Based on the UAT/QA workload analysis, the following are the required server specifications:
-- **Provider:** Biznet GIO (NEO Lite VPS)
-- **Package:** MM 8.4
-- **Specifications:** 4 vCPU (Dedicated), 8 GB RAM, 60 GB SSD Storage
+
+Based on the UAT/QA workload analysis, the following are the required server specifications for each provider:
+
+| Provider | Recommended Plan | vCPU | RAM | Storage | Performance Tier |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Biznet GIO** | NEO Lite MM 8.4 | 4 | 8 GB | 60 GB SSD | Dedicated CPU (Robust) |
+| **IDCloudHost** | NVMe 5 | 4 | 8 GB | 140 GB NVMe | Extreme NVMe (Fast I/O) |
+| **Hostinger** | KVM 2 | 2 | 8 GB | 100 GB NVMe | Cost-Efficient (Reliable) |
+
+### Provider Specific Notes:
+- **Biznet GIO:** Use the **NEO Lite** series. It offers consistent performance for CPU-intensive Docker build processes.
+- **IDCloudHost:** Use the **Cloud VPS NVMe** series for the best database response times.
+- **Hostinger:** Use the **KVM VPS** series. You can choose the **Ubuntu 24.04** template for the latest security patches.
+
+**General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
 - **QA Domain:** `qa.harikerja.com`
 
@@ -130,7 +141,7 @@ NEXT_PUBLIC_API_URL=https://qa.harikerja.com/api
 
 ## Stage 4: Build and Deploy Process
 
-We will use the primary `docker-compose.yml` because the Biznet NEO Lite MM 8.4 (8GB RAM) specifications are highly capable of handling the resource isolation limits feature.
+We will use the primary `docker-compose.yml` because the recommended specifications (8GB RAM) are highly capable of handling the resource isolation limits feature.
 
 ### 1. Run Built-in Commands (*Makefile* / Script)
 If using the project's built-in *Makefile*:
@@ -231,4 +242,4 @@ If all steps are successful, validate from your Browser:
 2. Access `https://qa.harikerja.com/api/schema/swagger-ui/` -> It should display the Django API documentation without SSL errors.
 3. Create a new tenant in the system, then access `https://<tenantname>.qa.harikerja.com` to ensure the cross-company access protection runs without a 404 (Not Found) in the Next.js *routing*.
 
-The **QA Deployment to Biznet GIO NEO Lite Server** process is complete. The *Tester* team can begin running test scenarios! 🚀
+The **QA Deployment to Cloud Server** process is complete. The *Tester* team can begin running test scenarios! 🚀

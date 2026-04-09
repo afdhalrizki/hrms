@@ -69,7 +69,7 @@ The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 | Tier | API URL / Domain | Purpose |
 | :--- | :--- | :--- |
 | **Dev** | `http://10.0.2.2:8000/api` | Local Development |
-| **QA** | `https://qa.harikerja.web.id/api` | IDCloudHost |
+| **QA** | `https://qa.harikerja.web.id/api` | Biznet / IDCH / Hostinger |
 | **Staging** | `https://staging.harikerja.web.id/api` | AWS Stress Test |
 | **Production** | `https://harikerja.com/api` | AWS Enterprise |
 
