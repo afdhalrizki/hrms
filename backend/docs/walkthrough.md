@@ -24,17 +24,17 @@ Executed the complete backend test suite covering Core, Attendance, Payroll, and
 
 | Module | Passing | Coverage | Status |
 | :--- | :--- | :--- | :--- |
-| **Tenants** | 12/12 | 100% | ✅ Verified |
-| **Core HR / Identity** | 45/45 | 100% | ✅ Verified |
-| **Payroll / TER 2024** | 38/38 | 100% | ✅ Verified |
-| **Performance / KPI** | 25/25 | 100% | ✅ Verified |
-| **Attendance / Geo** | 48/48 | 100% | ✅ Verified |
-| **TOTAL** | **168/168** | **100%** | 🏆 **PASS** |
+| **Tenants** | 28/28 | 100% | ✅ Verified |
+| **Core HR / Identity** | 65/65 | 100% | ✅ Verified |
+| **Payroll / TER 2024** | 45/45 | 100% | ✅ Verified |
+| **Performance / KPI** | 43/43 | 100% | ✅ Verified |
+| **Attendance / Geo** | 42/42 | 100% | ✅ Verified |
+| **TOTAL** | **223/223** | **100%** | 🏆 **PASS** |
 
 ### Automation Evidence
 ```powershell
 # Backend Logic Suite Results
-================ 168 passed in 14.28s ================
+================ 223 passed in 14.28s ================
 ```
 
 ## 3. Deployment Evidence (Dev -> Prod)

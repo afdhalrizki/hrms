@@ -75,14 +75,14 @@ The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 
 ## 🧪 Testing Standard
 
-The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate**.
+The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **106 robust tests**.
 
-### Unit & Logic Tests
+### Unit & Logic Tests - 91 Tests
 ```powershell
 pwsh .\run_unit_tests.ps1
 ```
 
-### End-to-End Testing (E2E)
+### End-to-End Testing (E2E) - 15 Tests
 ```powershell
 pwsh .\run_e2e_tests.ps1
 ```

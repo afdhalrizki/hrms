@@ -62,8 +62,8 @@ The mobile application is synchronized with the harikerja 4-tier environment hie
 - Live payslip history fetching with native PDF support and TER 2024 compliance.
 
 ### Phase M6-M7: Quality Assurance & Hardening (DONE)
-- 100% Pass Rate (24/24 Logic Tests) against live backend.
-- Verified E2E flow (Login -> Dashboard -> Attendance -> Logout).
+- 100% Pass Rate (91/91 Unit & Logic Tests) against live backend.
+- 100% Pass Rate (15/15 E2E Flow Scenarios).
 - JWT Refresh token flow and transparent 401 interceptor.
 
 **Status**: ✅ **COMPLETED**. The mobile application is now in full synchronization with the harikerja stack.

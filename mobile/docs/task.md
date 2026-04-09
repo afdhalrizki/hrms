@@ -33,7 +33,7 @@ This roadmap documents the evolution of the **harikerja HRMS** mobile applicatio
     - [x] Update Backend unit tests for `/api/auth/` URL changes.
     - [x] Re-verify Mobile logic tests (`api_service_test.dart`).
     - [x] Add Backend test for `/api/auth/token/refresh/`.
-    - [x] Final 100% test pass verification (168 combined tests).
+    - [x] Final 100% test pass verification (106 mobile tests).
 - [x] **M9: Frontend JWT Hardening**
     - [x] Implement `localStorage` persistence in `AuthContext.tsx`.
     - [x] Add transparent `401` refresh interceptor in `lib/api.ts`.
@@ -46,6 +46,6 @@ This roadmap documents the evolution of the **harikerja HRMS** mobile applicatio
     - [x] Seed `company1` tenant with consistent master data (admin=1).
     - [x] Synchronize `ApiService.dart` endpoints (e.g., `/schedules/`).
     - [x] Add `is_late` derived field calculation to `AttendanceSerializer`.
-    - [x] Verify 100% pass rate for mobile ESS logic suite (24/24 passing).
+    - [x] Verify 100% pass rate for mobile ESS logic suite (106 tests total).
 
 **Final Result**: ✅ All phases 100% completed and verified against the live backend infrastructure.

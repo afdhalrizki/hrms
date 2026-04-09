@@ -18,15 +18,15 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 ## 🖼 UI Previews
 
 ### Admin Dashboard
-![Dashboard Preview](./docs/assets/dashboard_preview.png)
+![Dashboard Preview](../docs/assets/dashboard_preview.png)
 *Modern, glassmorphism-based dashboard with real-time analytics indicators.*
 
 ### Premium Signup
-![Signup Preview](./docs/assets/signup_page_premium_harikerja.png)
+![Signup Preview](../docs/assets/signup_page_premium_harikerja.png)
 *Seamless tenant onboarding with instant domain validation.*
 
 ### Admin Provisioning
-![Provisioning Preview](./docs/assets/add_employee_modal_before_submit_1773638661925.png)
+![Provisioning Preview](../docs/assets/add_employee_modal_before_submit_1773638661925.png)
 *Employee creation form integrated securely with organizational RBAC toggles.*
 
 ## 🛠 Tech Stack
@@ -75,14 +75,14 @@ The harikerja platform follows a strict 4-tier promotion path:
 
 ## 🧪 Testing Standard
 
-The frontend uses a dual-layer strategy with **100% pass rate** across all scenarios.
+The frontend uses a dual-layer strategy with **100% pass rate** across **178 mission-critical tests**.
 
-### Unit Testing (Vitest)
+### Unit Testing (Vitest) - 144 Tests
 ```powershell
 .\run_unit_tests.ps1
 ```
 
-### End-to-End Testing (Playwright)
+### End-to-End Testing (Playwright) - 34 Tests
 ```powershell
 .\run_e2e_tests.ps1
 ```

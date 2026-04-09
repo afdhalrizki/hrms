@@ -19,8 +19,8 @@ This roadmap documents the UX and architectural evolution of the **harikerja HRM
     - [x] Multi-stage approval cycles for ESS requests (Leave, Overtime, Reimb).
     - [x] `FeatureGuard` component for subscription-based feature gating.
 - [x] **Phase F6: Quality Assurance & Automation**
-    - [x] 100% Vitest Unit Test coverage (60+ tests).
-    - [x] 100% Playwright E2E Pass Rate (25/25 scenarios).
+    - [x] 100% Vitest Unit Test coverage (144 tests).
+    - [x] 100% Playwright E2E Pass Rate (34/34 scenarios).
 - [x] **Phase F7: Deployment & Optimization**
     - [x] 4-Tier Environment Hierarchy (Dev, QA, Staging, Production).
     - [x] Fully automated `run_dev.ps1` and `run_e2e_tests.ps1` orchestration scripts.

@@ -23,21 +23,23 @@ The frontend achieves 100% reliability through exhaustive unit logic tests and a
 
 | Module | Unit Status (Vitest) | E2E Status (Playwright) | Status |
 | :--- | :--- | :--- | :--- |
-| **Auth & Tenant** | 12/12 ✅ | 4/4 ✅ | ✅ Verified |
-| **ESS Profile** | 15/15 ✅ | 5/5 ✅ | ✅ Verified |
+| **Auth & Security** | 15/15 ✅ | 5/5 ✅ | ✅ Verified |
+| **ESS Profile** | 12/12 ✅ | 5/5 ✅ | ✅ Verified |
 | **Attendance** | 10/10 ✅ | 4/4 ✅ | ✅ Verified |
 | **Performance** | 12/12 ✅ | 4/4 ✅ | ✅ Verified |
 | **Payroll** | 12/12 ✅ | 8/8 ✅ | ✅ Verified |
-| **TOTAL** | **61/61** | **25/25** | 🏆 **PASS** |
+| **Core Admin** | 30/30 ✅ | 8/8 ✅ | ✅ Verified |
+| **Integrations/Misc**| 53/53 ✅ | 0/0 ✅ | ✅ Verified |
+| **TOTAL** | **144/144** | **34/34** | 🏆 **PASS** |
 
 ### Automation Evidence
 ```powershell
 # Frontend E2E Results
-25 passed (1m 12s)
+34 passed (2m 36s)
 
 # Frontend Vitest Results
-Test Files  18 passed (18)
-Tests       61 passed (61)
+Test Files  27 passed (27)
+Tests       144 passed (144)
 ```
 
 ## 3. Production Readiness

@@ -15,6 +15,25 @@ A next-generation, multi-tenant Human Resource Management System (HRMS) built fo
 </p>
 *Biometric face verification and real-time ESS (Employee Self-Service) for modern workforces.*
 
+### 🛠️ Admin & Operations
+![Admin Registrations](./docs/assets/admin_registrations.png)
+*Streamlined tenant onboarding and organizational provisioning.*
+
+### 📅 Advanced Scheduling
+![Shift Management](./docs/assets/shift_management.png)
+*Interactive shift planning and calendar-based workforce orchestration.*
+
+### 💸 Financial Workflows
+![Reimbursement UI](./docs/assets/reimbursement_ui.png)
+*Multi-stage approval lifecycle for expense claims and reimbursements.*
+
+### 💳 Commercial Readiness
+<p align="center">
+  <img src="./docs/assets/pricing_tiers_ui.png" width="45%" />
+  <img src="./docs/assets/subscription_expired_ui.png" width="45%" />
+</p>
+*Tiered SaaS provisioning and intelligent subscription gating.*
+
 ## 📦 Getting Started
 
 Unified scripts to manage **Development**, **Staging**, and **Production** environments seamlessly.
@@ -33,6 +52,7 @@ make dev
 - **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
 - **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
 - **Backend API Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
+![Swagger UI](./docs/assets/swagger_ui.png)
 
 ## 📁 Project Modules
 
@@ -64,9 +84,9 @@ make dev
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 168 Logic tests (Pytest).
-- **Frontend**: 61 Unit tests (Vitest) + 25 E2E tests (Playwright).
-- **Mobile**: 25 Logic tests verified against a live backend.
+- **Backend**: 223 Mission-critical logic and E2E tests (Pytest).
+- **Frontend**: 178 Comprehensive unit and E2E tests (Vitest + Playwright).
+- **Mobile**: 106 Robust logic and integration tests (Flutter).
 
 ## 🎯 IMMEDIATE PRIORITIES (Current Focus)
 
@@ -125,8 +145,8 @@ For in-depth technical details, please refer to the platform-wide internal docum
 
 ## 🛠 Tech Stack
 
-- **Backend**: Python 3.12+, Django 6.0, Django-Tenants, DRF.
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion.
+- **Backend**: Python 3.12+, Django 5.2, Django-Tenants, DRF.
+- **Frontend**: Next.js 16 (App Router), TypeScript, Tailwind CSS, Framer Motion.
 - **Mobile**: Flutter 3.19+, Dart, Google ML Kit (Biometrics).
 - **Infrastructure**: PostgreSQL 15, Redis 7, PgBouncer, AWS (EKS/RDS/S3).
 

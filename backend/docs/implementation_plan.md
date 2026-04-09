@@ -16,7 +16,7 @@ The system employs a shared-database, separate-schema architecture for optimal i
     - `performance.*`: KPI strategies and appraisal review lifecycles.
 
 ## 🛠 2. Technical Stack & Standards
-- **Framework**: Django 5.2.12 + Django Rest Framework (DRF).
+- **Framework**: Django 5.2 + Django Rest Framework (DRF).
 - **Database**: PostgreSQL 14+ with `django-tenants`.
 - **API Standards**: RESTful principles, JSON-API compatible, OpenAPI 3.0 (Spectacular).
 - **Authentication**: Dual-mode supporting Session (Web) and JWT Rotation (Mobile).
@@ -56,7 +56,7 @@ The backend is synchronized with the harikerja 4-tier environment hierarchy:
 
 ## 🚀 5. Software Lifecycle
 - **Migrations**: `migrate_schemas --shared` followed by `--tenant` to ensure consistency.
-- **Testing**: 100% logic coverage with `pytest` (168+ mission-critical scenarios).
+- **Testing**: 100% logic coverage with `pytest` (223 mission-critical scenarios).
 - **API Documentation**: Automated OpenAPI 3.0 generation via `drf-spectacular`.
 
 ## ✅ 6. Roadmap Completion Summary
@@ -77,7 +77,7 @@ The backend is synchronized with the harikerja 4-tier environment hierarchy:
 
 ### Phase B5: Authentication & Hardening (DONE)
 - Unified `/api/auth/` namespace and JWT rotation for mobile session security.
-- 100% Logic Pass Rate verified (168/168 tests).
+- 100% Logic Pass Rate verified (223/223 tests).
 
 **Status**: ✅ **COMPLETED**. The backend core is fully hardened and synchronized.
 
