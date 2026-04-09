@@ -9,13 +9,13 @@ param (
 )
 
 # 1. Environment File Selection
-$env_file = "environments/.env.local"
+$env_file = "deploy/environments/.env.local"
 if ($env_name -eq "qa") {
-    $env_file = "environments/.env.qa"
+    $env_file = "deploy/environments/.env.qa"
 } elseif ($env_name -eq "staging") {
-    $env_file = "environments/.env.staging"
+    $env_file = "deploy/environments/.env.staging"
 } elseif ($env_name -eq "prod") {
-    $env_file = "environments/.env.production"
+    $env_file = "deploy/environments/.env.production"
 }
 
 # 2. Handle 'down'

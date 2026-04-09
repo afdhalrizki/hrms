@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   /* Directory for artifacts like screenshots and traces. */
-  outputDir: './logs/test-results',
+  outputDir: './e2e/test-results',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -20,10 +20,10 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],
-    ['html', { open: 'never', outputFolder: './logs/playwright-report' }],
+    ['html', { open: 'never', outputFolder: './e2e/report' }],
     ['monocart-reporter', {
       name: 'HRMS Frontend E2E Coverage Report',
-      outputFile: './e2e/frontend/coverage/index.html',
+      outputFile: './e2e/coverage/index.html',
       coverage: {
         entryFilter: (entry: any) => entry.url.includes('_next/static') && !entry.url.includes('vendor'),
         sourceFilter: (sourcePath: string) => sourcePath.includes('src') && !sourcePath.includes('node_modules'),

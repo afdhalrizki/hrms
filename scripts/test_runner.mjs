@@ -36,7 +36,7 @@ async function startBackendRunserver() {
   }
 
   log("[Backend] Starting run_dev.mjs (with Coverage collection) in background process...", COLORS.green);
-  BackendServerProcess = spawnBackground('node', [join(backendDir, 'run_dev.mjs'), '--coverage'], { 
+  BackendServerProcess = spawnBackground('node', [join(backendDir, 'scripts/run_dev.mjs'), '--coverage'], { 
     cwd: backendDir,
     logFile: join(LogDir, 'backend_server_bg.log')
   });
@@ -103,16 +103,16 @@ async function main() {
       process.exit(1);
     }
 
-    const dockerResult = await spawnStream('node', [join(RootDir, 'backend/run_unit_tests.mjs'), '--docker-only', '--reset-docker'], { cwd: join(RootDir, 'backend') });
+    const dockerResult = await spawnStream('node', [join(RootDir, 'backend/scripts/run_unit_tests.mjs'), '--docker-only', '--reset-docker'], { cwd: join(RootDir, 'backend') });
     if (dockerResult !== 0) {
        log("⚠️ Initial Docker setup failed; retrying without reset...", COLORS.yellow);
-       await spawnStream('node', [join(RootDir, 'backend/run_unit_tests.mjs'), '--docker-only'], { cwd: join(RootDir, 'backend') });
+       await spawnStream('node', [join(RootDir, 'backend/scripts/run_unit_tests.mjs'), '--docker-only'], { cwd: join(RootDir, 'backend') });
     }
 
     // 2. Start Backend Server (for E2E)
     if (!skipE2E) {
       log("🚀 Preparing backend infrastructure (migrations/deps)...", COLORS.yellow);
-      const initCode = await spawnStream('node', [join(RootDir, 'backend/run_dev.mjs'), '--no-server'], { cwd: join(RootDir, 'backend') });
+      const initCode = await spawnStream('node', [join(RootDir, 'backend/scripts/run_dev.mjs'), '--no-server'], { cwd: join(RootDir, 'backend') });
       if (initCode !== 0) {
         log("⚠️ Backend initialization failed. E2E might fail.", COLORS.red);
         allPassed = false;
@@ -133,9 +133,9 @@ async function main() {
     }
 
     const suites = [
-      { name: "Backend Stack", path: "backend/run_tests.mjs" },
-      { name: "Frontend Stack", path: "frontend/run_tests.mjs" },
-      { name: "Mobile Stack", path: "mobile/run_tests.mjs" }
+      { name: "Backend Stack", path: "backend/scripts/run_tests.mjs" },
+      { name: "Frontend Stack", path: "frontend/scripts/run_tests.mjs" },
+      { name: "Mobile Stack", path: "mobile/scripts/run_tests.mjs" }
     ];
 
     const results = [];
@@ -222,10 +222,10 @@ async function main() {
     }
 
     // Post-Processing Coverage (triggering the existing PS script)
-    const coverageScript = join(RootDir, 'backend/report_e2e_coverage.ps1');
+    const coverageScript = join(RootDir, 'backend/scripts/report_e2e_coverage.ps1');
     if (existsSync(coverageScript)) {
        log("\n📊 Post-Processing Coverage Data...", COLORS.cyan);
-       await spawnStream('pwsh', ['-NoProfile', '-NoLogo', '-Command', `cd '${join(RootDir, 'backend')}'; ./report_e2e_coverage.ps1`], { cwd: join(RootDir, 'backend') });
+       await spawnStream('pwsh', ['-NoProfile', '-NoLogo', '-Command', `cd '${join(RootDir, 'backend/scripts')}'; ./report_e2e_coverage.ps1`], { cwd: join(RootDir, 'backend/scripts') });
     }
 
     if (!allPassed) {

@@ -20,10 +20,10 @@ async function main() {
   const logs = args.includes('--logs') || args.includes('logs');
   const build = args.includes('--build') || args.includes('build');
 
-  let envFile = "environments/.env.local";
-  if (envName === "qa") envFile = "environments/.env.qa";
-  else if (envName === "staging") envFile = "environments/.env.staging";
-  else if (envName === "prod") envFile = "environments/.env.production";
+  let envFile = "deploy/environments/.env.local";
+  if (envName === "qa") envFile = "deploy/environments/.env.qa";
+  else if (envName === "staging") envFile = "deploy/environments/.env.staging";
+  else if (envName === "prod") envFile = "deploy/environments/.env.production";
 
   const envPath = join(RootDir, envFile);
   if (!existsSync(envPath)) {

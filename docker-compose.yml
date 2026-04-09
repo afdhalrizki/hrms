@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:15-alpine
     env_file:
-      - ./environments/.env.local
+      - ./deploy/environments/.env.local
     ports:
       - "5432:5432"
     volumes:
@@ -39,7 +39,7 @@ services:
   pgbouncer:
     image: brainsam/pgbouncer:latest
     env_file:
-      - ./environments/.env.local
+      - ./deploy/environments/.env.local
     ports:
       - "6432:6432"
     depends_on:
@@ -61,7 +61,7 @@ services:
     volumes:
       - ./backend:/app
     env_file:
-      - ./environments/.env.local
+      - ./deploy/environments/.env.local
     depends_on:
       db:
         condition: service_healthy

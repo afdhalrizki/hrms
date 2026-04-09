@@ -308,7 +308,7 @@ export async function saveDockerLogs(suffix, logDir, rootDir) {
   const timestamp = getTimestamp();
   const cleanSuffix = suffix.replace(/[^a-z0-9]/gi, '_');
   const outFile = join(logDir, `docker_compose_logs_${cleanSuffix}_${timestamp}.log`);
-  const envFile = join(rootDir, 'environments', '.env.local');
+  const envFile = join(rootDir, 'deploy', 'environments', '.env.local');
 
   log(`📦 Capturing docker compose logs to ${outFile}`, COLORS.yellow);
   try {

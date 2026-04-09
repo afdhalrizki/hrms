@@ -40,6 +40,10 @@ Unified scripts to manage **Development**, **Staging**, and **Production** envir
 
 ### Windows (PowerShell)
 ```powershell
+# 1. Setup SDK Environments (Flutter, JDK, Android Tools)
+.\scripts\setup_envs.ps1
+
+# 2. Start the platform
 .\up.ps1 dev -build
 ```
 

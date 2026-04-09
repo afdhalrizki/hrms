@@ -112,10 +112,9 @@ mobile/ios/ServiceDefinitions.json
 **/data/db/
 
 # Tools (SDKs & Portables) - Large Binaries
-tools/android-sdk/
-tools/android-temp/
-tools/flutter/
-tools/jdk17/
+# Ignore all subdirectories in tools/ except for documentation
+tools/*/
+!tools/README.md
 tools/*.zip
 tools/*.7z
 tools/*.tar.gz
@@ -124,4 +123,7 @@ tools/*.tar.gz
 *-failure.png
 
 # E2E Reports & Coverage
-/e2e/
+**/e2e/coverage/
+**/e2e/test-results/
+**/e2e/report/
+**/e2e/logs/

@@ -126,13 +126,13 @@ To ensure the project remains affordable during launch while being "future-proof
 
 ## Infrastructure Right-Sizing Comparison
 
-| Service | Phase 1: MVP | Phase 3: Enterprise Scale | Impact on Cost |
-|---|---|---|---|
-| **Cluster Fee** | $0 (App Runner/ECS) | $73 / month (EKS Control Plane) | High |
-| **Networking** | $0 (Public Subnet) | $96+ / month (3x NAT Gateways) | Very High |
-| **Database** | ~$25 / month (RDS t4g.small) | ~$300+ / month (Aurora Multi-AZ) | High |
-| **WAF** | $0 (Disabled) | $20+ / month (Base fee + Requests) | Low |
-| **Baseline Total** | **~$45 - $70 / month** | **~$500 - $800 / month** | **10x Efficiency** |
+| Service | Phase 1: MVP | Phase 2: Growth | Phase 3: Scale | Impact on Cost |
+|---|---|---|---|---|
+| **Cluster Fee** | $0 (App Runner/ECS) | $73 / month (EKS) | $73 / month (EKS) | Medium |
+| **Networking** | $0 (Public Subnet) | ~$32 / month (1x NAT) | $96+ / month (3x NAT) | Very High |
+| **Database** | ~$25 / month (RDS) | ~$60 / month (Aurora v2) | ~$300+ / month (Aurora HA) | High |
+| **WAF** | $0 (Disabled) | ~$10 / month (Basic) | $20+ / month (Enterprise) | Low |
+| **Baseline Total** | **~$45 - $70 / month** | **~$175 - $220 / month** | **~$500 - $800 / month** | **Scalable** |
 
 ---
 

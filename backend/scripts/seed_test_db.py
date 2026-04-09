@@ -8,7 +8,7 @@ BACKEND_DIR = SCRIPT_DIR.parent
 ROOT_DIR = BACKEND_DIR.parent
 
 # 2. Load environment variables from the root environments folder
-env_path = ROOT_DIR / 'environments' / '.env.local'
+env_path = ROOT_DIR / 'deploy' / 'environments' / '.env.local'
 load_dotenv(env_path)
 
 # 3. Add backend directory to sys.path so 'config.settings' can be found

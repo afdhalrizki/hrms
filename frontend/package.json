@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "start:backend:test": "pwsh -Command \"Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; pwsh ../backend/run_dev.ps1 -Seed -Coverage\""
+    "start:backend:test": "pwsh -Command \"Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; pwsh ../backend/scripts/run_dev.ps1 -Seed -Coverage\""
   },
   "dependencies": {
     "clsx": "^2.1.1",
