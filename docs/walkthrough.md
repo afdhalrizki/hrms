@@ -1,6 +1,6 @@
 # Walkthrough: harikerja HRMS (Fullstack & Mobile)
 
-A premium, high-performance HRMS ecosystem with a robust Multi-Tenant Backend, a glassmorphism Next.js 14 Frontend, and a biometric-enabled Flutter Mobile app.
+A premium, high-performance HRMS ecosystem with a robust Multi-Tenant Backend, a glassmorphism Next.js 16 Frontend, and a biometric-enabled Flutter Mobile app.
 
 ## 🖥️ Backend Infrastructure (Core)
 
