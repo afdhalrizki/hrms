@@ -60,7 +60,7 @@ async function stopBackendRunserver() {
 async function ensureBackendServerReady(maxAttempts = 3, waitSeconds = 240) {
   let attempt = 0;
   while (attempt < maxAttempts) {
-    const ready = await waitForHttp("http://localhost:8000/api/", 5000, 'backend-check');
+    const ready = await waitForHttp("http://localhost:8000/api/", 30000, 'backend-check');
     if (ready) {
       log("✅ Backend server is healthy.", COLORS.green);
       return true;

@@ -81,7 +81,8 @@ async function main() {
   if (!noSeed) {
     log("Seeding test database...", COLORS.yellow);
     const isWin = process.platform === 'win32';
-    const pythonPath = isWin ? join(BackendDir, 'venv', 'Scripts', 'python.exe') : join(BackendDir, 'venv', 'bin', 'python');
+    const venvPath = isWin ? join(BackendDir, 'venv', 'Scripts', 'python.exe') : join(BackendDir, 'venv', 'bin', 'python');
+    const pythonPath = existsSync(venvPath) ? venvPath : 'python';
     
     const seedResult = await spawnStream(pythonPath, [join('scripts', 'seed_test_db.py')], { cwd: BackendDir });
     if (seedResult !== 0) {
@@ -94,7 +95,8 @@ async function main() {
   }
 
   const isWin = process.platform === 'win32';
-  const pythonPath = isWin ? join(BackendDir, 'venv', 'Scripts', 'python.exe') : join(BackendDir, 'venv', 'bin', 'python');
+  const venvPath = isWin ? join(BackendDir, 'venv', 'Scripts', 'python.exe') : join(BackendDir, 'venv', 'bin', 'python');
+  const pythonPath = existsSync(venvPath) ? venvPath : 'python';
 
   const pytestArgs = ['-m', 'e2e', 'tests_e2e/', '--color=yes', '--maxfail=1', '--durations=20', '--reuse-db'];
   if (workers > 1) {

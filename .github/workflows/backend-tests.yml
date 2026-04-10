@@ -48,28 +48,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
+      - name: Install Backend Python dependencies
         working-directory: backend
         run: |
           python -m pip install -U pip
           pip install -r requirements.txt
 
-      - name: Run unit tests
-        working-directory: backend
+      - name: Create environment file
         run: |
-          python -m pytest -q
+          mkdir -p deploy/environments
+          cat <<EOF > deploy/environments/.env.local
+          DB_NAME=hrms
+          DB_USER=postgres
+          DB_PASSWORD=postgres
+          DB_HOST=localhost
+          DB_PORT=5432
+          REDIS_URL=redis://localhost:6379/1
+          SECRET_KEY=django-insecure-test-key-for-ci
+          DEBUG=True
+          DATABASE_URL=postgres://postgres:postgres@localhost:5432/hrms
+          EOF
 
-      - name: Run E2E tests
-        working-directory: backend
+      - name: Run Backend Tests
+        env:
+          CI: "true"
+          DB_PASSWORD: postgres
         run: |
-          # Pastikan server backend aktif jika diperlukan (misal via docker compose)
-          # Atau jika e2e sudah pakai pytest marker dan fixture yang bisa in-memory
-          python -m pytest -q tests_e2e
+          node backend/scripts/run_tests.mjs --skip-docker
 
       - name: Check for recurrent date-collision marker
         run: |

@@ -11,6 +11,7 @@ async function main() {
   const skipUnit = args.includes('--skip-unit');
   const dockerOnly = args.includes('--docker-only');
   const resetDocker = args.includes('--reset-docker');
+  const skipDocker = args.includes('--skip-docker');
 
   log("========================================", COLORS.cyan);
   log("🏆 HARIKERJA BACKEND TEST ORCHESTRATOR", COLORS.cyan);
@@ -30,6 +31,7 @@ async function main() {
     const unitArgs = [];
     if (dockerOnly) unitArgs.push('--docker-only');
     if (resetDocker) unitArgs.push('--reset-docker');
+    if (skipDocker) unitArgs.push('--skip-docker');
     
     const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_unit_tests.mjs'), ...unitArgs], { 
       cwd: BackendDir, 
@@ -46,7 +48,10 @@ async function main() {
   // 2. Run E2E Tests
   if (allPassed && !skipE2E && !dockerOnly) {
     log("\n🌐 [2/2] Running E2E Tests (Pytest)...", COLORS.yellow);
-    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_e2e_tests.mjs')], { 
+    const e2eArgs = [];
+    if (skipDocker) e2eArgs.push('--skip-docker');
+    
+    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_e2e_tests.mjs'), ...e2eArgs], { 
       cwd: BackendDir, 
       logFile: masterLogFile 
     });

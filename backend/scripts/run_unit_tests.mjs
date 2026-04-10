@@ -14,50 +14,74 @@ async function main() {
   const args = process.argv.slice(2);
   const dockerOnly = args.includes('--docker-only');
   const resetDocker = args.includes('--reset-docker');
-  const pytestArgs = args.filter(a => !a.startsWith('--docker-only') && !a.startsWith('--reset-docker'));
+  const skipDocker = args.includes('--skip-docker');
+  const pytestArgs = args.filter(a => !['--docker-only', '--reset-docker', '--skip-docker'].includes(a));
 
   log("--- HRMS Backend Test Environment Setup (Node.js) ---", COLORS.cyan);
 
   // 1. Env Check
   if (!existsSync(EnvFile)) {
-    log(`❌ ERROR: Environment file not found at ${EnvFile}`, COLORS.red);
-    process.exit(1);
+    log(`⚠️ WARNING: Environment file not found at ${EnvFile}`, COLORS.yellow);
+    if (!process.env.DB_PASSWORD) {
+       log("❌ ERROR: Required environment variables (e.g. DB_PASSWORD) are not set and .env.local is missing.", COLORS.red);
+       process.exit(1);
+    }
+    log("Continuing with existing environment variables...", COLORS.gray);
+  } else {
+    log("Loading environment variables from .env.local...", COLORS.gray);
+    const envContent = readFileSync(EnvFile, 'utf8');
+    envContent.split(/\r?\n/).forEach(line => {
+      const m = line.match(/^([^#=]+)=(.*)$/);
+      if (m) process.env[m[1].trim()] = m[2].trim();
+    });
   }
 
   // 2. Docker Setup
-  log("[1/3] Ensuring Docker services are running...", COLORS.yellow);
-  
-  if (!(await ensureDockerRunning())) {
-    process.exit(1);
-  }
+  if (skipDocker) {
+    log("[1/3] Skipping Docker setup (--skip-docker detected).", COLORS.yellow);
+  } else {
+    log("[1/3] Ensuring Docker services are running...", COLORS.yellow);
+    
+    if (!(await ensureDockerRunning())) {
+      process.exit(1);
+    }
 
-  const composeCmd = await getDockerComposeCommand();
-  if (!composeCmd) {
-    log("❌ ERROR: Neither docker-compose nor docker compose found.", COLORS.red);
-    process.exit(1);
-  }
+    const composeCmd = await getDockerComposeCommand();
+    if (!composeCmd) {
+      log("❌ ERROR: Neither docker-compose nor docker compose found.", COLORS.red);
+      process.exit(1);
+    }
 
-  if (resetDocker) {
-    log("[Docker] Reset requested: packing down and re-creating containers...", COLORS.cyan);
-    await spawnStream(composeCmd, ['--env-file', EnvFile, 'down', '--remove-orphans']);
-  }
+    if (resetDocker) {
+      log("[Docker] Reset requested: packing down and re-creating containers...", COLORS.cyan);
+      await spawnStream(composeCmd, ['--env-file', EnvFile, 'down', '--remove-orphans']);
+    }
 
-  await spawnStream(composeCmd, ['--env-file', EnvFile, 'up', '-d', 'db', 'redis', 'pgbouncer']);
+    await spawnStream(composeCmd, ['--env-file', EnvFile, 'up', '-d', 'db', 'redis', 'pgbouncer']);
+  }
 
   // 3. Env Vars & DB Health
-  log("[2/3] Loading environment variables and checking DB...", COLORS.yellow);
-  // Source env for this process
-  const envContent = readFileSync(EnvFile, 'utf8');
-  envContent.split(/\r?\n/).forEach(line => {
-    const m = line.match(/^([^#=]+)=(.*)$/);
-    if (m) process.env[m[1].trim()] = m[2].trim();
-  });
-  // Overrides for local native run
-  process.env.DB_HOST = "127.0.0.1";
-  process.env.REDIS_URL = "redis://localhost:6379/1";
-  process.env.DATABASE_URL = "postgres://hrms_user:hrms_password@localhost:6432/hrms";
+  log("[2/3] Checking DB health...", COLORS.yellow);
+  // Overrides for local native run (ensure we talk to host ports, not container names)
+  if (process.env.DB_HOST === "db") process.env.DB_HOST = "127.0.0.1";
+  if (!process.env.DB_HOST) process.env.DB_HOST = "127.0.0.1";
 
-  log("Waiting for database to be ready on localhost:5432...", COLORS.gray);
+  if (process.env.REDIS_URL?.includes("://redis:")) {
+    process.env.REDIS_URL = process.env.REDIS_URL.replace("://redis:", "://localhost:");
+  }
+  if (!process.env.REDIS_URL) process.env.REDIS_URL = "redis://localhost:6379/1";
+
+  if (process.env.DATABASE_URL?.includes("@pgbouncer:")) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL.replace("@pgbouncer:", "@localhost:");
+  }
+  if (process.env.DATABASE_URL?.includes("@db:")) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL.replace("@db:", "@localhost:");
+  }
+  if (!process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = "postgres://hrms_user:hrms_password@localhost:6432/hrms";
+  }
+
+  log(`Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:5432...`, COLORS.gray);
   const dbReady = await waitForPort(5432);
   if (!dbReady) {
     log("\n❌ ERROR: Database did not become ready in time.", COLORS.red);
@@ -65,14 +89,22 @@ async function main() {
   }
   log("Database is ready!", COLORS.green);
 
-  // 4. Venv & Pytest detection
-  log("[3/3] Checking pytest in virtual environment...", COLORS.yellow);
+  // 4. Pytest detection
+  log("[3/3] Checking pytest and python path...", COLORS.yellow);
   const isWin = process.platform === 'win32';
-  const pythonPath = isWin ? join(BackendDir, 'venv', 'Scripts', 'python.exe') : join(BackendDir, 'venv', 'bin', 'python');
+  const venvPath = isWin ? join(BackendDir, 'venv', 'Scripts', 'python.exe') : join(BackendDir, 'venv', 'bin', 'python');
+  const pythonPath = existsSync(venvPath) ? venvPath : 'python';
   
-  if (!existsSync(pythonPath)) {
-    log(`❌ ERROR: python not found in venv. Please ensure venv is setup.`, COLORS.red);
-    process.exit(1);
+  log(`Using python from: ${pythonPath}`, COLORS.gray);
+  
+  if (pythonPath === 'python') {
+     // Verify it works
+     try {
+       await spawnStream('python', ['--version'], { stdio: 'ignore' });
+     } catch (e) {
+       log("❌ ERROR: python not found in venv and system python is missing.", COLORS.red);
+       process.exit(1);
+     }
   }
 
   if (dockerOnly) {
