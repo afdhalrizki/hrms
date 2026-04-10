@@ -20,32 +20,32 @@ $LogFile = Join-Path $LogDir ("master_test_{0}.log" -f (Get-Date -Format 'yyyyMM
 Start-Transcript -Path $LogFile -Append
 try {
     Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "🏆 HARIKERJA MOBILE TEST ORCHESTRATOR" -ForegroundColor Cyan
+    Write-Host "[MOBILE] HARIKERJA MOBILE TEST ORCHESTRATOR" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
 
 $allPassed = $true
 
 # 1. Run Unit Tests (Flutter)
 if (-not $SkipUnit) {
-    Write-Host "`n🧪 [1/2] Running Unit Tests (Flutter)..." -ForegroundColor Yellow
+    Write-Host "`n[1/2] Running Unit Tests (Flutter)..." -ForegroundColor Yellow
     & ".\scripts\run_unit_tests.ps1"
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "❌ Unit Tests Failed." -ForegroundColor Red
+        Write-Host "[FAIL] Unit Tests Failed." -ForegroundColor Red
         $allPassed = $false
     } else {
-        Write-Host "✅ Unit Tests Passed." -ForegroundColor Green
+        Write-Host "[PASS] Unit Tests Passed." -ForegroundColor Green
     }
 }
 
 # 2. Run E2E Tests (Flutter)
 if ($allPassed -and -not $SkipE2E) {
-    Write-Host "`n🌐 [2/2] Running E2E Tests (Flutter)..." -ForegroundColor Yellow
+    Write-Host "`n[2/2] Running E2E Tests (Flutter)..." -ForegroundColor Yellow
     & ".\scripts\run_e2e_tests.ps1"
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "❌ E2E Tests Failed." -ForegroundColor Red
+        Write-Host "[FAIL] E2E Tests Failed." -ForegroundColor Red
         $allPassed = $false
     } else {
-        Write-Host "✅ E2E Tests Passed." -ForegroundColor Green
+        Write-Host "[PASS] E2E Tests Passed." -ForegroundColor Green
     }
 }
 
@@ -55,9 +55,9 @@ if ($allPassed -and -not $SkipE2E) {
 }
 
 if ($allPassed) {
-    Write-Host "`n🏆 ALL HARIKERJA MOBILE TESTS PASSED." -ForegroundColor Green
+    Write-Host "`n[SUCCESS] ALL HARIKERJA MOBILE TESTS PASSED." -ForegroundColor Green
     exit 0
 } else {
-    Write-Host "`n💀 SOME HARIKERJA MOBILE TESTS FAILED." -ForegroundColor Red
+    Write-Host "`n[FAILURE] SOME HARIKERJA MOBILE TESTS FAILED." -ForegroundColor Red
     exit 1
 }

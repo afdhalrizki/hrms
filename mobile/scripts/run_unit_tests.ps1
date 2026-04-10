@@ -1,5 +1,5 @@
 # Run all Flutter unit tests at once to reduce process startup overhead
-Write-Host "🚀 Starting Mobile Unit Test Suite (Merged) ..." -ForegroundColor Cyan
+Write-Host "[START] Starting Mobile Unit Test Suite (Merged) ..." -ForegroundColor Cyan
 
 $MobileDir = Split-Path -Parent $PSScriptRoot
 Push-Location $MobileDir
@@ -31,7 +31,7 @@ $fileReasons = @()
     if ($lineStr -match "(?i)warning") {
         $hasWarning = $true
         if ($lineStr -notmatch '^{.*}$') {
-            $fileReasons += "    ⚠️ $lineStr"
+            $fileReasons += "    [WARN] $lineStr"
         }
     }
 
@@ -44,29 +44,29 @@ $fileReasons = @()
                 $testNames[$evt.test.id] = $evt.test.name
                 if ($evt.test.name -notmatch "loading") {
                     # Print without newline for test name, will add result later
-                    Write-Host "🧪 $($evt.test.name) ... " -NoNewline
+                    Write-Host "[TEST] $($evt.test.name) ... " -NoNewline
                 }
             }
 
             if ($evt.type -eq "error") {
                 $name = if ($testNames.ContainsKey($evt.testID)) { $testNames[$evt.testID] } else { "Unknown Test" }
-                Write-Host "❌ ERROR" -ForegroundColor Red
-                $fileReasons += "    ❌ [$name]: $($evt.error)"
+                Write-Host "[ERROR] ERROR" -ForegroundColor Red
+                $fileReasons += "    [ERROR] [$name]: $($evt.error)"
             }
 
             if ($evt.type -eq "testDone") {
                 if ($evt.testID -eq 0) { return }
                 if ($evt.result -eq "success") { 
                     $filePassed++ 
-                    Write-Host "✅" -ForegroundColor Green
+                    Write-Host "[OK]" -ForegroundColor Green
                 }
                 elseif ($evt.result -eq "failure") { 
                     $fileFailed++ 
-                    Write-Host "❌" -ForegroundColor Red
+                    Write-Host "[FAIL]" -ForegroundColor Red
                 }
                 elseif ($evt.result -eq "error") { 
                     $fileErrors++ 
-                    Write-Host "⚠️" -ForegroundColor Magenta
+                    Write-Host "[ERR]" -ForegroundColor Magenta
                 }
                 $foundResults = $true
             }
@@ -75,12 +75,12 @@ $fileReasons = @()
 }
 
 Write-Host "`n========================================" -ForegroundColor White
-Write-Host "🏁 FINAL MOBILE UNIT SUMMARY" -ForegroundColor Cyan
+Write-Host "[SUMMARY] FINAL MOBILE UNIT SUMMARY" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor White
-Write-Host "✅ TOTAL PASSED:   $filePassed" -ForegroundColor Green
-Write-Host "❌ TOTAL FAILED:   $fileFailed" -ForegroundColor Red
-Write-Host "⚠️ TOTAL ERRORS:   $fileErrors" -ForegroundColor Magenta
-Write-Host "🔍 WARNINGS:       $(if ($hasWarning) { 1 } else { 0 })" -ForegroundColor Yellow
+Write-Host "[PASS] TOTAL PASSED:   $filePassed" -ForegroundColor Green
+Write-Host "[FAIL] TOTAL FAILED:   $fileFailed" -ForegroundColor Red
+Write-Host "[ERR]  TOTAL ERRORS:   $fileErrors" -ForegroundColor Magenta
+Write-Host "[WARN] WARNINGS:       $(if ($hasWarning) { 1 } else { 0 })" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor White
 
 foreach ($reason in $fileReasons) { Write-Host $reason -ForegroundColor Gray }
@@ -88,9 +88,9 @@ foreach ($reason in $fileReasons) { Write-Host $reason -ForegroundColor Gray }
 Pop-Location
 
 if ($fileFailed -eq 0 -and $fileErrors -eq 0 -and $foundResults) {
-    Write-Host "🏆 100% SUCCESS" -ForegroundColor Green
+    Write-Host "[SUCCESS] 100% SUCCESS" -ForegroundColor Green
     exit 0
 } else {
-    Write-Host "💀 SOME TESTS FAILED" -ForegroundColor Red
+    Write-Host "[FAILURE] SOME TESTS FAILED" -ForegroundColor Red
     exit 1
 }

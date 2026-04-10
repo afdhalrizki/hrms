@@ -3,8 +3,8 @@ param(
 )
 
 # Run Flutter E2E tests with detailed reporting
-Write-Host "`n🚀 Running Mobile End-to-End Tests (Detailed Reporting)..." -ForegroundColor Cyan
-if ($Integrated) { Write-Host "🔗 INTEGRATED MODE: Using real backend and database." -ForegroundColor Yellow }
+Write-Host "`n[START] Running Mobile End-to-End Tests (Detailed Reporting)..." -ForegroundColor Cyan
+if ($Integrated) { Write-Host "[MODE] INTEGRATED MODE: Using real backend and database." -ForegroundColor Yellow }
 
 $MobileDir = Split-Path -Parent $PSScriptRoot
 Push-Location $MobileDir
@@ -61,9 +61,9 @@ function Ensure-BackendStarted {
     
     # Check if backend is already healthy
     if ((Wait-ForPort -HostName '127.0.0.1' -Port 8000 -TimeoutSeconds 5) -and (Test-BackendHealth)) {
-        Write-Host "✅ Backend is already available and healthy." -ForegroundColor Green
+        Write-Host "[OK] Backend is already available and healthy." -ForegroundColor Green
     } else {
-        Write-Host "🚀 Backend not ready. Starting via run_dev.ps1..." -ForegroundColor Yellow
+        Write-Host "[WAIT] Backend not ready. Starting via run_dev.ps1..." -ForegroundColor Yellow
         # Start backend in a NEW background process so it persists
         $backendDir = Join-Path $root "backend"
         Start-Process -FilePath "pwsh" -ArgumentList "-NoProfile", "-NoLogo", "-Command", "cd '$backendDir'; ./scripts/run_dev.ps1 -NoDeps" -WindowStyle Hidden
@@ -76,7 +76,7 @@ function Ensure-BackendStarted {
     }
 
     if ($Integrated) {
-        Write-Host "🔗 Integrated mode: Bootstrapping tenants and seeding demo data..." -ForegroundColor Yellow
+        Write-Host "[MODE] Integrated mode: Bootstrapping tenants and seeding demo data..." -ForegroundColor Yellow
         Push-Location (Join-Path $root "backend")
         
         # Set environment for the current process so the next commands work
@@ -89,15 +89,15 @@ function Ensure-BackendStarted {
         $env:DATABASE_URL = "postgres://hrms_user:hrms_password@127.0.0.1:6432/hrms"
         
         $SetupLog = Join-Path $LogDir "integrated_setup.log"
-        Write-Host "🔗 Running bootstrap_tenants (Logging to $SetupLog)..." -ForegroundColor Gray
+        Write-Host "[EXEC] Running bootstrap_tenants (Logging to $SetupLog)..." -ForegroundColor Gray
         & ./venv/Scripts/python.exe manage.py bootstrap_tenants > $SetupLog 2>&1
-        Write-Host "🔗 Running seed_test_db.py (Logging to $SetupLog)..." -ForegroundColor Gray
+        Write-Host "[EXEC] Running seed_test_db.py (Logging to $SetupLog)..." -ForegroundColor Gray
         & ./venv/Scripts/python.exe scripts/seed_test_db.py >> $SetupLog 2>&1
         Pop-Location
 
 
         # Pre-flight smoke test
-        Write-Host "💨 Running pre-flight smoke test (Login check)..." -ForegroundColor Yellow
+        Write-Host "[WAIT] Running pre-flight smoke test (Login check)..." -ForegroundColor Yellow
         try {
             $headers = @{ 
                 "X-Tenant-Domain" = "company1.localhost"
@@ -108,20 +108,18 @@ function Ensure-BackendStarted {
             $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/auth/login/" -Method Post -Headers $headers -Body $body -TimeoutSec 30 -UseBasicParsing
 
             if ($resp.StatusCode -eq 200) {
-                Write-Host "✅ Smoke test passed: Backend is reachable and login works." -ForegroundColor Green
+                Write-Host "[OK] Smoke test passed: Backend is reachable and login works." -ForegroundColor Green
             } else {
-                Write-Host "⚠️ Smoke test failed with status: $($resp.StatusCode)" -ForegroundColor Red
+                Write-Host "[WARN] Smoke test failed with status: $($resp.StatusCode)" -ForegroundColor Red
             }
         } catch {
-            Write-Host "❌ Smoke test ERROR: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "[ERROR] Smoke test ERROR: $($_.Exception.Message)" -ForegroundColor Red
             if ($_.Exception.Response) {
                 $errBody = [System.Text.Encoding]::UTF8.GetString($_.Exception.Response.GetResponseStream().ToArray())
                 Write-Host "   Response Body: $errBody" -ForegroundColor Gray
             }
         }
     }
-
-
 
     return (Test-BackendHealth)
 }
@@ -135,7 +133,7 @@ if (-not (Ensure-BackendStarted -StartTimeoutSeconds 180)) {
     exit 1
 }
 
-Write-Host "📦 Generating localizations..." -ForegroundColor Gray
+Write-Host "[INFO] Generating localizations..." -ForegroundColor Gray
 & flutter gen-l10n 2>$null
 
 # Hybrid VM mode is the most reliable for real-backend integration in this environment.
@@ -160,7 +158,7 @@ $testNames = @{}
     # Detect Warnings
     if ($lineStr -match "(?i)warning") { 
         $hasWarning = $true; 
-        if ($lineStr -notmatch '^{.*}$') { $fileReasons += "    ⚠️ $lineStr" }
+        if ($lineStr -notmatch '^{.*}$') { $fileReasons += "    [WARN] $lineStr" }
     }
 
     # Parse JSON events
@@ -172,7 +170,7 @@ $testNames = @{}
             if ($evt.type -eq "testStart" -and $evt.test.name) {
                 $testNames[$evt.test.id] = $evt.test.name
                 if ($evt.test.name -notmatch "loading") {
-                    Write-Host "`n🏃 Testing: $($evt.test.name)" -ForegroundColor Cyan
+                    Write-Host "`n[RUN] Testing: $($evt.test.name)" -ForegroundColor Cyan
                 }
             }
 
@@ -184,8 +182,8 @@ $testNames = @{}
 
             if ($evt.type -eq "error") {
                 $name = if ($testNames.ContainsKey($evt.testID)) { $testNames[$evt.testID] } else { "Unknown Test" }
-                Write-Host "   ❌ ERROR: $($evt.error)" -ForegroundColor Red
-                $fileReasons += "    ❌ [$name]: $($evt.error)"
+                Write-Host "   [ERROR] ERROR: $($evt.error)" -ForegroundColor Red
+                $fileReasons += "    [ERROR] [$name]: $($evt.error)"
             }
 
             if ($evt.type -eq "testDone") {
@@ -193,15 +191,15 @@ $testNames = @{}
                 $foundResults = $true
                 if ($evt.result -eq "success") { 
                     $filePassed++ 
-                    Write-Host "   ✅ PASSED" -ForegroundColor Green
+                    Write-Host "   [PASS] PASSED" -ForegroundColor Green
                 }
                 elseif ($evt.result -eq "failure") { 
                     $fileFailed++ 
-                    Write-Host "   ❌ FAILED" -ForegroundColor Red
+                    Write-Host "   [FAIL] FAILED" -ForegroundColor Red
                 }
                 elseif ($evt.result -eq "error") { 
                     $fileErrors++ 
-                    Write-Host "   ⚠️ ERROR" -ForegroundColor Magenta
+                    Write-Host "   [ERR]  ERROR" -ForegroundColor Magenta
                 }
             }
         } catch { }
@@ -209,12 +207,12 @@ $testNames = @{}
 }
 
 Write-Host "`n========================================" -ForegroundColor White
-Write-Host "🏁 E2E TEST SUMMARY" -ForegroundColor Cyan
+Write-Host "[SUMMARY] E2E TEST SUMMARY" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor White
-Write-Host "✅ TOTAL PASSED:   $filePassed" -ForegroundColor Green
-Write-Host "❌ TOTAL FAILED:   $fileFailed" -ForegroundColor Red
-Write-Host "⚠️ TOTAL ERRORS:   $fileErrors" -ForegroundColor Magenta
-Write-Host "🔍 TOTAL WARNINGS: $(if ($hasWarning) { 1 } else { 0 })" -ForegroundColor Yellow
+Write-Host "[PASS] TOTAL PASSED:   $filePassed" -ForegroundColor Green
+Write-Host "[FAIL] TOTAL FAILED:   $fileFailed" -ForegroundColor Red
+Write-Host "[ERR]  TOTAL ERRORS:   $fileErrors" -ForegroundColor Magenta
+Write-Host "[WARN] TOTAL WARNINGS: $(if ($hasWarning) { 1 } else { 0 })" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor White
 
 if ($fileFailed -gt 0 -or $fileErrors -gt 0) {
@@ -225,9 +223,9 @@ if ($fileFailed -gt 0 -or $fileErrors -gt 0) {
 Pop-Location
 
 if ($fileFailed -eq 0 -and $fileErrors -eq 0 -and $foundResults) {
-    Write-Host "🏆 E2E SUCCESS" -ForegroundColor Green
+    Write-Host "[SUCCESS] E2E SUCCESS" -ForegroundColor Green
     exit 0
 } else {
-    Write-Host "💀 E2E TEST FAILED" -ForegroundColor Red
+    Write-Host "[FAILURE] E2E TEST FAILED" -ForegroundColor Red
     exit 1
 }

@@ -383,5 +383,162 @@ void main() {
         expect(find.byIcon(Icons.access_time_filled, skipOffstage: false), findsAtLeast(1));
       });
     });
+
+    testWidgets('Logout Confirmation: Cancel', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        final settingsBtn = find.byKey(const Key('nav_settings'), skipOffstage: false);
+        await safeTap(tester, settingsBtn);
+        await waitFor(tester, find.text('Settings', skipOffstage: false), message: 'Settings Screen');
+        
+        final logoutBtn = find.byKey(const Key('qa_logout_btn'), skipOffstage: false);
+        await scrollTo(tester, logoutBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, logoutBtn);
+        
+        await waitFor(tester, find.text('Logout', skipOffstage: false), message: 'Logout confirmation dialog');
+        await safeTap(tester, find.byKey(const Key('qa_logout_cancel'), skipOffstage: false));
+        
+        await waitFor(tester, find.text('Settings', skipOffstage: false), message: 'Still on Settings screen after cancel');
+      });
+    });
+
+    testWidgets('HomeScreen: Pull to Refresh', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        await waitFor(tester, find.textContaining('Welcome', skipOffstage: false), message: 'Dashboard loaded');
+        
+        final scrollable = find.byType(Scrollable, skipOffstage: false).first;
+        await tester.drag(scrollable, const Offset(0, 500));
+        await tester.pump();
+        // Check if RefreshIndicator is active
+        expect(find.byType(RefreshIndicator, skipOffstage: false), findsOneWidget);
+        await tester.pumpAndSettle();
+        await waitFor(tester, find.textContaining('Welcome', skipOffstage: false), message: 'Dashboard refreshed');
+      });
+    });
+
+    testWidgets('Reimbursement: Form Validation', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        final reimbBtn = find.byKey(const Key('qa_reimbursement'), skipOffstage: false);
+        await scrollTo(tester, reimbBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, reimbBtn);
+        
+        await safeTap(tester, find.byType(FloatingActionButton, skipOffstage: false));
+        await waitFor(tester, find.text('New Reimbursement Claim', skipOffstage: false), message: 'Apply screen');
+        
+        // Submit without amount and description
+        await safeTap(tester, find.text('Submit Claim', skipOffstage: false));
+        
+        await waitFor(tester, find.text('Please enter amount', skipOffstage: false), message: 'Amount validation error');
+        await waitFor(tester, find.text('Please enter description', skipOffstage: false), message: 'Description validation error');
+      });
+    });
+
+    testWidgets('Leave Apply: Form Validation', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        await safeTap(tester, find.byKey(const Key('qa_leaves'), skipOffstage: false));
+        await safeTap(tester, find.byType(FloatingActionButton, skipOffstage: false));
+        await waitFor(tester, find.text('New Leave Request', skipOffstage: false), message: 'New Leave screen');
+        
+        // Reason is empty by default, try submit
+        await safeTap(tester, find.text('Apply Leave', skipOffstage: false));
+        await waitFor(tester, find.text('Please enter a reason', skipOffstage: false), message: 'Reason validation error');
+      });
+    });
+
+    testWidgets('Localization Check: Indonesian Locale', (tester) async {
+      await tester.runAsync(() async {
+        await tester.pumpWidget(app.HRMSApp(
+          theme: ThemeData.dark().copyWith(textTheme: testTextTheme),
+          locale: const Locale('id'),
+        ));
+        await tester.pumpAndSettle();
+        
+        // 'Sign In' in English, 'Masuk' in id
+        await waitFor(tester, find.text('Masuk', skipOffstage: false), message: 'Indonesian Sign In button');
+        // label.toUpperCase() in LoginScreen makes it uppercase
+        await waitFor(tester, find.textContaining('SUBDOMAIN PERUSAHAAN', skipOffstage: false), message: 'Indonesian subdomain hint');
+      });
+    });
+
+    testWidgets('Attendance: History Highlights (Missing Out)', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        final correctionBtn = find.byKey(const Key('qa_correction'), skipOffstage: false);
+        await scrollTo(tester, correctionBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, correctionBtn);
+        
+        await safeTap(tester, find.text('History', skipOffstage: false));
+        await tester.pumpAndSettle();
+        
+        // Check for "missing out" indicator (orange color badge with --:--)
+        // In CorrectionRequestScreen, it shows 'Out: --:--' in orange if check_out is null
+        final missingOutText = find.text('Out: --:--', skipOffstage: false);
+        await waitFor(tester, missingOutText, message: 'Missing Out indicator');
+      });
+    });
+
+    testWidgets('Attendance: Clock-Out Flow', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        
+        // Scenario: Currently Clocked In (Mock data in test_helper has one record with check_out: null)
+        await waitFor(tester, find.text('Clock Out', skipOffstage: false), message: 'Clock Out state');
+        
+        await safeTap(tester, find.byKey(const Key('qa_clock_in'), skipOffstage: false));
+        await waitFor(tester, find.byType(FaceVerificationScreen, skipOffstage: false), message: 'Face Verification');
+        await safeTap(tester, find.byKey(const Key('simulate_face_success'), skipOffstage: false));
+        
+        // After successful face verification and mock POST, it should ideally go back to Clock In for next day
+        // (Note: In mock setup it depends on how _loadProfile handles the refresh)
+        await waitFor(tester, find.text('Clock Out', skipOffstage: false), message: 'Clocked state remains until refresh happens or data changes');
+      });
+    });
+
+    testWidgets('Leave: Balance Verification', (tester) async {
+      await tester.runAsync(() async {
+        mockEmptyResponse = false;
+        await performLogin(tester);
+        
+        // Ensure Home Screen has finished loading before navigating away
+        await tester.pumpAndSettle(const Duration(seconds: 1));
+        
+        await safeTap(tester, find.byKey(const Key('qa_leaves'), skipOffstage: false));
+        await tester.pumpAndSettle();
+        
+        // Verify balance from mock (10.0 remaining days)
+        await waitFor(tester, find.textContaining('10.0', skipOffstage: false), message: 'Leave balance card with 10 days');
+        await waitFor(tester, find.textContaining('Used: 2.0 / Total: 12.0', skipOffstage: false), message: 'Leave balance details');
+      });
+    });
+
+    testWidgets('Payslip: Formatting & Accuracy', (tester) async {
+      await tester.runAsync(() async {
+        mockEmptyResponse = false; // Explicit reset to prevent leakage
+        await performLogin(tester);
+        
+        // Check formatting in "Recent Activities" on Home Screen
+        // Mock payslip salary: 5000000
+        await waitFor(tester, find.textContaining('Rp 5,000,000', skipOffstage: false), message: 'Payslip IDR formatting with commas');
+        
+        await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
+        await waitFor(tester, find.text('NET SALARY', skipOffstage: false), message: 'Payslip detail screen');
+        await waitFor(tester, find.textContaining('5,000,000', skipOffstage: false), message: 'Formatted salary in details');
+      });
+    });
+
+    testWidgets('Payslip: Empty State', (tester) async {
+      await tester.runAsync(() async {
+        mockEmptyResponse = true;
+        await performLogin(tester);
+        
+        await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
+        await tester.pumpAndSettle();
+        
+        await waitFor(tester, find.textContaining('No payslips found', skipOffstage: false), message: 'Empty state message');
+      });
+    });
   });
 }

@@ -73,7 +73,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
       );
     }
 
-    final netSalary = double.tryParse(_selectedPayslip?['net_pay']?.toString() ?? '0') ?? 0;
+    final netSalary = double.tryParse(_selectedPayslip?['net_salary']?.toString() ?? '0') ?? 0;
     final paidAt = _selectedPayslip?['payment_date'] != null 
         ? DateFormat('d MMM yyyy').format(DateTime.parse(_selectedPayslip['payment_date']))
         : 'Pending';

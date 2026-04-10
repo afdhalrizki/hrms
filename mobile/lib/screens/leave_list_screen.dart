@@ -128,7 +128,7 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
           const Text('Leave Balance', style: TextStyle(color: Colors.white70)),
           const SizedBox(height: 8),
           Text(
-            '${_balance!.remainingDays} Days Left',
+            '${_balance!.remainingDays.toStringAsFixed(1)} Days Left',
             style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),

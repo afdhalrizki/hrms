@@ -143,7 +143,6 @@ class ApiService {
         return true;
       }
     } catch (e) {
-      debugPrint('Token refresh error: $e');
     }
     return false;
   }

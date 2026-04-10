@@ -82,8 +82,8 @@ void setupSystemChannelMocks() {
 http.Client getMockClient() {
   return MockClient((request) async {
     final method = request.method.toUpperCase();
-    final url = request.url.toString().toLowerCase();
-    final h = {'content-type': 'application/json'};
+    final url = request.url.toString();
+    final h = {'Content-Type': 'application/json'};
 
     if (mockErrorStatus) {
       return http.Response(jsonEncode({'error': mockErrorMessage}), 500, headers: h);
@@ -131,20 +131,20 @@ http.Client getMockClient() {
       ]), 200, headers: h);
     }
 
-    // --- Leave Requests: POST must return 201 ---
+    // --- Leave Requests ---
     if (url.contains('/leave-requests')) {
       if (method == 'POST') return http.Response(jsonEncode({'id': 2, 'status': 'PENDING'}), 201, headers: h);
       return http.Response(jsonEncode(mockEmptyResponse ? [] : [
-        {'id': 1, 'status': 'APPROVED', 'leave_type_name': 'Annual Leave',
-         'start_date': '2026-04-01', 'end_date': '2026-04-02',
-         'created_at': '2026-04-01T08:00:00Z'}
+        {'id': 1, 'status': 'APPROVED', 'leave_type': 'Annual Leave',
+         'start_date': '2026-04-10', 'end_date': '2026-04-12', 
+         'reason': 'Mock data', 'created_at': '2026-04-01T10:00:00Z'}
       ]), 200, headers: h);
     }
 
     // --- Leave Balances ---
     if (url.contains('/leave-balances')) {
       return http.Response(jsonEncode(mockEmptyResponse ? [] : [
-        {'id': 1, 'leave_type': 'Annual', 'balance': 12}
+        {'year': 2026, 'total_days': 12.0, 'used_days': 2.0, 'remaining_days': 10.0}
       ]), 200, headers: h);
     }
 
@@ -166,8 +166,19 @@ http.Client getMockClient() {
     // --- Payslips ---
     if (url.contains('/payslips')) {
       return http.Response(jsonEncode(mockEmptyResponse ? [] : [
-        {'id': 1, 'period_name': 'April 2026', 'net_salary': '5000000',
-         'paid_at': '2026-04-01'}
+        {
+          'id': 1, 
+          'period_name': 'April 2026', 
+          'net_salary': 5000000,
+          'payment_date': '2026-04-01',
+          'basic_salary': 4500000,
+          'allowances': [
+            {'name': 'Transport', 'amount': 500000}
+          ],
+          'deductions': [
+            {'name': 'Tax', 'amount': 0}
+          ]
+        }
       ]), 200, headers: h);
     }
 
