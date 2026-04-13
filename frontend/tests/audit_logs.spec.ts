@@ -43,20 +43,48 @@ test.describe('Audit Logs & Traceability', () => {
     console.log('--- Waiting for modal to close and log to persist ---');
     await expect(page.locator('form')).not.toBeVisible({ timeout: 15000 });
     
-    // Give a small grace period for the backend to process the audit log record
-    await page.waitForTimeout(2000);
+    // Give a small grace period for the backend to process the audit log record and for polling to kick in
+    console.log('--- Waiting for Audit log to persist and UI to refresh ---');
+    await page.waitForTimeout(5000);
     
     console.log('--- Navigating to Audit Logs ---');
     await page.goto('http://127.0.0.1:3000/en/settings/audit-logs?test_tenant=company1');
     
+    // Diagnostic: Check for client-side crash
+    const errorHeading = page.locator('h2:has-text("Application error")');
+    if (await errorHeading.isVisible()) {
+        const errorDetail = await page.locator('body').innerText();
+        console.error('--- CLIENT-SIDE CRASH DETECTED ---');
+        console.error(errorDetail);
+        throw new Error('Application error detected on Audit Logs page');
+    }
+    
     // Wait for table to load and be visible
     const table = page.locator('table');
-    await expect(table).toBeVisible({ timeout: 15000 });
+    await expect(table).toBeVisible({ timeout: 20000 });
     
-    // Since we updated the UI to show the object name in the table, we can use a simple filter
+    // Since we updated the UI to show the object name in the table, we can use a simple filter.
+    // We use a longer timeout here because polling takes 10s, but we'll try a manual refresh first.
     console.log(`--- Searching for ${branchName} in Audit Log table ---`);
+    
+    // Attempt manual refresh to speed up the test
+    const refreshBtn = page.locator('#refresh-audit-logs');
+    if (await refreshBtn.isVisible()) {
+        await refreshBtn.click();
+        console.log('--- Triggered manual refresh ---');
+    }
+
     const logRow = table.locator('tr').filter({ hasText: branchName });
-    await expect(logRow).toBeVisible({ timeout: 25000 });
+    
+    // Retry visibility with a shorter interval or just rely on the increased timeout
+    try {
+        await expect(logRow).toBeVisible({ timeout: 15000 });
+    } catch (e) {
+        console.log('--- Still waiting, triggering second manual refresh ---');
+        if (await refreshBtn.isVisible()) await refreshBtn.click();
+        await expect(logRow).toBeVisible({ timeout: 20000 });
+    }
+
     await expect(logRow).toContainText(/CREATE/i);
     
     console.log('Audit log successfully verified.');

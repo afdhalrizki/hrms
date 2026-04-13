@@ -20,7 +20,7 @@ django.setup()
 
 from django.contrib.auth import get_user_model
 from tenants.models import Tenant
-from core.models import Employee, Department, Role, Golongan, AccessRole
+from core.models import Employee, Department, Role, Golongan, AccessRole, Branch
 from django_tenants.utils import schema_context
 from datetime import date
 
@@ -103,6 +103,8 @@ for user_data in test_users:
             'is_superuser': user_data['is_superuser'],
         }
     )
+    user.is_staff = user_data['is_staff']
+    user.is_superuser = user_data['is_superuser']
     user.set_password('password123')
     user.tenants.clear() # Ensure strict isolation for E2E tests
     user.tenants.add(user_data['tenant'])
@@ -137,10 +139,32 @@ with schema_context('company1'):
     Department.objects.all().delete()
     Golongan.objects.all().delete()
     AccessRole.objects.all().delete()
+    Branch.objects.all().delete()
 
     dept, _ = Department.objects.get_or_create(name="Engineering")
     role_se, _ = Role.objects.get_or_create(name="Software Engineer", department=dept)
     gol, _ = Golongan.objects.get_or_create(name="3A", defaults={'base_salary': 5000000})
+    
+    branch_jkt, _ = Branch.objects.get_or_create(
+        name="Jakarta Office",
+        defaults={
+            "address": "Jl. Sudirman No. 1",
+            "latitude": -6.208800,
+            "longitude": 106.845600,
+            "radius_meters": 100,
+            "timezone": "Asia/Jakarta"
+        }
+    )
+    branch_bdg, _ = Branch.objects.get_or_create(
+        name="Bandung Hub",
+        defaults={
+            "address": "Jl. Asia Afrika No. 10",
+            "latitude": -6.917500,
+            "longitude": 107.619100,
+            "radius_meters": 50,
+            "timezone": "Asia/Jakarta"
+        }
+    )
     
     # Roles
     admin_role, _ = AccessRole.objects.get_or_create(
@@ -185,7 +209,8 @@ with schema_context('company1'):
             'role': role_se,
             'golongan': gol,
             'join_date': date(2025, 1, 1),
-            'ktp_number': 'ADM123'
+            'ktp_number': 'ADM123',
+            'branch': branch_jkt
         }
     )
     admin_emp.access_role = admin_role
@@ -242,6 +267,23 @@ with schema_context('company1'):
     lb2, _ = LeaveBalance.objects.get_or_create(employee=employee_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
     print(f"Seeded LeaveBalances for {admin_emp.email} and {employee_emp.email}")
 
+    # Attendance
+    from django.utils import timezone
+    import datetime
+    today_date = timezone.now().date()
+    # Seeding an active Check In for employee1 for today
+    Attendance.objects.get_or_create(
+        employee=employee_emp,
+        date=today_date,
+        defaults={
+            'check_in': datetime.time(9, 0),
+            'status': 'PRESENT',
+            'liveness_verified': True,
+            'verification_method': 'LIVENESS'
+        }
+    )
+    print(f"Seeded active Check-In for {employee_emp.email} for today.")
+
     # Add Appraisal Data for performance test
     from performance.models import KPI, KPITarget, Appraisal
     kpi, _ = KPI.objects.get_or_create(name="Sales Target", unit=KPI.Unit.CURRENCY)
@@ -279,11 +321,17 @@ with schema_context('company1'):
     
     # Payslips for Admin
     from payroll.models import PayrollPeriod, Payslip
+    from datetime import date
+    from django.utils import timezone
+    
+    today = timezone.now().date()
+    current_month = today.month
+    current_year = today.year
     
     period, _ = PayrollPeriod.objects.get_or_create(
-        month=3,
-        year=2026,
-        defaults={'start_date': date(2026, 3, 1), 'end_date': date(2026, 3, 31), 'is_closed': True}
+        month=current_month,
+        year=current_year,
+        defaults={'start_date': date(current_year, current_month, 1), 'end_date': today, 'is_closed': False}
     )
     print(f"Seeded PayrollPeriod: {period}")
     

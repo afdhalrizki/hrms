@@ -87,10 +87,30 @@ async function main() {
   if (!skipSeed) {
     log("[2/3] Preparing/Seeding test data (Backend)...", COLORS.yellow);
     let pythonCmd = 'python';
-    const venvPath = join(BackendDir, 'venv', 'Scripts', 'python.exe');
-    if (existsSync(venvPath)) {
-      pythonCmd = venvPath;
-      log(`Using Virtual Environment: ${pythonCmd}`, COLORS.gray);
+    try {
+      await execAsync('python --version');
+    } catch (e) {
+      try {
+        await execAsync('python3 --version');
+        pythonCmd = 'python3';
+      } catch (e2) {
+        log("Warning: Neither 'python' nor 'python3' found in PATH.", COLORS.yellow);
+      }
+    }
+
+    const venvPathWin = join(BackendDir, 'venv', 'Scripts', 'python.exe');
+    const venvPathLinux = join(BackendDir, 'venv', 'bin', 'python');
+    const venvPathLinuxAlt = join(BackendDir, 'venv_linux', 'bin', 'python');
+    
+    if (existsSync(venvPathWin)) {
+      pythonCmd = venvPathWin;
+      log(`Using Windows venv: ${pythonCmd}`, COLORS.gray);
+    } else if (existsSync(venvPathLinux)) {
+      pythonCmd = venvPathLinux;
+      log(`Using Linux venv: ${pythonCmd}`, COLORS.gray);
+    } else if (existsSync(venvPathLinuxAlt)) {
+      pythonCmd = venvPathLinuxAlt;
+      log(`Using Linux venv (alt): ${pythonCmd}`, COLORS.gray);
     }
 
     const seedScript = join(BackendDir, 'scripts', 'seed_test_db.py');

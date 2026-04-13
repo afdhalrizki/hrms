@@ -60,6 +60,8 @@ flutter pub get
 ```powershell
 # Automated Local Dev - RECOMMENDED
 pwsh .\run_dev.ps1
+# or via Node:
+node scripts/run_dev.mjs
 ```
 
 ## 🌐 Deployment & Infrastructure
@@ -80,11 +82,31 @@ The mobile application has a comprehensive test suite covering core logic and E2
 ### Unit & Logic Tests - 91 Tests
 ```powershell
 pwsh .\run_unit_tests.ps1
+# or
+node scripts/run_unit_tests.mjs
 ```
 
 ### End-to-End Testing (E2E) - 15 Tests
+
+**Run with mocked API (Isolated):**
 ```powershell
 pwsh .\run_e2e_tests.ps1
+# or
+node scripts/run_e2e_tests.mjs
+```
+
+**Run with real integrated API and Database:**
+```powershell
+pwsh .\run_e2e_tests.ps1 -Integrated
+# or
+node scripts/run_e2e_tests.mjs --integrated
+```
+
+### Run All Tests (Unit + E2E)
+```powershell
+pwsh .\run_tests.ps1
+# or
+node scripts/run_tests.mjs
 ```
 
 ## 📚 Technical Documentation

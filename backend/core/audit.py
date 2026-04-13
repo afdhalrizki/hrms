@@ -41,31 +41,44 @@ class AuditLogger:
         
         changed_fields = {}
         
-        if action_type == 'UPDATE' and hasattr(instance, '_old_values'):
-            # Calculate diff
-            new_values = model_to_dict(instance)
-            for field, old_val in instance._old_values.items():
-                new_val = new_values.get(field)
-                if str(old_val) != str(new_val): # Stringify for safer comparison
-                    changed_fields[field] = {
-                        'old': str(old_val),
-                        'new': str(new_val)
-                    }
-        elif action_type == 'CREATE':
-            changed_fields = model_to_dict(instance)
-            # Convert all values to string for JSON storage if needed
-            changed_fields = {k: str(v) for k, v in changed_fields.items()}
+        try:
+            if action_type == 'UPDATE' and hasattr(instance, '_old_values'):
+                # Calculate diff
+                new_values = model_to_dict(instance)
+                for field, old_val in instance._old_values.items():
+                    new_val = new_values.get(field)
+                    if str(old_val) != str(new_val): # Stringify for safer comparison
+                        changed_fields[field] = {
+                            'old': str(old_val),
+                            'new': str(new_val)
+                        }
+            elif action_type == 'CREATE':
+                # Use model_to_dict for initial capture
+                fields_dict = model_to_dict(instance)
+                # Convert all values to string for JSON storage and easier search
+                changed_fields = {k: str(v) for k, v in fields_dict.items() if v is not None}
+                
+                # Explicitly ensure searchable identifiers are present (even if not in model_to_dict)
+                if hasattr(instance, 'name') and instance.name:
+                    changed_fields['name'] = str(instance.name)
+                if hasattr(instance, 'fullname') and instance.fullname:
+                    changed_fields['fullname'] = str(instance.fullname)
 
-        if action_type == 'DELETE' or changed_fields:
-            from .models import AuditLog
-            AuditLog.objects.create(
-                action_type=action_type,
-                model_name=model_name,
-                object_id=object_id,
-                changed_fields=changed_fields,
-                actor=actor if actor and actor.is_authenticated else None,
-                ip_address=ip_address
-            )
+            if action_type == 'DELETE' or changed_fields:
+                from .models import AuditLog
+                AuditLog.objects.create(
+                    action_type=action_type,
+                    model_name=model_name,
+                    object_id=object_id,
+                    changed_fields=changed_fields,
+                    actor=actor if actor and actor.is_authenticated else None,
+                    ip_address=ip_address
+                )
+        except Exception as e:
+            # Silence audit errors to prevent breaking the main transaction, 
+            # but log them for debugging
+            print(f"AuditLogger Error: {str(e)}")
+
 
 class AuditModelMixin:
     """

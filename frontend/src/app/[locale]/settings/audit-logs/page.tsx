@@ -38,22 +38,68 @@ export default function AuditLogsPage() {
   const [logs, setLogs] = React.useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [expandedId, setExpandedId] = React.useState<number | null>(null);
+  const [isMounted, setIsMounted] = React.useState(false);
 
-  const fetchData = React.useCallback(async () => {
+  const fetchData = React.useCallback(async (isSilent = false) => {
     try {
-      setIsLoading(true);
+      if (!isSilent) setIsLoading(true);
       const data = await apiFetch('/audit-logs');
-      setLogs(data || []);
+      if (Array.isArray(data)) {
+        setLogs(data);
+      }
     } catch (error) {
-      toast.error('Failed to load audit logs');
+      console.error('Failed to load audit logs:', error);
+      if (!isSilent) toast.error('Failed to load audit logs');
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, []);
 
   React.useEffect(() => {
+    setIsMounted(true);
     fetchData();
+    
+    // Implement silent polling for "Live Tracking"
+    const interval = setInterval(() => {
+      fetchData(true);
+    }, 10000); // 10 seconds
+    
+    return () => clearInterval(interval);
   }, [fetchData]);
+
+  // Helper for safe date formatting
+  const formatDateSafe = (dateStr: string, formatStr: string) => {
+    try {
+      if (!dateStr) return '---';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      return format(date, formatStr);
+    } catch (e) {
+      return '---';
+    }
+  };
+
+  // Helper to extract a displayable identifier from potentially nested changed_fields
+  const getIdentifier = (log: AuditLog) => {
+    const fields = log.changed_fields || {};
+    // Priority fields: name, fullname
+    for (const key of ['name', 'fullname']) {
+      const val = fields[key];
+      if (typeof val === 'string') return val;
+      if (typeof val === 'object' && val !== null && val.new !== undefined) return String(val.new);
+    }
+    return `#${log.object_id}`;
+  };
+
+  if (!isMounted) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full p-20 text-gray-500 font-mono text-xs uppercase tracking-widest animate-pulse italic">
+          Initializing audit interface...
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -67,27 +113,19 @@ export default function AuditLogsPage() {
             </h1>
             <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <Activity size={14} className="text-emerald-500 animate-pulse" />
-            Live Tracking Active
+          <div className="flex items-center gap-4">
+            <button 
+              id="refresh-audit-logs"
+              onClick={() => fetchData(false)}
+              className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-bold text-gray-400 transition-all flex items-center gap-2"
+            >
+              <Activity size={14} className={cn("text-emerald-500", isLoading && "animate-spin")} />
+              {isLoading ? tCommon('loading') : 'Refresh Now'}
+            </button>
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              Live Tracking Active
+            </div>
           </div>
-        </div>
-
-        {/* Filters Placeholder */}
-        <div className="glass-card p-4 rounded-2xl border border-white/10 bg-white/[0.02] flex flex-wrap gap-4 items-center">
-          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Filter by:</span>
-          <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/50">
-            <option>All actions</option>
-            <option>CREATE</option>
-            <option>UPDATE</option>
-            <option>DELETE</option>
-          </select>
-          <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/50">
-            <option>All models</option>
-            <option>Employee</option>
-            <option>Attendance</option>
-            <option>Payroll</option>
-          </select>
         </div>
 
         {/* Logs Table */}
@@ -118,18 +156,18 @@ export default function AuditLogsPage() {
                         <div className="flex items-center gap-3">
                           <Clock size={16} className="text-gray-500" />
                           <div>
-                            <p className="text-sm font-bold text-white">{format(new Date(log.timestamp), 'HH:mm:ss')}</p>
-                            <p className="text-[10px] text-gray-500 uppercase tracking-tighter">{format(new Date(log.timestamp), 'MMM dd, yyyy')}</p>
+                            <p className="text-sm font-bold text-white">{formatDateSafe(log.timestamp, 'HH:mm:ss')}</p>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-tighter">{formatDateSafe(log.timestamp, 'MMM dd, yyyy')}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2">
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
-                            {log.actor_name ? log.actor_name[0] : 'S'}
+                            {log.actor_name ? String(log.actor_name)[0] : 'S'}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-200">{log.actor_name || 'System Auto'}</p>
+                            <p className="text-sm font-medium text-gray-200">{String(log.actor_name || 'System Auto')}</p>
                             <p className="text-[10px] text-gray-600 font-mono tracking-tighter">{log.ip_address || '0.0.0.0'}</p>
                           </div>
                         </div>
@@ -148,9 +186,10 @@ export default function AuditLogsPage() {
                         <div className="flex items-center gap-2 text-sm text-gray-300">
                           <Database size={14} className="text-gray-600" />
                           <span className="font-mono">{log.model_name}</span>
-                          <span className="text-xs text-gray-600 font-bold tracking-tighter">
-                            {log.changed_fields?.name || log.changed_fields?.fullname || `#${log.object_id}`}
+                          <span className="text-xs text-gray-600 font-bold tracking-tighter audit-log-identifier">
+                            {getIdentifier(log)}
                           </span>
+                          <span className="sr-only">#{log.object_id}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
@@ -163,7 +202,7 @@ export default function AuditLogsPage() {
                     {/* Expandable Diff View */}
                     <AnimatePresence>
                       {expandedId === log.id && (
-                        <tr>
+                        <tr key={`${log.id}-details`}>
                           <td colSpan={5} className="p-0 border-t-0">
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
@@ -177,14 +216,14 @@ export default function AuditLogsPage() {
                                   {Object.entries(log.changed_fields || {}).map(([field, data]: [string, any]) => (
                                     <div key={field} className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                                       <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">{field.replace('_', ' ')}</p>
-                                      {typeof data === 'object' && data.old !== undefined ? (
+                                      {typeof data === 'object' && data !== null && data.old !== undefined ? (
                                         <div className="flex items-center gap-3">
-                                          <span className="text-xs text-red-400 line-through bg-red-400/10 px-2 py-1 rounded-md">{data.old || 'None'}</span>
+                                          <span className="text-xs text-red-400 line-through bg-red-400/10 px-2 py-1 rounded-md">{String(data.old || 'None')}</span>
                                           <ChevronRight size={14} className="text-gray-600" />
-                                          <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">{data.new || 'None'}</span>
+                                          <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">{String(data.new || 'None')}</span>
                                         </div>
                                       ) : (
-                                        <p className="text-xs text-white">{JSON.stringify(data)}</p>
+                                        <p className="text-xs text-white sans-serif truncate">{typeof data === 'string' ? data : JSON.stringify(data)}</p>
                                       )}
                                     </div>
                                   ))}

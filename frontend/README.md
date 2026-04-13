@@ -19,14 +19,17 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 
 ### Admin Dashboard
 ![Dashboard Preview](../docs/assets/dashboard_preview.png)
+
 *Modern, glassmorphism-based dashboard with real-time analytics indicators.*
 
 ### Premium Signup
 ![Signup Preview](../docs/assets/signup_page_premium_harikerja.png)
+
 *Seamless tenant onboarding with instant domain validation.*
 
 ### Admin Provisioning
 ![Provisioning Preview](../docs/assets/add_employee_modal_before_submit_1773638661925.png)
+
 *Employee creation form integrated securely with organizational RBAC toggles.*
 
 ## 🛠 Tech Stack
@@ -80,11 +83,31 @@ The frontend uses a dual-layer strategy with **100% pass rate** across **178 mis
 ### Unit Testing (Vitest) - 144 Tests
 ```powershell
 .\run_unit_tests.ps1
+# or
+node scripts/run_unit_tests.mjs
 ```
 
 ### End-to-End Testing (Playwright) - 34 Tests
+
+**Run with mocked API (Fast/Isolated):**
 ```powershell
 .\run_e2e_tests.ps1
+# or
+node scripts/run_e2e_tests.mjs
+```
+
+**Run with real integrated API and Database:**
+```powershell
+.\run_e2e_tests.ps1 -Integrated
+# or
+node scripts/run_e2e_tests.mjs --integrated
+```
+
+### Run All Tests (Unit + E2E)
+```powershell
+.\run_tests.ps1 
+# or 
+node scripts/run_tests.mjs
 ```
 
 ## 📚 Technical Documentation

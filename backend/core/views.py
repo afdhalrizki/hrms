@@ -200,7 +200,7 @@ class DashboardStatsAPIView(views.APIView):
         total_employees = employees.count()
         
         dept_stats = Department.objects.annotate(
-            employee_count=Count('employee'),
+            employee_count=Count('employees'),
             # For real scenarios, we would sum the salary from Payroll/Payslip app here.
             # Mirroring the frontend's needs for total department cost.
         ).values('name', 'employee_count')
@@ -218,10 +218,10 @@ class DashboardStatsAPIView(views.APIView):
         payroll_totals = Payslip.objects.filter(
             period__start_date__month=current_month,
             period__start_date__year=current_year,
-            status='PAID'
+            payment_date__isnull=False
         ).aggregate(
             total_salary=Sum('net_pay'),
-            total_overtime=Sum('overtime_total')
+            total_overtime=Sum('overtime_pay')
         )
 
         return Response({
