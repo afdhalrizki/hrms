@@ -5,40 +5,53 @@ A next-generation, multi-tenant Human Resource Management System (HRMS) built fo
 ## ✨ Platform Highlights
 
 ### Professional Admin Dashboard
+
 ![Dashboard Preview](./docs/assets/dashboard_preview.png)
-*Modern, glassmorphism-based command center for HR professionals.*
+
+_Modern, glassmorphism-based command center for HR professionals._
 
 ### Secure Mobile Attendance
+
 <p align="center">
-  <img src="./docs/assets/mobile_preview.png" width="45%" />
-  <img src="./docs/assets/mobile_face_id.png" width="45%" />
+  <img src="./docs/assets/mobile_preview.png" width="48%" />
+  <img src="./docs/assets/mobile_face_id.png" width="48%" />
 </p>
-*Biometric face verification and real-time ESS (Employee Self-Service) for modern workforces.*
+
+_Biometric face verification and real-time ESS (Employee Self-Service) for modern workforces._
 
 ### 🛠️ Admin & Operations
+
 ![Admin Registrations](./docs/assets/admin_registrations.png)
-*Streamlined tenant onboarding and organizational provisioning.*
+
+_Streamlined tenant onboarding and organizational provisioning._
 
 ### 📅 Advanced Scheduling
+
 ![Shift Management](./docs/assets/shift_management.png)
-*Interactive shift planning and calendar-based workforce orchestration.*
+
+_Interactive shift planning and calendar-based workforce orchestration._
 
 ### 💸 Financial Workflows
+
 ![Reimbursement UI](./docs/assets/reimbursement_ui.png)
-*Multi-stage approval lifecycle for expense claims and reimbursements.*
+
+_Multi-stage approval lifecycle for expense claims and reimbursements._
 
 ### 💳 Commercial Readiness
+
 <p align="center">
-  <img src="./docs/assets/pricing_tiers_ui.png" width="45%" />
-  <img src="./docs/assets/subscription_expired_ui.png" width="45%" />
+  <img src="./docs/assets/pricing_tiers_ui.png" width="48%" />
+  <img src="./docs/assets/subscription_expired_ui.png" width="48%" />
 </p>
-*Tiered SaaS provisioning and intelligent subscription gating.*
+
+_Tiered SaaS provisioning and intelligent subscription gating._
 
 ## 📦 Getting Started
 
 Unified scripts to manage **Development**, **Staging**, and **Production** environments seamlessly.
 
 ### Windows (PowerShell)
+
 ```powershell
 # 1. Setup SDK Environments (Flutter, JDK, Android Tools)
 .\scripts\setup_envs.ps1
@@ -48,23 +61,25 @@ Unified scripts to manage **Development**, **Staging**, and **Production** envir
 ```
 
 ### Linux/macOS (Make)
+
 ```bash
 make dev
 ```
 
 **Access Points (Local Dev):**
+
 - **Public Dashboard**: [http://localhost:3000](http://localhost:3000)
 - **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
 - **Backend API Docs**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
-![Swagger UI](./docs/assets/swagger_ui.png)
+  ![Swagger UI](./docs/assets/swagger_ui.png)
 
 ## 📁 Project Modules
 
-| Module | Purpose | Documentation |
-| :--- | :--- | :--- |
-| **Backend** | Django REST API & Multi-tenant Core | [**README**](./backend/README.md) |
-| **Frontend** | Next.js Premium Admin Dashboard | [**README**](./frontend/README.md) |
-| **Mobile** | Flutter Employee Self-Service App | [**README**](./mobile/README.md) |
+| Module       | Purpose                             | Documentation                      |
+| :----------- | :---------------------------------- | :--------------------------------- |
+| **Backend**  | Django REST API & Multi-tenant Core | [**README**](./backend/README.md)  |
+| **Frontend** | Next.js Premium Admin Dashboard     | [**README**](./frontend/README.md) |
+| **Mobile**   | Flutter Employee Self-Service App   | [**README**](./mobile/README.md)   |
 
 ## 🚀 Key Features
 
@@ -77,12 +92,12 @@ make dev
 
 ## 🌐 Deployment & Infrastructure
 
-| Tier | Domain | Hosting Platform | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `qa.harikerja.web.id` | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing. |
-| **Staging** | `staging.harikerja.web.id` | **AWS Enterprise** | 1M User stress test. |
-| **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
+| Tier           | Domain                     | Hosting Platform              | Purpose                            |
+| :------------- | :------------------------- | :---------------------------- | :--------------------------------- |
+| **Dev**        | `localhost`                | Local Docker                  | Rapid prototyping & local testing. |
+| **QA**         | `qa.harikerja.web.id`      | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
+| **Staging**    | `staging.harikerja.web.id` | **AWS Enterprise**            | 1M User stress test.               |
+| **Production** | `harikerja.com`            | **AWS Enterprise**            | Official enterprise workloads.     |
 
 ## 🧪 Testing Standard
 
@@ -97,6 +112,7 @@ The platform achieves a unified **100% test pass rate** across all layers of the
 The platform has achieved **Platform Gold Release v1.3.0** and is now focusing on **Production Readiness** and **Performance Optimization**:
 
 ### 🔥 High Priority Tasks (Next 8-12 weeks)
+
 1. **Production Monitoring & Observability**
    - Prometheus + Grafana for real-time monitoring
    - ELK Stack for centralized logging
@@ -119,6 +135,7 @@ The platform has achieved **Platform Gold Release v1.3.0** and is now focusing o
    - Infrastructure as Code with Terraform
 
 ### 📋 Detailed Implementation Plan
+
 For complete details on immediate priorities, see: [**Immediate Priorities**](./docs/immediate_priorities.md)
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
@@ -126,12 +143,15 @@ For complete details on immediate priorities, see: [**Immediate Priorities**](./
 As **harikerja** transitions from a solo-developed MVP to a mission-critical enterprise platform, we have established a clear technical organization roadmap to ensure 99.9% uptime and data integrity for 1 million users.
 
 ### Technical Team Organization
+
 To guarantee stability, we have defined a **10-person core team** structure:
+
 - **Development (4 People)**: 2 Backend (Django), 1 Frontend (Next.js), 1 Mobile (Flutter).
 - **Platform & Reliability (2 People)**: 1 DevOps/SRE, 1 Security Engineer.
 - **Quality & Ops (4 People)**: 1 QA Automation, 3 Technical Support/Implementation.
 
 ### Strategic Transition Phases
+
 1.  **Current Phase**: Production Readiness & Performance Optimization (8-12 weeks)
 2.  **Next Phase**: 1,000 - 10,000 User Scaling with enhanced monitoring
 3.  **Future Phase**: 100,000+ User scaling with full 10-person team deployment
@@ -141,6 +161,7 @@ Detailed scaling strategy: [**Technical Team Strategy**](./docs/plans/technical_
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide internal documentation:
+
 - [**Immediate Priorities**](./docs/immediate_priorities.md) - Current focus areas
 - [**Implementation Plan**](./docs/implementation_plan.md) - Overall architecture blueprint
 - [**Walkthrough & Results**](./docs/walkthrough.md) - Feature stability summaries
@@ -155,6 +176,6 @@ For in-depth technical details, please refer to the platform-wide internal docum
 - **Infrastructure**: PostgreSQL 15, Redis 7, PgBouncer, AWS (EKS/RDS/S3).
 
 ---
+
 **Status**: 🚀 **Platform Gold Release v1.3.0 (March 31, 2026)**. Ready for Production Readiness Phase.
 **Current Focus**: High Priority Performance Optimization & Security Hardening (Phase P5).
-
