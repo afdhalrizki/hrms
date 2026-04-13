@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "start:backend:test": "pwsh -Command \"Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; pwsh ../backend/scripts/run_dev.ps1 -Seed -Coverage\""
+    "start:backend:test": "kill $(lsof -ti:8000) 2>/dev/null || true; node ../backend/scripts/run_dev.mjs --seed --coverage"
   },
   "dependencies": {
     "clsx": "^2.1.1",

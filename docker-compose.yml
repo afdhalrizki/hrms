@@ -1,16 +1,19 @@
-
 services:
   db:
     image: postgres:15-alpine
     env_file:
       - ./deploy/environments/.env.local
+    environment:
+      - POSTGRES_INITDB_ARGS=--auth-host=md5
+    command: postgres -c listen_addresses='*'
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_fresh:/var/lib/postgresql/data
+      - ./backend/postgres_config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hrms_user -d hrms"]
+      test: ['CMD-SHELL', 'pg_isready -U hrms_user -d hrms']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,10 +26,10 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,7 +44,7 @@ services:
     env_file:
       - ./deploy/environments/.env.local
     ports:
-      - "6432:6432"
+      - '6432:6432'
     depends_on:
       db:
         condition: service_healthy
@@ -57,7 +60,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./backend:/app
     env_file:
@@ -68,8 +71,7 @@ services:
       redis:
         condition: service_healthy
       pgbouncer:
-        condition:
-          service_started
+        condition: service_started
     restart: unless-stopped
     deploy:
       resources:
@@ -82,7 +84,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -91,8 +93,7 @@ services:
       - ./environments/.env.local
     depends_on:
       backend:
-        condition:
-          service_started
+        condition: service_started
     restart: unless-stopped
     deploy:
       resources:
@@ -101,4 +102,4 @@ services:
           memory: 2048M
 
 volumes:
-  postgres_data:
+  postgres_data_fresh:

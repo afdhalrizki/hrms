@@ -47,14 +47,12 @@ class LocationService {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
+      desiredAccuracy: LocationAccuracy.high,
     );
   }
 
-  double calculateDistance(double startLat, double startLng, double endLat, double endLng) {
+  double calculateDistance(
+      double startLat, double startLng, double endLat, double endLng) {
     return Geolocator.distanceBetween(startLat, startLng, endLat, endLng);
   }
 }

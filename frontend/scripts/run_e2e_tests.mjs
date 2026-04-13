@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { 
-  ensureDir, log, COLORS, spawnStream, waitForHttp, isPortInUse, waitForPort, spawnBackground 
+  ensureDir, log, COLORS, spawnStream, waitForHttp, isPortInUse, waitForPort, spawnBackground, moveFailureScreenshots 
 } from '../../scripts/lib.mjs';
 
 const execAsync = promisify(exec);
@@ -158,6 +158,10 @@ async function main() {
       cwd: FrontendDir,
       env: testEnv
     });
+  }
+
+  if (existsSync(FrontendDir)) {
+    await moveFailureScreenshots(FrontendDir);
   }
 
   if (exitCode === 0) {

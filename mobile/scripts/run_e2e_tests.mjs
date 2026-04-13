@@ -1,14 +1,14 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { 
-  ensureDir, 
-  log, 
-  COLORS, 
-  spawnStream, 
-  waitForPort, 
-  waitForHttp, 
+import {
+  ensureDir,
+  log,
+  COLORS,
+  spawnStream,
+  waitForPort,
+  waitForHttp,
   spawnBackground,
-  isPortInUse
+  isPortInUse,
 } from '../../scripts/lib.mjs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -21,86 +21,110 @@ const RootDir = resolve(MobileDir, '..');
 async function testBackendHealth() {
   try {
     // Attempt a simple health check
-    return await waitForHttp('http://127.0.0.1:8000/api/', 5000, 'Backend Health');
+    return await waitForHttp(
+      'http://127.0.0.1:8000/api/',
+      5000,
+      'Backend Health',
+    );
   } catch (e) {
     return false;
   }
 }
 
 async function ensureBackendStarted(isIntegrated) {
-  log("[Pre-check] Ensuring backend is reachable on http://127.0.0.1:8000 ...", COLORS.yellow);
-  
+  log(
+    '[Pre-check] Ensuring backend is reachable on http://127.0.0.1:8000 ...',
+    COLORS.yellow,
+  );
+
   const inUse = await isPortInUse(8000);
   if (inUse) {
     const healthy = await testBackendHealth();
     if (healthy) {
-      log("✅ Backend is already available and healthy.", COLORS.green);
+      log('✅ Backend is already available and healthy.', COLORS.green);
     } else {
-      log("⚠️ Port 8000 is in use but backend is not healthy. Please check manual server or close port.", COLORS.red);
+      log(
+        '⚠️ Port 8000 is in use but backend is not healthy. Please check manual server or close port.',
+        COLORS.red,
+      );
       return false;
     }
   } else {
-    log("🚀 Backend not ready. Starting via run_dev.ps1...", COLORS.yellow);
+    log('🚀 Backend not ready. Starting via run_dev.mjs...', COLORS.yellow);
     const backendDir = join(RootDir, 'backend');
-    
-    // Start backend in background. Using pwsh to run the existing robust script.
-    spawnBackground('pwsh', ['-NoProfile', '-NoLogo', '-Command', `./scripts/run_dev.ps1 -NoDeps`], { 
-      cwd: backendDir 
+
+    // Start backend in background. Using node to run the script.
+    spawnBackground('node', ['./scripts/run_dev.mjs', '--no-deps'], {
+      cwd: backendDir,
     });
 
-    log("Waiting for backend port 8000 (max 180s)...", COLORS.gray);
+    log('Waiting for backend port 8000 (max 180s)...', COLORS.gray);
     const portReady = await waitForPort(8000, '127.0.0.1', 180000);
     if (!portReady) {
-      log("❌ ERROR: Timeout waiting for backend port 8000", COLORS.red);
+      log('❌ ERROR: Timeout waiting for backend port 8000', COLORS.red);
       return false;
     }
-    
+
     const healthy = await testBackendHealth();
     if (!healthy) {
-      log("❌ ERROR: Backend started but health check failed.", COLORS.red);
+      log('❌ ERROR: Backend started but health check failed.', COLORS.red);
       return false;
     }
   }
 
   if (isIntegrated) {
-    log("🔗 Integrated mode: Bootstrapping tenants and seeding demo data...", COLORS.yellow);
+    log(
+      '🔗 Integrated mode: Bootstrapping tenants and seeding demo data...',
+      COLORS.yellow,
+    );
     const backendDir = join(RootDir, 'backend');
-    
-    // Set environment for the current process so the next commands work (matching run_e2e_tests.ps1)
+
+    // Set environment for the current process so the next commands work (matching run_e2e_tests.mjs)
     const integratedEnv = {
       ...process.env,
-      DB_HOST: "127.0.0.1",
-      DB_PORT: "6432",
-      DB_USER: "hrms_user",
-      DB_PASSWORD: "hrms_password",
-      DB_NAME: "hrms",
-      REDIS_URL: "redis://localhost:6379/1",
-      DATABASE_URL: "postgres://hrms_user:hrms_password@127.0.0.1:6432/hrms"
+      DB_HOST: '127.0.0.1',
+      DB_PORT: '6432',
+      DB_USER: 'hrms_user',
+      DB_PASSWORD: 'hrms_password',
+      DB_NAME: 'hrms',
+      REDIS_URL: 'redis://localhost:6379/1',
+      DATABASE_URL: 'postgres://hrms_user:hrms_password@127.0.0.1:6432/hrms',
     };
 
     // Pre-flight setup: Bootstrapping and Seeding
     try {
-      log("🔗 Running bootstrap_tenants...", COLORS.gray);
-      await execAsync('venv\\Scripts\\python.exe manage.py bootstrap_tenants', { 
+      log('🔗 Running bootstrap_tenants...', COLORS.gray);
+      await execAsync('venv\\Scripts\\python.exe manage.py bootstrap_tenants', {
         cwd: backendDir,
-        env: integratedEnv
+        env: integratedEnv,
       });
-      
-      log("🔗 Running seed_test_db.py...", COLORS.gray);
-      await execAsync('venv\\Scripts\\python.exe scripts/seed_test_db.py', { 
+
+      log('🔗 Running seed_test_db.py...', COLORS.gray);
+      await execAsync('venv\\Scripts\\python.exe scripts/seed_test_db.py', {
         cwd: backendDir,
-        env: integratedEnv
+        env: integratedEnv,
       });
-      
+
       // Smoke test: Login check
-      log("💨 Running pre-flight smoke test (Login check)...", COLORS.yellow);
-      const smokeTestCmd = '$headers = @{ "X-Tenant-Domain" = "company1.localhost"; "Host" = "company1.localhost:8000"; "Content-Type" = "application/json" }; $body = @{ "email" = "admin@company1.com"; "password" = "password123" } | ConvertTo-Json; $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/auth/login/" -Method Post -Headers $headers -Body $body -UseBasicParsing; if ($resp.StatusCode -eq 200) { exit 0 } else { exit 1 }';
+      log('💨 Running pre-flight smoke test (Login check)...', COLORS.yellow);
+      const smokeTestCmd =
+        '$headers = @{ "X-Tenant-Domain" = "company1.localhost"; "Host" = "company1.localhost:8000"; "Content-Type" = "application/json" }; $body = @{ "email" = "admin@company1.com"; "password" = "password123" } | ConvertTo-Json; $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/auth/login/" -Method Post -Headers $headers -Body $body -UseBasicParsing; if ($resp.StatusCode -eq 200) { exit 0 } else { exit 1 }';
       // Smoke test should also have the host header properly set, but the command itself is fine
-      const smokeExit = await spawnStream('pwsh', ['-NoProfile', '-Command', smokeTestCmd]);
+      const smokeExit = await spawnStream('pwsh', [
+        '-NoProfile',
+        '-Command',
+        smokeTestCmd,
+      ]);
       if (smokeExit === 0) {
-        log("✅ Smoke test passed: Backend is reachable and login works.", COLORS.green);
+        log(
+          '✅ Smoke test passed: Backend is reachable and login works.',
+          COLORS.green,
+        );
       } else {
-        log("⚠️ Smoke test failed. Tests might fail due to auth issues.", COLORS.red);
+        log(
+          '⚠️ Smoke test failed. Tests might fail due to auth issues.',
+          COLORS.red,
+        );
       }
     } catch (err) {
       log(`❌ Integrated setup failed: ${err.message}`, COLORS.red);
@@ -115,31 +139,50 @@ async function runE2ETests() {
   const args = process.argv.slice(2);
   const isIntegrated = args.includes('--integrated');
 
-  log("\n🚀 Running Mobile End-to-End Tests (Detailed Reporting)...", COLORS.cyan);
-  if (isIntegrated) log("🔗 INTEGRATED MODE: Using real backend and database.", COLORS.yellow);
+  log(
+    '\n🚀 Running Mobile End-to-End Tests (Detailed Reporting)...',
+    COLORS.cyan,
+  );
+  if (isIntegrated)
+    log('🔗 INTEGRATED MODE: Using real backend and database.', COLORS.yellow);
 
   if (!(await ensureBackendStarted(isIntegrated))) {
     process.exit(1);
   }
 
-  log("📦 Generating localizations...", COLORS.gray);
+  log('📦 Generating localizations...', COLORS.gray);
   try {
     await execAsync('flutter gen-l10n', { cwd: MobileDir });
   } catch (e) {
     // Ignore if it fails but log it
-    log("⚠️ flutter gen-l10n failed or not configured, continuing...", COLORS.gray);
+    log(
+      '⚠️ flutter gen-l10n failed or not configured, continuing...',
+      COLORS.gray,
+    );
   }
 
-  const logDir = join(MobileDir, 'e2e/logs');
+  const logDir = join(MobileDir, 'logs');
   await ensureDir(logDir);
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[:.]/g, '-')
+    .slice(0, 19)
+    .replace('T', '_');
   const logFile = join(logDir, `e2e_test_${timestamp}.log`);
 
   log(`[RUNNING] test/e2e_test.dart`, COLORS.yellow);
   log(`Logging output to: ${logFile}`, COLORS.gray);
 
-  const dartDefines = isIntegrated ? ['--dart-define=INTEGRATED_TEST=true'] : [];
-  const flutterArgs = ['test', '--reporter', 'json', ...dartDefines, 'test/e2e_test.dart'];
+  const dartDefines = isIntegrated
+    ? ['--dart-define=INTEGRATED_TEST=true']
+    : [];
+  const flutterArgs = [
+    'test',
+    '--reporter',
+    'json',
+    ...dartDefines,
+    'test/e2e_test.dart',
+  ];
 
   let filePassed = 0;
   let fileFailed = 0;
@@ -151,9 +194,9 @@ async function runE2ETests() {
 
   // We use spawn because we need to parse JSON line by line
   const { spawn } = await import('node:child_process');
-  const child = spawn('flutter.bat', flutterArgs, { 
+  const child = spawn('flutter', flutterArgs, {
     cwd: MobileDir,
-    shell: true
+    shell: true,
   });
 
   const fs = await import('node:fs');
@@ -162,7 +205,7 @@ async function runE2ETests() {
   child.stdout.on('data', (data) => {
     const str = data.toString();
     logStream.write(data);
-    
+
     const lines = str.split(/\r?\n/);
     for (let line of lines) {
       line = line.trim();
@@ -184,13 +227,15 @@ async function runE2ETests() {
           }
 
           if (evt.type === 'print') {
-             if (/(TEST:|DEBUG MOBILE:|HTTP REQUEST|LOGIN:)/i.test(evt.message)) {
-               log(`   ${evt.message}`, COLORS.gray);
-             }
+            if (
+              /(TEST:|DEBUG MOBILE:|HTTP REQUEST|LOGIN:)/i.test(evt.message)
+            ) {
+              log(`   ${evt.message}`, COLORS.gray);
+            }
           }
 
           if (evt.type === 'error') {
-            const name = testNames.get(evt.testID) || "Unknown Test";
+            const name = testNames.get(evt.testID) || 'Unknown Test';
             log(`   ❌ ERROR: ${evt.error}`, COLORS.red);
             fileReasons.push(`    ❌ [${name}]: ${evt.error}`);
           }
@@ -234,29 +279,29 @@ async function runE2ETests() {
     });
   });
 
-  log("\n========================================", COLORS.white);
-  log("🏁 E2E TEST SUMMARY", COLORS.cyan);
-  log("========================================", COLORS.white);
+  log('\n========================================', COLORS.white);
+  log('🏁 E2E TEST SUMMARY', COLORS.cyan);
+  log('========================================', COLORS.white);
   log(`✅ TOTAL PASSED:   ${filePassed}`, COLORS.green);
   log(`❌ TOTAL FAILED:   ${fileFailed}`, COLORS.red);
   log(`⚠️ TOTAL ERRORS:   ${fileErrors}`, COLORS.magenta);
   log(`🔍 TOTAL WARNINGS: ${hasWarning ? 1 : 0}`, COLORS.yellow);
-  log("========================================", COLORS.white);
+  log('========================================', COLORS.white);
 
   if (fileFailed > 0 || fileErrors > 0) {
-    fileReasons.forEach(r => log(r, COLORS.gray));
+    fileReasons.forEach((r) => log(r, COLORS.gray));
   }
 
   if (fileFailed === 0 && fileErrors === 0 && foundResults) {
-    log("🏆 E2E SUCCESS", COLORS.green);
+    log('🏆 E2E SUCCESS', COLORS.green);
     process.exit(0);
   } else {
-    log("💀 E2E TEST FAILED", COLORS.red);
+    log('💀 E2E TEST FAILED', COLORS.red);
     process.exit(1);
   }
 }
 
-runE2ETests().catch(err => {
+runE2ETests().catch((err) => {
   log(`FATAL ERROR: ${err.message}`, COLORS.red);
   process.exit(1);
 });

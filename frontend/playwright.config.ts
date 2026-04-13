@@ -21,15 +21,20 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { open: 'never', outputFolder: './e2e/report' }],
-    ['monocart-reporter', {
-      name: 'HRMS Frontend E2E Coverage Report',
-      outputFile: './e2e/coverage/index.html',
-      coverage: {
-        entryFilter: (entry: any) => entry.url.includes('_next/static') && !entry.url.includes('vendor'),
-        sourceFilter: (sourcePath: string) => sourcePath.includes('src') && !sourcePath.includes('node_modules'),
-        reports: ['v8', 'console-summary', 'lcov', 'html'],
-      }
-    }]
+    [
+      'monocart-reporter',
+      {
+        name: 'HRMS Frontend E2E Coverage Report',
+        outputFile: './e2e/coverage/index.html',
+        coverage: {
+          entryFilter: (entry: any) =>
+            entry.url.includes('_next/static') && !entry.url.includes('vendor'),
+          sourceFilter: (sourcePath: string) =>
+            sourcePath.includes('src') && !sourcePath.includes('node_modules'),
+          reports: ['v8', 'console-summary', 'lcov', 'html'],
+        },
+      },
+    ],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -56,7 +61,7 @@ export default defineConfig({
       env: {
         NODE_ENV: 'test',
       },
-      reuseExistingServer: false,
+      reuseExistingServer: true,
       stdout: 'pipe',
       stderr: 'pipe',
       timeout: 600 * 1000,

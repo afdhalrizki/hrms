@@ -1,6 +1,7 @@
 [run]
 branch = True
-source = .
+source =
+    .
 parallel = True
 omit =
     */migrations/*
@@ -10,7 +11,11 @@ omit =
     manage.py
     config/wsgi.py
     config/asgi.py
-
+[paths]
+source =
+    .
+    D:/hr/hrms/backend
+    D:\\hr\\hrms\\backend
 [report]
 show_missing = True
 precision = 2

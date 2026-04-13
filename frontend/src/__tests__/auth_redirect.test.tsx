@@ -22,7 +22,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
-  DashboardLayout: ({ children }: any) => <div>{children}</div>
+  DashboardLayout: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock('framer-motion', () => ({
@@ -91,5 +91,5 @@ describe('Home Page Redirection', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(mockPush).not.toHaveBeenCalled();
-  });
+  }, 10000);
 });

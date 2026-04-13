@@ -27,6 +27,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 *.tsbuildinfo
+.eslintcache
 
 # Environment
 .env
@@ -86,6 +87,12 @@ mobile/doc/api/
 mobile/.temp/
 mobile/local/
 mobile/coverage/
+mobile/build/
+mobile/logs/
+mobile/logs/archive/
+mobile/test-results/
+mobile/playwright-report/
+mobile/.nyc_output/
 
 # Android-specific
 mobile/android/local.properties
@@ -119,11 +126,18 @@ tools/*.zip
 tools/*.7z
 tools/*.tar.gz
 
-# Test Artifacts
+# Test Logs & Artifacts
 *-failure.png
+**/*.log
+**/logs/
+**/logs/archive/
+unit_test_*.log
+e2e_test_*.log
 
 # E2E Reports & Coverage
 **/e2e/coverage/
 **/e2e/test-results/
 **/e2e/report/
-**/e2e/logs/
+**/playwright-report/
+**/blob-report/
+**/.nyc_output/

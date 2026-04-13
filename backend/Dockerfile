@@ -6,7 +6,13 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev gcc \
+    && apt-get install -y --no-install-recommends \
+        libpq-dev \
+        gcc \
+        pkg-config \
+        libcairo2-dev \
+        meson \
+        ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
