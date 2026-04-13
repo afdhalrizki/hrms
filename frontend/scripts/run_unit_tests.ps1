@@ -1,14 +1,15 @@
-# Vitest Unit Test Master Script
-# Usage: .\run_unit_tests.ps1 [-Coverage] [-SkipInstall]
+# Vitest Unit Test Master Script (PowerShell)
+# Usage: .\run_unit_tests.ps1 [-Coverage] [-SkipInstall] [-Quick]
 
 param (
     [switch]$Coverage,      # Run with coverage report
-    [switch]$SkipInstall,  # Skip npm install check
-    [switch]$Quick        # Run with minimal dependencies and faster mode
+    [switch]$SkipInstall,   # Skip npm install check
+    [switch]$Quick          # Run with minimal dependencies and faster mode
 )
 
-$ScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$FrontendDir = Split-Path -Parent $ScriptDir
+$ErrorActionPreference = "Stop"
+
+$FrontendDir = Split-Path -Parent $PSScriptRoot
 Push-Location $FrontendDir
 
 Write-Host "--- HRMS Frontend Unit Test Automation ---" -ForegroundColor Cyan
@@ -28,22 +29,17 @@ if (-not $SkipInstall) {
 Write-Host "[2/2] Launching Vitest Suite..." -ForegroundColor Cyan
 Write-Host "Logging output to: $LogFile" -ForegroundColor Gray
 
-$TestCmd = "npx vitest run --pool=threads --maxWorkers 8 --reporter=verbose --reporter=json --outputFile=logs/unit_results.json"
-if ($Coverage) {
-    $TestCmd = "npx vitest run --coverage --pool=threads --maxWorkers 8 --reporter=verbose --reporter=json --outputFile=logs/unit_results.json"
-} elseif ($Quick) {
-    $TestCmd = "npx vitest run --pool=threads --maxWorkers 4 --reporter=verbose --reporter=json --outputFile=logs/unit_results.json"
-}
+$workers = if ($Quick) { 4 } else { 8 }
+$vitestArgs = @("vitest", "run", "--pool=threads", "--maxWorkers", $workers, "--reporter=verbose", "--reporter=json", "--outputFile=logs/unit_results.json")
+if ($Coverage) { $vitestArgs += "--coverage" }
 
-Write-Host "Executing: $TestCmd" -ForegroundColor Gray
-Invoke-Expression "$TestCmd | Tee-Object -FilePath '$LogFile'"
-
+& npx @vitestArgs 2>&1 | Tee-Object -FilePath $LogFile
 $ExitCode = $LASTEXITCODE
 
 if ($ExitCode -eq 0) {
     Write-Host "`nSUCCESS! All unit tests passed." -ForegroundColor Green
 } else {
-    Write-Host "`nFAILURE. Some unit tests failed. Check the output above." -ForegroundColor Red
+    Write-Host "`nFAILURE. Some unit tests failed." -ForegroundColor Red
 }
 
 Pop-Location

@@ -1,4 +1,4 @@
-# Playwright E2E Master Script
+# Playwright E2E Master Script (PowerShell)
 # Usage: .\run_e2e_tests.ps1 [-Live] [-SkipInstall] [-SkipSeed]
 
 param (
@@ -7,7 +7,9 @@ param (
     [switch]$SkipSeed      # Skip database seeding
 )
 
-$InternalScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+$ErrorActionPreference = "Stop"
+
+$InternalScriptDir = $PSScriptRoot
 $FrontendDir = Split-Path -Parent -Path $InternalScriptDir
 $RootDir = Split-Path -Parent -Path $FrontendDir
 $BackendDir = Join-Path $RootDir "backend"
@@ -30,46 +32,34 @@ if (-not $SkipInstall) {
 
 Write-Host "Logging output to: $LogFile" -ForegroundColor Gray
 
-function Wait-ForPort {
-    param(
-        [string]$HostName = '127.0.0.1',
-        [int]$Port,
-        [int]$TimeoutSeconds = 120,
-        [int]$IntervalSeconds = 2
-    )
-
-    $waited = 0
-    while ($waited -lt $TimeoutSeconds) {
-        $portOpen = $false
-        try {
-            $client = New-Object System.Net.Sockets.TcpClient
-            $waitTask = $client.BeginConnect($HostName, $Port, $null, $null)
-            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
-                $client.EndConnect($waitTask)
-                $portOpen = $true
-            }
-            $client.Close()
-        } catch { }
-
-        if ($portOpen) {
-            return $true
-        }
-        Start-Sleep -Seconds $IntervalSeconds
-        $waited += $IntervalSeconds
+function Test-BackendHealth {
+    try {
+        $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+        if ($resp.StatusCode -ge 200 -and $resp.StatusCode -lt 500) { return $true }
+    } catch {
+        if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) { return $true }
     }
     return $false
 }
 
-function Test-BackendHealth {
-    try {
-        Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop | Out-Null
-        return $true
-    } catch {
-        if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
-            return $true
-        }
-        return $false
+function Wait-ForPort {
+    param([int]$Port, [int]$TimeoutSeconds = 120)
+    $waited = 0
+    while ($waited -lt $TimeoutSeconds) {
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $waitTask = $client.BeginConnect("127.0.0.1", $Port, $null, $null)
+            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+                $client.EndConnect($waitTask)
+                $client.Close()
+                return $true
+            }
+            $client.Close()
+        } catch { }
+        Start-Sleep -Seconds 2
+        $waited += 2
     }
+    return $false
 }
 
 # 2. Environment Setup
@@ -78,25 +68,21 @@ if ($Live) {
     
     $UpScript = Join-Path $RootDir "up.ps1"
     if (Test-Path $UpScript) {
-        Write-Host "Ensuring backend is up..."
+        Write-Host "Ensuring backend is up..." -ForegroundColor Gray
         Push-Location $RootDir
-        .\up.ps1 dev
+        & .\up.ps1 dev
         Pop-Location
 
-        Write-Host "Waiting for backend port 8000 (max 120s)..." -ForegroundColor Gray
+        Write-Host "Waiting for backend port 8000 (max 180s)..." -ForegroundColor Gray
         if (-not (Wait-ForPort -Port 8000 -TimeoutSeconds 180)) {
             Write-Host "ERROR: Backend port 8000 did not become available." -ForegroundColor Red
-            Pop-Location
             exit 1
         }
 
         if (-not (Test-BackendHealth)) {
             Write-Host "ERROR: Backend health check failed after startup." -ForegroundColor Red
-            Pop-Location
             exit 1
         }
-
-        # Wait for DB to settle
         Start-Sleep -Seconds 5
     } else {
         Write-Host "Warning: up.ps1 not found, continuing with existing backend state..." -ForegroundColor Yellow
@@ -113,45 +99,34 @@ if (-not $SkipSeed) {
         Write-Host "Using Virtual Environment: $VenvPath" -ForegroundColor Gray
     }
 
-    if (Test-Path (Join-Path $BackendDir "scripts/seed_test_db.py")) {
-        Push-Location $BackendDir
-        & $PythonCmd scripts/seed_test_db.py
-        
+    $seedScript = Join-Path $BackendDir "scripts\seed_test_db.py"
+    if (Test-Path $seedScript) {
+        & $PythonCmd $seedScript
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Seed successful." -ForegroundColor Green
-        }
-        else {
+        } else {
             Write-Host "Warning: Seed script failed (Exit Code: $LASTEXITCODE)." -ForegroundColor Gray
         }
-        Pop-Location
+    } else {
+        Write-Host "Warning: Seed script not found at $seedScript" -ForegroundColor Yellow
     }
-    else {
-        Write-Host "Warning: Seed script not found at backend/scripts/seed_test_db.py" -ForegroundColor Yellow
-    }
-}
-else {
-    Write-Host "[2/3] Skipping Seed..." -ForegroundColor Gray
 }
 
-# 3. Port Cleanup (Ensure 3000 and 8000 are available/managed)
-Write-Host "[3/4] Ensuring ports are available..." -ForegroundColor Yellow
+# 3. Port Cleanup
+Write-Host "[3/4] Ensuring ports (3000, 8000) are available..." -ForegroundColor Yellow
 $Ports = @(3000, 8000)
 foreach ($Port in $Ports) {
-    $PortLine = netstat -ano | findstr ":$Port" | select-string "LISTENING" | Select-Object -First 1
-    if ($PortLine) {
-        $PidMatch = [regex]::Match($PortLine.ToString(), "\d+$")
-        if ($PidMatch.Success) {
-            $ActivePid = $PidMatch.Value
-            Write-Host "Found process $ActivePid on port $Port. Cleaning up..." -ForegroundColor Gray
-            Stop-Process -Id $ActivePid -Force -ErrorAction SilentlyContinue
+    $connections = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+    foreach ($conn in $connections) {
+        if ($conn.OwningProcess) {
+            Write-Host "Cleaning up process $($conn.OwningProcess) on port $Port..." -ForegroundColor Gray
+            Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue
         }
     }
 }
 
-# 3.5. Build Frontend (Ensure clean production build once)
+# 3.5. Build Frontend
 Write-Host "[3.5/4] Building Frontend Production Bundle..." -ForegroundColor Yellow
-
-# Force SWC disablement to avoid native binding errors on Node 24
 $env:NEXT_DISABLE_SWC = "1"
 $env:NEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK = "1"
 
@@ -165,28 +140,31 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[4/4] Launching Playwright Tests..." -ForegroundColor Cyan
 $env:PORT = "3000"
 $env:PLAYWRIGHT_JSON_OUTPUT_NAME = "logs/e2e_results.json"
+$env:NEXT_PUBLIC_API_URL = if ($Live) { "https://qa.harikerja.web.id/api" } else { "http://localhost:8000/api" }
 
-# Note: Playwright's webServer config handles starting and waiting for the Next.js dev server.
-
-$workersArg = 1
-$playwrightCmd = "npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=$workersArg --retries=2 --timeout=120000 --reporter=list,json"
-Write-Host "Executing: $playwrightCmd" -ForegroundColor Gray
-Invoke-Expression "$playwrightCmd | Tee-Object -FilePath '$LogFile'"
-
+$playwrightCmd = "npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=1 --retries=2 --timeout=120000 --reporter=list,json"
+& npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=1 --retries=2 --timeout=120000 --reporter=list,json 2>&1 | Tee-Object -FilePath $LogFile
 $ExitCode = $LASTEXITCODE
 
-# Extra retry for transient ci/environment failures
+# Extra retry
 if ($ExitCode -ne 0) {
     Write-Host "Transient failure detected, retrying Playwright suite once more..." -ForegroundColor Yellow
     Start-Sleep -Seconds 5
-    Invoke-Expression $playwrightCmd
+    & npx playwright test --grep-invert 'diagnostic|Instrumentation' --workers=1 --retries=2 --timeout=120000 --reporter=list,json
     $ExitCode = $LASTEXITCODE
+}
+
+# Move screenshots
+$pngFiles = Get-ChildItem -Path $FrontendDir -Filter "*-failure.png" -File -ErrorAction SilentlyContinue
+if ($pngFiles) {
+    if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+    $pngFiles | Move-Item -Destination $LogDir -Force
+    Write-Host "📸 Moved $($pngFiles.Count) failure screenshots to $LogDir" -ForegroundColor DarkYellow
 }
 
 if ($ExitCode -eq 0) {
     Write-Host "`nWINNER! All tests passed." -ForegroundColor Green
-}
-else {
+} else {
     Write-Host "`nFAILURE. Some tests failed. Check the Playwright report." -ForegroundColor Red
 }
 

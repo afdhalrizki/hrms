@@ -5,238 +5,166 @@
 param(
     [int]$Workers = 0,
     [switch]$NoSeed,
-    [switch]$NoStart
+    [switch]$NoStart,
+    [switch]$NoDeps,
+    [switch]$ForceDeps
 )
 
 $ErrorActionPreference = "Stop"
 
 # 1. Setup Paths
 $BackendDir = Split-Path -Parent $PSScriptRoot
-Push-Location $BackendDir
 $RootDir = Split-Path -Parent $BackendDir
-$EnvFile = Join-Path $RootDir "deploy\environments\.env.local"
 $VenvDir = Join-Path $BackendDir "venv"
-$PytestExec = Join-Path $VenvDir "Scripts\pytest.exe"
 $PythonExec = Join-Path $VenvDir "Scripts\python.exe"
-
-Push-Location $BackendDir
 
 Write-Host "--- HRMS Backend E2E Test Suite ---" -ForegroundColor Cyan
 
-function Wait-BackendHealth {
-    param(
-        [int]$MaxWaitSeconds = 180,
-        [int]$IntervalSeconds = 3
-    )
-
-    $waited = 0
-    while ($waited -lt $MaxWaitSeconds) {
-        $portOpen = $false
-        try {
-            $client = New-Object System.Net.Sockets.TcpClient
-            $waitTask = $client.BeginConnect("127.0.0.1", 8000, $null, $null)
-            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
-                $client.EndConnect($waitTask)
-                $portOpen = $true
-            }
-            $client.Close()
-        } catch { }
-
-        if ($portOpen) {
-            try {
-                $health = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
-                if ($health.StatusCode -ge 200 -and $health.StatusCode -lt 500) {
-                    return $true
-                }
-            } catch [System.Net.WebException] {
-                if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
-                    return $true
-                }
-            } catch {
-                # continue
-            }
-
-            # If Invoke-WebRequest raises HttpResponseException for 404, allow it as healthy too
-            try {
-                $health = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
-                if ($health.StatusCode -eq 404) { return $true }
-            } catch [Microsoft.PowerShell.Commands.HttpResponseException] {
-                if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
-                    return $true
-                }
-            } catch {
-                # continue and retry
-            }
+function Test-BackendHealth {
+    try {
+        $health = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+        if ($health.StatusCode -ge 200 -and $health.StatusCode -lt 500) {
+            return $true
         }
-        Write-Host "." -NoNewline -ForegroundColor Gray
-        Start-Sleep -Seconds $IntervalSeconds
-        $waited += $IntervalSeconds
+    } catch {
+        if ($_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
+            return $true
+        }
     }
     return $false
 }
 
 function Wait-ForPort {
-    param(
-        [string]$HostName = '127.0.0.1',
-        [int]$Port,
-        [int]$TimeoutSeconds = 120,
-        [int]$IntervalSeconds = 2
-    )
-
+    param([int]$Port, [int]$TimeoutSeconds = 120)
     $waited = 0
     while ($waited -lt $TimeoutSeconds) {
-        $portOpen = $false
         try {
             $client = New-Object System.Net.Sockets.TcpClient
-            $waitTask = $client.BeginConnect($HostName, $Port, $null, $null)
+            $waitTask = $client.BeginConnect("127.0.0.1", $Port, $null, $null)
             if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
                 $client.EndConnect($waitTask)
-                $portOpen = $true
+                $client.Close()
+                return $true
             }
             $client.Close()
         } catch { }
-
-        if ($portOpen) {
-            return $true
-        }
-        Start-Sleep -Seconds $IntervalSeconds
-        $waited += $IntervalSeconds
+        Start-Sleep -Seconds 2
+        $waited += 2
     }
     return $false
 }
 
 function Ensure-BackendStarted {
-    param(
-        [int]$StartTimeoutSeconds = 180
-    )
-
-    $root = Split-Path -Parent (Split-Path -Parent -Path $PSScriptRoot)
-    $upScript = Join-Path $root "up.ps1"
-
-    if (Wait-BackendHealth -MaxWaitSeconds 5) {
-        return $true
-    }
-
+    if (Test-BackendHealth) { return $true }
     if ($NoStart) {
         Write-Host "NoStart flag set and backend is not ready." -ForegroundColor Yellow
         return $false
     }
 
+    $upScript = Join-Path $RootDir "up.ps1"
     if (-not (Test-Path $upScript)) {
         Write-Host "up.ps1 not found at $upScript. Cannot auto-start backend." -ForegroundColor Yellow
         return $false
     }
 
     Write-Host "⚠️ Starting backend via up.ps1 dev..." -ForegroundColor Yellow
-    Push-Location $root
+    Push-Location $RootDir
     .\up.ps1 dev
     Pop-Location
 
-    Write-Host "Waiting for backend port 8000 (max $StartTimeoutSeconds s)..." -ForegroundColor Gray
-    if (-not (Wait-ForPort -HostName '127.0.0.1' -Port 8000 -TimeoutSeconds $StartTimeoutSeconds -IntervalSeconds 2)) {
-        Write-Host "ERROR: Timeout waiting for backend port 8000" -ForegroundColor Red
+    Write-Host "Waiting for backend port 8000 (max 180s)..." -ForegroundColor Gray
+    if (-not (Wait-ForPort -Port 8000 -TimeoutSeconds 180)) {
+        Write-Host "❌ ERROR: Timeout waiting for backend port 8000" -ForegroundColor Red
         return $false
     }
 
     Write-Host "Performing backend API health check..." -ForegroundColor Gray
-    if (-not (Wait-BackendHealth)) {
-        Write-Host "ERROR: Backend health endpoint is still failing." -ForegroundColor Red
-        return $false
+    $waited = 0
+    while ($waited -lt 120) {
+        if (Test-BackendHealth) { return $true }
+        Start-Sleep -Seconds 5
+        $waited += 5
     }
-
-    Start-Sleep -Seconds 5
-    return $true
+    return $false
 }
 
-# 1. Check if server is running and healthy
+# 1. Sync Dependencies
+if (-not $NoDeps) {
+    Write-Host "Checking dependencies..." -ForegroundColor Yellow
+    if (-not (Test-Path $VenvDir)) {
+        Write-Host "Creating virtual environment..." -ForegroundColor Gray
+        python -m venv $VenvDir
+    }
+    
+    $reqFile = Join-Path $BackendDir "requirements.txt"
+    $reqHashPath = Join-Path $BackendDir ".venv_requirements.hash"
+    $currentHash = (Get-FileHash -Path $reqFile -Algorithm SHA256).Hash
+    $cachedHash = if (Test-Path $reqHashPath) { Get-Content $reqHashPath -Raw } else { "" }
+
+    if ($ForceDeps -or $currentHash -ne $cachedHash) {
+        Write-Host "Installing requirements..." -ForegroundColor Gray
+        & $PythonExec -m pip install --upgrade pip setuptools wheel
+        & $PythonExec -m pip install -r $reqFile
+        $currentHash | Out-File -FilePath $reqHashPath -Encoding ascii
+    }
+}
+
+# 2. Check server
 Write-Host "Checking if backend server is running on localhost:8000..." -ForegroundColor Yellow
-$serverReady = Ensure-BackendStarted -StartTimeoutSeconds 180
-
-if (-not $serverReady) {
-    Write-Host "ERROR: Backend server is not ready on localhost:8000 after retries." -ForegroundColor Red
-    Write-Host "Please run 'pwsh ./run_dev.ps1' in a separate terminal first, then rerun." -ForegroundColor Yellow
+if (-not (Ensure-BackendStarted)) {
+    Write-Host "❌ ERROR: Backend server is not ready." -ForegroundColor Red
     exit 1
 }
-Write-Host "✅ Backend server is reachable and healthy." -ForegroundColor Green
+Write-Host "✅ Backend server is unreachable and healthy." -ForegroundColor Green
 
-# 2. Virtual Environment Check
-if (-not (Test-Path $PytestExec)) {
-    Write-Host "pytest not found in $VenvDir. Please ensure venv is setup." -ForegroundColor Red
-    exit 1
-}
-
-# 2. Seed Test Data
+# 3. Seeding
 if (-not $NoSeed) {
-    Write-Host "Seeding test database..." -ForegroundColor Cyan
-    & $PythonExec "$PSScriptRoot\seed_test_db.py"
-} else {
-    Write-Host "Skipping seed step due to --NoSeed." -ForegroundColor Yellow
+    Write-Host "Seeding test database..." -ForegroundColor Yellow
+    $seedScript = Join-Path $BackendDir "scripts\seed_test_db.py"
+    & $PythonExec $seedScript
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ ERROR: Database seeding failed." -ForegroundColor Red
+        exit 1
+    }
 }
 
-# 3. Run Pytest with E2E marker
+# 4. Run Pytest
 Write-Host "Running E2E tests targetting localhost:8000..." -ForegroundColor Green
-
-# Ensuring log directory exists
 $LogDir = Join-Path $BackendDir "logs"
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
 $LogFile = Join-Path $LogDir ("e2e_test_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
-try {
-    # Dynamically detect terminal width for better alignment when piped
-    $termWidth = if ($Host.UI.RawUI.WindowSize.Width -gt 0) { $Host.UI.RawUI.WindowSize.Width } else { 120 }
+$workerCount = if ($Workers -gt 0) { $Workers } else { 1 }
+$pytestArgs = @("-m", "e2e", "tests_e2e/", "--color=yes", "--maxfail=1", "--durations=20", "--reuse-db", "-n", $workerCount)
 
-    # Force color output and pass detected terminal width
-    $workerCount = if ($Workers -gt 0) { $Workers } else { 1 }
+$env:COLUMNS = 120
+& $PythonExec -m pytest @pytestArgs 2>&1 | Tee-Object -FilePath $LogFile
+$exitCode = $LASTEXITCODE
 
-    $pytestArgs = @(
-        "-m", "e2e",
-        "tests_e2e/",
-        "--color=yes",
-        "--maxfail=1",
-        "--durations=20",
-        "--reuse-db",
-        "-n", $workerCount
-    )
+# 5. Summary
+$finalLines = Get-Content $LogFile -Tail 10
+$summaryLine = $finalLines | Where-Object { $_ -match "==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*" }
 
-    $env:COLUMNS = $termWidth
-    & $PythonExec -m pytest @pytestArgs 2>&1 | Tee-Object -FilePath $LogFile
-    $exitCode = $LASTEXITCODE
+Write-Host "`n" + ("=" * 60) -ForegroundColor Gray
+Write-Host "                E2E TEST RUN SUMMARY" -ForegroundColor Cyan -NoNewline
+Write-Host " (Exit: $exitCode)" -ForegroundColor Gray
+Write-Host ("=" * 60) -ForegroundColor Gray
 
-    # 4. Final Summary Parsing
-    $finalLines = Get-Content $LogFile -Tail 10
-    $summaryLine = $finalLines | Where-Object { $_ -match "==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*" }
-    
-    Write-Host "`n" + ("=" * 60) -ForegroundColor Gray
-    Write-Host "                E2E TEST RUN SUMMARY" -ForegroundColor Cyan -NoNewline
-    Write-Host " (Exit: $exitCode)" -ForegroundColor Gray
-    Write-Host ("=" * 60) -ForegroundColor Gray
-    
-    if ($summaryLine) {
-        # Clean up the summary line for display
-        $cleanSummary = $summaryLine.Trim(' =')
-        Write-Host " DETAILS : $cleanSummary" -ForegroundColor White
-        
-        # Determine Status and Color
-        if ($cleanSummary -match "failed|error") {
-            Write-Host " STATUS  : ❌ E2E TESTS FAILED" -ForegroundColor Red
-        } elseif ($cleanSummary -match "warning") {
-            Write-Host " STATUS  : ⚠️ E2E PASSED WITH WARNINGS" -ForegroundColor Yellow
-        } elseif ($exitCode -eq 0) {
-            Write-Host " STATUS  : ✅ E2E TESTS PASSED" -ForegroundColor Green
-        } else {
-            Write-Host " STATUS  : ❌ UNKNOWN FAILURE (Exit Code: $exitCode)" -ForegroundColor Red
-        }
-    } else {
-        if ($exitCode -eq 0) {
-            Write-Host " STATUS  : ✅ E2E TESTS PASSED" -ForegroundColor Green
-        } else {
-            Write-Host " STATUS  : ❌ E2E EXECUTION FAILED" -ForegroundColor Red
-        }
+if ($summaryLine) {
+    $cleanSummary = $summaryLine.Trim(' =')
+    Write-Host " DETAILS : $cleanSummary" -ForegroundColor White
+    if ($cleanSummary -match "failed|error") {
+        Write-Host " STATUS  : ❌ E2E TESTS FAILED" -ForegroundColor Red
+    } elseif ($cleanSummary -match "warning") {
+        Write-Host " STATUS  : ⚠️ E2E PASSED WITH WARNINGS" -ForegroundColor Yellow
+    } elseif ($exitCode -eq 0) {
+        Write-Host " STATUS  : ✅ E2E TESTS PASSED" -ForegroundColor Green
     }
-    Write-Host ("=" * 60) -ForegroundColor Gray
-} finally {
-    # File is persistent in logs/ now
+} elseif ($exitCode -eq 0) {
+    Write-Host " STATUS  : ✅ E2E TESTS PASSED" -ForegroundColor Green
+} else {
+    Write-Host " STATUS  : ❌ E2E EXECUTION FAILED" -ForegroundColor Red
 }
+Write-Host ("=" * 60) -ForegroundColor Gray
 
-Pop-Location
 exit $exitCode

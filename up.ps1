@@ -1,14 +1,25 @@
 param (
-    [Parameter(Mandatory=$true, Position=0)]
+    [Parameter(Position=0)]
     [ValidateSet("dev", "qa", "staging", "prod")]
-    $env_name,
+    $env_name = "dev",
 
     [switch]$down,
     [switch]$logs,
     [switch]$build
 )
 
-# 1. Environment File Selection
+# 1. Docker Command Detection
+$dockerCmd = "docker-compose"
+if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
+    $dockerCmd = "docker compose"
+}
+
+if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ ERROR: Neither docker-compose nor docker compose found." -ForegroundColor Red
+    exit 1
+}
+
+# 2. Environment File Selection
 $env_file = "deploy/environments/.env.local"
 if ($env_name -eq "qa") {
     $env_file = "deploy/environments/.env.qa"
@@ -18,24 +29,40 @@ if ($env_name -eq "qa") {
     $env_file = "deploy/environments/.env.production"
 }
 
-# 2. Handle 'down'
+if (-not (Test-Path $env_file)) {
+    Write-Host "❌ ERROR: Environment file not found at $env_file" -ForegroundColor Red
+    exit 1
+}
+
+# 3. Handle 'down'
 if ($down) {
     Write-Host "Stopping all HRMS [$env_name] containers..." -ForegroundColor Yellow
-    docker-compose --env-file $env_file down
-    exit
+    & $dockerCmd --env-file $env_file down
+    exit $LASTEXITCODE
 }
 
-# 3. Handle 'logs'
+# 4. Handle 'logs'
 if ($logs) {
-    docker-compose --env-file $env_file logs -f
-    exit
+    Write-Host "Viewing logs for HRMS [$env_name]..." -ForegroundColor Cyan
+    & $dockerCmd --env-file $env_file logs -f
+    exit $LASTEXITCODE
 }
 
-# 4. Handle Start/Build
+# 5. Handle Start/Build
 $build_flag = if ($build) { "--build" } else { "" }
 
 Write-Host "Starting HRMS Platform in [$env_name] mode using [$env_file]..." -ForegroundColor Cyan
-docker-compose --env-file $env_file up -d $build_flag
+if ($build) {
+    & $dockerCmd --env-file $env_file up -d --build
+} else {
+    & $dockerCmd --env-file $env_file up -d
+}
 
-Write-Host "System is coming up..." -ForegroundColor Green
-Write-Host "To view logs, run: .\up.ps1 $env_name -logs"
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "System is coming up..." -ForegroundColor Green
+    Write-Host "To view logs, run: .\up.ps1 $env_name -logs"
+} else {
+    Write-Host "❌ ERROR: Failed to start containers (Exit Code: $LASTEXITCODE)" -ForegroundColor Red
+}
+
+exit $LASTEXITCODE
