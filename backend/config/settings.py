@@ -30,6 +30,20 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 TENANT_DOMAIN_SUFFIX = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.localhost').split(',')
 
+# Security Hardening for Production
+if not DEBUG:
+    # Use SECURE_SSL_REDIRECT only if your proxy (Nginx/LB) doesn't handle it
+    SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    # If the app is behind a proxy that handles SSL (like Nginx), you might need:
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Application definition
 

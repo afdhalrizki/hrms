@@ -92,9 +92,30 @@ Because we don't have a SSH server, the easiest way for a beginner to run migrat
 
 ---
 
+## Stage 6: Load Testing (1M User Simulation)
+10-person core team expects this environment to handle sharp traffic spikes.
+
+1.  Use **Locust** or **JMeter** from a separate EC2 instance.
+2.  Target the `staging.harikerja.web.id` endpoint.
+3.  Monitor **App Runner Metrics** (CPU/RAM) during the test.
+4.  Validate that the DB handles concurrent connections via **RDS Performance Insights**.
+
+---
+
+## Stage 7: Monitoring (AWS CloudWatch)
+
+1.  **Logs**: Centralized in CloudWatch Logs under `/aws/apprunner/hrms-backend-staging`.
+2.  **Metrics**: Set up a CloudWatch Dashboard for:
+    *   `RequestCount`
+    *   `HTTP5xxErrorCount`
+    *   `CPUUtilization` (App Runner)
+    *   `DatabaseConnections` (RDS)
+3.  **Alarms**: Create an alarm that emails you if `CPUUtilization > 80%` for 5 minutes.
+
+---
+
 ## Summary for Solo-Dev
 - **Logs:** Go to App Runner -> **Logs** tab to see trial/error messages.
 - **Costs:** Monitor the **AWS Billing Dashboard**. App Runner "Provisioned instances" have a small fee even when idle, but it's much cheaper than EKS.
 
 The Staging environment is now LIVE. 🚀
-

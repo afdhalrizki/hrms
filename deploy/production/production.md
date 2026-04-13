@@ -84,6 +84,26 @@ The safest way for a solo dev to run migrations is via a temporary "Public" wind
 
 ---
 
+## Stage 6: Security Hardening
+
+1.  **AWS WAF**: 
+    *   Create a Web ACL and associate it with your App Runner service.
+    *   Enable **Amazon Managed Rules** (Core rule set, SQL Injection).
+    *   Enable **IP Rate Limiting** to prevent brute-force attacks on login.
+2.  **AWS Secrets Manager**:
+    *   Store `DATABASE_URL` and `SECRET_KEY` in Secrets Manager.
+    *   Update your environment variables to reference the secret ARN (requires custom integration) or keep them in App Runner Environment Variables with restricted IAM access.
+
+---
+
+## Stage 7: Disaster Recovery (DR)
+
+1.  **Automated Backups**: Ensure RDS has a 7-30 day retention period.
+2.  **Snapshot Replication**: Enable replication of RDS snapshots to a secondary region (e.g., from `us-east-1` to `us-west-2`).
+3.  **Point-in-Time Recovery**: Test restoring the DB once every 6 months to a temporary instance.
+
+---
+
 ## Scaling for the Future
 - **Horizontal Scaling:** App Runner will automatically add more instances if the CPU usage is high.
 - **Microservices:** If you need more complex routing later, you can migrate from App Runner to **Amazon EKS** as documented in the [AWS High Availability Architecture](../docs/aws_high_availability_architecture.md).

@@ -19,7 +19,7 @@ Based on the UAT/QA workload analysis, the following are the required server spe
 
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
-- **QA Domain:** `qa.harikerja.com`
+- **QA Domain:** `qa.harikerja.web.id`
 
 ---
 
@@ -120,11 +120,11 @@ Fill in the following key configurations for QA mode:
 # --- CORE API ---
 DEBUG=False
 SECRET_KEY=fill-with-a-very-long-and-random-secret-key
-ALLOWED_HOSTS=.qa.harikerja.com,localhost,127.0.0.1
-CSRF_TRUSTED_ORIGINS=https://*.qa.harikerja.com
+ALLOWED_HOSTS=.qa.harikerja.web.id,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=https://*.qa.harikerja.web.id
 
 # --- TENANT SETTINGS ---
-TENANT_DOMAIN_SUFFIX=qa.harikerja.com
+TENANT_DOMAIN_SUFFIX=qa.harikerja.web.id
 
 # --- DATABASE ---
 POSTGRES_DB=hrms_qa
@@ -134,7 +134,7 @@ POSTGRES_HOST=db
 POSTGRES_PORT=5432
 
 # --- FRONTEND ---
-NEXT_PUBLIC_API_URL=https://qa.harikerja.com/api
+NEXT_PUBLIC_API_URL=https://qa.harikerja.web.id/api
 ```
 
 ---
@@ -161,14 +161,14 @@ Once all containers are active, enter the `backend` container and run migrations
 ```bash
 docker compose exec backend bash
 python manage.py migrate_schemas --shared
-python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=qa.harikerja.com --is_primary=True
+python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=qa.harikerja.web.id --is_primary=True
 ```
 
 ---
 
 ## Stage 5: Nginx Reverse Proxy & SSL Configuration (HTTPS)
 
-Our application needs to be accessible via `https://qa.harikerja.com` and *wildcard tenants* like `https://<anything>.qa.harikerja.com`.
+Our application needs to be accessible via `https://qa.harikerja.web.id` and *wildcard tenants* like `https://<anything>.qa.harikerja.web.id`.
 
 ### 1. Create Nginx Server Block
 Create a specific configuration file:
@@ -180,7 +180,7 @@ Insert the following *Reverse Proxy* code:
 ```nginx
 server {
     listen 80;
-    server_name qa.harikerja.com *.qa.harikerja.com;
+    server_name qa.harikerja.web.id *.qa.harikerja.web.id;
 
     # Bypass static file max payload
     client_max_body_size 100M;
@@ -223,14 +223,14 @@ sudo systemctl reload nginx
 ```
 
 ### 3. Setup Wildcard SSL (*Let's Encrypt*)
-Specifically for *Multi-Tenant* (SaaS) applications, we **must** use a *Wildcard SSL* (`*.qa.harikerja.com`). This requires DNS validation.
+Specifically for *Multi-Tenant* (SaaS) applications, we **must** use a *Wildcard SSL* (`*.qa.harikerja.web.id`). This requires DNS validation.
 
 ```bash
-sudo certbot certonly --manual --preferred-challenges=dns --email admin@qa.harikerja.com --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d qa.harikerja.com -d *.qa.harikerja.com
+sudo certbot certonly --manual --preferred-challenges=dns --email admin@qa.harikerja.web.id --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d qa.harikerja.web.id -d *.qa.harikerja.web.id
 ```
 
 > **IMPORTANT**:
-> The command above will provide a *TXT record* (e.g., `_acme-challenge.qa.harikerja.com`). You must go to your domain's **DNS Manager Panel**, and add the TXT record before pressing `Enter` in the terminal.
+> The command above will provide a *TXT record* (e.g., `_acme-challenge.qa.harikerja.web.id`). You must go to your domain's **DNS Manager Panel**, and add the TXT record before pressing `Enter` in the terminal.
 
 After the certificate is issued, edit the manual Nginx profile to install the SSL:
 ```bash
@@ -243,8 +243,8 @@ Change the `listen 80;` port to the standard `443 ssl` (refer to the standard Ce
 ## Stage 6: Verification & UAT (*User Acceptance Testing*)
 
 If all steps are successful, validate from your Browser:
-1. Access `https://qa.harikerja.com` -> It should display the Next.js *Landing Page / Admin Panel Login*.
-2. Access `https://qa.harikerja.com/api/schema/swagger-ui/` -> It should display the Django API documentation tanpa SSL errors.
+1. Access `https://qa.harikerja.web.id` -> It should display the Next.js *Landing Page / Admin Panel Login*.
+2. Access `https://qa.harikerja.web.id/api/schema/swagger-ui/` -> It should display the Django API documentation tanpa SSL errors.
 
 ---
 
