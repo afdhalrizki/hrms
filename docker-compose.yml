@@ -5,18 +5,22 @@ services:
       - ./deploy/environments/.env.local
     environment:
       - POSTGRES_INITDB_ARGS=--auth-host=md5
-    command: postgres -c listen_addresses='*'
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - postgres_data_fresh:/var/lib/postgresql/data
-      - ./backend/postgres_config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    container_name: hrms-db
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U hrms_user -d hrms']
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      hrms_net:
+        ipv4_address: 172.25.0.10
+        aliases:
+          - db
     deploy:
       resources:
         limits:
@@ -33,6 +37,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - hrms_net
     deploy:
       resources:
         limits:
@@ -40,15 +46,23 @@ services:
           memory: 256M
 
   pgbouncer:
-    image: brainsam/pgbouncer:latest
+    image: edoburu/pgbouncer:latest
     env_file:
       - ./deploy/environments/.env.local
+    environment:
+      - DATABASE_URL=postgres://hrms_user:hrms_password@172.25.0.10:5432/hrms
+      - AUTH_TYPE=trust
+      - POOL_MODE=transaction
+      - MAX_CLIENT_CONN=100
     ports:
-      - '6432:6432'
+      - '6432:5432'
+    restart: unless-stopped
+    networks:
+      hrms_net:
+        ipv4_address: 172.25.0.11
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
     deploy:
       resources:
         limits:
@@ -100,6 +114,13 @@ services:
         limits:
           cpus: '1.0'
           memory: 2048M
+
+networks:
+  hrms_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
 
 volumes:
   postgres_data_fresh:

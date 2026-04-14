@@ -91,9 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
       for (var payslip in payslips) {
         activities.add(
           Activity(
-            title: "Payslip ${payslip['period_name']}",
+            title: "Payslip ${payslip['period_name'] ?? payslip['period']?.toString() ?? ''}".trim(),
             subtitle:
-                "Rp ${NumberFormat('#,###').format(double.tryParse(payslip['net_salary']?.toString() ?? '0'))}",
+                "Rp ${NumberFormat('#,###').format(double.tryParse(payslip['net_pay']?.toString() ?? '0'))}",
             time: payslip['payment_date'] != null
                 ? DateFormat('d MMM').format(DateTime.parse(payslip['payment_date']))
                 : "Recent",

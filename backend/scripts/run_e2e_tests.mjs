@@ -10,6 +10,7 @@ import {
   waitForHttp,
   isPortInUse,
   waitForPort,
+  getPythonExec,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -92,12 +93,9 @@ async function main() {
   log('--- HRMS Backend E2E Test Suite (Node.js) ---', COLORS.cyan);
 
   // 1. Venv Check
-  const isWin = process.platform === 'win32';
   const venvDir = join(BackendDir, 'venv');
-  const venvPython = isWin
-    ? join(venvDir, 'Scripts', 'python.exe')
-    : join(venvDir, 'bin', 'python');
-  const systemPython = isWin ? 'python' : 'python3';
+  const pythonPath = getPythonExec(BackendDir);
+  const systemPython = process.platform === 'win32' ? 'python' : 'python3';
 
   log('Checking virtual environment...', COLORS.yellow);
   if (!existsSync(venvDir)) {
@@ -107,8 +105,7 @@ async function main() {
     });
   }
 
-  // Update pythonPath after potential venv creation
-  const pythonPath = existsSync(venvPython) ? venvPython : systemPython;
+  // (Removed manual path resolution as getPythonExec handles it)
 
   // 2. Sync Dependencies
   log('Syncing dependencies...', COLORS.yellow);

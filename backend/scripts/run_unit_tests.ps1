@@ -16,12 +16,17 @@ $BackendDir = Split-Path -Parent $PSScriptRoot
 $RootDir = Split-Path -Parent $BackendDir
 $EnvFile = Join-Path $RootDir "deploy\environments\.env.local"
 $VenvDir = Join-Path $BackendDir "venv"
-$PythonExec = Join-Path $VenvDir "Scripts\python.exe"
+$PythonExec = if ($IsWindows) { Join-Path $VenvDir "Scripts\python.exe" } else { Join-Path $VenvDir "bin/python" }
 
 # 2. Docker Command Detection
-$dockerCmd = "docker-compose"
-if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
-    $dockerCmd = "docker compose"
+$dockerCmd = "docker compose"
+if (docker compose version 2>$null) { $dockerCmd = "docker compose" }
+elseif (Get-Command "docker-compose" -ErrorAction SilentlyContinue) { $dockerCmd = "docker-compose" }
+else { $dockerCmd = $null }
+
+if (-not $dockerCmd) {
+    Write-Host "❌ ERROR: Neither docker compose nor docker-compose found." -ForegroundColor Red
+    exit 1
 }
 
 function Wait-ForServiceHealth {
@@ -95,6 +100,30 @@ if ($SkipDocker) {
     }
 
     if ($ResetDocker) { Reset-DockerServices }
+    else {
+        # Proactive check for port 5433 occupancy
+        $rawPort = 5433
+        $rawPortInUse = $false
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $waitTask = $client.BeginConnect("127.0.0.1", $rawPort, $null, $null)
+            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) { $rawPortInUse = $true; $client.Close() }
+        } catch { }
+
+        if ($rawPortInUse) {
+            # Check if 6432 is ALSO in use
+            $proxyInUse = $false
+            try {
+                $client = New-Object System.Net.Sockets.TcpClient
+                $waitTask = $client.BeginConnect("127.0.0.1", 6432, $null, $null)
+                if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) { $proxyInUse = $true; $client.Close() }
+            } catch { }
+
+            if (-not $proxyInUse) {
+                Write-Host "⚠️ Port $rawPort is in use. Attempting to proceed with pgbouncer setup..." -ForegroundColor Yellow
+            }
+        }
+    }
 
     & $dockerCmd --env-file $EnvFile up -d db redis pgbouncer
     if ($LASTEXITCODE -ne 0) {
@@ -109,12 +138,12 @@ $env:REDIS_URL = "redis://localhost:6379/1"
 $env:DATABASE_URL = "postgres://hrms_user:hrms_password@localhost:6432/hrms"
 
 # Wait for DB to be ready
-Write-Host "Waiting for database to be ready on localhost:5432..." -ForegroundColor Gray
+Write-Host "Waiting for database to be ready on localhost:6432..." -ForegroundColor Gray
 $dbReady = $false
 for ($i=0; $i -lt 20; $i++) {
     try {
         $client = New-Object System.Net.Sockets.TcpClient
-        $waitTask = $client.BeginConnect("127.0.0.1", 5432, $null, $null)
+        $waitTask = $client.BeginConnect("127.0.0.1", 6432, $null, $null)
         if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
             $client.EndConnect($waitTask)
             $dbReady = $true

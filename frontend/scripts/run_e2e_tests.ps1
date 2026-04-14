@@ -93,7 +93,7 @@ if (-not $SkipSeed) {
     Write-Host "[2/3] Preparing/Seeding test data (Backend)..." -ForegroundColor Yellow
     
     $PythonCmd = "python"
-    $VenvPath = Join-Path $BackendDir "venv\Scripts\python.exe"
+    $VenvPath = if ($IsWindows) { Join-Path $BackendDir "venv\Scripts\python.exe" } else { Join-Path $BackendDir "venv/bin/python" }
     if (Test-Path $VenvPath) {
         $PythonCmd = $VenvPath
         Write-Host "Using Virtual Environment: $VenvPath" -ForegroundColor Gray

@@ -12,6 +12,7 @@ import {
   isPortInUse,
   getDockerComposeCommand,
   ensureDockerRunning,
+  getPythonExec,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -63,8 +64,8 @@ async function main() {
     log('[1/5] Ensuring Docker services are running...', COLORS.yellow);
 
     // Defensive Port Checks
-    const requiredPorts = [5432, 6379, 6432, 8000];
-    for (const port of requiredPorts) {
+    const ports = [5433, 6379, 6432, 8000];
+    for (const port of ports) {
       if (await isPortInUse(port)) {
         log(
           `WARNING: Port ${port} is already in use. This might cause Docker or Local Server to fail.`,
@@ -128,24 +129,22 @@ async function main() {
       'postgres://hrms_user:hrms_password@localhost:6432/hrms';
   }
 
+  const dbPort = process.env.DATABASE_URL?.includes(':6432/') ? 6432 : 5432;
   log(
-    `Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:5432...`,
+    `Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:${dbPort}...`,
     COLORS.gray,
   );
-  const dbReady = await waitForPort(5432);
+  const dbReady = await waitForPort(dbPort);
   if (!dbReady) {
-    log('\n❌ ERROR: Database did not become ready in time.', COLORS.red);
+    log(`\n❌ ERROR: Database port ${dbPort} did not become ready in time.`, COLORS.red);
     process.exit(1);
   }
   log('Database is ready!', COLORS.green);
 
   // 4. Venv Check
-  const isWin = process.platform === 'win32';
   const venvDir = join(BackendDir, 'venv');
-  const venvPython = isWin
-    ? join(venvDir, 'Scripts', 'python.exe')
-    : join(venvDir, 'bin', 'python');
-  const systemPython = isWin ? 'python' : 'python3';
+  const venvPython = getPythonExec(BackendDir);
+  const systemPython = process.platform === 'win32' ? 'python' : 'python3';
 
   log('[3/5] Checking virtual environment...', COLORS.yellow);
   if (!existsSync(venvDir)) {

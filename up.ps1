@@ -9,13 +9,13 @@ param (
 )
 
 # 1. Docker Command Detection
-$dockerCmd = "docker-compose"
-if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
-    $dockerCmd = "docker compose"
-}
+$dockerCmd = "docker compose"
+if (docker compose version 2>$null) { $dockerCmd = "docker compose" }
+elseif (Get-Command "docker-compose" -ErrorAction SilentlyContinue) { $dockerCmd = "docker-compose" }
+else { $dockerCmd = $null }
 
-if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ ERROR: Neither docker-compose nor docker compose found." -ForegroundColor Red
+if (-not $dockerCmd) {
+    Write-Host "❌ ERROR: Neither docker compose nor docker-compose found." -ForegroundColor Red
     exit 1
 }
 

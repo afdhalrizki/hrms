@@ -1,19 +1,15 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, readdirSync } from 'node:fs';
-import { ensureDir, log, COLORS, spawnStream } from '../../scripts/lib.mjs';
+import { ensureDir, log, COLORS, spawnStream, getPythonExec } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BackendDir = resolve(__dirname, '..');
 const VenvDir = join(BackendDir, 'venv');
-const isWin = process.platform === 'win32';
-const PythonExec = isWin
-  ? join(VenvDir, 'Scripts', 'python.exe')
-  : join(VenvDir, 'bin', 'python');
-
 function getPythonCommand() {
-  if (existsSync(PythonExec)) return PythonExec;
-  return isWin ? 'python' : 'python3';
+  const pythonPath = getPythonExec(BackendDir);
+  if (existsSync(pythonPath)) return pythonPath;
+  return process.platform === 'win32' ? 'python' : 'python3';
 }
 
 const coverageFile = join(BackendDir, '.coverage');
@@ -28,7 +24,7 @@ async function main() {
 
   if (!existsSync(VenvDir)) {
     log('Creating virtual environment...', COLORS.gray);
-    const systemPython = isWin ? 'python' : 'python3';
+    const systemPython = process.platform === 'win32' ? 'python' : 'python3';
     await spawnStream(systemPython, ['-m', 'venv', VenvDir], {
       cwd: BackendDir,
     });

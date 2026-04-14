@@ -73,7 +73,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
       );
     }
 
-    final netSalary = double.tryParse(_selectedPayslip?['net_salary']?.toString() ?? '0') ?? 0;
+    final netSalary = double.tryParse(_selectedPayslip?['net_pay']?.toString() ?? '0') ?? 0;
     final paidAt = _selectedPayslip?['payment_date'] != null 
         ? DateFormat('d MMM yyyy').format(DateTime.parse(_selectedPayslip['payment_date']))
         : 'Pending';
@@ -106,13 +106,11 @@ class _PayslipScreenState extends State<PayslipScreen> {
               _buildSummaryCard(netSalary, paidAt),
               const SizedBox(height: 32),
               _buildSectionHeader("Earnings"),
-              _buildComponentItem("Basic Salary", "Rp ${NumberFormat('#,###').format(_selectedPayslip?['basic_salary'] ?? 0)}"),
-              if (_selectedPayslip?['allowances'] != null)
-                ...(_selectedPayslip!['allowances'] as List).map((a) => _buildComponentItem(a['name'], "Rp ${NumberFormat('#,###').format(a['amount'])}")),
+              _buildComponentItem("Basic Salary", "Rp ${NumberFormat('#,###').format(double.tryParse(_selectedPayslip?['basic_salary']?.toString() ?? '0'))}"),
+              _buildComponentItem("Total Allowance", "Rp ${NumberFormat('#,###').format(double.tryParse(_selectedPayslip?['total_allowance']?.toString() ?? '0'))}"),
               const SizedBox(height: 24),
               _buildSectionHeader("Deductions"),
-               if (_selectedPayslip?['deductions'] != null)
-                ...(_selectedPayslip!['deductions'] as List).map((d) => _buildComponentItem(d['name'], "-Rp ${NumberFormat('#,###').format(d['amount'])}", isNegative: true)),
+              _buildComponentItem("Total Deduction", "-Rp ${NumberFormat('#,###').format(double.tryParse(_selectedPayslip?['total_deduction']?.toString() ?? '0'))}", isNegative: true),
               const SizedBox(height: 48),
               _buildDownloadButton(),
             ],
@@ -142,7 +140,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
           children: [
             const Icon(Icons.calendar_today, size: 20, color: Colors.blueAccent),
             Text(
-              _selectedPayslip?['period_name'] ?? 'Select Period',
+              _selectedPayslip?['period_name'] ?? _selectedPayslip?['period']?.toString() ?? 'Select Period',
               style: AppTheme.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             const Icon(Icons.expand_more, size: 20, color: Colors.white38),
@@ -163,7 +161,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
         itemBuilder: (context, index) {
           final payslip = _payslips[index];
           return ListTile(
-            title: Text(payslip['period_name'], style: const TextStyle(color: Colors.white)),
+            title: Text(payslip['period_name'] ?? payslip['period']?.toString() ?? 'Period', style: const TextStyle(color: Colors.white)),
             onTap: () {
               setState(() => _selectedPayslip = payslip);
               Navigator.pop(context);
@@ -254,7 +252,7 @@ class _PayslipScreenState extends State<PayslipScreen> {
         try {
           await ApiService().downloadPdf(
             "/payslips/${_selectedPayslip['id']}/download_pdf/", 
-            'Payslip_${_selectedPayslip['period_name']}.pdf'
+            'Payslip_${_selectedPayslip['period_name'] ?? _selectedPayslip['period']}.pdf'
           );
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

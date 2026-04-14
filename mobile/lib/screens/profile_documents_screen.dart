@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile/utils/style_utils.dart';
@@ -7,8 +8,7 @@ import '../widgets/loading_indicator.dart';
 
 class ProfileDocumentsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
-  final dynamic mockController;
-  const ProfileDocumentsScreen({super.key, required this.userData, this.mockController});
+  const ProfileDocumentsScreen({super.key, required this.userData});
 
   @override
   State<ProfileDocumentsScreen> createState() => _ProfileDocumentsScreenState();
@@ -27,14 +27,8 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    if (widget.mockController != null) {
-      _cameraController = widget.mockController;
-      _isCameraReady = true;
-      if (mounted) setState(() {});
-      return;
-    }
-
-    if (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST')) {
+    final bool isTest = const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST');
+    if (isTest) {
       return;
     }
 
@@ -75,8 +69,8 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
     try {
       final List<int> bytes;
       if (isTest) {
-        // Dummy 1x1 PNG bytes
-        bytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xFF, 0xFF, 0x3F, 0x00, 0x05, 0xFE, 0x02, 0xFE, 0xDC, 0x44, 0x74, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82];
+        // Valid base64 1x1 PNG
+        bytes = base64Decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
       } else {
         final XFile image = await _cameraController!.takePicture();
         bytes = await image.readAsBytes();
@@ -89,7 +83,7 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
         employeeId, 
         fieldName, 
         bytes, 
-        "${fieldName}_${DateTime.now().millisecondsSinceEpoch}.jpg"
+        "${fieldName}_${DateTime.now().millisecondsSinceEpoch}.png"
       );
 
       if (mounted) {
@@ -150,7 +144,7 @@ class _ProfileDocumentsScreenState extends State<ProfileDocumentsScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: widget.mockController != null
+                child: (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST'))
                     ? Container(key: const Key('mock_camera_preview'), color: Colors.grey[800], child: const Center(child: Icon(Icons.camera_alt, color: Colors.white, size: 50)))
                     : CameraPreview(_cameraController!),
               ),

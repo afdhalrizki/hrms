@@ -8,9 +8,8 @@ import '../widgets/loading_indicator.dart';
 
 class FaceVerificationScreen extends StatefulWidget {
   final bool isClockIn;
-  final dynamic mockController;
 
-  const FaceVerificationScreen({super.key, required this.isClockIn, this.mockController});
+  const FaceVerificationScreen({super.key, required this.isClockIn});
 
   @override
   State<FaceVerificationScreen> createState() => _FaceVerificationScreenState();
@@ -34,14 +33,8 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    if (widget.mockController != null) {
-      _cameraController = widget.mockController;
-      _isCameraInitialized = true;
-      if (mounted) setState(() {});
-      return;
-    }
-
-    if (const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST')) {
+    final bool isTest = const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST');
+    if (isTest) {
       return;
     }
     
@@ -180,6 +173,8 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isTest = const bool.fromEnvironment('INTEGRATED_TEST') || Platform.environment.containsKey('FLUTTER_TEST');
+
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return Scaffold(
         backgroundColor: Colors.black,
@@ -239,7 +234,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       body: Stack(
         alignment: Alignment.center,
         children: [
-          if (widget.mockController != null)
+          if (isTest)
             Container(key: const Key('mock_camera_preview'), color: Colors.blue[900], child: const Center(child: Icon(Icons.camera, color: Colors.white, size: 100)))
           else
             CameraPreview(_cameraController!),

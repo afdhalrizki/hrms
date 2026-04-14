@@ -10,6 +10,7 @@ import {
   isPortInUse,
   getDockerComposeCommand,
   ensureDockerRunning,
+  getPythonExec,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -78,6 +79,14 @@ async function main() {
         'down',
         '--remove-orphans',
       ]);
+    } else {
+      // Proactive check for port 5433 conflict if we are trying to start Docker
+      if (await isPortInUse(5433)) {
+        // If 5433 is in use, check if 6432 is ALSO in use (then maybe it's our own docker)
+        if (!(await isPortInUse(6432))) {
+          log('⚠️ Port 5433 is in use. Attempting to proceed with pgbouncer setup...', COLORS.yellow);
+        }
+      }
     }
 
     await spawnStream(composeCmd, [
@@ -123,24 +132,22 @@ async function main() {
       'postgres://hrms_user:hrms_password@localhost:6432/hrms';
   }
 
+  const dbPort = process.env.DATABASE_URL?.includes(':6432/') ? 6432 : 5432;
   log(
-    `Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:5432...`,
+    `Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:${dbPort}...`,
     COLORS.gray,
   );
-  const dbReady = await waitForPort(5432);
+  const dbReady = await waitForPort(dbPort);
   if (!dbReady) {
-    log('\n❌ ERROR: Database did not become ready in time.', COLORS.red);
+    log(`\n❌ ERROR: Database port ${dbPort} did not become ready in time.`, COLORS.red);
     process.exit(1);
   }
   log('Database is ready!', COLORS.green);
 
   // 4. Pytest detection
   log('[3/3] Checking pytest and python path...', COLORS.yellow);
-  const isWin = process.platform === 'win32';
-  const venvPath = isWin
-    ? join(BackendDir, 'venv', 'Scripts', 'python.exe')
-    : join(BackendDir, 'venv', 'bin', 'python');
-  const systemPython = isWin ? 'python' : 'python3';
+  const venvPath = getPythonExec(BackendDir);
+  const systemPython = process.platform === 'win32' ? 'python' : 'python3';
 
   if (!existsSync(venvPath)) {
     log('Creating virtual environment...', COLORS.yellow);

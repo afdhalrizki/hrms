@@ -74,6 +74,87 @@ function Ensure-BackendStarted {
     }
 
     if ($Integrated) {
+    Write-Host "[Pre-check] Ensuring database services are reachable (Integrated Mode)..." -ForegroundColor Yellow
+    
+    $dbPort = 6432
+    $dbPortInUse = $false
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $waitTask = $client.BeginConnect("127.0.0.1", $dbPort, $null, $null)
+        if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+            $client.EndConnect($waitTask)
+            $dbPortInUse = $true
+            $client.Close()
+        }
+    } catch { }
+
+    if (-not $dbPortInUse) {
+        # Check for port 5433 (Docker DB) occupancy
+        $rawPort = 5433
+        $rawPortInUse = $false
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $waitTask = $client.BeginConnect("127.0.0.1", $rawPort, $null, $null)
+            if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+                $rawPortInUse = $true
+                $client.Close()
+            }
+        } catch { }
+
+        if ($rawPortInUse) {
+            Write-Host "⚠️ Port $rawPort is in use. Attempting to proceed with pgbouncer setup..." -ForegroundColor Yellow
+        }
+
+        Write-Host "🚀 Database port $dbPort not ready. Starting via docker compose..." -ForegroundColor Yellow
+        
+        # Check if Docker is running
+        docker info >$null 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "❌ ERROR: Docker daemon is not running. Please start Docker manually." -ForegroundColor Red
+            exit 1
+        }
+
+        # Resolve docker command
+        $dockerCmd = "docker compose"
+        if (-not (Get-Command "docker-compose" -ErrorAction SilentlyContinue)) { # Check if we should fallback to v1? No, prefer v2
+             if (-not (docker compose version 2>$null)) { $dockerCmd = "docker-compose" }
+        }
+        # Refined preference logic:
+        if (docker compose version 2>$null) { $dockerCmd = "docker compose" }
+        elseif (Get-Command "docker-compose" -ErrorAction SilentlyContinue) { $dockerCmd = "docker-compose" }
+        else { $dockerCmd = $null }
+
+        & $dockerCmd --env-file (Join-Path $RootDir "deploy\environments\.env.local") up -d db redis pgbouncer
+        
+        Write-Host "Waiting for database port $dbPort (max 120s)..." -ForegroundColor Gray
+        $waited = 0
+        while ($waited -lt 120) {
+            try {
+                $client = New-Object System.Net.Sockets.TcpClient
+                $waitTask = $client.BeginConnect("127.0.0.1", $dbPort, $null, $null)
+                if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
+                    $client.EndConnect($waitTask)
+                    $dbPortInUse = $true
+                    $client.Close()
+                    break
+                }
+            } catch { }
+            Start-Sleep -Seconds 2
+            $waited += 2
+            Write-Host "." -NoNewline -ForegroundColor Gray
+        }
+
+        if (-not $dbPortInUse) {
+            Write-Host "`n❌ ERROR: Timeout waiting for database port $dbPort" -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "`n✅ Database services are now available." -ForegroundColor Green
+    } else {
+        Write-Host "✅ Database port $dbPort is already available." -ForegroundColor Green
+    }
+}
+
+if ($Integrated) {
         Write-Host "🔗 Integrated mode: Bootstrapping and seeding..." -ForegroundColor Yellow
         Push-Location $BackendDir
         
@@ -82,20 +163,28 @@ function Ensure-BackendStarted {
         $env:DB_USER = "hrms_user"; $env:DB_PASSWORD = "hrms_password"
         $env:DATABASE_URL = "postgres://hrms_user:hrms_password@127.0.0.1:6432/hrms"
         
+        $PythonExec = if ($IsWindows) { Join-Path $BackendDir "venv\Scripts\python.exe" } else { Join-Path $BackendDir "venv/bin/python" }
+        
+        Write-Host "🔗 Running shared migrations..." -ForegroundColor Gray
+        & $PythonExec manage.py migrate_schemas --shared > $null 2>&1
+        
         Write-Host "🔗 Running bootstrap_tenants..." -ForegroundColor Gray
-        & ./venv/Scripts/python.exe manage.py bootstrap_tenants > $null 2>&1
+        & $PythonExec manage.py bootstrap_tenants > $null 2>&1
+        
         Write-Host "🔗 Running seed_test_db.py..." -ForegroundColor Gray
-        & ./venv/Scripts/python.exe scripts/seed_test_db.py > $null 2>&1
+        & $PythonExec scripts/seed_test_db.py > $null 2>&1
         Pop-Location
 
         # Smoke test
         Write-Host "💨 Running pre-flight smoke test..." -ForegroundColor Yellow
         try {
-            $headers = @{ "X-Tenant-Domain" = "company1.localhost"; "Host" = "company1.localhost:8000"; "Content-Type" = "application/json" }
-            $body = @{ "email" = "admin@company1.com"; "password" = "password123" } | ConvertTo-Json
-            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/auth/login/" -Method Post -Headers $headers -Body $body -UseBasicParsing
-            if ($resp.StatusCode -eq 200) { Write-Host "✅ Smoke test passed." -ForegroundColor Green }
-            else { Write-Host "⚠️ Smoke test failed (Status: $($resp.StatusCode))" -ForegroundColor Red }
+            $SmokeTestCmd = 'curl -s -X POST -H "X-Tenant-Domain: company1.localhost" -H "Host: company1.localhost:8000" -H "Content-Type: application/json" -d "{\`"email\`": \`"admin@company1.com\`", \`"password\`": \`"password123\`"}" http://127.0.0.1:8000/api/auth/login/'
+            $Resp = Invoke-Expression $SmokeTestCmd
+            if ($Resp -like "*access*") {
+                Write-Host "✅ Smoke test passed." -ForegroundColor Green
+            } else {
+                Write-Host "⚠️ Smoke test failed. Backend response: $Resp" -ForegroundColor Red
+            }
         } catch {
             Write-Host "⚠️ Smoke test error: $($_.Exception.Message)" -ForegroundColor Red
         }

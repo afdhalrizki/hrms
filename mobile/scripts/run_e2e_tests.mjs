@@ -9,6 +9,9 @@ import {
   waitForHttp,
   spawnBackground,
   isPortInUse,
+  getPythonExec,
+  ensureDockerRunning,
+  getDockerComposeCommand,
 } from '../../scripts/lib.mjs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -73,13 +76,10 @@ async function ensureBackendStarted(isIntegrated) {
   }
 
   if (isIntegrated) {
-    log(
-      '🔗 Integrated mode: Bootstrapping tenants and seeding demo data...',
-      COLORS.yellow,
-    );
     const backendDir = join(RootDir, 'backend');
+    const pythonExec = getPythonExec(backendDir);
+    const envFile = join(RootDir, 'deploy', 'environments', '.env.local');
 
-    // Set environment for the current process so the next commands work (matching run_e2e_tests.mjs)
     const integratedEnv = {
       ...process.env,
       DB_HOST: '127.0.0.1',
@@ -91,40 +91,82 @@ async function ensureBackendStarted(isIntegrated) {
       DATABASE_URL: 'postgres://hrms_user:hrms_password@127.0.0.1:6432/hrms',
     };
 
-    // Pre-flight setup: Bootstrapping and Seeding
+    async function verifyDbConnection() {
+      try {
+        await execAsync(
+          `${pythonExec} -c "import psycopg2; psycopg2.connect('dbname=hrms user=hrms_user password=hrms_password host=127.0.0.1 port=6432 connect_timeout=5')"`,
+          { env: integratedEnv },
+        );
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    log('[Pre-check] Ensuring database services are reachable (Integrated Mode)...', COLORS.yellow);
+    const dbInUse = await isPortInUse(6432);
+    if (!dbInUse) {
+      log('🚀 Database port 6432 not ready. Starting via docker compose...', COLORS.yellow);
+      if (!(await ensureDockerRunning())) {
+        return false;
+      }
+      const composeCmd = await getDockerComposeCommand();
+      await spawnStream(
+        composeCmd,
+        ['--env-file', envFile, 'up', '-d', 'db', 'redis', 'pgbouncer'],
+        { cwd: RootDir },
+      );
+    }
+
+    log('⏳ Waiting for verified database connection through proxy...', COLORS.gray);
+    let dbVerified = false;
+    let retries = 30;
+    while (retries > 0 && !dbVerified) {
+      dbVerified = await verifyDbConnection();
+      if (!dbVerified) {
+        process.stdout.write(COLORS.gray + '.');
+        await new Promise((r) => setTimeout(r, 2000));
+        retries--;
+      }
+    }
+
+    if (!dbVerified) {
+      log('\n❌ ERROR: Database proxy (pgbouncer) is up, but backend database is unreachable.', COLORS.red);
+      log('   Check pgbouncer logs: docker compose logs pgbouncer', COLORS.yellow);
+      return false;
+    }
+    log('\n✅ Database connection verified.', COLORS.green);
+
+    // Pre-flight setup: Migrations, Bootstrapping and Seeding
     try {
+      log('🔗 Running shared migrations...', COLORS.gray);
+      await execAsync(`${pythonExec} manage.py migrate_schemas --shared`, {
+        cwd: backendDir,
+        env: integratedEnv,
+      });
+
       log('🔗 Running bootstrap_tenants...', COLORS.gray);
-      await execAsync('venv\\Scripts\\python.exe manage.py bootstrap_tenants', {
+      await execAsync(`${pythonExec} manage.py bootstrap_tenants`, {
         cwd: backendDir,
         env: integratedEnv,
       });
 
       log('🔗 Running seed_test_db.py...', COLORS.gray);
-      await execAsync('venv\\Scripts\\python.exe scripts/seed_test_db.py', {
+      await execAsync(`${pythonExec} scripts/seed_test_db.py`, {
         cwd: backendDir,
         env: integratedEnv,
       });
 
       // Smoke test: Login check
       log('💨 Running pre-flight smoke test (Login check)...', COLORS.yellow);
-      const smokeTestCmd =
-        '$headers = @{ "X-Tenant-Domain" = "company1.localhost"; "Host" = "company1.localhost:8000"; "Content-Type" = "application/json" }; $body = @{ "email" = "admin@company1.com"; "password" = "password123" } | ConvertTo-Json; $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/auth/login/" -Method Post -Headers $headers -Body $body -UseBasicParsing; if ($resp.StatusCode -eq 200) { exit 0 } else { exit 1 }';
-      // Smoke test should also have the host header properly set, but the command itself is fine
-      const smokeExit = await spawnStream('pwsh', [
-        '-NoProfile',
-        '-Command',
-        smokeTestCmd,
-      ]);
-      if (smokeExit === 0) {
-        log(
-          '✅ Smoke test passed: Backend is reachable and login works.',
-          COLORS.green,
-        );
+      const smokeTestCmd = `curl -s -X POST -H "X-Tenant-Domain: company1.localhost" -H "Host: company1.localhost:8000" -H "Content-Type: application/json" -d '{"email": "admin@company1.com", "password": "password123"}' http://127.0.0.1:8000/api/auth/login/`;
+      
+      const { stdout, stderr } = await execAsync(smokeTestCmd);
+      if (stdout.includes("access")) {
+        log('✅ Smoke test passed: Backend is reachable and login works.', COLORS.green);
       } else {
-        log(
-          '⚠️ Smoke test failed. Tests might fail due to auth issues.',
-          COLORS.red,
-        );
+        log('⚠️ Smoke test failed. Backend response did not contain access token.', COLORS.red);
+        log(`Debug info: ${stdout}`, COLORS.gray);
       }
     } catch (err) {
       log(`❌ Integrated setup failed: ${err.message}`, COLORS.red);
@@ -136,15 +178,13 @@ async function ensureBackendStarted(isIntegrated) {
 }
 
 async function runE2ETests() {
-  const args = process.argv.slice(2);
-  const isIntegrated = args.includes('--integrated');
+  const isIntegrated = true; // Always on integrated mode by default
 
   log(
-    '\n🚀 Running Mobile End-to-End Tests (Detailed Reporting)...',
+    '\n🚀 Running Mobile End-to-End Tests (INTEGRATED MODE)...',
     COLORS.cyan,
   );
-  if (isIntegrated)
-    log('🔗 INTEGRATED MODE: Using real backend and database.', COLORS.yellow);
+  log('🔗 Using real backend and database.', COLORS.yellow);
 
   if (!(await ensureBackendStarted(isIntegrated))) {
     process.exit(1);
@@ -189,6 +229,10 @@ async function runE2ETests() {
   let fileErrors = 0;
   let hasWarning = false;
   let foundResults = false;
+  const fs = await import('node:fs');
+  const testFileContent = fs.readFileSync(join(MobileDir, 'test/e2e_test.dart'), 'utf-8');
+  const totalTests = (testFileContent.match(/testWidgets\(/g) || []).length;
+  let currentTestCount = 0;
   const testNames = new Map();
   const fileReasons = [];
 
@@ -199,7 +243,6 @@ async function runE2ETests() {
     shell: true,
   });
 
-  const fs = await import('node:fs');
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
   child.stdout.on('data', (data) => {
@@ -221,8 +264,9 @@ async function runE2ETests() {
           const evt = JSON.parse(line);
           if (evt.type === 'testStart' && evt.test.name) {
             testNames.set(evt.test.id, evt.test.name);
-            if (!evt.test.name.includes('loading')) {
-              log(`\n🏃 Testing: ${evt.test.name}`, COLORS.cyan);
+            if (!evt.test.name.includes('loading') && !evt.test.name.includes('tearDownAll')) {
+              currentTestCount++;
+              log(`\n[${currentTestCount}/${totalTests}] 🏃 Testing: ${evt.test.name}`, COLORS.cyan);
             }
           }
 

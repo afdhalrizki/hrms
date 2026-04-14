@@ -18,17 +18,17 @@ $BackendDir = Split-Path -Parent $PSScriptRoot
 $RootDir = Split-Path -Parent $BackendDir
 $EnvFile = Join-Path $RootDir "deploy\environments\.env.local"
 $VenvDir = Join-Path $BackendDir "venv"
-$PythonExec = Join-Path $VenvDir "Scripts\python.exe"
+$PythonExec = if ($IsWindows) { Join-Path $VenvDir "Scripts\python.exe" } else { Join-Path $VenvDir "bin/python" }
 $ReqHashPath = Join-Path $BackendDir ".venv_requirements.hash"
 
 # 2. Docker Command Detection
-$dockerCmd = "docker-compose"
-if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
-    $dockerCmd = "docker compose"
-}
+$dockerCmd = "docker compose"
+if (docker compose version 2>$null) { $dockerCmd = "docker compose" }
+elseif (Get-Command "docker-compose" -ErrorAction SilentlyContinue) { $dockerCmd = "docker-compose" }
+else { $dockerCmd = $null }
 
-if (-not (Get-Command $dockerCmd -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ ERROR: Neither docker-compose nor docker compose found." -ForegroundColor Red
+if (-not $dockerCmd) {
+    Write-Host "❌ ERROR: Neither docker compose nor docker-compose found." -ForegroundColor Red
     exit 1
 }
 
@@ -60,7 +60,7 @@ if ($SkipDocker) {
     Write-Host "[1/5] Ensuring Docker services are running..." -ForegroundColor Yellow
     
     # Defensive Port Checks
-    $RequiredPorts = @(5432, 6379, 6432, 8000)
+    $RequiredPorts = @(5433, 6379, 6432, 8000)
     foreach ($Port in $RequiredPorts) {
         if (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue) {
             Write-Host "WARNING: Port $Port is already in use. This might cause Docker or Local Server to fail." -ForegroundColor Yellow
@@ -87,12 +87,12 @@ $env:REDIS_URL = "redis://localhost:6379/1"
 $env:DATABASE_URL = "postgres://hrms_user:hrms_password@localhost:6432/hrms"
 
 # Wait for DB to be ready
-Write-Host "Waiting for database to be ready on localhost:5432..." -ForegroundColor Gray
+Write-Host "Waiting for database to be ready on localhost:6432..." -ForegroundColor Gray
 $dbReady = $false
 for ($i=0; $i -lt 20; $i++) {
     try {
         $client = New-Object System.Net.Sockets.TcpClient
-        $waitTask = $client.BeginConnect("127.0.0.1", 5432, $null, $null)
+        $waitTask = $client.BeginConnect("127.0.0.1", 6432, $null, $null)
         if ($waitTask.AsyncWaitHandle.WaitOne(500, $false)) {
             $client.EndConnect($waitTask)
             $dbReady = $true

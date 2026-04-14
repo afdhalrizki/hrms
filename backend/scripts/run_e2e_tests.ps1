@@ -16,7 +16,7 @@ $ErrorActionPreference = "Stop"
 $BackendDir = Split-Path -Parent $PSScriptRoot
 $RootDir = Split-Path -Parent $BackendDir
 $VenvDir = Join-Path $BackendDir "venv"
-$PythonExec = Join-Path $VenvDir "Scripts\python.exe"
+$PythonExec = if ($IsWindows) { Join-Path $VenvDir "Scripts\python.exe" } else { Join-Path $VenvDir "bin/python" }
 
 Write-Host "--- HRMS Backend E2E Test Suite ---" -ForegroundColor Cyan
 

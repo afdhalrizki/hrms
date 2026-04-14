@@ -249,12 +249,12 @@ export function parseMetrics(logContent, suiteName) {
 
 export async function getDockerComposeCommand() {
   try {
-    await execAsync('docker-compose --version');
-    return 'docker-compose';
+    await execAsync('docker compose version');
+    return 'docker compose';
   } catch (e) {
     try {
-      await execAsync('docker compose version');
-      return 'docker compose';
+      await execAsync('docker-compose --version');
+      return 'docker-compose';
     } catch (e2) {
       return null;
     }
@@ -408,4 +408,17 @@ export async function moveFailureScreenshots(dir) {
   } catch (e) {
     // No-op if failed to search/move
   }
+}
+
+/**
+ * Returns the path to the python executable within a virtual environment.
+ * Handles platform differences (Windows vs POSIX).
+ * @param {string} backendDir Path to the backend directory containing the venv.
+ * @returns {string} Path to the python executable.
+ */
+export function getPythonExec(backendDir) {
+  const isWin = process.platform === 'win32';
+  return isWin
+    ? join(backendDir, 'venv', 'Scripts', 'python.exe')
+    : join(backendDir, 'venv', 'bin', 'python');
 }

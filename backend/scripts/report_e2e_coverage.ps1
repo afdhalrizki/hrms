@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 
 $BackendDir = Split-Path -Parent $PSScriptRoot
 $VenvDir = Join-Path $BackendDir "venv"
-$PythonExec = Join-Path $VenvDir "Scripts\python.exe"
+$PythonExec = if ($IsWindows) { Join-Path $VenvDir "Scripts\python.exe" } else { Join-Path $VenvDir "bin/python" }
 
 function Get-PythonCommand {
     if (Test-Path $PythonExec) { return $PythonExec }

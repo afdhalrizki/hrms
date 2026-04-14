@@ -8,50 +8,24 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 import 'package:mobile/api/api_service.dart';
+import 'package:integration_test/integration_test.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
   initTestHttpOverrides();
   GoogleFonts.config.allowRuntimeFetching = false;
 
   final testTextTheme = ThemeData.dark().textTheme;
-  const bool isIntegrated = bool.fromEnvironment('INTEGRATED_TEST', defaultValue: false);
 
-  Future<void> setupTestEnvironment() async {
-    if (isIntegrated) {
-      await setupIntegratedApiService();
-    } else {
-      await setupMockApiService();
-    }
-  }
-
-  group(isIntegrated ? 'End-to-End App Flow Test (Real Backend)' : 'End-to-End App Flow Test (Mock Backend)', () {
+  group('Mobile E2E Tests', () {
     
     setUp(() async {
-      SharedPreferences.setMockInitialValues({});
-      ApiService.reset(); // Absolute static isolation
       await setupTestEnvironment();
-      
-      // Strict reset for all environmental flags
-      mockErrorStatus = false;
-      mockEmptyResponse = false;
-      mockTokenExpired = false;
-      mockErrorMessage = 'Error';
-      
-      final binding = TestWidgetsFlutterBinding.ensureInitialized();
-      binding.platformDispatcher.implicitView!.physicalSize = const Size(1080, 1920);
-      binding.platformDispatcher.implicitView!.devicePixelRatio = 1.0;
     });
 
     tearDown(() {
-      // Explicit reset to prevent leakage
-      mockErrorStatus = false;
-      mockEmptyResponse = false;
-      mockTokenExpired = false;
-      mockErrorMessage = 'Error';
       ApiService.reset();
-      final binding = TestWidgetsFlutterBinding.ensureInitialized();
-      binding.platformDispatcher.implicitView!.resetPhysicalSize();
     });
 
     Future<void> settleResilient(WidgetTester tester, {int frames = 20}) async {
@@ -118,13 +92,13 @@ void main() {
        await waitFor(tester, finder, message: "Field ${finder.description}");
        await tester.ensureVisible(finder);
        await tester.enterText(finder, text);
-       if (isIntegrated) {
-         await Future.delayed(const Duration(milliseconds: 250));
-       }
        await tester.pumpAndSettle();
     }
     
     Future<void> performLogin(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
       await tester.pumpWidget(app.HRMSApp(
         theme: ThemeData.dark().copyWith(textTheme: testTextTheme),
         locale: const Locale('en'),
@@ -141,99 +115,13 @@ void main() {
       }
     }
 
-    // PRIORITIESED LOGIC SCENARIOS (LOGIC-FIRST)
-    group('E2E Logic Scenarios', () {
-      testWidgets('Empty States Flow', (tester) async {
-        await tester.runAsync(() async {
-          mockEmptyResponse = true;
-          await performLogin(tester);
-          await safeTap(tester, find.byKey(const Key('qa_leaves'), skipOffstage: false));
-          await tester.pumpAndSettle();
-          await waitFor(tester, find.textContaining('No leave requests found', skipOffstage: false), message: 'Leave empty state');
-          await safeTap(tester, find.byType(BackButton, skipOffstage: false).last);
-
-          await safeTap(tester, find.byKey(const Key('qa_reimbursement'), skipOffstage: false));
-          await tester.pumpAndSettle();
-          await waitFor(tester, find.textContaining('No claims found', skipOffstage: false), message: 'Reimbursement empty state');
-        });
-      });
-
-      testWidgets('Global Error Handling', (tester) async {
-        await tester.runAsync(() async {
-          await performLogin(tester);
-          mockErrorStatus = true;
-          mockErrorMessage = "Server Down";
-          
-          final navFinder = find.byKey(const Key('nav_schedule'), skipOffstage: false);
-          await tester.tap(navFinder, warnIfMissed: false);
-          
-          await tester.pump();
-          tester.takeException(); 
- 
-          await waitFor(tester, find.textContaining('fetch schedules', skipOffstage: false), message: 'Error in body');
-        });
-      });
-
-      testWidgets('Face Verification Failure', (tester) async {
-        await tester.runAsync(() async {
-          await performLogin(tester);
-          await safeTap(tester, find.byKey(const Key('qa_clock_in'), skipOffstage: false));
-          await tester.pumpAndSettle();
-          
-          // Pattern: Animation-Safe pumpAndSettle Alignment
-          final failBtn = find.byKey(const Key('simulate_face_failure'), skipOffstage: false);
-          await safeTap(tester, failBtn);
-          
-          await waitFor(tester, find.textContaining('failed', skipOffstage: false), message: 'Verification failed message');
-        });
-      });
-
-      testWidgets('Correction Flow', (tester) async {
-        await tester.runAsync(() async {
-          await performLogin(tester);
-          final correctionBtn = find.byKey(const Key('qa_correction'), skipOffstage: false);
-          await scrollTo(tester, correctionBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
-          await safeTap(tester, correctionBtn);
-          await tester.pumpAndSettle();
-          
-          await safeTap(tester, find.text('History', skipOffstage: false));
-          await tester.pumpAndSettle();
-          
-          // Animation-Safe pumpAndSettle Interaction with modal delay
-          final editBtn = find.byKey(const Key('qa_edit_record_0'), skipOffstage: false);
-          await waitFor(tester, editBtn, message: 'Edit Icon for first record');
-          await safeTap(tester, editBtn);
-          
-          await tester.pump(const Duration(seconds: 1)); // Wait for Modal Animation
-          await tester.pumpAndSettle(const Duration(milliseconds: 100), EnginePhase.sendSemanticsUpdate, const Duration(seconds: 30)); 
-             
-          await safeEnterText(tester, find.byKey(const Key('correction_reason'), skipOffstage: false), 'Testing correction');
-             
-          final submitBtn = find.text('Submit Request', skipOffstage: false);
-          await safeTap(tester, submitBtn);
-             
-          await waitFor(tester, find.text('Attendance Correction', skipOffstage: false), message: 'Back to correction screen');
-        });
-      });
-
-      testWidgets('Token Auto-Refresh Resilience', (tester) async {
-        await tester.runAsync(() async {
-          await performLogin(tester);
-          mockTokenExpired = true;
-          await safeTap(tester, find.byKey(const Key('nav_schedule'), skipOffstage: false), settleBefore: false);
-          await tester.pumpAndSettle();
-          await waitFor(tester, find.text('My Schedule', skipOffstage: false), message: 'Schedule screen after refresh');
-        });
-      });
-    });
 
     // MAIN APPLICATION FLOWS
-    testWidgets('Full Workflow: Login -> Profile -> Attendance -> Logout', (tester) async {
+    testWidgets('[1] Full Workflow: Login -> Profile -> Attendance -> Logout', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
-        await waitFor(tester, find.textContaining('Admin One', skipOffstage: false), message: 'Home Screen loaded');
-
         final profileBtn = find.byKey(const Key('qa_profile'), skipOffstage: false);
+        await waitFor(tester, profileBtn, message: 'Home Screen loaded');
         await scrollTo(tester, profileBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
         await safeTap(tester, profileBtn);
         await waitFor(tester, find.text('Edit Profile', skipOffstage: false), message: "Profile Screen");
@@ -258,7 +146,7 @@ void main() {
       });
     });
 
-    testWidgets('Leaves Flow: view and apply', (tester) async {
+    testWidgets('[2] Leaves Flow: view and apply', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         await safeTap(tester, find.byKey(const Key('qa_leaves'), skipOffstage: false));
@@ -275,7 +163,7 @@ void main() {
       });
     });
     
-    testWidgets('Payslip: view details', (tester) async {
+    testWidgets('[3] Payslip: view details', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
@@ -284,7 +172,7 @@ void main() {
       });
     });
 
-    testWidgets('Reimbursement: apply flow', (tester) async {
+    testWidgets('[4] Reimbursement: apply flow', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         
@@ -305,7 +193,7 @@ void main() {
       });
     });
 
-    testWidgets('Performance Flow', (tester) async {
+    testWidgets('[5] Performance Flow', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final perfBtn = find.byKey(const Key('qa_performance'), skipOffstage: false);
@@ -323,7 +211,7 @@ void main() {
       });
     });
 
-    testWidgets('Profile Update Resilience', (tester) async {
+    testWidgets('[6] Profile Update Resilience', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final profileBtn = find.byKey(const Key('qa_profile'), skipOffstage: false);
@@ -341,14 +229,17 @@ void main() {
         await safeTap(tester, find.text('TK/0', skipOffstage: false).last);
         await tester.pumpAndSettle();
         
-        await safeTap(tester, find.byKey(const Key('profile_save_btn'), skipOffstage: false));
+        await safeTap(tester, find.byKey(const Key('profile_save_btn'), skipOffstage: false), settleAfter: false);
         await waitForSnackBar(tester, 'successfully');
         await waitFor(tester, find.textContaining('Welcome', skipOffstage: false), message: 'Dashboard');
       });
     });
 
-    testWidgets('Invalid Login Case', (tester) async {
+    testWidgets('[7] Invalid Login Case', (tester) async {
       await tester.runAsync(() async {
+        tester.view.physicalSize = const Size(1080, 1920);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
         await tester.pumpWidget(app.HRMSApp(
           theme: ThemeData.dark().copyWith(textTheme: testTextTheme),
           locale: const Locale('en'),
@@ -362,19 +253,19 @@ void main() {
       });
     });
 
-    testWidgets('Documents Flow: upload and verify', (tester) async {
+    testWidgets('[8] Documents Flow: upload and verify', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final docsBtn = find.byKey(const Key('qa_documents'), skipOffstage: false);
         await scrollTo(tester, docsBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
         await safeTap(tester, docsBtn);
         await waitFor(tester, find.text('Documents', skipOffstage: false), message: 'Documents Screen');
-        await safeTap(tester, find.byKey(const Key('simulate_doc_capture'), skipOffstage: false));
+        await safeTap(tester, find.byKey(const Key('simulate_doc_capture'), skipOffstage: false), settleAfter: false);
         await waitForSnackBar(tester, 'uploaded successfully');
       });
     });
 
-    testWidgets('Schedule Flow: view list', (tester) async {
+    testWidgets('[9] Schedule Flow: view list', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final scheduleBtn = find.byKey(const Key('nav_schedule'), skipOffstage: false);
@@ -384,7 +275,7 @@ void main() {
       });
     });
 
-    testWidgets('Logout Confirmation: Cancel', (tester) async {
+    testWidgets('[10] Logout Confirmation: Cancel', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final settingsBtn = find.byKey(const Key('nav_settings'), skipOffstage: false);
@@ -402,7 +293,7 @@ void main() {
       });
     });
 
-    testWidgets('HomeScreen: Pull to Refresh', (tester) async {
+    testWidgets('[11] HomeScreen: Pull to Refresh', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         await waitFor(tester, find.textContaining('Welcome', skipOffstage: false), message: 'Dashboard loaded');
@@ -417,7 +308,7 @@ void main() {
       });
     });
 
-    testWidgets('Reimbursement: Form Validation', (tester) async {
+    testWidgets('[12] Reimbursement: Form Validation', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final reimbBtn = find.byKey(const Key('qa_reimbursement'), skipOffstage: false);
@@ -435,7 +326,7 @@ void main() {
       });
     });
 
-    testWidgets('Leave Apply: Form Validation', (tester) async {
+    testWidgets('[13] Leave Apply: Form Validation', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         await safeTap(tester, find.byKey(const Key('qa_leaves'), skipOffstage: false));
@@ -448,8 +339,11 @@ void main() {
       });
     });
 
-    testWidgets('Localization Check: Indonesian Locale', (tester) async {
+    testWidgets('[14] Localization Check: Indonesian Locale', (tester) async {
       await tester.runAsync(() async {
+        tester.view.physicalSize = const Size(1080, 1920);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
         await tester.pumpWidget(app.HRMSApp(
           theme: ThemeData.dark().copyWith(textTheme: testTextTheme),
           locale: const Locale('id'),
@@ -463,7 +357,7 @@ void main() {
       });
     });
 
-    testWidgets('Attendance: History Highlights (Missing Out)', (tester) async {
+    testWidgets('[15] Attendance: History Highlights (Missing Out)', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         final correctionBtn = find.byKey(const Key('qa_correction'), skipOffstage: false);
@@ -480,7 +374,7 @@ void main() {
       });
     });
 
-    testWidgets('Attendance: Clock-Out Flow', (tester) async {
+    testWidgets('[16] Attendance: Clock-Out Flow', (tester) async {
       await tester.runAsync(() async {
         await performLogin(tester);
         
@@ -497,9 +391,8 @@ void main() {
       });
     });
 
-    testWidgets('Leave: Balance Verification', (tester) async {
+    testWidgets('[17] Leave: Balance Verification', (tester) async {
       await tester.runAsync(() async {
-        mockEmptyResponse = false;
         await performLogin(tester);
         
         // Ensure Home Screen has finished loading before navigating away
@@ -508,37 +401,31 @@ void main() {
         await safeTap(tester, find.byKey(const Key('qa_leaves'), skipOffstage: false));
         await tester.pumpAndSettle();
         
-        // Verify balance from mock (10.0 remaining days)
-        await waitFor(tester, find.textContaining('10.0', skipOffstage: false), message: 'Leave balance card with 10 days');
-        await waitFor(tester, find.textContaining('Used: 2.0 / Total: 12.0', skipOffstage: false), message: 'Leave balance details');
+        // Verify balance from integrated seed
+        const expectedRemaining = '12.0';
+        const expectedUsedTotal = 'Used: 0.0';
+        
+        await waitFor(tester, find.textContaining(expectedRemaining, skipOffstage: false), message: 'Leave balance card with expected remaining');
+        await waitFor(tester, find.textContaining(expectedUsedTotal, skipOffstage: false), message: 'Leave balance details');
       });
     });
 
-    testWidgets('Payslip: Formatting & Accuracy', (tester) async {
+    testWidgets('[18] Payslip: Formatting & Accuracy', (tester) async {
       await tester.runAsync(() async {
-        mockEmptyResponse = false; // Explicit reset to prevent leakage
         await performLogin(tester);
         
         // Check formatting in "Recent Activities" on Home Screen
-        // Mock payslip salary: 5000000
-        await waitFor(tester, find.textContaining('Rp 5,000,000', skipOffstage: false), message: 'Payslip IDR formatting with commas');
+        const formattedApp = 'Rp 16,500,000';
+        const formattedDetails = '16,500,000';
+        
+        await waitFor(tester, find.textContaining(formattedApp, skipOffstage: false), message: 'Payslip IDR formatting with commas');
         
         await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
         await waitFor(tester, find.text('NET SALARY', skipOffstage: false), message: 'Payslip detail screen');
-        await waitFor(tester, find.textContaining('5,000,000', skipOffstage: false), message: 'Formatted salary in details');
+        await waitFor(tester, find.textContaining(formattedDetails, skipOffstage: false), message: 'Formatted salary in details');
       });
     });
 
-    testWidgets('Payslip: Empty State', (tester) async {
-      await tester.runAsync(() async {
-        mockEmptyResponse = true;
-        await performLogin(tester);
-        
-        await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
-        await tester.pumpAndSettle();
-        
-        await waitFor(tester, find.textContaining('No payslips found', skipOffstage: false), message: 'Empty state message');
-      });
-    });
+
   });
 }

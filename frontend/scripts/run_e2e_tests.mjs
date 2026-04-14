@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { 
-  ensureDir, log, COLORS, spawnStream, waitForHttp, isPortInUse, waitForPort, spawnBackground, moveFailureScreenshots 
+  ensureDir, log, COLORS, spawnStream, waitForHttp, isPortInUse, waitForPort, spawnBackground, moveFailureScreenshots, getPythonExec
 } from '../../scripts/lib.mjs';
 
 const execAsync = promisify(exec);
@@ -98,19 +98,16 @@ async function main() {
       }
     }
 
-    const venvPathWin = join(BackendDir, 'venv', 'Scripts', 'python.exe');
-    const venvPathLinux = join(BackendDir, 'venv', 'bin', 'python');
-    const venvPathLinuxAlt = join(BackendDir, 'venv_linux', 'bin', 'python');
-    
-    if (existsSync(venvPathWin)) {
-      pythonCmd = venvPathWin;
-      log(`Using Windows venv: ${pythonCmd}`, COLORS.gray);
-    } else if (existsSync(venvPathLinux)) {
-      pythonCmd = venvPathLinux;
-      log(`Using Linux venv: ${pythonCmd}`, COLORS.gray);
-    } else if (existsSync(venvPathLinuxAlt)) {
-      pythonCmd = venvPathLinuxAlt;
-      log(`Using Linux venv (alt): ${pythonCmd}`, COLORS.gray);
+    const venvPath = getPythonExec(BackendDir);
+    if (existsSync(venvPath)) {
+      pythonCmd = venvPath;
+      log(`Using venv: ${pythonCmd}`, COLORS.gray);
+    } else {
+      const venvPathLinuxAlt = join(BackendDir, 'venv_linux', 'bin', 'python');
+      if (existsSync(venvPathLinuxAlt)) {
+        pythonCmd = venvPathLinuxAlt;
+        log(`Using Linux venv (alt): ${pythonCmd}`, COLORS.gray);
+      }
     }
 
     const seedScript = join(BackendDir, 'scripts', 'seed_test_db.py');

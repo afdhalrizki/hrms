@@ -55,9 +55,9 @@ class LeaveBalance {
   factory LeaveBalance.fromJson(Map<String, dynamic> json) {
     return LeaveBalance(
       year: json['year'],
-      totalDays: (json['total_days'] as num).toDouble(),
-      usedDays: (json['used_days'] as num).toDouble(),
-      remainingDays: (json['remaining_days'] as num).toDouble(),
+      totalDays: double.tryParse(json['total_days']?.toString() ?? '0') ?? 0.0,
+      usedDays: double.tryParse(json['used_days']?.toString() ?? '0') ?? 0.0,
+      remainingDays: double.tryParse(json['remaining_days']?.toString() ?? '0') ?? 0.0,
     );
   }
 }

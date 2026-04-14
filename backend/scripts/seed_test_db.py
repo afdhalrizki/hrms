@@ -31,7 +31,15 @@ import socket
 from django.db import connections
 from django.db.utils import OperationalError
 
-def is_db_reachable(host='localhost', port=5432, timeout=0.5):
+def is_db_reachable(host=None, port=None, timeout=0.5):
+    host = host or os.getenv('DB_HOST', 'localhost')
+    if port is None:
+        db_url = os.getenv('DATABASE_URL', '')
+        if ':6432/' in db_url:
+            port = 6432
+        else:
+            port = int(os.getenv('DB_PORT', 5432))
+    
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(timeout)
