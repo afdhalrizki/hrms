@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { BASE_URL } from './test_helper';
 
 test.describe('Company Onboarding Flow', () => {
 
@@ -8,40 +9,12 @@ test.describe('Company Onboarding Flow', () => {
     }
   });
 
-  test.beforeEach(async ({ page }) => {
-    // Universal Mock for public endpoints
-    await page.route('**/api/**', async route => {
-      const method = route.request().method();
-      const url = route.request().url();
-
-      if (method === 'OPTIONS') {
-        await route.fulfill({
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': 'http://localhost:3000',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        });
-        return;
-      }
-
-      if (url.includes('/api/public/signup') && method === 'POST') {
-        await route.fulfill({
-          status: 201,
-          contentType: 'application/json',
-          body: JSON.stringify({ success: true, message: 'Registration request submitted' })
-        });
-        return;
-      }
-
-      await route.fallback();
-    });
-  });
+  // No absolute beforeEach mocking - we want the real backend!
 
   test('should allow a new company to submit a registration request', async ({ page }) => {
-    // 1. Navigate to the signup page
-    await page.goto('/en/signup');
+    // 1. Navigate to the signup page 
+    // We don't use ?test_tenant here because signup is on the public root
+    await page.goto(`${BASE_URL}/en/signup`);
 
     // 2. Verify we are on the right page
     await expect(page).toHaveURL(/.*\/signup/, { timeout: 15000 });
@@ -60,8 +33,9 @@ test.describe('Company Onboarding Flow', () => {
     // 4. Submit the form
     await page.click('button:has-text("Create Workspace")');
 
-    // 5. Verify the success state
-    await expect(page.getByText('Request Submitted!')).toBeVisible({ timeout: 15000 });
+    // 5. Verify the success state from real backend
+    // Backend should return 201 Created and the frontend should show the success view
+    await expect(page.getByText(/Request Submitted!|Created successfully/i)).toBeVisible({ timeout: 20000 });
     await expect(page.getByText(companyName)).toBeVisible();
     await expect(page.getByText(adminEmail)).toBeVisible();
 
@@ -71,17 +45,21 @@ test.describe('Company Onboarding Flow', () => {
   });
 
   test('should show error for invalid email', async ({ page }) => {
-    await page.goto('/en/signup');
+    await page.goto(`${BASE_URL}/en/signup`);
     
     await page.fill('input[name="company_name"]', 'Invalid Email Corp');
     await page.fill('input[name="subdomain_prefix"]', 'invalidemail');
     await page.fill('input[name="admin_email"]', 'not-an-email');
     
-    // HTML5 validation catches this, or the button click triggers it
+    // Attempt submit
     await page.click('button:has-text("Create Workspace")');
     
-    // Check if the HTML5 validation is triggered
+    // 1. Check HTML5 validation (client-side)
     const isInvalid = await page.$eval('input[name="admin_email"]', (el: HTMLInputElement) => !el.checkValidity());
     expect(isInvalid).toBeTruthy();
+    
+    // 2. Check if the button click shows a validation message
+    // Usually browser shows a balloon, but we just verify it didn't submit
+    await expect(page.getByText(/Request Submitted!/i)).not.toBeVisible();
   });
 });

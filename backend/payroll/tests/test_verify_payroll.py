@@ -20,6 +20,10 @@ class PayrollVerificationTestCase(TenantTestCase):
         from users.models import User
         self.admin_user = User.objects.create_user(email="admin@test.com", password="password", is_staff=True)
         self.admin_user.tenants.add(self.tenant)
+        # Enable payroll module for the tenant
+        self.tenant.plan_type = 'PROFESSIONAL'
+        self.tenant.enabled_modules = ['core', 'payroll', 'attendance']
+        self.tenant.save()
         self.domain = self.tenant.domains.first().domain
 
     def test_payroll(self):
@@ -138,10 +142,10 @@ class PayrollVerificationTestCase(TenantTestCase):
 
     def test_api_payslip_generate_empty_ids(self):
         """API: Posting empty employee_ids list is handled."""
-        self.client.force_login(self.admin_user)
+        self.client.force_authenticate(user=self.admin_user)
         url = reverse('payslip-generate')
         payload = {'employee_ids': [], 'month': 3, 'year': 2026}
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain, secure=True)
         # Should return 400 Bad Request if list is required and non-empty
         # Or 200 with 0 count if it's allowed but does nothing
         # Our current implementation probably returns 400 because of required field.
@@ -149,8 +153,8 @@ class PayrollVerificationTestCase(TenantTestCase):
 
     def test_api_payslip_download_404(self):
         """API: Download non-existent payslip returns 404."""
-        self.client.force_login(self.admin_user)
+        self.client.force_authenticate(user=self.admin_user)
         # Non-existent ID like 99999
         url = reverse('payslip-download-pdf', kwargs={'pk': 99999})
-        response = self.client.get(url, SERVER_NAME=self.domain)
+        response = self.client.get(url, SERVER_NAME=self.domain, secure=True)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -3,6 +3,8 @@ from django_tenants.utils import schema_context
 from core.models import Branch, WorkflowConfig, WorkflowStage, WorkflowAction, Employee
 from core.services import WorkflowService
 from attendance.models import LeaveRequest
+from notifications.models import SystemNotification
+from users.models import User
 from datetime import date
 
 class WorkflowIntegrationTest(TenantTestCase):
@@ -21,6 +23,9 @@ class WorkflowIntegrationTest(TenantTestCase):
                 join_date=date(2024, 1, 1),
                 ktp_number="1111111111"
             )
+            # Create User for employee
+            User.objects.create_user(email="test@example.com", password="password")
+
             self.supervisor = Employee.objects.create(
                 fullname="Supervisor",
                 email="sup@example.com",
@@ -28,6 +33,9 @@ class WorkflowIntegrationTest(TenantTestCase):
                 join_date=date(2024, 1, 1),
                 ktp_number="2222222222"
             )
+            # Create User for supervisor
+            User.objects.create_user(email="sup@example.com", password="password")
+
             self.emp.supervisor = self.supervisor
             self.emp.save()
 
@@ -65,6 +73,9 @@ class WorkflowIntegrationTest(TenantTestCase):
             WorkflowService.initialize_workflow(leave)
             self.assertEqual(leave.current_stage, self.s1)
             self.assertEqual(leave.status, 'PENDING')
+            
+            # Assertion: Supervisor should have 1 notification
+            self.assertTrue(SystemNotification.objects.filter(category='OPERATIONAL', title="Persetujuan Diperlukan").exists())
 
             # 2. Supervisor approves
             WorkflowService.process_action(leave, self.supervisor, 'APPROVED', "Looks good")
@@ -76,6 +87,9 @@ class WorkflowIntegrationTest(TenantTestCase):
             WorkflowService.process_action(leave, self.supervisor, 'APPROVED', "Final check")
             leave.refresh_from_db()
             self.assertEqual(leave.status, 'APPROVED')
+            
+            # Assertion: Employee should have 1 approval notification
+            self.assertTrue(SystemNotification.objects.filter(category='OPERATIONAL', title="Status Pengajuan: Success").exists())
             self.assertIsNone(WorkflowStage.objects.filter(workflow=self.config, sequence__gt=leave.current_stage.sequence).first())
 
     def test_workflow_rejection(self):

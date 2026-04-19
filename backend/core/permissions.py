@@ -62,16 +62,19 @@ class HasRBACPermission(permissions.BasePermission):
         if employee.access_role and employee.access_role.permissions.get(required_perm, False):
             return True
             
-        # For non-managers (no direct permission), we only allow GET by default.
-        # Data isolation for GET should be handled by the view's get_queryset.
+        # For non-managers (no direct permission):
         if request.method == 'GET':
+            if view.action == 'list':
+                # List views are restrictive: require management perm OR explicit list self-service
+                if getattr(view, 'allow_self_service_list', False):
+                    return True
+                return False
+            # Always allow retrieve (detail) as data isolation is handled by get_queryset
             return True
-            
-        # For POST, PATCH, PUT, allow only if the view explicitly enables self-service.
-        # This is for things like Attendance, Leave Requests, Reimbursements, etc.
-        # Allow standard self-service actions (list, create, retrieve, etc.) if enabled on the view
-        standard_actions = ['list', 'create', 'retrieve', 'update', 'partial_update', 'destroy']
-        if getattr(view, 'allow_self_service', False) and view.action in standard_actions:
+        
+        # Mutations (POST, PATCH, PUT)
+        standard_self_service_actions = ['create', 'retrieve', 'update', 'partial_update']
+        if getattr(view, 'allow_self_service', False) and view.action in standard_self_service_actions:
             return True
 
         # Allow detail actions to bypass global check so they can be handled by has_object_permission
@@ -144,8 +147,47 @@ class FeatureRequiredPermission(permissions.BasePermission):
             return True
             
         # Enterprise tenants have all features
-        if getattr(request.tenant, 'plan_type', 'BASIC') == 'ENTERPRISE':
+        if getattr(request.tenant, 'plan_type', 'ESSENTIAL') == 'ENTERPRISE':
             return True
             
         enabled_modules = getattr(request.tenant, 'enabled_modules', [])
         return required_feature in enabled_modules
+
+class SubscriptionStatusPermission(permissions.BasePermission):
+    """
+    Enforces the subscription state policies (pricing_strategy_v2):
+    1. ACTIVE: Full access.
+    2. EXPIRED (Grace Period): Read-Only access (GET).
+    3. SUSPENDED: No access (403 Forbidden).
+    
+    Exemptions:
+    - Public schema access (always allowed for registration/login).
+    - Billing module (to allow tenants to pay and renew).
+    """
+    def has_permission(self, request, view):
+        # 1. Exempt public schema
+        current_tenant = getattr(request, 'tenant', None)
+        if not current_tenant or current_tenant.schema_name == 'public':
+            return True
+
+        # 2. Exempt Billing ViewSet (to allow recovery/payment)
+        # We check the view's name or a custom attribute
+        if 'BillingViewSet' in str(view.__class__):
+            return True
+
+        status = current_tenant.subscription_status
+        
+        if status == 'ACTIVE':
+            return True
+        
+        if status == 'EXPIRED':
+            # Read-Only Access (Grace Period)
+            if request.method in permissions.SAFE_METHODS:
+                return True
+            return False
+
+        if status == 'SUSPENDED':
+            # Block All Access
+            return False
+            
+        return True

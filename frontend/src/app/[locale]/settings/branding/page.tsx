@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useTenant } from '@/context/TenantContext';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { usePermission } from '@/hooks/usePermission';
 
 export default function BrandingPage() {
   const t = useTranslations('Branding');
@@ -28,24 +29,11 @@ export default function BrandingPage() {
   const [primaryColor, setPrimaryColor] = React.useState(tenant.themePrimaryColor || '#6366f1');
   const [secondaryColor, setSecondaryColor] = React.useState(tenant.themeSecondaryColor || '#4f46e5');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { hasPermission } = usePermission();
+  const isAdmin = hasPermission('manage_settings');
+  const [isLoading, setIsLoading] = React.useState(false); // No need to fetch profile separately
 
-  const [isAdmin, setIsAdmin] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const checkAccess = async () => {
-      try {
-        const userData = await apiFetch('/users/me');
-        // Strictly check for ADMIN role, ignoring is_staff (which managers have for portal login)
-        setIsAdmin(userData.role === 'ADMIN');
-      } catch (error) {
-        console.error('Failed to check branding access');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkAccess();
-  }, []);
+  // No need for separate checkAccess as usePermission uses AuthContext which is already loaded
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

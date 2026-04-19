@@ -1,6 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from core.audit import AuditModel
+from core.utils import ktp_upload_path, npwp_upload_path, face_reference_upload_path
 
 
 class AccessRole(AuditModel):
@@ -23,6 +25,11 @@ class AccessRole(AuditModel):
 
     def __str__(self):
         return self.name
+
+    def delete(self, *args, **kwargs):
+        if self.is_default:
+            raise ValidationError(_("System default roles cannot be deleted."))
+        return super().delete(*args, **kwargs)
 
 
 class Department(AuditModel):
@@ -131,11 +138,24 @@ class Employee(AuditModel):
 
     # Contact & Documentation (Phase 70)
     address = models.TextField(_("home address"), blank=True, null=True)
-    ktp_image = models.ImageField(_("KTP document scan"), upload_to='employee_docs/ktp/', blank=True, null=True)
-    npwp_image = models.ImageField(_("NPWP document scan"), upload_to='employee_docs/npwp/', blank=True, null=True)
+    ktp_image = models.ImageField(
+        _("KTP document scan"), 
+        upload_to=ktp_upload_path, 
+        blank=True, null=True
+    )
+    npwp_image = models.ImageField(
+        _("NPWP document scan"), 
+        upload_to=npwp_upload_path, 
+        blank=True, null=True
+    )
 
     # Face Recognition Reference
-    face_reference = models.ImageField(_("face reference"), upload_to='face_references/', blank=True, null=True, help_text=_("Master photo for face recognition"))
+    face_reference = models.ImageField(
+        _("face reference"), 
+        upload_to=face_reference_upload_path, 
+        blank=True, null=True, 
+        help_text=_("Master photo for face recognition")
+    )
 
     class Meta:
         verbose_name = _("employee")
@@ -145,34 +165,6 @@ class Employee(AuditModel):
         return f"{self.nik} - {self.fullname}"
 
 
-class SystemNotification(AuditModel):
-    """
-    Stores system-wide or per-tenant notifications for admins and employees.
-    Used for subscription alerts, system maintenance, etc.
-    """
-    LEVEL_CHOICES = [
-        ('INFO', _('Info')),
-        ('WARNING', _('Warning')),
-        ('CRITICAL', _('Critical')),
-        ('SUCCESS', _('Success')),
-    ]
-
-    title = models.CharField(_("title"), max_length=255)
-    message = models.TextField(_("message"))
-    level = models.CharField(_("level"), max_length=10, choices=LEVEL_CHOICES, default='INFO')
-    is_active = models.BooleanField(_("is active"), default=True)
-    expires_at = models.DateTimeField(_("expires at"), null=True, blank=True)
-    
-    # Optional target: if null, it's global for the tenant
-    target_user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True, related_name='notifications', verbose_name=_("target user"))
-
-    class Meta:
-        verbose_name = _("system notification")
-        verbose_name_plural = _("system notifications")
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"[{self.level}] {self.title}"
 class WorkflowConfig(AuditModel):
     """
     Defines which model (e.g. LeaveRequest) uses which approval workflow.

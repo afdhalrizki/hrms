@@ -18,6 +18,21 @@ interface TenantContextType {
   subscriptionStatus?: string;
   expiryDate?: string;
   isSubscriptionActive?: boolean;
+  // Quota Fields
+  storageUsedBytes?: number;
+  totalStorageCapacityMb?: number;
+  employeeCount?: number;
+  totalEmployeeCapacity?: number;
+  // Payroll & Attendance Settings
+  lateDeductionRate?: number;
+  absenceDeductionRate?: number;
+  jkkRate?: number;
+  reimbursementApprovalLevel?: string;
+  overtimeRate?: number;
+  payrollOvertimeDivisor?: number;
+  leaveApprovalLevel?: string;
+  overtimeApprovalLevel?: string;
+  isBiometricEnabled?: boolean;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -50,6 +65,17 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
       // Special override for E2E testing on localhost
       if (testTenant && isLocal) {
+        if (testTenant === 'public') {
+          sessionStorage.removeItem('test_tenant_e2e');
+          setTenant({
+            tenantName: 'Public',
+            subdomain: '',
+            isPublic: true,
+            isLoading: false,
+          });
+          return;
+        }
+
         // Persist for next navigation
         sessionStorage.setItem('test_tenant_e2e', testTenant);
         
@@ -120,6 +146,19 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 planType: data.plan_type,
                 enabledModules: data.enabled_modules,
                 isSubscriptionActive: data.is_subscription_active,
+                storageUsedBytes: data.storage_used_bytes,
+                totalStorageCapacityMb: data.total_storage_capacity_mb,
+                employeeCount: data.employee_count,
+                totalEmployeeCapacity: data.total_employee_capacity,
+                lateDeductionRate: data.late_deduction_rate,
+                absenceDeductionRate: data.absence_deduction_rate,
+                jkkRate: data.jkk_rate,
+                reimbursementApprovalLevel: data.reimbursement_approval_level,
+                overtimeRate: data.overtime_rate,
+                payrollOvertimeDivisor: data.payroll_overtime_divisor,
+                leaveApprovalLevel: data.leave_approval_level,
+                overtimeApprovalLevel: data.overtime_approval_level,
+                isBiometricEnabled: data.is_biometric_enabled,
                 isLoading: false,
               }));
             })

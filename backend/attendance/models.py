@@ -2,6 +2,7 @@ from datetime import date
 from django.db import models
 from core.models import Employee
 from core.audit import AuditModel
+from core.utils import attendance_photo_upload_path, leave_attachment_upload_path
 
 
 class Attendance(AuditModel):
@@ -23,7 +24,10 @@ class Attendance(AuditModel):
     latitude_in = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude_in = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     # ... previous fields ...
-    photo_in = models.ImageField(upload_to='attendance_photos/', blank=True, null=True)
+    photo_in = models.ImageField(
+        upload_to=attendance_photo_upload_path, 
+        blank=True, null=True
+    )
     liveness_verified = models.BooleanField(default=False)
     verification_method = models.CharField(max_length=20, default='MANUAL', choices=[
         ('MANUAL', 'Manual'),
@@ -32,6 +36,7 @@ class Attendance(AuditModel):
     ])
     
     is_out_of_bounds = models.BooleanField(default=False)
+    biometric_skipped = models.BooleanField(default=False, help_text="True if clock-in was performed without photo due to tenant policy")
     distance_from_branch = models.FloatField(null=True, blank=True, help_text="Distance in meters when clock-in")
 
     class Meta:
@@ -69,7 +74,10 @@ class LeaveRequest(AuditModel):
     hr_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     # Proof of sick leave etc.
-    attachment = models.FileField(upload_to='leave_attachments/', blank=True, null=True)
+    attachment = models.FileField(
+        upload_to=leave_attachment_upload_path, 
+        blank=True, null=True
+    )
 
     def __str__(self):
         return f"{self.employee.fullname} - {self.leave_type} ({self.start_date} to {self.end_date})"

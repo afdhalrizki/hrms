@@ -44,7 +44,18 @@ _Multi-stage approval lifecycle for expense claims and reimbursements._
   <img src="./docs/assets/subscription_expired_ui.png" width="48%" />
 </p>
 
-_Tiered SaaS provisioning and intelligent subscription gating._
+_Tiered SaaS provisioning and intelligent subscription gating (Essential, Professional, Premium, Enterprise)._
+
+### 📊 Commercial Plans
+
+| Feature | **ESSENTIAL HR** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
+| :--- | :--- | :--- | :--- | :--- |
+| **Employee Limit** | 50 | 500 | 2,000 | 10,000+ |
+| **Core HR** | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
+| **Attendance** | ✅ Clock-in/out | ✅ Geofencing | ✅ Correction | ✅ Shift/Roster |
+| **Payroll** | ❌ | ✅ PPh 21/BPJS | ✅ Advanced | ✅ Analytics |
+| **Performance** | ❌ | ❌ | ✅ KPI/Appraisal | ✅ Team Coaching |
+| **Analytics** | ❌ | ❌ | ❌ | ✅ Audit/Insight |
 
 ## 📦 Getting Started
 

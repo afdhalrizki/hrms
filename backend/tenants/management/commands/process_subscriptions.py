@@ -7,7 +7,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # This command should be run in the 'public' schema context
-        tenants = Tenant.objects.exclude(schema_name='public')
+        from django_tenants.utils import get_public_schema_name
+        tenants = Tenant.objects.exclude(schema_name=get_public_schema_name())
         self.stdout.write(f"Processing {tenants.count()} tenant subscriptions...")
 
         for tenant in tenants:
@@ -31,12 +32,13 @@ class Command(BaseCommand):
         """
         Logic to send emails and create in-app SystemNotification.
         """
-        from core.models import SystemNotification
+        from notifications.services import NotificationService
         from django_tenants.utils import schema_context
         
         with schema_context(tenant.schema_name):
+            service = NotificationService()
             if status == 'EXPIRED':
-                SystemNotification.objects.create(
+                service.send_admin_notification(
                     title="Subscription Expired",
                     message="Your subscription has expired. The system is now in Read-Only mode. Please renew to continue full operations.",
                     level='WARNING'
@@ -44,7 +46,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"  - Notification: Created 'Expired' alert for {tenant.name}")
                 
             elif status == 'SUSPENDED':
-                SystemNotification.objects.create(
+                service.send_admin_notification(
                     title="Account Suspended",
                     message="Your account has been suspended due to non-payment. Access is restricted. Please contact support or renew immediately.",
                     level='CRITICAL'
@@ -53,7 +55,7 @@ class Command(BaseCommand):
             
             elif status == 'ACTIVE':
                 # Possibly a renewal notification
-                SystemNotification.objects.create(
+                service.send_admin_notification(
                     title="Subscription Active",
                     message="Thank you for your payment! Your subscription is now active.",
                     level='SUCCESS'

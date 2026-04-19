@@ -258,7 +258,7 @@ class InfrastructureTestCase(TenantTestCase):
 
     def test_system_notification_filtering(self):
         """Verify notification creation and filtering."""
-        from core.models import SystemNotification
+        from notifications.models import SystemNotification
         SystemNotification.objects.create(title="Global Update", message="Upgrade soon", level='INFO')
         SystemNotification.objects.create(title="Private Alert", message="Check your salary", target_user=self.user)
         

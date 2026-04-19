@@ -11,6 +11,11 @@ from payroll.services import PayrollCalculator, BPJSManager, TaxEngine
 class PayrollExtendedTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
+        # Upgrade tenant plan to enable payroll feature
+        self.tenant.plan_type = 'PROFESSIONAL'
+        self.tenant.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement']
+        self.tenant.save()
+
         self.client = APIClient()
         self.dept = Department.objects.create(name="Engineering")
         self.role = Role.objects.create(name="Backend DEV", department=self.dept)
@@ -46,6 +51,8 @@ class PayrollExtendedTestCase(TenantTestCase):
         # we focus on the calculation. For API tests we need a real user.
         from users.models import User
         self.api_user = User.objects.create_user(email='admin@tenant.com', password='password', is_staff=True)
+        # Associate user with tenant for TenantAccessMiddleware
+        self.api_user.tenants.add(self.tenant)
 
     def test_bpjs_ketenagakerjaan_calculation(self):
         """Verify JKK, JKM, JHT, and JP (capped) portions with custom tenant risk."""
@@ -101,7 +108,7 @@ class PayrollExtendedTestCase(TenantTestCase):
             'period_id': self.period.id,
             'employee_ids': [self.employee.id]
         }
-        response = self.client.post(url, data, format='json', SERVER_NAME=self.tenant.domains.first().domain)
+        response = self.client.post(url, data, format='json', SERVER_NAME=self.tenant.domains.first().domain, secure=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Payslip.objects.count(), 1)
 
@@ -110,9 +117,9 @@ class PayrollExtendedTestCase(TenantTestCase):
         calc = PayrollCalculator(self.employee, self.period)
         payslip = calc.run()
         
-        self.client.force_authenticate(user=self.api_user)
         url = reverse('payslip-download-pdf', kwargs={'pk': payslip.id})
-        response = self.client.get(url, SERVER_NAME=self.tenant.domains.first().domain)
+        self.client.force_authenticate(user=self.api_user)
+        response = self.client.get(url, SERVER_NAME=self.tenant.domains.first().domain, secure=True)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response['Content-Type'], 'application/pdf')
@@ -207,7 +214,7 @@ class PayrollExtendedTestCase(TenantTestCase):
         self.client.force_authenticate(user=user2)
         
         url = reverse('payslip-list')
-        response = self.client.get(url, SERVER_NAME=self.tenant.domains.first().domain)
+        response = self.client.get(url, SERVER_NAME=self.tenant.domains.first().domain, secure=True)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Should only see 1 payslip (their own)

@@ -20,10 +20,11 @@ class Command(BaseCommand):
         # Simplification: check if expiry_date + grace_period is older than threshold_date
         # (Assuming grace_period is already passed if they are SUSPENDED)
         
+        from django_tenants.utils import get_public_schema_name
         tenants_to_delete = Tenant.objects.filter(
             subscription_status='SUSPENDED',
             expiry_date__lt=threshold_date
-        ).exclude(schema_name='public')
+        ).exclude(schema_name=get_public_schema_name())
 
         if not tenants_to_delete.exists():
             self.stdout.write("No tenants found for cleanup.")

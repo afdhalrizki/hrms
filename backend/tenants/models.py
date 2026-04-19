@@ -1,12 +1,16 @@
 from django.db import models
 from django_tenants.models import TenantMixin, DomainMixin
 
+def tenant_logo_upload_path(instance, filename):
+    from core.utils import tenant_directory_path
+    return tenant_directory_path(instance, filename, prefix='tenant_logos')
+
 class Tenant(TenantMixin):
     name = models.CharField(max_length=100)
     created_on = models.DateField(auto_now_add=True)
     
     # Customization Fields
-    logo = models.ImageField(upload_to='tenant_logos/', null=True, blank=True)
+    logo = models.ImageField(upload_to=tenant_logo_upload_path, null=True, blank=True)
     theme_primary_color = models.CharField(max_length=10, default='#6366f1', help_text="Primary brand color (hex)")
     theme_secondary_color = models.CharField(max_length=10, default='#4f46e5', help_text="Secondary brand color (hex)")
     address = models.TextField(null=True, blank=True)
@@ -16,6 +20,10 @@ class Tenant(TenantMixin):
     overtime_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Tarif lembur per jam global (0 = gunakan formula)")
     payroll_overtime_divisor = models.IntegerField(default=173, help_text="Standard pembagi upah lembur (default Indonesia: 173)")
     jkk_rate = models.DecimalField(max_digits=5, decimal_places=4, default=0.0024, help_text="Tarif JKK (Jaminan Kecelakaan Kerja) sesuai tingkat risiko (0.24% - 1.74%)")
+    
+    # Attendance Deductions
+    late_deduction_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Potongan tunjangan makan/transport jika terlambat (flat)")
+    absence_deduction_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Potongan gaji jika alpa (flat per hari)")
     
     # Approval Settings
     APPROVAL_LEVEL_CHOICES = [
@@ -43,15 +51,21 @@ class Tenant(TenantMixin):
 
     # Tiering & Feature Access
     PLAN_CHOICES = [
-        ('BASIC', 'Basic (Digital Presence)'),
-        ('PROFESSIONAL', 'Professional (Operational Efficiency)'),
-        ('ENTERPRISE', 'Enterprise (Strategic Human Capital)'),
+        ('FREE', 'Free Tier'),
+        ('ESSENTIAL', 'Essential HR'),
+        ('PROFESSIONAL', 'Professional'),
+        ('PREMIUM', 'Premium'),
+        ('ENTERPRISE', 'Enterprise'),
     ]
-    plan_type = models.CharField(max_length=20, choices=PLAN_CHOICES, default='ENTERPRISE')
+    plan_type = models.CharField(max_length=20, choices=PLAN_CHOICES, default='FREE')
     enabled_modules = models.JSONField(default=list, blank=True, help_text="List of enabled modules (e.g. ['payroll', 'attendance'])")
-    max_employees = models.PositiveIntegerField(default=1000, help_text="Maximum number of employees allowed for this tenant")
+    max_employees = models.PositiveIntegerField(default=10, help_text="Base maximum number of employees allowed for this plan")
+    extra_employees = models.PositiveIntegerField(default=0, help_text="Additional employee quota purchased via add-ons")
     storage_limit_mb = models.PositiveIntegerField(default=100, help_text="Maximum storage allowed for this tenant in MB")
+    extra_storage_mb = models.PositiveIntegerField(default=0, help_text="Additional storage quota purchased via add-ons (MB)")
     storage_used_bytes = models.PositiveBigIntegerField(default=0, help_text="Current storage usage in bytes")
+    employee_count = models.PositiveIntegerField(default=0, help_text="Current number of employees in this tenant")
+    is_biometric_enabled = models.BooleanField(default=True, help_text="Allow clock-in without photo if disabled (Emergency Storage Fallback)")
 
     from django.core.validators import MinValueValidator, MaxValueValidator
     max_admins = models.IntegerField(
@@ -63,6 +77,26 @@ class Tenant(TenantMixin):
     # default true, schema will be automatically created and synced when it is saved
     auto_create_schema = True
 
+    @property
+    def total_employee_capacity(self):
+        """Returns the total capacity (Base + Purchased Addons)."""
+        return self.max_employees + self.extra_employees
+
+    @property
+    def total_storage_capacity_mb(self):
+        """Returns the total storage capacity in MB (Base + Purchased Addons)."""
+        return self.storage_limit_mb + self.extra_storage_mb
+
+    @property
+    def total_storage_capacity_bytes(self):
+        """Returns the total storage capacity in Bytes."""
+        return self.total_storage_capacity_mb * 1024 * 1024
+
+    @property
+    def current_employee_count(self):
+        """Returns the current number of employees (cached in the employee_count field)."""
+        return self.employee_count
+
     def is_module_enabled(self, module_name):
         """Check if a specific feature module is enabled for this tenant."""
         if self.plan_type == 'ENTERPRISE':
@@ -73,24 +107,36 @@ class Tenant(TenantMixin):
         # Set default modules and quotas based on plan if not already set
         if not self.pk:
             if not self.enabled_modules:
-                if self.plan_type == 'BASIC':
+                if self.plan_type == 'FREE':
                     self.enabled_modules = ['core', 'attendance']
+                    self.max_employees = 10
+                    self.storage_limit_mb = 100
+                elif self.plan_type == 'ESSENTIAL':
+                    self.enabled_modules = ['core', 'attendance', 'leaves']
                     self.max_employees = 50
                     self.storage_limit_mb = 100
                 elif self.plan_type == 'PROFESSIONAL':
                     self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement']
-                    self.max_employees = 250
-                    self.storage_limit_mb = 1000
+                    self.max_employees = 500
+                    self.storage_limit_mb = 2000
+                elif self.plan_type == 'PREMIUM':
+                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'performance']
+                    self.max_employees = 2000
+                    self.storage_limit_mb = 5000
                 elif self.plan_type == 'ENTERPRISE':
-                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'performance', 'analytics', 'audit']
                     self.max_employees = 10000
-                    self.storage_limit_mb = 10000
+                    self.storage_limit_mb = 20000
             
             # Quotas should still be applied if not default
-            if self.plan_type == 'BASIC' and self.max_employees == 1000:
+            if self.plan_type == 'FREE':
+                self.max_employees = 10
+            elif self.plan_type == 'ESSENTIAL':
                 self.max_employees = 50
-            elif self.plan_type == 'PROFESSIONAL' and self.max_employees == 1000:
-                self.max_employees = 250
+            elif self.plan_type == 'PROFESSIONAL':
+                self.max_employees = 500
+            elif self.plan_type == 'PREMIUM':
+                self.max_employees = 2000
         super().save(*args, **kwargs)
 
     @property

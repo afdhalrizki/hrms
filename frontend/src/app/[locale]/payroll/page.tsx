@@ -20,6 +20,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { PayslipDetailModal } from '@/components/payroll/PayslipDetailModal';
 import { GeneratePayrollModal } from '@/components/payroll/GeneratePayrollModal';
+import { usePermission } from '@/hooks/usePermission';
+import * as perms from '@/core/constants';
 
 interface Payslip {
   id: number;
@@ -40,17 +42,17 @@ export default function PayrollPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedPayslip, setSelectedPayslip] = React.useState<Payslip | null>(null);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
-  const [isAdmin, setIsAdmin] = React.useState(false);
+  const { hasPermission } = usePermission();
+
+  const canManage = hasPermission('manage_payroll');
+  const canViewAll = hasPermission('view_all_payslips');
+  const isManagerMode = canManage || canViewAll;
 
   const fetchData = React.useCallback(async () => {
     try {
       setIsLoading(true);
-      const [payslipData, userData] = await Promise.all([
-        apiFetch('/payslips'),
-        apiFetch('/users/me'),
-      ]);
+      const payslipData = await apiFetch('/payslips');
       setPayslips(payslipData || []);
-      setIsAdmin(userData.role === 'ADMIN' || userData.is_staff);
     } catch (error) {
       toast.error('Failed to load payroll data');
     } finally {
@@ -73,7 +75,7 @@ export default function PayrollPage() {
       <div className="space-y-8">
         {/* Restricted Access View for Employees with no payroll data. 
             Admins always see the page. Employees with data see the page. */}
-        {!isLoading && !isAdmin && payslips.length === 0 ? (
+        {!isLoading && !isManagerMode && payslips.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center">
             <div className="h-20 w-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mb-4">
               <Eye size={40} />
@@ -92,7 +94,7 @@ export default function PayrollPage() {
                 <h1 className="text-3xl font-black tracking-tight text-gray-900">{t('title')}</h1>
                 <p className="text-muted-foreground">{t('subtitle')}</p>
               </div>
-              {isAdmin && (
+              {canManage && (
                 <button 
                   onClick={() => setIsGenerateModalOpen(true)}
                   className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"

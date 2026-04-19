@@ -25,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Map<String, dynamic>? _userData;
+  User? _userData;
   List<Activity> _activities = [];
   Map<String, dynamic>? _latestAttendance;
   bool _isLoading = true;
@@ -39,8 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadProfile() async {
     try {
       final api = ApiService();
-      final user = await api.getEmployeeProfile();
-      print('HOMESCREEN LOADED USER: $user');
+      final user = await api.getUserProfile();
 
       // Fetch data sequentially to avoid connection bottlenecks on runserver
       final attendance = await api.getAttendanceRecords();
@@ -148,8 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d MMMM yyyy').format(now);
-    final fullName = _userData?['fullname'] ?? 'User';
-    final roleName = _userData?['role_name'] ?? 'Staff';
+    final fullName = _userData?.fullname ?? 'User';
+    final roleName = _userData?.roleName ?? 'Staff';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -167,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 32),
                   _buildAttendanceCard(
                     context,
-                    _userData?['employee_id'],
+                    _userData?.employeeId,
                     l10n,
                   ),
                   const SizedBox(height: 32),
@@ -470,8 +469,15 @@ class _HomeScreenState extends State<HomeScreen> {
         'label': l10n.performance,
         'color': const Color(0xFF10B981),
         'key': 'qa_performance',
+        'permission': 'view_performance_report',
       },
     ];
+
+    // Filter items based on permissions
+    final filteredItems = items.where((item) {
+      if (item['permission'] == null) return true;
+      return _userData?.hasPermission(item['permission'] as String) ?? false;
+    }).toList();
 
     return GridView.builder(
       shrinkWrap: true,
@@ -482,9 +488,9 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisSpacing: 16,
         childAspectRatio: 2.2,
       ),
-      itemCount: items.length,
+      itemCount: filteredItems.length,
       itemBuilder: (context, index) {
-        final item = items[index];
+        final item = filteredItems[index];
         return InkWell(
           onTap: () {
             final userData = _userData;
@@ -513,7 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileEditScreen(userData: userData),
+                  builder: (context) => ProfileEditScreen(userData: userData.toJson()),
                 ),
               ).then((_) => _loadProfile());
             } else if (userData != null &&
@@ -522,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      ProfileDocumentsScreen(userData: userData),
+                      ProfileDocumentsScreen(userData: userData.toJson()),
                 ),
               ).then((_) => _loadProfile());
             } else if (userData != null &&
@@ -531,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      CorrectionRequestScreen(userData: userData),
+                      CorrectionRequestScreen(userData: userData.toJson()),
                 ),
               ).then((_) => _loadProfile());
             } else if (userData != null &&
@@ -540,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      PerformanceDashboardScreen(userData: userData),
+                      PerformanceDashboardScreen(userData: userData.toJson()),
                 ),
               ).then((_) => _loadProfile());
             }
@@ -695,7 +701,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBottomNavigation(BuildContext context, AppLocalizations l10n) {
     // Ensure user data is present before requiring it
     final settingsTarget = _userData != null
-        ? SettingsScreen(userData: _userData!)
+        ? SettingsScreen(userData: _userData!.toJson())
         : null;
 
     return Container(

@@ -10,13 +10,30 @@ from core.permissions import HasRBACPermission, TenantAccessPermission
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, TenantAccessPermission]
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, TenantAccessPermission]
+    required_rbac_permission = 'manage_access_roles'
+    allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
-        # Users can see their own profile, staff can see all
-        if self.request.user.is_staff:
+        # Users can see their own profile, managers can see all
+        user = self.request.user
+        
+        # 1. Self-service
+        if self.action in ['retrieve', 'me']:
+            return User.objects.filter(id=user.id)
+            
+        # 2. Management Access
+        # HasRBACPermission handles global access check, but we still need to filter queryset
+        # for safety if they somehow bypass the permission class (e.g. nested calls)
+        from core.models import Employee
+        employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_access_roles'))
+        
+        if is_manager:
             return User.objects.all()
-        return User.objects.filter(id=self.request.user.id)
+            
+        return User.objects.filter(id=user.id)
 
     @action(detail=False, methods=['get'])
     def me(self, request):

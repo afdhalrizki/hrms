@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from core.models import Employee
 from core.audit import AuditModel
+from core.utils import reimbursement_upload_path
 
 class ReimbursementCategory(AuditModel):
     name = models.CharField(_("name"), max_length=100)
@@ -28,9 +29,16 @@ class Reimbursement(AuditModel):
     amount = models.DecimalField(_("amount"), max_digits=12, decimal_places=2)
     description = models.TextField(_("description"))
     receipt_number = models.CharField(_("receipt number"), max_length=100, blank=True, null=True)
-    attachment = models.FileField(_("attachment"), upload_to='reimbursements/', blank=True, null=True)
+    attachment = models.FileField(
+        _("attachment"), 
+        upload_to=reimbursement_upload_path, 
+        blank=True, null=True
+    )
     
-    # Multi-stage approval
+    # Workflow Integration
+    current_stage = models.ForeignKey('core.WorkflowStage', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("current stage"))
+    
+    # [DEPRECATED] Backward compatibility / simple flow
     status = models.CharField(_("status"), max_length=10, choices=STATUS_CHOICES, default='PENDING')
     supervisor_status = models.CharField(_("supervisor status"), max_length=10, choices=STATUS_CHOICES, default='PENDING')
     finance_status = models.CharField(_("finance status"), max_length=10, choices=STATUS_CHOICES, default='PENDING')

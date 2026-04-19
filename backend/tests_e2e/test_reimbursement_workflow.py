@@ -58,4 +58,4 @@ def test_reimbursement_workflow_success(base_url, tenant1_domain, client):
         headers=get_auth_headers(tenant1_domain, admin_token)
     )
     assert res_fin.status_code == 200
-    assert res_fin.json()["final_status"] == "APPROVED"
+    assert res_fin.json()["current_status"] == "APPROVED"

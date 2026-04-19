@@ -66,7 +66,7 @@ class ReimbursementTestCase(TenantTestCase):
                 'amount': 150000,
                 'description': 'Taxi to client'
             }
-            response = self.client.post(url, data, HTTP_HOST=host)
+            response = self.client.post(url, data, HTTP_HOST=host, secure=True)
             if response.status_code != 201:
                 print(f"Status Code: {response.status_code}")
                 print(f"Response Content: {response.content}")
@@ -76,7 +76,7 @@ class ReimbursementTestCase(TenantTestCase):
             # 2. Supervisor approves
             self.client.force_login(self.supervisor_user)
             approve_url = reverse('reimbursement-approve-supervisor', args=[reimb_id])
-            response = self.client.post(approve_url, HTTP_HOST=host)
+            response = self.client.post(approve_url, HTTP_HOST=host, secure=True)
             self.assertEqual(response.status_code, 200)
             
             reimb = Reimbursement.objects.get(id=reimb_id)
@@ -89,7 +89,7 @@ class ReimbursementTestCase(TenantTestCase):
             self.supervisor_user.save()
             
             approve_finance_url = reverse('reimbursement-approve-finance', args=[reimb_id])
-            response = self.client.post(approve_finance_url, {'approved_amount': 140000}, HTTP_HOST=host)
+            response = self.client.post(approve_finance_url, {'approved_amount': 140000}, HTTP_HOST=host, secure=True)
             self.assertEqual(response.status_code, 200)
             
             reimb.refresh_from_db()
@@ -109,7 +109,7 @@ class ReimbursementTestCase(TenantTestCase):
             
             # Login as staff
             self.client.force_login(self.emp_user)
-            response = self.client.get(reverse('reimbursement-list'), HTTP_HOST=host)
+            response = self.client.get(reverse('reimbursement-list'), HTTP_HOST=host, secure=True)
             self.assertEqual(len(response.json()), 0) # Only sees own (none yet)
             
             # Submit one for staff
@@ -117,7 +117,7 @@ class ReimbursementTestCase(TenantTestCase):
                 employee=self.emp, category=self.cat, 
                 date='2026-01-02', amount=100, description='Staff expense'
             )
-            response = self.client.get(reverse('reimbursement-list'), HTTP_HOST=host)
+            response = self.client.get(reverse('reimbursement-list'), HTTP_HOST=host, secure=True)
             self.assertEqual(len(response.json()), 1)
 
     def test_amount_validation(self):
@@ -128,7 +128,7 @@ class ReimbursementTestCase(TenantTestCase):
         
         for invalid_amount in [-100, 0]:
             data = {'category': self.cat.id, 'date': '2026-01-01', 'amount': invalid_amount, 'description': 'Invalid'}
-            response = self.client.post(url, data, HTTP_HOST=host)
+            response = self.client.post(url, data, HTTP_HOST=host, secure=True)
             self.assertEqual(response.status_code, 400)
             self.assertIn('Amount must be greater than zero', str(response.content))
 
@@ -140,7 +140,7 @@ class ReimbursementTestCase(TenantTestCase):
         
         # self.cat has max_amount=1000000
         data = {'category': self.cat.id, 'date': '2026-01-01', 'amount': 1500000, 'description': 'Too expensive'}
-        response = self.client.post(url, data, HTTP_HOST=host)
+        response = self.client.post(url, data, HTTP_HOST=host, secure=True)
         self.assertEqual(response.status_code, 400)
         self.assertIn('Amount exceeds the maximum limit', str(response.content))
 
@@ -156,7 +156,7 @@ class ReimbursementTestCase(TenantTestCase):
             self.client.force_login(self.emp_user)
             # Try to approve self claim
             url = reverse('reimbursement-approve-supervisor', args=[reimb.id])
-            response = self.client.post(url, HTTP_HOST=host)
+            response = self.client.post(url, HTTP_HOST=host, secure=True)
             # HasRBACPermission should block this (requires manage_reimbursement)
             self.assertEqual(response.status_code, 403)
 
@@ -170,7 +170,7 @@ class ReimbursementTestCase(TenantTestCase):
             )
             
             self.client.force_login(self.supervisor_user)
-            response = self.client.get(reverse('reimbursement-list'), HTTP_HOST=host)
+            response = self.client.get(reverse('reimbursement-list'), HTTP_HOST=host, secure=True)
             self.assertEqual(len(response.json()), 1)
 
     def test_rejection_permanence(self):
@@ -187,7 +187,7 @@ class ReimbursementTestCase(TenantTestCase):
             self.client.force_login(self.supervisor_user)
             
             url = reverse('reimbursement-approve-supervisor', args=[reimb.id])
-            response = self.client.post(url, HTTP_HOST=host)
+            response = self.client.post(url, HTTP_HOST=host, secure=True)
             # Viewset might allow the action but let's see logic.
             # Actually, the current viewset approve_supervisor doesn't check current status.
             # I should probably add a check in views.py if I want strict rejection permanence.
@@ -208,7 +208,7 @@ class ReimbursementTestCase(TenantTestCase):
             self.client.force_login(self.supervisor_user)
             
             url = reverse('reimbursement-export-csv') + '?month=3&year=2026'
-            response = self.client.get(url, HTTP_HOST=host)
+            response = self.client.get(url, HTTP_HOST=host, secure=True)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response['Content-Type'], 'text/csv')
             content = response.content.decode('utf-8')

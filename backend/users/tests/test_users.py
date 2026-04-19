@@ -18,6 +18,7 @@ class UserModuleTestCase(TenantTestCase):
         # User who belongs ONLY to self.tenant
         self.tenant_user = User.objects.create_user(email='user@tenant.com', password='password')
         self.tenant_user.tenants.add(self.tenant)
+        Employee.objects.create(email=self.tenant_user.email, nik='T01', fullname='Tenant User', join_date='2024-01-01', ktp_number='K1234')
         
         self.staff_user = User.objects.create_user(email='staff@platform.com', password='password', is_staff=True)
         self.domain = self.tenant.domains.first().domain
@@ -46,16 +47,14 @@ class UserModuleTestCase(TenantTestCase):
         role = Role.objects.create(name="Developer", department=dept)
         gol = Golongan.objects.create(name="G2", base_salary=15000000)
         
-        employee = Employee.objects.create(
-            nik="DEV-001",
-            fullname="Tenant User",
-            email=self.tenant_user.email,
-            department=dept,
-            role=role,
-            golongan=gol,
-            join_date="2024-01-01",
-            ktp_number="123456789"
-        )
+        employee = Employee.objects.get(email=self.tenant_user.email)
+        employee.nik = "DEV-001"
+        employee.department = dept
+        employee.role = role
+        employee.golongan = gol
+        employee.join_date = "2024-01-01"
+        employee.ktp_number = "123456789"
+        employee.save()
         
         url = reverse('user-me')
         self.client.force_login(self.tenant_user)
@@ -100,11 +99,11 @@ class UserModuleTestCase(TenantTestCase):
         url = reverse('user-me')
         self.client.force_login(self.tenant_user)
         
-        # Requesting from self.tenant (where they HAVE NO employee record yet)
+        # Requesting from self.tenant
         response = self.client.get(url, SERVER_NAME=self.domain)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Should NOT have employee data from the other schema
-        self.assertIsNone(response.data.get('employee_nik'))
+        # Should return employee data from self.tenant (T01) and NOT from iso_test (OTHER-001)
+        self.assertEqual(response.data.get('employee_nik'), 'T01')
         self.assertEqual(response.data['email'], self.tenant_user.email)
 
 class MiddlewareTestCase(TenantTestCase):
@@ -297,9 +296,11 @@ class UserManagementTestCase(TenantTestCase):
         
         staff = User.objects.create_user(email='staff_access@test.com', password='password', is_staff=True)
         staff.tenants.add(self.tenant)
+        Employee.objects.create(email=staff.email, nik='S01', fullname='Staff User', join_date='2024-01-01', ktp_number='K9999')
         
         regular = User.objects.create_user(email='regular_access@test.com', password='password')
         regular.tenants.add(self.tenant)
+        Employee.objects.create(email=regular.email, nik='R01', fullname='Regular User', join_date='2024-01-01', ktp_number='K5678')
         
         url = reverse('user-list')
         

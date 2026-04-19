@@ -30,7 +30,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - '6379:6379'
+      - '6380:6379'
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
@@ -87,6 +87,8 @@ services:
       pgbouncer:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - hrms_net
     deploy:
       resources:
         limits:
@@ -109,6 +111,8 @@ services:
       backend:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - hrms_net
     deploy:
       resources:
         limits:

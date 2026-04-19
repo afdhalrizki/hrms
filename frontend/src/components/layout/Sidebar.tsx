@@ -26,23 +26,25 @@ import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
 import { getBaseUrl } from '@/lib/api';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { usePermission } from '@/hooks/usePermission';
+import * as perms from '@/core/constants';
 
 const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
   { nameKey: 'profile',    icon: Users,            href: '/profile' },
-  { nameKey: 'employees', icon: Users,            href: '/employees', isAdminOnly: true },
+  { nameKey: 'employees', icon: Users,            href: '/employees', requiredPermission: 'manage_hr' },
   { nameKey: 'performance', icon: TrendingUp,     href: '/performance' },
-  { nameKey: 'branches',  icon: MapPin,           href: '/branches',  isAdminOnly: true },
+  { nameKey: 'branches',  icon: MapPin,           href: '/branches',  requiredPermission: 'manage_hr' },
   { nameKey: 'attendance',icon: Calendar,         href: '/attendance' },
   { nameKey: 'leaves',    icon: Briefcase,        href: '/leaves' },
   { nameKey: 'reimbursements', icon: Receipt,      href: '/reimbursements' },
-  { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   isAdminOnly: true },
-  { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', isAdminOnly: true },
-  { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', isAdminOnly: true },
-  { nameKey: 'settings',  icon: Settings,         href: '/settings',  isAdminOnly: true },
-  { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', isAdminOnly: true, module: 'audit' },
-  { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', isAdminOnly: true, module: 'core' },
-  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', isAdminOnly: true, module: 'core' },
+  { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   requiredPermission: 'manage_payroll' },
+  { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', requiredPermission: 'manage_settings' },
+  { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', requiredPermission: 'manage_hr' },
+  { nameKey: 'settings',  icon: Settings,         href: '/settings',  requiredPermission: 'manage_settings' },
+  { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', requiredPermission: 'view_audit_logs', module: 'audit' },
+  { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', requiredPermission: 'manage_settings', module: 'core' },
+  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', requiredPermission: 'manage_settings', module: 'core' },
 ];
 
 export function Sidebar() {
@@ -54,10 +56,9 @@ export function Sidebar() {
     return enabledModules?.includes(item.module);
   });
   const t = useTranslations('Navigation');
-  const tCommon = useTranslations('Common');
-  const pathname = usePathname();
-  const { tenantName, logo } = useTenant();
+  const { logo, tenantName } = useTenant();
   const { user, loading } = useAuth();
+  const { hasPermission } = usePermission();
 
   const getInitials = (name: string | null) => {
     if (!name) return '??';
@@ -65,42 +66,43 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 glass-card border-r transition-transform">
-      <div className="flex flex-col h-full">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 glass-nav border-r border-white/10 transition-transform backdrop-blur-[20px] shadow-2xl">
+      <div className="flex flex-col h-full bg-background/20">
         {/* Logo Section */}
-        <div className="p-6">
-          <div className="flex items-center gap-3 overflow-hidden">
+        <div className="p-8 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+          <div className="flex items-center gap-4 overflow-hidden relative z-10">
             {logo ? (
-              <div className="h-10 w-10 shrink-0 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-black/5 overflow-hidden">
+              <div className="h-12 w-12 shrink-0 rounded-2xl bg-white flex items-center justify-center shadow-xl shadow-black/10 overflow-hidden border border-white/20">
                 <img 
                   src={logo.startsWith('http') ? logo : `${getBaseUrl().replace('/api', '')}${logo}`} 
                   alt={`${tenantName} Logo`} 
-                  className="h-full w-full object-contain p-1" 
+                  className="h-full w-full object-contain p-1.5" 
                 />
               </div>
             ) : (
-              <div className="h-10 w-10 shrink-0 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                <Briefcase size={22} />
+              <div className="h-12 w-12 shrink-0 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30">
+                <Briefcase size={24} />
               </div>
             )}
             <div className="overflow-hidden">
-              <h1 className="text-xl font-bold tracking-tight truncate">
+              <h1 className="text-xl font-black tracking-tighter truncate">
                 {tenantName === 'Public' ? 'harikerja' : tenantName}
               </h1>
-              <span className="text-xs font-medium text-muted-foreground opacity-70 block truncate">
-                {tenantName === 'Public' ? 'Public Portal' : 'Workspace Portal'}
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block truncate opacity-60">
+                {tenantName === 'Public' ? 'Public Portal' : 'Workspace'}
               </span>
             </div>
           </div>
-          <div className="mt-6">
+          <div className="mt-8">
             <LanguageSwitcher />
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-1 mt-4">
+        <nav className="flex-1 px-4 space-y-1.5 mt-4 overflow-y-auto no-scrollbar">
           {filteredItems.filter(item => {
-            if (item.isAdminOnly && !user?.is_staff && !user?.is_global_admin) {
+            if (item.requiredPermission && !hasPermission(item.requiredPermission)) {
               return false;
             }
             return true;
@@ -111,38 +113,38 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative overflow-hidden",
+                  "group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 relative overflow-hidden border border-transparent",
                   isActive 
-                    ? "text-primary bg-primary/10 font-medium" 
-                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                    ? "text-primary bg-primary/10 font-bold border-primary/10 shadow-sm" 
+                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground hover:border-white/5"
                 )}
               >
                 {isActive && (
                   <motion.div
-                    layoutId="active-pill"
-                    className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
+                    layoutId="active-nav-glow"
+                    className="absolute inset-0 bg-primary/5 -z-10"
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />
                 )}
-                <item.icon className={cn("transition-transform group-hover:scale-110", isActive ? "text-primary" : "")} size={20} />
-                <span className="flex-1">{t(item.nameKey)}</span>
-                <ChevronRight className={cn("ml-auto opacity-0 transition-all", isActive ? "opacity-40" : "group-hover:translate-x-1 group-hover:opacity-40")} size={14} />
+                <item.icon className={cn("transition-all group-hover:scale-110 group-hover:rotate-3", isActive ? "text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "")} size={20} />
+                <span className="flex-1 text-sm tracking-tight">{t(item.nameKey)}</span>
+                <ChevronRight className={cn("ml-auto opacity-0 transition-all", isActive ? "opacity-60 translate-x-0" : "group-hover:translate-x-1 group-hover:opacity-40")} size={14} />
               </Link>
             );
           })}
         </nav>
 
         {/* User Profile Section */}
-        <div className="p-4 mt-auto">
-          <div className="glass-card rounded-2xl p-4 border flex items-center gap-3 overflow-hidden">
-            <div className="h-10 w-10 shrink-0 rounded-full bg-accent flex items-center justify-center text-white font-bold">
+        <div className="p-6 mt-auto">
+          <div className="glass-card rounded-[1.5rem] p-4 border border-white/10 flex items-center gap-4 overflow-hidden shadow-inner group/user cursor-pointer hover:bg-white/5 transition-all">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center text-accent font-black text-sm border border-accent/10 shadow-lg">
               {loading ? '...' : getInitials(user?.fullname || user?.email || 'Admin')}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-semibold truncate">
+              <p className="text-sm font-bold truncate group-hover/user:text-accent transition-colors">
                 {loading ? tCommon('loading') : (user?.fullname || 'Admin User')}
               </p>
-              <p className="text-xs text-muted-foreground truncate">
+              <p className="text-[10px] text-muted-foreground truncate font-medium uppercase tracking-tight opacity-60">
                 {user?.email || 'admin@hrms.com'}
               </p>
             </div>

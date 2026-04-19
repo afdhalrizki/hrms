@@ -12,7 +12,14 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - **Comprehensive Reporting**: Standardized CSV/PDF exports for Attendance recaps, Appraisal summaries, and Payroll data.
 - [x] **Strategic HR**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
 - [x] **ESS Profile Management**: Restricted self-service API allowing employees to update personal contact info and upload KTP/NPWP documents without compromising HR master data.
-- [x] **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Basic, Professional, Enterprise).
+- [x] **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Essential, Professional, Premium, Enterprise).
+  
+  | Feature | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
+  | :--- | :---: | :---: | :---: | :---: |
+  | **Quota** | 50 Emp | 500 Emp | 2,000 Emp | 10,000+ |
+  | **Payroll** | ❌ | ✅ | ✅ | ✅ |
+  | **Performance**| ❌ | ❌ | ✅ | ✅ |
+  | **Analytics** | ❌ | ❌ | ❌ | ✅ |
 - [x] **Cloud-Native Storage**: Ready for Amazon S3 or AWS-compatible storage via `django-storages` for multi-node scalability.
 
 ## 📁 Core Modules

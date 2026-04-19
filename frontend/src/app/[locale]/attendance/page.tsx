@@ -9,7 +9,8 @@ import {
   MoreVertical,
   CheckCircle2,
   UserX,
-  AlertCircle
+  AlertCircle,
+  ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -120,6 +121,10 @@ export default function AttendancePage() {
             <a href="/attendance/corrections" className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2 text-white">
               <AlertCircle size={18} />
               Correction Requests
+            </a>
+            <a href="/attendance/audit" className="px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-sm font-medium hover:bg-amber-500/20 transition-colors flex items-center gap-2 text-amber-500">
+              <ShieldAlert size={18} />
+              Audit Log
             </a>
             <button 
               onClick={handleClockAction}

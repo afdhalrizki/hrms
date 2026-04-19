@@ -43,6 +43,51 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+    @property
+    def permissions(self):
+        """
+        Returns the raw permissions JSON from the associated Employee's AccessRole.
+        Used by the frontend to enforce dynamic feature flags.
+        """
+        try:
+            from core.models import Employee
+            employee = Employee.objects.filter(email=self.email).select_related('access_role').first()
+            if employee and employee.access_role:
+                return employee.access_role.permissions
+        except:
+            pass
+        return {}
+
+    @property
+    def role(self):
+        """
+        Synthesized role for frontend consumption.
+        Derives from Employee's capabilities instead of just the role name.
+        """
+        if self.is_superuser or self.is_global_admin:
+            return 'SUPERADMIN'
+            
+        from core import constants
+        perms = self.permissions
+        
+        # 1. Admin Capability (manage_settings / manage_hr / manage_access_roles)
+        # Even if role name is renamed, presence of these permissions signals ADMIN status to UI
+        if perms.get(constants.MANAGE_SETTINGS) or perms.get(constants.MANAGE_ACCESS_ROLES) or self.is_staff:
+            return 'ADMIN'
+            
+        # 2. Manager Capability (approve_* things or view_reports)
+        is_manager = any([
+            perms.get(constants.APPROVE_LEAVE),
+            perms.get(constants.APPROVE_REIMBURSEMENT),
+            perms.get(constants.APPROVE_ATTENDANCE_CORRECTION),
+            perms.get(constants.APPROVE_OVERTIME),
+            perms.get(constants.VIEW_PERFORMANCE_REPORT)
+        ])
+        if is_manager:
+            return 'MANAGER'
+            
+        return 'EMPLOYEE'
+
 from django.db.models.signals import m2m_changed, pre_delete
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError

@@ -16,8 +16,9 @@ class KPIViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPI.objects.all()
     serializer_class = KPISerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_performance' # Need to add this to RBAC
+    required_rbac_permission = 'manage_performance'
     required_feature = 'performance'
+    allow_self_service_list = True
 
 class KPITargetViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPITarget.objects.all()
@@ -25,6 +26,7 @@ class KPITargetViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_performance'
     required_feature = 'performance'
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -45,13 +47,22 @@ class AppraisalViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_performance'
     required_feature = 'performance'
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_performance')):
+        # Staff users can see everything
+        if user.is_staff:
             return Appraisal.objects.all()
+
+        # Managers/Admins with specific permissions also see everything
+        if employee and employee.access_role:
+            has_manage = employee.access_role.permissions.get('manage_performance')
+            has_view = employee.access_role.permissions.get('view_performance_report')
+            if has_manage or has_view:
+                return Appraisal.objects.all()
         
         # Employees see their own appraisals
         if employee:
@@ -89,6 +100,7 @@ class AppraisalReviewViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_performance'
     required_feature = 'performance'
     allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user

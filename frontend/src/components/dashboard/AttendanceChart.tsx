@@ -11,17 +11,17 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 
-const data = [
-  { day: 'Mon', attendance: 850 },
-  { day: 'Tue', attendance: 920 },
-  { day: 'Wed', attendance: 880 },
-  { day: 'Thu', attendance: 954 },
-  { day: 'Fri', attendance: 890 },
-  { day: 'Sat', attendance: 420 },
-  { day: 'Sun', attendance: 380 },
+const defaultData = [
+  { day: 'Mon', attendance: 0 },
+  { day: 'Tue', attendance: 0 },
+  { day: 'Wed', attendance: 0 },
+  { day: 'Thu', attendance: 0 },
+  { day: 'Fri', attendance: 0 },
+  { day: 'Sat', attendance: 0 },
+  { day: 'Sun', attendance: 0 },
 ];
 
-export default function AttendanceChart() {
+export default function AttendanceChart({ data = defaultData }: { data?: any[] }) {
   return (
     <div className="w-full h-full min-h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
@@ -31,41 +31,51 @@ export default function AttendanceChart() {
         >
           <defs>
             <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
               <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
             </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+          <CartesianGrid strokeDasharray="5 5" vertical={false} stroke="rgba(255,255,255,0.03)" />
           <XAxis 
             dataKey="day" 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fill: '#6b7280', fontSize: 12, fontWeight: 600 }}
+            tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
             dy={10}
           />
           <YAxis 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fill: '#6b7280', fontSize: 12, fontWeight: 600 }}
+            tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
           />
           <Tooltip 
+            cursor={{ stroke: 'rgba(99, 102, 241, 0.2)', strokeWidth: 2 }}
             contentStyle={{ 
-              backgroundColor: '#0f172a', 
+              backgroundColor: 'rgba(15, 23, 42, 0.8)', 
+              backdropFilter: 'blur(16px)',
               border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '16px',
-              fontSize: '12px',
-              fontWeight: 'bold',
-              color: '#fff'
+              borderRadius: '20px',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+              fontSize: '11px',
+              fontWeight: '900',
+              padding: '12px 16px',
+              textTransform: 'uppercase'
             }}
-            itemStyle={{ color: '#6366f1' }}
+            itemStyle={{ color: '#818cf8', padding: 0 }}
           />
           <Area 
             type="monotone" 
             dataKey="attendance" 
             stroke="#6366f1" 
-            strokeWidth={3}
+            strokeWidth={4}
             fillOpacity={1} 
             fill="url(#colorAttendance)" 
+            filter="url(#glow)"
+            animationDuration={2000}
           />
         </AreaChart>
       </ResponsiveContainer>

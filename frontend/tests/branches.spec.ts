@@ -1,14 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
-test.describe('Branch Management', () => {
-  const adminUrl = 'http://localhost:3000';
-
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://localhost:3000',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
-    'Access-Control-Allow-Credentials': 'true'
-  };
+test.describe.serial('Branch Management', () => {
+  const admin = TEST_USERS.admin;
 
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== testInfo.expectedStatus) {
@@ -17,75 +11,18 @@ test.describe('Branch Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    let mockBranches = [
-      { id: 'b1', name: 'Jakarta Office', address: 'Jl. Sudirman No. 1', latitude: -6.2088, longitude: 106.8456, radius_meters: 100, timezone: 'Asia/Jakarta' },
-      { id: 'b2', name: 'Bandung Hub', address: 'Jl. Asia Afrika No. 10', latitude: -6.9175, longitude: 107.6191, radius_meters: 50, timezone: 'Asia/Jakarta' }
-    ];
-
-    await page.route('**/*', async route => {
-      const urlStr = route.request().url();
-      if (!urlStr.toLowerCase().includes('api')) {
-        await route.continue();
-        return;
-      }
-      
-      const method = route.request().method();
-      const url = route.request().url();
-      
-      if (method === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: corsHeaders });
-        return;
-      }
-
-      const cleanUrl = url.split('?')[0];
-      let responseBody: any = null;
-      let status = 200;
-
-      if (cleanUrl.match(/\/auth\/login\/?$/)) {
-        responseBody = { id: 1, email: 'admin@company1.net', role: 'ADMIN', fullname: 'Admin User', is_staff: true };
-      } else if (cleanUrl.match(/\/users\/me\/?$/)) {
-        responseBody = { id: 1, email: 'admin@company1.net', role: 'ADMIN', is_staff: true, fullname: 'Admin User' };
-      } else if (cleanUrl.match(/\/tenant\/settings\/?$/)) {
-        responseBody = { name: 'Company1', enabled_modules: ['attendance', 'payroll', 'branches'], is_subscription_active: true };
-      } else if (cleanUrl.match(/\/branches\/?$/)) {
-        if (method === 'GET') {
-          responseBody = mockBranches;
-        } else if (method === 'POST') {
-          const newBranch = { id: 'b3', name: 'Surabaya Office' };
-          mockBranches.push(newBranch as any);
-          responseBody = newBranch;
-          status = 201;
-        }
-      } else if (cleanUrl.match(/\/branches\/[a-z0-9-]+\/?$/)) {
-        const id = cleanUrl.split('/').filter(Boolean).pop();
-        if (method === 'PATCH') {
-          responseBody = { id, name: 'Jakarta Head Office' };
-        } else if (method === 'DELETE') {
-          mockBranches = mockBranches.filter(b => b.id !== id);
-          responseBody = { success: true };
-        }
-      }
-
-      if (responseBody) {
-        await route.fulfill({ status, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify(responseBody) });
-      } else {
-        await route.fulfill({ status: 200, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify([]) });
-      }
-    });
-
-    await page.goto(`${adminUrl}/en/login?test_tenant=company1`);
-    await page.locator('input[type="email"]').fill('admin@company1.net');
-    await page.locator('input[type="password"]').fill('password123');
-    await page.getByRole('button', { name: /Sign In/i }).click();
-    await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
+    // Perform real login as admin
+    await login(page, admin.email, admin.password);
   });
 
   test('should display branch list and support searching', async ({ page }) => {
-    await page.goto(`${adminUrl}/en/branches?test_tenant=company1`);
+    await page.goto(getTenantUrl('/en/branches'));
+    
+    // 1. Verify branches from real seeded backend
     await expect(page.getByText('Jakarta Office')).toBeVisible({ timeout: 15000 });
     await expect(page.getByText('Bandung Hub')).toBeVisible();
     
-    // Test search
+    // 2. Test search
     const searchInput = page.getByPlaceholder(/Search branches/i);
     await searchInput.fill('Jakarta');
     await expect(page.getByText('Jakarta Office')).toBeVisible();
@@ -93,42 +30,62 @@ test.describe('Branch Management', () => {
   });
 
   test('should add a new branch successfully', async ({ page }) => {
-    await page.goto(`${adminUrl}/en/branches?test_tenant=company1`);
-    await page.getByRole('button', { name: /Add Branch/i }).click();
+    await page.goto(getTenantUrl('/en/branches'));
+    const addBtn = page.getByRole('button', { name: /Add Branch/i });
+    await expect(addBtn).toBeVisible({ timeout: 10000 });
+    await addBtn.click();
     
     await expect(page.getByText(/Add New Branch/i)).toBeVisible();
     
-    await page.locator('input[name="name"]').fill('Surabaya Office');
-    await page.locator('textarea[name="address"]').fill('Jl. Tunjungan No. 5');
-    await page.locator('input[name="latitude"]').fill('-7.2575');
-    await page.locator('input[name="longitude"]').fill('112.7521');
-    await page.locator('input[name="radius_meters"]').fill('150');
-    await page.locator('select[name="timezone"]').selectOption('Asia/Jakarta');
+    const timestamp = Date.now();
+    const branchName = `Office ${timestamp}`;
+    
+    await page.locator('input[name="name"]').fill(branchName);
+    await page.locator('textarea[name="address"]').fill('Jl. Integrated Test No. 99');
+    await page.locator('input[name="latitude"]').fill('-7.9893');
+    await page.locator('input[name="longitude"]').fill('112.6245');
+    await page.locator('input[name="radius_meters"]').fill('200');
+    await page.locator('select[name="timezone"]').selectOption({ label: 'Asia/Jakarta' });
     
     await page.getByRole('button', { name: /Create Branch/i }).click();
-    await expect(page.getByText(/Add New Branch/i)).not.toBeVisible();
+    
+    // Verify modal closes and success message
+    await expect(page.getByText(/Branch created successfully/i)).toBeVisible({ timeout: 15000 });
+    
+    // Verify persistence in the list
+    await page.fill('input[placeholder*="Search"]', branchName);
+    await expect(page.getByText(branchName)).toBeVisible({ timeout: 15000 });
   });
 
   test('should edit an existing branch', async ({ page }) => {
-    await page.goto(`${adminUrl}/en/branches?test_tenant=company1`);
+    await page.goto(getTenantUrl('/en/branches'));
     
     // Find Jakarta Office card and click edit
     const jakartaCard = page.locator('div.glass-card').filter({ hasText: 'Jakarta Office' });
-    await jakartaCard.hover(); // Actions appear on hover
-    await jakartaCard.locator('button').first().click(); // First button is edit
+    await jakartaCard.hover(); 
+    
+    // On hover, we expect edit and delete buttons
+    // The edit button usually has a pencil icon or is the first button in the actions group
+    const editBtn = jakartaCard.locator('button').first();
+    await editBtn.click();
     
     await expect(page.getByText(/Edit Branch/i)).toBeVisible();
-    await page.locator('input[name="name"]').fill('Jakarta Head Office');
+    const newName = 'Jakarta HQ ' + Date.now();
+    await page.locator('input[name="name"]').fill(newName);
     await page.getByRole('button', { name: /Save Changes/i }).click();
     
-    await expect(page.getByText(/Edit Branch/i)).not.toBeVisible();
+    await expect(page.getByText(/Branch updated successfully/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(newName)).toBeVisible();
   });
 
   test('should delete a branch successfully', async ({ page }) => {
-    await page.goto(`${adminUrl}/en/branches?test_tenant=company1`);
+    await page.goto(getTenantUrl('/en/branches'));
     
     // Find Bandung Hub card
     const bandungCard = page.locator('div.glass-card').filter({ hasText: 'Bandung Hub' });
+    await bandungCard.hover();
+    
+    // Delete button is usually the second button
     const deleteBtn = bandungCard.locator('button').nth(1);
 
     // Setup dialog handler before clicking
@@ -136,7 +93,8 @@ test.describe('Branch Management', () => {
     
     await deleteBtn.click({ force: true });
     
-    // Wait for the card to disappear from the DOM
+    // Verify the card disappears and success toast
+    await expect(page.getByText(/Branch deleted successfully/i)).toBeVisible({ timeout: 15000 });
     await expect(bandungCard).not.toBeVisible({ timeout: 15000 });
   });
 });

@@ -28,6 +28,7 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -36,9 +37,9 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         # Managers and Staff see everything
         if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
             queryset = Attendance.objects.all()
-            employee_id = self.request.query_params.get('employee_id')
-            if employee_id:
-                queryset = queryset.filter(employee_id=employee_id)
+            skipped = self.request.query_params.get('biometric_skipped')
+            if skipped:
+                queryset = queryset.filter(biometric_skipped=(skipped.lower() == 'true'))
             return queryset
             
         # Regular employees only see their own records
@@ -190,6 +191,7 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -284,6 +286,7 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -332,7 +335,7 @@ class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_settings'
+    required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
 
 
@@ -342,6 +345,8 @@ class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
+    allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -369,6 +374,8 @@ class LeaveBalanceViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
+    allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -389,6 +396,7 @@ class AttendanceCorrectionRequestViewSet(AuditModelMixin, viewsets.ModelViewSet)
     required_rbac_permission = 'manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
@@ -448,7 +456,8 @@ class AttendanceCorrectionRequestViewSet(AuditModelMixin, viewsets.ModelViewSet)
                     attendance.check_out = instance.requested_check_out
                 attendance.save()
                 
-                # Re-calculate status (LATE etc) if needed? 
-                # For now just save the requested times.
+                # Re-calculate status (LATE etc) after time correction
+                AttendanceService.recalculate_attendance_status(attendance)
+                
                 from core.audit import AuditLogger
                 AuditLogger.log_change('UPDATE', attendance, actor=user)

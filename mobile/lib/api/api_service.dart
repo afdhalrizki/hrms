@@ -216,7 +216,7 @@ class ApiService {
 
   }
 
-  Future<Map<String, dynamic>> getUserProfile() async {
+  Future<User> getUserProfile() async {
     final tenant = await getTenant();
     final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse("$baseUrl/users/me/"),
@@ -224,7 +224,7 @@ class ApiService {
     ));
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return User.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to fetch user profile: ${response.body}');
     }

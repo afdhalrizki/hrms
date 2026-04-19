@@ -14,8 +14,8 @@ class TieringAccessTestCase(TenantTestCase):
         self.client = APIClient()
         self.domain_name = self.tenant.domains.first().domain
         
-        # Setup tenant as BASIC
-        self.tenant.plan_type = 'BASIC'
+        # Setup tenant as ESSENTIAL
+        self.tenant.plan_type = 'ESSENTIAL'
         self.tenant.enabled_modules = ['core', 'attendance']
         self.tenant.max_employees = 2
         self.tenant.save()
@@ -29,8 +29,8 @@ class TieringAccessTestCase(TenantTestCase):
         self.user.tenants.add(self.tenant)
         self.client.force_login(self.user)
 
-    def test_basic_tier_restrictions(self):
-        """BASIC tier should NOT have access to payroll."""
+    def test_essential_tier_restrictions(self):
+        """ESSENTIAL tier should NOT have access to payroll."""
         with schema_context(self.tenant.schema_name):
             url = reverse('payrollperiod-list')
             response = self.client.get(url, SERVER_NAME=self.domain_name)

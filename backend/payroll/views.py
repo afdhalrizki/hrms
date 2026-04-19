@@ -1,12 +1,13 @@
 from rest_framework import viewsets, permissions
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission, FeatureRequiredPermission
-from .models import SalaryComponent, PayrollPeriod, Payslip, PayslipDetail
+from .models import SalaryComponent, PayrollPeriod, Payslip, PayslipDetail, EmployeeSalaryComponent
 from .serializers import (
     SalaryComponentSerializer,
     PayrollPeriodSerializer,
     PayslipSerializer,
-    PayslipDetailSerializer
+    PayslipDetailSerializer,
+    EmployeeSalaryComponentSerializer
 )
 
 class SalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -15,6 +16,20 @@ class SalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
     required_feature = 'payroll'
+
+class EmployeeSalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
+    queryset = EmployeeSalaryComponent.objects.all()
+    serializer_class = EmployeeSalaryComponentSerializer
+    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'manage_payroll'
+    required_feature = 'payroll'
+
+    def get_queryset(self):
+        queryset = EmployeeSalaryComponent.objects.all()
+        emp_id = self.request.query_params.get('employee_id') or self.request.query_params.get('employee')
+        if emp_id:
+            queryset = queryset.filter(employee_id=emp_id)
+        return queryset
 
 class PayrollPeriodViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayrollPeriod.objects.all()
@@ -34,6 +49,8 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
     required_feature = 'payroll'
+    allow_self_service = True
+    allow_self_service_list = True
 
     @action(detail=False, methods=['post'])
     def generate(self, request):
@@ -71,14 +88,29 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        employee = Employee.objects.filter(email=user.email).first()
+        employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
         
-        # Managers see all payslips
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_payroll')):
+        # Managers or auditors see all payslips
+        is_payroll_admin = False
+        if employee and employee.access_role:
+            perms = employee.access_role.permissions
+            is_payroll_admin = perms.get('manage_payroll', False) or perms.get('view_all_payslips', False)
+
+        if user.is_staff or is_payroll_admin:
             queryset = Payslip.objects.all()
             period_id = self.request.query_params.get('period_id')
+            employee_id = self.request.query_params.get('employee_id') or self.request.query_params.get('employee')
+            month = self.request.query_params.get('period_month')
+            year = self.request.query_params.get('period_year')
+            
             if period_id:
                 queryset = queryset.filter(period_id=period_id)
+            if employee_id:
+                queryset = queryset.filter(employee_id=employee_id)
+            if month:
+                queryset = queryset.filter(period__month=month)
+            if year:
+                queryset = queryset.filter(period__year=year)
             return queryset
             
         # Employees only see their own
@@ -106,13 +138,23 @@ class PayslipDetailViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
     required_feature = 'payroll'
+    allow_self_service = True
+    allow_self_service_list = True
 
     def get_queryset(self):
         user = self.request.user
-        employee = Employee.objects.filter(email=user.email).first()
+        employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
         
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_payroll')):
-            return PayslipDetail.objects.all()
+        is_payroll_admin = False
+        if employee and employee.access_role:
+            is_payroll_admin = employee.access_role.permissions.get('manage_payroll', False)
+
+        if user.is_staff or is_payroll_admin:
+            queryset = PayslipDetail.objects.all()
+            payslip_id = self.request.query_params.get('payslip_id') or self.request.query_params.get('payslip')
+            if payslip_id:
+                queryset = queryset.filter(payslip_id=payslip_id)
+            return queryset
             
         if employee:
             return PayslipDetail.objects.filter(payslip__employee=employee)

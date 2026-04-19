@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 import socket
+import sys
+
+# Detect if we are running tests
+TESTING = 'test' in sys.argv or 'test_schemas' in sys.argv or 'pytest' in sys.modules
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +35,7 @@ TENANT_DOMAIN_SUFFIX = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.localhost').split(',')
 
 # Security Hardening for Production
-if not DEBUG:
+if not DEBUG and not TESTING:
     # Use SECURE_SSL_REDIRECT only if your proxy (Nginx/LB) doesn't handle it
     SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
     SESSION_COOKIE_SECURE = True
@@ -62,6 +66,7 @@ SHARED_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'storages',
+    'billing',
 ]
 
 TENANT_APPS = [
@@ -75,12 +80,14 @@ TENANT_APPS = [
     'payroll',  # Per-tenant: Payroll
     'reimbursement',  # Per-tenant: Reimbursement & Expense Claim
     'performance',
+    'notifications',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 MIDDLEWARE = [
     'django_tenants.middleware.main.TenantMainMiddleware',
+    'users.e2e_middleware.E2ETenantMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -272,6 +279,9 @@ CSRF_TRUSTED_ORIGINS = [
 # REST Framework Settings
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'core.permissions.SubscriptionStatusPermission',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',

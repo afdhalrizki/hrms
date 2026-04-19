@@ -1,14 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
 test.describe.serial('Attendance Management', () => {
-  const tenantUrl = 'http://localhost:3000';
-  
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://localhost:3000',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRFToken',
-    'Access-Control-Allow-Credentials': 'true'
-  };
+  const employee = TEST_USERS.employee;
 
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== testInfo.expectedStatus) {
@@ -17,85 +11,52 @@ test.describe.serial('Attendance Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    await page.route('**/*', async route => {
-      const urlStr = route.request().url();
-      if (!urlStr.includes('/api/')) {
-        await route.continue();
-        return;
-      }
-      
-      const url = new URL(urlStr);
-      const path = url.pathname;
-      const method = route.request().method();
-      
-      if (method === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: corsHeaders });
-        return;
-      }
-
-      let responseBody: any = null;
-      let status = 200;
-
-      if (path.includes('/auth/login')) {
-        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', fullname: 'Employee One', is_staff: false };
-      } else if (path.includes('/users/me')) {
-        responseBody = { id: 2, email: 'employee1@company1.net', role: 'EMPLOYEE', is_staff: false, fullname: 'Employee One' };
-      } else if (path.includes('/tenant/settings')) {
-        responseBody = { name: 'Company1', enabled_modules: ['attendance'], is_subscription_active: true };
-      } else if (path.includes('/attendance-correction-requests')) {
-        if (method === 'POST') {
-          responseBody = { id: 10, status: 'PENDING' };
-          status = 201;
-        }
-      } else if (path.includes('/attendance')) {
-        const today = new Date().toISOString().split('T')[0];
-        if (method === 'GET') {
-          responseBody = [
-            { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: null, status: "PRESENT", is_late: false, liveness_verified: true, verification_method: 'LIVENESS' }
-          ];
-        } else {
-          responseBody = { id: 1, employee_name: 'Employee One', date: today, check_in: "09:00", check_out: "17:00", status: "PRESENT", is_late: false, liveness_verified: true, verification_method: 'LIVENESS' };
-          status = 201;
-        }
-      }
-
-      if (responseBody) {
-        await route.fulfill({ status, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify(responseBody) });
-      } else {
-        await route.fulfill({ status: 200, contentType: 'application/json', headers: corsHeaders, body: JSON.stringify([]) });
-      }
-    });
-
-    await page.goto(`${tenantUrl}/en/login?test_tenant=company1`);
-    await page.locator('input[id="email"]').fill('employee1@company1.net');
-    await page.locator('input[id="password"]').fill('password123');
-    await page.getByRole('button', { name: /Sign In/i }).click();
-    await expect(page.locator('aside')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/Workspace Portal/i)).toBeVisible({ timeout: 15000 });
+    // Perform real login as employee1
+    await login(page, employee.email, employee.password);
   });
 
-  test('should verify attendance dashboard and perform actions', async ({ page }) => {
-    await page.goto(`${tenantUrl}/en/attendance?test_tenant=company1`);
+  test('should verify attendance dashboard and perform check-out', async ({ page }) => {
+    await page.goto(getTenantUrl('/en/attendance'));
     await page.waitForLoadState('networkidle');
     
-    // 1. Verify Stats
-    const successRateCard = page.getByText(/Success Rate/i);
-    await expect(successRateCard).toBeVisible({ timeout: 15000 });
+    // 1. Verify Stats from real backend
+    // Since employee1 is seeded with a check-in, success rate or presence should be reflected
+    await expect(page.getByText(/Success Rate/i)).toBeVisible({ timeout: 15000 });
     
-    // 2. Perform Check Out
+    // 2. Perform Check Out 
+    // employee1 is already checked in by the seed script.
     const checkOutBtn = page.getByRole('button', { name: /Check Out/i });
-    await expect(checkOutBtn).toBeVisible({ timeout: 10000 });
+    await expect(checkOutBtn).toBeVisible({ timeout: 15000 });
     await checkOutBtn.click();
-    await expect(page.getByText(/Attendance recorded successfully/i)).toBeVisible({ timeout: 10000 });
-
-    // 3. Submit Correction Request
-    const requestCorrectionBtn = page.getByRole('button', { name: /Request Correction/i }).first();
-    await requestCorrectionBtn.click();
-    await expect(page.getByRole('heading', { name: /Request Correction/i })).toBeVisible();
-    await page.locator('textarea').fill('Forgot to check in due to morning meeting.');
     
-    // Use requestSubmit for reliability
-    await page.locator('form').evaluate(node => (node as HTMLFormElement).requestSubmit());
-    await expect(page.getByText(/Correction request submitted successfully!/i)).toBeVisible();
+    // Verify success toast from real backend
+    await expect(page.getByText(/Attendance recorded successfully|Clocked out successfully/i)).toBeVisible({ timeout: 15000 });
+  });
+
+  test('should allow employee to submit a correction request', async ({ page }) => {
+    await page.goto(getTenantUrl('/en/attendance'));
+    await page.waitForLoadState('networkidle');
+
+    // 1. Open Correction Modal
+    const requestCorrectionBtn = page.getByRole('button', { name: /Request Correction/i }).first();
+    await expect(requestCorrectionBtn).toBeVisible({ timeout: 10000 });
+    await requestCorrectionBtn.click();
+    
+    await expect(page.getByRole('heading', { name: /Request Correction/i })).toBeVisible();
+    
+    // 2. Fill form
+    await page.locator('textarea').fill('Integrated test correction request: Forgot to check out yesterday.');
+    
+    // 3. Submit
+    const submitBtn = page.getByRole('button', { name: /Submit Request/i });
+    if (await submitBtn.isVisible()) {
+      await submitBtn.click();
+    } else {
+      // Fallback if the button text is different or in a form
+      await page.locator('form').evaluate(node => (node as HTMLFormElement).requestSubmit());
+    }
+    
+    // 4. Verify success from real backend
+    await expect(page.getByText(/Correction request submitted successfully!/i)).toBeVisible({ timeout: 15000 });
   });
 });

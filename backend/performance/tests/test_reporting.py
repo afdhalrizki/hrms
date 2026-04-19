@@ -15,6 +15,11 @@ class PerformanceReportingTestCase(TenantTestCase):
         super().setUp()
         self.client = APIClient()
         
+        # Enable 'performance' module for this tenant
+        self.tenant.plan_type = 'PROFESSIONAL'
+        self.tenant.enabled_modules = ['core', 'performance']
+        self.tenant.save()
+        
         with schema_context(self.tenant.schema_name):
             self.dept = Department.objects.create(name='Performance HR')
             self.user = User.objects.create_user(email='hr_report@example.com', password='password', is_staff=True)

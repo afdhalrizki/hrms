@@ -317,8 +317,9 @@ class ProvisioningDepthTestCase(TestCase):
         with schema_context(tenant.schema_name):
             # Roles
             from core.models import AccessRole
-            self.assertTrue(AccessRole.objects.filter(name="HR Administrator").exists())
-            self.assertTrue(AccessRole.objects.filter(name="Standard Employee").exists())
+            self.assertTrue(AccessRole.objects.filter(name="Admin").exists())
+            self.assertTrue(AccessRole.objects.filter(name="HR Manager").exists())
+            self.assertTrue(AccessRole.objects.filter(name="Staff").exists())
             
             # Admin User Connection
             admin_user = User.objects.get(email='depth@test.com')
@@ -327,5 +328,5 @@ class ProvisioningDepthTestCase(TestCase):
             # Employee Linkage
             employee = Employee.objects.get(email='depth@test.com')
             self.assertEqual(employee.nik, "ADMIN-001")
-            self.assertEqual(employee.access_role.name, "HR Administrator")
+            self.assertEqual(employee.access_role.name, "Admin")
             self.assertEqual(employee.status, 'PERMANENT')

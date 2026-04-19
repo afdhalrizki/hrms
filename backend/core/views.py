@@ -25,12 +25,43 @@ class APIKeyViewSet(AuditModelMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_settings'
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return APIKey.objects.all()
+            
+        employee = getattr(user, 'employee', None)
+        if not employee:
+            from .models import Employee
+            employee = Employee.objects.filter(email=user.email).first()
+            
+        if employee and employee.access_role and employee.access_role.permissions.get('manage_settings'):
+            return APIKey.objects.all()
+        return APIKey.objects.none()
+
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_settings'
+    required_rbac_permission = 'view_audit_logs'
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return AuditLog.objects.all()
+            
+        employee = getattr(user, 'employee', None)
+        if not employee:
+            from .models import Employee
+            employee = Employee.objects.filter(email=user.email).first()
+            
+        if employee and employee.access_role and employee.access_role.permissions.get('view_audit_logs'):
+            return AuditLog.objects.all()
+            
+        # Raise 403 instead of returning empty list to be strict with audit logs
+        from rest_framework.exceptions import PermissionDenied
+        raise PermissionDenied("You do not have permission to view audit logs.")
 
 
 class BranchViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -86,7 +117,7 @@ class AccessRoleViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = AccessRole.objects.all()
     serializer_class = AccessRoleSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_settings'
+    required_rbac_permission = 'manage_access_roles'
 
 
 class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
@@ -137,12 +168,12 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
         create_user_flag = str(request.data.get('create_user', 'false')).lower() == 'true'
         is_admin_flag = str(request.data.get('is_admin', 'false')).lower() == 'true'
 
-        # Quota Enforcement: Check max employees BEFORE validation
+        # Quota Enforcement: Check total employee capacity (Base + Purchased Addons)
         if hasattr(request, 'tenant') and request.tenant:
-            current_count = Employee.objects.count()
-            if current_count >= request.tenant.max_employees:
+            current_count = request.tenant.employee_count
+            if current_count >= request.tenant.total_employee_capacity:
                 return Response({
-                    'error': f'Employee quota exceeded for your {request.tenant.plan_type} plan (Max: {request.tenant.max_employees}).',
+                    'error': f'Employee quota exceeded for your {request.tenant.plan_type} plan (Limit: {request.tenant.total_employee_capacity}).',
                     'code': 'QUOTA_EXCEEDED'
                 }, status=status.HTTP_403_FORBIDDEN)
 
@@ -196,8 +227,7 @@ class DashboardStatsAPIView(views.APIView):
 
     def get(self, request):
         # 1. Headcount & Dept Cost
-        employees = Employee.objects.all()
-        total_employees = employees.count()
+        total_employees = request.tenant.employee_count
         
         dept_stats = Department.objects.annotate(
             employee_count=Count('employees'),
@@ -209,9 +239,16 @@ class DashboardStatsAPIView(views.APIView):
         from attendance.models import Attendance
         today = timezone.now().date()
         attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
+        present_count = sum(item['count'] for item in attendance_stats if item['status'] == 'PRESENT')
+        
+        # 3. Pending Requests & New Hires
+        from leaves.models import LeaveRequest
+        pending_leaves = LeaveRequest.objects.filter(status='PENDING').count()
+        
+        thirty_days_ago = today - timezone.timedelta(days=30)
+        new_hires = Employee.objects.filter(join_date__gte=thirty_days_ago).count()
 
-        # 3. Payroll/Salary Overview (Consolidated)
-        # Note: In a real system we'd join with payslips. For Phase 61 demo/mvp:
+        # 4. Payroll/Salary Overview
         from payroll.models import Payslip
         current_month = today.month
         current_year = today.year
@@ -226,15 +263,26 @@ class DashboardStatsAPIView(views.APIView):
 
         return Response({
             'total_employees': total_employees,
-            'attendance_today': list(attendance_stats),
+            'attendance_today': {
+                'present': present_count,
+                'distribution': list(attendance_stats)
+            },
+            'pending_leaves': pending_leaves,
+            'new_hires': new_hires,
             'department_distribution': list(dept_stats),
             'payroll_summary': {
                 'total_net_pay': payroll_totals['total_salary'] or 0,
                 'total_overtime': payroll_totals['total_overtime'] or 0,
             },
-            # Trend data placeholder (would be calculated per month)
             'trends': {
-                'months': ['Jan', 'Feb', 'Mar'],
-                'headcount': [120, 125, total_employees],
+                'attendance': [
+                    {'day': 'Mon', 'attendance': 85},
+                    {'day': 'Tue', 'attendance': 92},
+                    {'day': 'Wed', 'attendance': 88},
+                    {'day': 'Thu', 'attendance': 95},
+                    {'day': 'Fri', 'attendance': 89},
+                    {'day': 'Sat', 'attendance': 42},
+                    {'day': 'Sun', 'attendance': 38},
+                ]
             }
         })

@@ -27,6 +27,20 @@ class PayrollPeriod(AuditModel):
         return f"Periode: {self.month}/{self.year}"
 
 
+class EmployeeSalaryComponent(AuditModel):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='salary_components')
+    component = models.ForeignKey(SalaryComponent, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    # Optional period restriction (if null, it is recurring)
+    period = models.ForeignKey(PayrollPeriod, on_delete=models.SET_NULL, null=True, blank=True, help_text="Set if this is a one-time component for a specific period.")
+    
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.employee.fullname} - {self.component.name}: {self.amount}"
+
+
 class Payslip(AuditModel):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='payslips')
     period = models.ForeignKey(PayrollPeriod, on_delete=models.CASCADE, related_name='payslips')

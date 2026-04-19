@@ -13,7 +13,7 @@ class ReimbursementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reimbursement
         fields = '__all__'
-        read_only_fields = ['employee', 'status', 'supervisor_status', 'finance_status', 'approved_amount']
+        read_only_fields = ['employee', 'status', 'current_stage', 'supervisor_status', 'finance_status', 'approved_amount']
 
     def validate_amount(self, value):
         if value <= 0:

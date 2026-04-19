@@ -12,7 +12,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         tenant = connection.tenant
-        self.stdout.write(f"Exporting data for tenant: {tenant.name} (Schema: {tenant.schema_name})")
+        tenant_name = getattr(tenant, 'name', tenant.schema_name)
+        self.stdout.write(f"Exporting data for tenant: {tenant_name} (Schema: {tenant.schema_name})")
 
         output_dir = options.get('output_dir') or f"exports/{tenant.schema_name}"
         if not os.path.exists(output_dir):

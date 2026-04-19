@@ -12,9 +12,12 @@ class Command(BaseCommand):
     help = 'Bootstrap public tenant and a sample company1 tenant'
 
     def handle(self, *args, **kwargs):
+        from django_tenants.utils import get_public_schema_name
+        public_schema = get_public_schema_name()
+        
         # 1. Create the public / main tenant
-        if not Tenant.objects.filter(schema_name='public').exists():
-            public_tenant = Tenant(schema_name='public', name='Public')
+        if not Tenant.objects.filter(schema_name=public_schema).exists():
+            public_tenant = Tenant(schema_name=public_schema, name='Public')
             public_tenant.save(verbosity=0)
             Domain.objects.create(
                 domain='localhost',

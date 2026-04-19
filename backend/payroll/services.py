@@ -112,8 +112,41 @@ class PayrollCalculator:
     from django.db import transaction
     @transaction.atomic
     def run(self) -> Payslip:
-        # 1. Base Salary from Golongan
-        basic = self.employee.golongan.base_salary if self.employee.golongan else Decimal('0')
+        # 1. Base Salary from Golongan (with Pro-rata for joiners/leavers)
+        raw_basic = self.employee.golongan.base_salary if self.employee.golongan else Decimal('0')
+        
+        # Ensure dates are date objects (handle potential string inputs from tests/mocks)
+        from datetime import date
+        from django.utils.dateparse import parse_date
+        
+        def to_date(d):
+            if isinstance(d, str):
+                return parse_date(d)
+            return d
+
+        p_start = to_date(self.period.start_date)
+        p_end = to_date(self.period.end_date)
+        e_join = to_date(self.employee.join_date)
+
+        # Calculate pro-rata ratio
+        period_days = (p_end - p_start).days + 1
+        
+        # Effective working days in this period (considering join date)
+        effective_start = max(p_start, e_join)
+        effective_end = p_end # [TODO] Add support for resignation date
+        
+        if effective_start > p_end:
+            # Joined after this period ends
+            basic = Decimal('0')
+        elif effective_start > p_start:
+            # Joined mid-period
+            worked_days = (effective_end - effective_start).days + 1
+            ratio = Decimal(str(worked_days)) / Decimal(str(period_days))
+            basic = (raw_basic * ratio).quantize(Decimal('1')) # Round to nearest IDR
+        else:
+            # Active for the full period
+            basic = raw_basic
+
         self.gross_pay += basic
         self.details.append({
             'description': 'Gaji Pokok',
@@ -121,7 +154,59 @@ class PayrollCalculator:
             'is_deduction': False
         })
 
-        # 2. BPJS Calculations
+        # 2. Daily Allowances (Meal & Transport) from Golongan
+        from attendance.models import Attendance
+        attendances = Attendance.objects.filter(
+            employee=self.employee,
+            date__range=(p_start, p_end)
+        )
+        days_present = attendances.filter(status='PRESENT').count()
+        days_late = attendances.filter(status='LATE').count()
+        days_absent = attendances.filter(status='ABSENT').count()
+        days_worked = days_present + days_late
+
+        from django.db import connection
+        from django_tenants.utils import get_tenant_model
+        tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+
+        if self.employee.golongan:
+            meal_allowance = self.employee.golongan.meal_allowance * days_worked
+            transport_allowance = self.employee.golongan.transport_allowance * days_worked
+            
+            if meal_allowance > 0:
+                self.gross_pay += meal_allowance
+                self.details.append({'description': f'Tunjangan Makan ({days_worked} hari)', 'amount': meal_allowance, 'is_deduction': False})
+            
+            if transport_allowance > 0:
+                self.gross_pay += transport_allowance
+                self.details.append({'description': f'Tunjangan Transport ({days_worked} hari)', 'amount': transport_allowance, 'is_deduction': False})
+
+        # 2.5 Attendance Deductions (Late & Absent)
+        from django.db import connection
+        from django_tenants.utils import get_tenant_model
+        
+        # In some test environments, connection.tenant might be a FakeTenant.
+        # We try to get the real tenant object to access custom settings.
+        try:
+            tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+        except Exception:
+            tenant = connection.tenant
+            
+        late_rate = Decimal(str(getattr(tenant, 'late_deduction_rate', 0)))
+        absent_rate = Decimal(str(getattr(tenant, 'absence_deduction_rate', 0)))
+        
+        late_deduction = late_rate * days_late
+        absence_deduction = absent_rate * days_absent
+        
+        if late_deduction > 0:
+            self.total_deductions += late_deduction
+            self.details.append({'description': f'Potongan Terlambat ({days_late} kali)', 'amount': late_deduction, 'is_deduction': True})
+            
+        if absence_deduction > 0:
+            self.total_deductions += absence_deduction
+            self.details.append({'description': f'Potongan Alpa ({days_absent} hari)', 'amount': absence_deduction, 'is_deduction': True})
+
+        # 3. BPJS Calculations
         from django.db import connection
         tenant = connection.tenant
         
@@ -148,7 +233,7 @@ class PayrollCalculator:
         from attendance.models import Overtime
         approved_overtimes = Overtime.objects.filter(
             employee=self.employee,
-            date__range=(self.period.start_date, self.period.end_date),
+            date__range=(p_start, p_end),
             status='APPROVED'
         )
         total_overtime_hours = sum(ot.hours for ot in approved_overtimes)
@@ -181,7 +266,7 @@ class PayrollCalculator:
         from reimbursement.models import Reimbursement
         approved_reimbursements = Reimbursement.objects.filter(
             employee=self.employee,
-            date__range=(self.period.start_date, self.period.end_date),
+            date__range=(p_start, p_end),
             status='APPROVED'
         )
         total_reimbursement = sum(r.approved_amount or r.amount for r in approved_reimbursements)
@@ -193,15 +278,39 @@ class PayrollCalculator:
                 'amount': total_reimbursement,
                 'is_deduction': False
             })
+
+        # 5.5 Custom Salary Components (Bonuses, Loans, Recurring Allowances)
+        from django.db import models
+        from .models import EmployeeSalaryComponent
+        custom_components = EmployeeSalaryComponent.objects.filter(
+            employee=self.employee,
+            is_active=True
+        ).filter(
+            models.Q(period=self.period) | models.Q(period__isnull=True)
+        )
         
-        # 6. Net Salary
-        self.net_pay = self.gross_pay - self.total_deductions
+        for esc in custom_components:
+            amount = esc.amount
+            if esc.component.type == 'ALLOWANCE':
+                self.gross_pay += amount
+                self.details.append({'description': esc.component.name, 'amount': amount, 'is_deduction': False})
+            else:
+                self.total_deductions += amount
+                self.details.append({'description': esc.component.name, 'amount': amount, 'is_deduction': True})
+        
+        # 6. Net Salary (Floor to Zero to prevent negative pay)
+        self.net_pay = max(Decimal('0'), self.gross_pay - self.total_deductions)
 
         # 6. Commit to DB
+        # Calculate total allowance (excluding basic)
+        total_allowance = self.gross_pay - basic
+        
         payslip = Payslip.objects.create(
             employee=self.employee,
             period=self.period,
             basic_salary=basic,
+            total_allowance=total_allowance,
+            total_deduction=self.total_deductions,
             overtime_pay=overtime_pay,
             pph21_tax=tax,
             net_pay=self.net_pay

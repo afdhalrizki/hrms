@@ -67,18 +67,39 @@ except Tenant.DoesNotExist:
     from tenants.models import Domain
     Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
     Domain.objects.get_or_create(domain='127.0.0.1', tenant=public_tenant, is_primary=False)
+    
+    # Registration Requests for Superadmin tests
+    from tenants.models import RegistrationRequest
+    RegistrationRequest.objects.all().delete()
+    RegistrationRequest.objects.create(
+        company_name='Pending Corp', 
+        subdomain_prefix='pending', 
+        admin_email='admin@pending.com', 
+        status='PENDING'
+    )
+    RegistrationRequest.objects.create(
+        company_name='Approved Inc', 
+        subdomain_prefix='approved', 
+        admin_email='admin@approved.com', 
+        status='APPROVED'
+    )
+    print("Seeded RegistrationRequests in public schema.")
 
 try:
     tenant = Tenant.objects.get(schema_name='company1')
     tenant.plan_type = 'ENTERPRISE'
     tenant.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+    tenant.late_deduction_rate = 50000
+    tenant.absence_deduction_rate = 100000
     tenant.save()
 except Tenant.DoesNotExist:
     tenant = Tenant.objects.create(
         schema_name='company1', 
         name='Company One',
         plan_type='ENTERPRISE',
-        enabled_modules=['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
+        enabled_modules=['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance'],
+        late_deduction_rate=50000,
+        absence_deduction_rate=100000
     )
 
 from tenants.models import Domain
@@ -95,6 +116,8 @@ except Tenant.DoesNotExist:
     Domain.objects.create(domain='company2.localhost', tenant=tenant2, is_primary=True)
 
 test_users = [
+    # Public / Platform
+    {'email': 'superadmin@harikerja.com', 'is_staff': True, 'is_superuser': True, 'tenant': public_tenant},
     # Company 1
     {'email': 'admin@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
     {'email': 'manager1@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
@@ -151,7 +174,14 @@ with schema_context('company1'):
 
     dept, _ = Department.objects.get_or_create(name="Engineering")
     role_se, _ = Role.objects.get_or_create(name="Software Engineer", department=dept)
-    gol, _ = Golongan.objects.get_or_create(name="3A", defaults={'base_salary': 5000000})
+    gol, _ = Golongan.objects.get_or_create(
+        name="3A", 
+        defaults={
+            'base_salary': 5000000,
+            'meal_allowance': 50000,
+            'transport_allowance': 30000
+        }
+    )
     
     branch_jkt, _ = Branch.objects.get_or_create(
         name="Jakarta Office",

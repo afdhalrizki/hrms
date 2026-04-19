@@ -32,10 +32,11 @@ from attendance.views import (
     AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, 
     ShiftViewSet, ScheduleViewSet, AttendanceCorrectionRequestViewSet, LeaveBalanceViewSet
 )
-from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet
+from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet, EmployeeSalaryComponentViewSet
 from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
 from reimbursement.views import ReimbursementViewSet, ReimbursementCategoryViewSet
 from performance.views import KPIViewSet, KPITargetViewSet, AppraisalViewSet, AppraisalReviewViewSet
+from billing.views import BillingViewSet, QuotaReductionRequestViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -53,6 +54,7 @@ router.register(r'shifts', ShiftViewSet)
 router.register(r'schedules', ScheduleViewSet)
 router.register(r'leave-balances', LeaveBalanceViewSet)
 router.register(r'salary-components', SalaryComponentViewSet)
+router.register(r'employee-salary-components', EmployeeSalaryComponentViewSet)
 router.register(r'payroll-periods', PayrollPeriodViewSet)
 router.register(r'payslips', PayslipViewSet)
 router.register(r'payslip-details', PayslipDetailViewSet)
@@ -70,6 +72,8 @@ router.register(r'appraisals', AppraisalViewSet)
 router.register(r'appraisal-reviews', AppraisalReviewViewSet)
 router.register(r'public/signup', PublicSignupViewSet, basename='public-signup')
 router.register(r'internal/registrations', RegistrationApprovalViewSet, basename='internal-registration')
+router.register(r'quota-reduction', QuotaReductionRequestViewSet, basename='quota-reduction')
+router.register(r'billing', BillingViewSet, basename='billing')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

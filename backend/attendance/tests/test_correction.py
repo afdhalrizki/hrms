@@ -54,7 +54,7 @@ class AttendanceCorrectionTestCase(TenantTestCase):
         
         url = reverse('attendance-detail', kwargs={'pk': self.attendance.id})
         payload = {'check_in': '08:00:00'}
-        response = self.client.patch(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.patch(url, payload, format='json', HTTP_HOST=self.domain_name)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
@@ -73,7 +73,7 @@ class AttendanceCorrectionTestCase(TenantTestCase):
             'requested_check_out': '17:30:00',
             'reason': 'Forgot to clock in'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', HTTP_HOST=self.domain_name)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         request_id = response.data['id']
         
@@ -84,8 +84,9 @@ class AttendanceCorrectionTestCase(TenantTestCase):
         self.client.force_login(self.user_jane)
         detail_url = reverse('attendancecorrectionrequest-detail', kwargs={'pk': request_id})
         # Note: In our implementation, perform_update handles the workflow transition
-        patch_response = self.client.patch(detail_url, {'status': 'APPROVED'}, format='json', SERVER_NAME=self.domain_name)
+        patch_response = self.client.patch(detail_url, {'status': 'APPROVED'}, format='json', HTTP_HOST=self.domain_name)
         self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(patch_response.data['status'], 'APPROVED') # debug
         
         # 3. Verify original attendance is updated
         with schema_context(self.tenant.schema_name):
