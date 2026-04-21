@@ -75,15 +75,22 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
         else:
             employees = Employee.objects.filter(id__in=employee_ids)
             
+        from django.db import IntegrityError
         results = []
+        skipped = 0
         for emp in employees:
-            calc = PayrollCalculator(emp, period)
-            payslip = calc.run()
-            results.append(PayslipSerializer(payslip).data)
+            try:
+                calc = PayrollCalculator(emp, period)
+                payslip = calc.run()
+                results.append(PayslipSerializer(payslip).data)
+            except IntegrityError:
+                skipped += 1
+                continue
             
         return Response({
-            'message': f'Successfully generated {len(results)} payslips',
-            'payslips': results
+            'message': f'Successfully generated {len(results)} payslips' + (f' ({skipped} already generated)' if skipped > 0 else ''),
+            'payslips': results,
+            'skipped_count': skipped
         })
 
     def get_queryset(self):

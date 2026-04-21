@@ -74,6 +74,18 @@ class AppraisalViewSet(AuditModelMixin, viewsets.ModelViewSet):
         import csv
         from django.http import HttpResponse
         
+        # Security: Only allow managers/staff to export full reports
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and (
+            employee.access_role.permissions.get('manage_performance') or 
+            employee.access_role.permissions.get('view_performance_report')
+        ))
+        
+        if not is_manager:
+            from rest_framework.response import Response
+            return Response({'detail': 'Permission denied. Only managers can export reports.'}, status=403)
+
         queryset = self.get_queryset()
         status_filter = request.query_params.get('status')
         if status_filter:

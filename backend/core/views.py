@@ -227,22 +227,20 @@ class DashboardStatsAPIView(views.APIView):
 
     def get(self, request):
         # 1. Headcount & Dept Cost
-        total_employees = request.tenant.employee_count
+        total_employees = Employee.objects.count()
         
         dept_stats = Department.objects.annotate(
             employee_count=Count('employees'),
-            # For real scenarios, we would sum the salary from Payroll/Payslip app here.
-            # Mirroring the frontend's needs for total department cost.
         ).values('name', 'employee_count')
 
         # 2. Attendance Health (Today)
         from attendance.models import Attendance
-        today = timezone.now().date()
+        today = timezone.localdate()
         attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
-        present_count = sum(item['count'] for item in attendance_stats if item['status'] == 'PRESENT')
+        present_count = Attendance.objects.filter(date=today, status='PRESENT').count()
         
         # 3. Pending Requests & New Hires
-        from leaves.models import LeaveRequest
+        from attendance.models import LeaveRequest
         pending_leaves = LeaveRequest.objects.filter(status='PENDING').count()
         
         thirty_days_ago = today - timezone.timedelta(days=30)
@@ -253,36 +251,31 @@ class DashboardStatsAPIView(views.APIView):
         current_month = today.month
         current_year = today.year
         payroll_totals = Payslip.objects.filter(
-            period__start_date__month=current_month,
-            period__start_date__year=current_year,
+            period__month=current_month,
+            period__year=current_year,
             payment_date__isnull=False
         ).aggregate(
             total_salary=Sum('net_pay'),
             total_overtime=Sum('overtime_pay')
         )
 
-        return Response({
+        attendance_percent = (present_count / total_employees * 100) if total_employees > 0 else 0
+        
+        response_data = {
             'total_employees': total_employees,
-            'attendance_today': {
-                'present': present_count,
-                'distribution': list(attendance_stats)
-            },
+            'attendance_today': list(attendance_stats),
             'pending_leaves': pending_leaves,
             'new_hires': new_hires,
             'department_distribution': list(dept_stats),
             'payroll_summary': {
-                'total_net_pay': payroll_totals['total_salary'] or 0,
-                'total_overtime': payroll_totals['total_overtime'] or 0,
+                'total_net_pay': float(payroll_totals['total_salary'] or 0),
+                'total_overtime': float(payroll_totals['total_overtime'] or 0),
             },
             'trends': {
-                'attendance': [
-                    {'day': 'Mon', 'attendance': 85},
-                    {'day': 'Tue', 'attendance': 92},
-                    {'day': 'Wed', 'attendance': 88},
-                    {'day': 'Thu', 'attendance': 95},
-                    {'day': 'Fri', 'attendance': 89},
-                    {'day': 'Sat', 'attendance': 42},
-                    {'day': 'Sun', 'attendance': 38},
-                ]
-            }
-        })
+                'months': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                'headcount': [total_employees] * 6,
+            },
+            'attendance_percent': round(attendance_percent, 1)
+        }
+        
+        return Response(response_data)

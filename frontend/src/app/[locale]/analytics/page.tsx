@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { 
   TrendingUp, 
   Users, 
+  UserCheck,
   CreditCard, 
   Clock, 
   Download,
@@ -17,6 +18,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 interface DashboardStats {
   total_employees: number;
+  attendance_percent: number;
   attendance_today: { status: string; count: number }[];
   department_distribution: { name: string; employee_count: number }[];
   payroll_summary: {
@@ -33,16 +35,21 @@ export default function AnalyticsPage() {
   const t = useTranslations('Analytics');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isFetching = useRef(false);
 
   const fetchData = useCallback(async () => {
+    if (isFetching.current) return;
     try {
+      isFetching.current = true;
       setIsLoading(true);
-      const data = await apiFetch('/dashboard-stats');
+      const data = await apiFetch('/core/dashboard-stats/');
       setStats(data);
     } catch (error) {
+      console.error('[Analytics] Failed to fetch stats:', error);
       toast.error('Failed to load dashboard metrics');
     } finally {
       setIsLoading(false);
+      isFetching.current = false;
     }
   }, []);
 
@@ -78,11 +85,12 @@ export default function AnalyticsPage() {
     );
   }
 
-  const fmt = (n: number) => `Rp ${(n / 1_000_000).toFixed(1)}jt`;
+  const fmt = (n: number) => `Rp ${new Intl.NumberFormat('en-US').format(n)}`;
 
   const kpis = [
     { key: 'totalPayroll', label: t('totalPayroll'), value: fmt(stats?.payroll_summary.total_net_pay || 0), icon: CreditCard, color: '#3B82F6' },
     { key: 'totalHeadcount', label: t('totalHeadcount'), value: `${stats?.total_employees || 0}`, icon: Users, color: '#10B981' },
+    { key: 'attendanceRate', label: 'Attendance Rate', value: `${stats?.attendance_percent || 0}%`, icon: UserCheck, color: '#10B981' },
     { key: 'overtimeCost', label: t('overtimeCost'), value: fmt(stats?.payroll_summary.total_overtime || 0), icon: Clock, color: '#F59E0B' },
     { key: 'costPerEmployee', label: t('costPerEmployee'), value: fmt((stats?.payroll_summary.total_net_pay || 0) / (stats?.total_employees || 1)), icon: TrendingUp, color: '#8B5CF6' },
   ];
@@ -173,7 +181,7 @@ export default function AnalyticsPage() {
                 <div key={d.name} className="space-y-2">
                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                     <span className="text-gray-400">{d.name}</span>
-                    <span className="text-white">{d.employee_count} staff</span>
+                    <span className="text-white" data-testid="dept-staff-count">{d.employee_count} staff</span>
                   </div>
                   <div className="h-3 rounded-full bg-white/5 overflow-hidden border border-white/5 p-0.5">
                     <div 

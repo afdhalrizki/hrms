@@ -4,18 +4,23 @@ This document contains a step-by-step (End-to-End) guide to deploy the harikerja
 
 ## Recommended Server Specifications
 
-Based on the UAT/QA workload analysis, the following are the required server specifications for each provider:
+Based on the UAT/QA workload analysis, specifically considering **Automated E2E Testing (Playwright)** requirements, the following are the required server specifications:
 
-| Provider | Recommended Plan | vCPU | RAM | Storage | Performance Tier |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Biznet GIO** | NEO Lite MM 8.4 | 4 | 8 GB | 60 GB SSD | Dedicated CPU (Robust) |
-| **IDCloudHost** | NVMe 5 | 4 | 8 GB | 140 GB NVMe | Extreme NVMe (Fast I/O) |
-| **Hostinger** | KVM 2 | 2 | 8 GB | 100 GB NVMe | Cost-Efficient (Reliable) |
+| Tier | vCPU | RAM | Storage | Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| **Minimum** | 4 Cores | 8 GB | 60 GB SSD | Manual UAT & Basic API Testing |
+| **Ideal (Lancar)** | 8 Cores | 16 GB | 100 GB NVMe | Full Automated E2E & CI/CD Pipelines |
 
-### Provider Specific Notes:
-- **Biznet GIO:** Use the **NEO Lite** series. It offers consistent performance for CPU-intensive Docker build processes.
-- **IDCloudHost:** Use the **Cloud VPS NVMe** series for the best database response times.
-- **Hostinger:** Use the **KVM VPS** series. You can choose the **Ubuntu 24.04** template for the latest security patches.
+### Provider Plan Recommendations:
+- **Biznet GIO:** Use **NEO Lite MM 8.4** (Min) or **NEO Lite MM 16.8** (Ideal).
+- **IDCloudHost:** Use **NVMe 5** (Min) or **NVMe 6** (Ideal) for better I/O performance.
+- **Hostinger:** Use **KVM 4** or above to ensure enough RAM for headless browsers.
+
+### Technical Rationale for 16GB RAM:
+While the Django backend and Next.js frontend are lightweight, the **QA Environment** has unique resource demands:
+1.  **Headless Browsers (Playwright/Cypress):** Each worker instance of a headless browser (Chrome/Webkit) can consume **500MB - 1GB RAM**. Running 4+ tests in parallel requires significant RAM headroom.
+2.  **CI/CD Overhead:** If the server is used as a GitHub Action runner or for local Docker builds, the Next.js compilation process is very CPU/RAM intensive.
+3.  **Database Seeding:** Frequent resets and seeding of the multi-tenant database snapshots are significantly faster with a larger PostgreSQL shared buffer.
 
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS

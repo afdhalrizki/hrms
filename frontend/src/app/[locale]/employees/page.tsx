@@ -19,6 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
+import { toast } from 'sonner';
 
 interface Employee {
   id: number;
@@ -132,15 +133,16 @@ export default function EmployeesPage() {
       });
       await fetchEmployees(); // Refresh list
       setIsAddModalOpen(false); // Close Modal
+      toast.success("Employee provisioned successfully");
       
       // Reset Form
       setFormData(prev => ({
         ...prev,
         nik: '', fullname: '', email: '', phone: '', ktp_number: '', is_admin: false
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create employee:", error);
-      alert("Error creating employee. Please check inputs.");
+      toast.error(error.message || "Error creating employee. Please check inputs.");
     } finally {
       setIsSubmitting(false);
     }

@@ -19,7 +19,7 @@ test.describe.serial('Leaves Management', () => {
     await page.goto(getTenantUrl('/en/leaves'));
     
     // 1. Check remaining days from real seeded backend (12 days total, 0 used)
-    await expect(page.getByText('12')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('remaining-days-value')).toContainText('12', { timeout: 15000 });
     
     // 2. Check history table (should be empty or show "No data")
     const table = page.locator('table');
@@ -33,14 +33,14 @@ test.describe.serial('Leaves Management', () => {
     await page.goto(getTenantUrl('/en/leaves'));
     
     // 1. Verify balances are loaded
-    await expect(page.getByText('12')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('remaining-days-value')).toContainText('12', { timeout: 10000 });
     
     // 2. Open Request Leave Modal
     const requestBtn = page.getByRole('button', { name: /Request Leave/i });
     await expect(requestBtn).toBeVisible();
     await requestBtn.click();
     
-    await expect(page.getByRole('heading', { name: /New Leave Request/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /Request Leave/i })).toBeVisible({ timeout: 10000 });
     
     // 3. Fill form
     await page.locator('textarea').fill('Integrated test leave: Family vacation.');
@@ -53,7 +53,8 @@ test.describe.serial('Leaves Management', () => {
     await expect(page.getByText(/Leave request submitted successfully!/i)).toBeVisible({ timeout: 15000 });
     
     // 6. Verify it appears in history
-    await expect(page.getByText('Family vacation')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('PENDING')).toBeVisible();
+    const row = page.locator('tr').filter({ hasText: 'Family vacation' });
+    await expect(row).toBeVisible({ timeout: 10000 });
+    await expect(row.getByText('PENDING')).toBeVisible();
   });
 });

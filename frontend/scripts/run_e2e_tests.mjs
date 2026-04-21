@@ -1,6 +1,6 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { 
@@ -10,28 +10,57 @@ import {
 const execAsync = promisify(exec);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FrontendDir = resolve(__dirname, '..');
-const RootDir = resolve(FrontendDir, '..');
-const BackendDir = resolve(RootDir, 'backend');
+const BackendDir = resolve(__dirname, '..', '..', 'backend');
+const RootDir = resolve(BackendDir, '..');
+const EnvFile = join(RootDir, 'deploy', 'environments', '.env.local');
+
+// 0. Load Environment Variables
+if (existsSync(EnvFile)) {
+    log('Loading environment variables from .env.local...', COLORS.gray);
+    const envContent = readFileSync(EnvFile, 'utf8');
+    envContent.split(/\r?\n/).forEach((line) => {
+      const m = line.match(/^([^#=]+)=(.*)$/);
+      if (m) {
+        const key = m[1].trim();
+        const value = m[2].trim();
+        process.env[key] = value;
+        if (key.startsWith('DB_')) {
+          log(`Loaded Env: ${key}=${value}`, COLORS.gray);
+        }
+      }
+    });
+}
 
 async function cleanupPort(port) {
-  if (process.platform !== 'win32') return;
   try {
-    const { stdout } = await execAsync(`netstat -ano | findstr :${port} | findstr LISTENING`);
-    if (stdout) {
-      const lines = stdout.trim().split('\n');
-      for (const line of lines) {
-        const parts = line.trim().split(/\s+/);
-        const pid = parts[parts.length - 1];
-        if (pid && !isNaN(pid)) {
-          log(`Cleaning up process ${pid} on port ${port}...`, COLORS.gray);
-          try {
+    if (process.platform === 'win32') {
+      const { stdout } = await execAsync(`netstat -ano | findstr :${port} | findstr LISTENING`);
+      if (stdout) {
+        const lines = stdout.trim().split('\n');
+        for (const line of lines) {
+          const parts = line.trim().split(/\s+/);
+          const pid = parts[parts.length - 1];
+          if (pid && !isNaN(pid)) {
+            log(`Cleaning up process ${pid} on port ${port}...`, COLORS.gray);
             await execAsync(`taskkill /F /PID ${pid}`);
-          } catch (e) {}
+          }
         }
+      }
+    } else {
+      // Linux/macOS cleanup
+      log(`Checking port ${port} on Linux...`, COLORS.gray);
+      try {
+        // Try fuser first
+        await execAsync(`fuser -k ${port}/tcp 2>/dev/null || true`);
+        // Then try lsof + kill as backup
+        await execAsync(`lsof -ti:${port} | xargs kill -9 2>/dev/null || true`);
+        log(`Cleaned up port ${port}.`, COLORS.gray);
+      } catch (e) {
+        // cleanup failed, which is fine
       }
     }
   } catch (e) {
-    // Port not in use or findstr failed, which is fine
+    // Port not in use or cleanup failed, which is fine
   }
 }
 
@@ -128,28 +157,37 @@ async function main() {
   // 3. Port Cleanup
   log("[3/4] Ensuring ports are available...", COLORS.yellow);
   await cleanupPort(3000);
+  await cleanupPort(3001);
   await cleanupPort(8000);
 
   // 3.5. Build Frontend
-  log("[3.5/4] Building Frontend Production Bundle...", COLORS.yellow);
-  const buildEnv = { 
-    ...process.env, 
-    NEXT_DISABLE_SWC: "1", 
-    NEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK: "1" 
-  };
-  const buildCode = await spawnStream('npm', ['run', 'build'], { cwd: FrontendDir, env: buildEnv });
-  if (buildCode !== 0) {
-    log("ERROR: Frontend build failed. Aborting tests.", COLORS.red);
-    process.exit(1);
+  if (!args.includes('--skip-build')) {
+    log("[3.5/4] Building Frontend Production Bundle...", COLORS.yellow);
+    const buildEnv = { 
+      ...process.env, 
+      NEXT_DISABLE_SWC: "1", 
+      NEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK: "1",
+      NODE_OPTIONS: "--max-old-space-size=2048",
+      NEXT_PUBLIC_API_URL: live ? 'https://qa.harikerja.web.id/api' : 'http://127.0.0.1:8000/api'
+    };
+    const buildCode = await spawnStream('npm', ['run', 'build'], { cwd: FrontendDir, env: buildEnv });
+    if (buildCode !== 0) {
+      log("ERROR: Frontend build failed. Aborting tests.", COLORS.red);
+      process.exit(1);
+    }
+  } else {
+    log("[3.5/4] Skipping Frontend Build (Using existing .next folder)...", COLORS.gray);
   }
 
   // 4. Execution
   log("[4/4] Launching Playwright Tests...", COLORS.cyan);
   const testEnv = {
     ...process.env,
-    PORT: "3000",
+    PORT: "3001",
+    HOSTNAME: "127.0.0.1", // Force IPv4 to avoid EADDRINUSE conflicts
+    NODE_OPTIONS: "--max-old-space-size=1536", // Limit memory per worker
     PLAYWRIGHT_JSON_OUTPUT_NAME: "logs/e2e_results.json",
-    NEXT_PUBLIC_API_URL: live ? 'https://qa.harikerja.web.id/api' : 'http://localhost:8000/api'
+    NEXT_PUBLIC_API_URL: (live ? 'https://qa.harikerja.web.id/api' : 'http://127.0.0.1:8000/api')
   };
 
   const pwArgs = [
@@ -169,7 +207,9 @@ async function main() {
 
   // Extra retry for transient failures
   if (exitCode !== 0) {
-    log("Transient failure detected, retrying Playwright suite once more...", COLORS.yellow);
+    log("Transient failure detected, cleaning up ports and retrying Playwright suite once more...", COLORS.yellow);
+    await cleanupPort(3000);
+    await cleanupPort(8000);
     await new Promise(r => setTimeout(r, 5000));
     exitCode = await spawnStream('npx', pwArgs, { 
       cwd: FrontendDir,

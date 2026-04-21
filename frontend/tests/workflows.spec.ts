@@ -45,18 +45,26 @@ test.describe.serial('Workflow Configurations', () => {
     await addStageBtn.click();
     
     // Verify a new stage appeared
-    await expect(page.getByPlaceholder(/Stage Name/i).last()).toBeVisible();
+    const newStage = page.getByTestId('stage-row').last();
+    await expect(newStage).toBeVisible({ timeout: 10000 });
     
     // 4. Configure the stage
-    await page.getByPlaceholder(/Stage Name/i).last().fill('Department Manager Approval');
+    await newStage.getByPlaceholder(/Stage Name/i).fill('Department Manager Approval');
     
     // Select approver type (e.g. ROLE)
-    const approverTypeSelect = page.locator('select[name*="approver_type"]').last();
-    await approverTypeSelect.selectOption('ROLE');
+    const roleButton = page.getByRole('button', { name: 'ROLE', exact: true }).last();
+    await roleButton.click();
     
     // Select specific role (Seeded: Manager)
-    const roleSelect = page.locator('select[name*="role_id"]').last();
+    const roleSelect = page.locator('select[name*="approver_role"]').last();
     await expect(roleSelect).toBeVisible();
+    
+    // Wait for roles to load
+    await expect(async () => {
+      const count = await roleSelect.locator('option').count();
+      if (count <= 1) throw new Error('Roles not loaded yet');
+    }).toPass({ timeout: 20000 });
+
     await roleSelect.selectOption({ label: 'Manager' });
 
     // 5. Save changes

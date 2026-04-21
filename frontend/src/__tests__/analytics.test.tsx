@@ -57,13 +57,13 @@ describe('AnalyticsPage', () => {
     
     await waitFor(() => {
       // API call completed
-      expect(apiFetch).toHaveBeenCalledWith('/dashboard-stats');
+      expect(apiFetch).toHaveBeenCalledWith('/core/dashboard-stats/');
     });
 
     // KPI validations
     expect(screen.getAllByText('150')[0]).toBeDefined(); // headcount
-    expect(screen.getAllByText('Rp 500.0jt')[0]).toBeDefined(); // net pay
-    expect(screen.getAllByText('Rp 15.0jt')[0]).toBeDefined(); // overtime pay
+    expect(screen.getAllByText('Rp 500,000,000')[0]).toBeDefined(); // net pay
+    expect(screen.getAllByText('Rp 15,000,000')[0]).toBeDefined(); // overtime pay
 
     // Chart and distribution
     expect(screen.getByText('Engineering')).toBeDefined();

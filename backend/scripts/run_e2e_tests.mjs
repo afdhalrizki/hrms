@@ -11,6 +11,7 @@ import {
   isPortInUse,
   waitForPort,
   getPythonExec,
+  parseMetrics,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -135,7 +136,34 @@ async function main() {
     }
   }
 
-  // 3. Check if backend server is running and healthy
+  // 3. Env Check & DB Health Overrides
+  if (existsSync(EnvFile)) {
+    log('Loading environment variables from .env.local...', COLORS.gray);
+    const envContent = readFileSync(EnvFile, 'utf8');
+    envContent.split(/\r?\n/).forEach((line) => {
+      const m = line.match(/^([^#=]+)=(.*)$/);
+      if (m) process.env[m[1].trim()] = m[2].trim();
+    });
+  }
+
+  // Overrides for local native run (ensure we talk to host ports, not container names)
+  if (process.env.DB_HOST === 'db' || !process.env.DB_HOST) {
+    process.env.DB_HOST = '127.0.0.1';
+  }
+  if (process.env.DB_PORT === '5432' || !process.env.DB_PORT) {
+    process.env.DB_PORT = '5433';
+  }
+  if (process.env.REDIS_URL?.includes('://redis:')) {
+    process.env.REDIS_URL = process.env.REDIS_URL.replace('://redis:', '://127.0.0.1:');
+  }
+  if (process.env.DATABASE_URL?.includes('@pgbouncer:')) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL.replace('@pgbouncer:', '@localhost:');
+  }
+  if (process.env.DATABASE_URL?.includes('@db:')) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL.replace('@db:', '@localhost:');
+  }
+
+  // 4. Check if backend server is running and healthy
   log(
     'Checking if backend server is running on localhost:8000...',
     COLORS.yellow,
@@ -201,41 +229,28 @@ async function main() {
   );
 
   // 4. Summary
-  log('\n' + '='.repeat(60), COLORS.gray);
-  log('                E2E TEST RUN SUMMARY', COLORS.cyan);
-  log(' (Exit: ' + exitCode + ')', COLORS.gray);
-  log('='.repeat(60), COLORS.gray);
-
   const logContent = readFileSync(logFile, 'utf8');
-  const finalLines = logContent.split(/\r?\n/).slice(-10).join('\n');
-  const summaryMatch = finalLines.match(
-    /==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*/,
-  );
+  const metrics = parseMetrics(logContent, 'Backend');
 
-  if (summaryMatch) {
-    const cleanSummary = summaryMatch[0].replace(/[= ]/g, ' ').trim();
-    log(' DETAILS : ' + cleanSummary, COLORS.white);
+  log('\n' + '='.repeat(60), COLORS.cyan);
+  log('                E2E TEST RUN SUMMARY', COLORS.cyan);
+  log('='.repeat(60), COLORS.cyan);
 
-    if (cleanSummary.match(/failed|error/)) {
-      log(' STATUS  : ❌ E2E TESTS FAILED', COLORS.red);
-    } else if (cleanSummary.match(/warning/)) {
-      log(' STATUS  : ⚠️ E2E PASSED WITH WARNINGS', COLORS.yellow);
-    } else if (exitCode === 0) {
-      log(' STATUS  : ✅ E2E TESTS PASSED', COLORS.green);
-    } else {
-      log(
-        ' STATUS  : ❌ UNKNOWN FAILURE (Exit Code: ' + exitCode + ')',
-        COLORS.red,
-      );
-    }
-  } else {
-    if (exitCode === 0) {
-      log(' STATUS  : ✅ E2E TESTS PASSED', COLORS.green);
-    } else {
-      log(' STATUS  : ❌ E2E EXECUTION FAILED', COLORS.red);
-    }
-  }
-  log('='.repeat(60), COLORS.gray);
+  const statusColor =
+    metrics.f === 0 && metrics.e === 0 && exitCode === 0
+      ? COLORS.green
+      : COLORS.red;
+  const statusText =
+    metrics.f === 0 && metrics.e === 0 && exitCode === 0 ? 'SUCCESS' : 'FAILURE';
+
+  log(`Status:         ${statusText}`, statusColor);
+  log(`Exit Code:      ${exitCode}`, exitCode === 0 ? COLORS.white : COLORS.red);
+  log('-'.repeat(60), COLORS.gray);
+  log(`Tests Passed:   ${metrics.p}`, COLORS.green);
+  log(`Tests Failed:   ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
+  log(`Tests Errored:  ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
+  log(`Warnings:       ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log('='.repeat(60), COLORS.cyan);
 
   process.exit(exitCode);
 }

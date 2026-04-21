@@ -72,7 +72,6 @@ SHARED_APPS = [
 TENANT_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.admin',
     'core',  # Per-tenant: HR Master Data
@@ -95,9 +94,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'users.middleware.TenantAccessMiddleware',
     'users.middleware.SubscriptionMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -250,10 +249,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://.*\.localhost:3000$",
-    r"^http://localhost:3000$",
+    r"^http://.*\.localhost:300[01]$",
+    r"^http://localhost:300[01]$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 from corsheaders.defaults import default_headers
@@ -269,7 +270,10 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
     "http://*.localhost:3000",
+    "http://*.localhost:3001",
     "https://harikerja.web.id",
     "https://*.harikerja.web.id",
     "https://harikerja.com",

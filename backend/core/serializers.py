@@ -134,3 +134,7 @@ class EmployeeProfileSerializer(serializers.ModelSerializer):
             'role_name', 'golongan_name', 'supervisor_name', 
             'join_date', 'status'
         ]
+        extra_kwargs = {
+            'ktp_number': {'required': False},
+            'npwp_number': {'required': False},
+        }

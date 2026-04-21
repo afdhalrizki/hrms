@@ -18,11 +18,18 @@ class PayslipDetailSerializer(serializers.ModelSerializer):
 
 class PayslipSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
+    period_name = serializers.ReadOnlyField(source='period.__str__')
+    status = serializers.SerializerMethodField()
     details = PayslipDetailSerializer(many=True, read_only=True)
     
     class Meta:
         model = Payslip
         fields = '__all__'
+
+    def get_status(self, obj):
+        if obj.payment_date:
+            return 'PAID'
+        return 'PROCESSED'
 
 class EmployeeSalaryComponentSerializer(serializers.ModelSerializer):
     component_name = serializers.ReadOnlyField(source='component.name')

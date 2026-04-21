@@ -11,18 +11,31 @@ test.describe.serial('Admin Payroll Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    page.on('console', msg => {
+      if (msg.type() === 'error' || msg.text().includes('DEBUG:')) {
+        console.log(`BROWSER: ${msg.text()}`);
+      }
+    });
     // Perform real login as admin
     await login(page, admin.email, admin.password);
   });
 
   test('should allow admin to generate payroll for a period', async ({ page }) => {
+    console.log('--- Navigating to Payroll ---');
     await page.goto(getTenantUrl('/en/payroll'));
     
-    // 1. Verify Stats are visible from real backend
-    // Seeded data: Net Pay 16,500,000 for Admin One
-    await expect(page.getByText(/16,500,000/)).toBeVisible({ timeout: 20000 });
+    // 1. Verify table content first (Admin One)
+    console.log('--- Verifying Table Content ---');
+    await expect(page.locator('tr', { hasText: 'Admin One' }).first()).toBeVisible({ timeout: 20000 });
+    
+    // 2. Verify Stats are visible from real backend
+    console.log('--- Verifying Stats ---');
+    // The screenshot shows empty cards, let's wait for the number to appear
+    const totalPayrollText = page.locator('p', { hasText: /Rp/ }).first();
+    await expect(totalPayrollText).toContainText(/16.*500.*000/, { timeout: 20000 });
 
     // 2. Open Run Payroll Modal
+    console.log('--- Opening Run Payroll Modal ---');
     const runBtn = page.getByRole('button', { name: /Generate Payroll|Run Payroll/i });
     await expect(runBtn).toBeVisible({ timeout: 15000 });
     await runBtn.click({ force: true });
@@ -33,22 +46,24 @@ test.describe.serial('Admin Payroll Management', () => {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const periodName = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
     
-    await expect(page.getByRole('heading', { name: /Bulk Generate Payroll|Run Payroll/i })).toBeVisible({ timeout: 15000 });
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible({ timeout: 15000 });
     
     // Match the period button from seed
-    const periodBtn = page.getByRole('button', { name: new RegExp(periodName, 'i') }).first();
+    const periodBtn = modal.getByRole('button', { name: new RegExp(periodName, 'i') }).first();
     await expect(periodBtn).toBeVisible({ timeout: 10000 });
+    await periodBtn.scrollIntoViewIfNeeded();
     await periodBtn.click({ force: true });
     
     // Click Generate/Process Button
-    const processBtn = page.getByRole('button', { name: /Process|Generate/i });
+    const processBtn = modal.getByRole('button', { name: /Process|Generate/i });
     await expect(processBtn).toBeVisible();
-    await processBtn.click({ force: true });
+    await processBtn.click();
 
     // 4. Verify Success from real backend
     // Relaxed check to handle both initial generation and "already exists" state if seeded
     try {
-      await expect(page.getByText(/Payroll generated successfully|already generated/i)).toBeVisible({ timeout: 20000 });
+      await expect(page.locator('body').getByText(/Payroll generated successfully|already generated/i)).toBeVisible({ timeout: 20000 });
     } catch (e) {
       console.log('Success toast not found, checking if progress bar or table updated.');
       await expect(page.locator('tr').first()).toBeVisible({ timeout: 10000 });
@@ -67,9 +82,10 @@ test.describe.serial('Admin Payroll Management', () => {
     await viewBtn.click({ force: true });
 
     // Verify Modal Details reflect seeded data
-    await expect(page.getByText(/Payslip Breakdown|Details/i)).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(admin.fullname)).toBeVisible();
-    await expect(page.getByText(/Basic Salary/i)).toBeVisible();
-    await expect(page.getByText(/15,000,000/)).toBeVisible();
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible({ timeout: 15000 });
+    await expect(modal.getByText(admin.fullname)).toBeVisible();
+    await expect(modal.getByText(/Basic Salary/i)).toBeVisible();
+    await expect(modal.getByText(/15,000,000/)).toBeVisible();
   });
 });

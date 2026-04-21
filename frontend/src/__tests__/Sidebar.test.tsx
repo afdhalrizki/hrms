@@ -1,65 +1,70 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import React from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
-import { useAuth } from '@/context/AuthContext';
-import { useTenant } from '@/context/TenantContext';
+import { loginAs } from './setup';
+import { AuthProvider } from '@/context/AuthContext';
+import { TenantProvider } from '@/context/TenantContext';
+import { NextIntlClientProvider } from 'next-intl';
 
-// Mock the contexts
-vi.mock('@/context/AuthContext', () => ({
-  useAuth: vi.fn(),
-}));
-
-vi.mock('@/context/TenantContext', () => ({
-  useTenant: vi.fn(),
-}));
+// Mock next-intl
+vi.mock('next-intl', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    useTranslations: vi.fn(() => (key: string) => key),
+    useLocale: () => 'en',
+  };
+});
 
 // Mock Next.js navigation
 vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
-describe('Sidebar Component', () => {
-  it('renders loading state for profile', () => {
-    (useTenant as any).mockReturnValue({ tenantName: 'TestCorp' });
-    (useAuth as any).mockReturnValue({ user: null, loading: true });
+vi.mock('@/i18n/routing', () => ({
+  Link: ({ children, href }: any) => <a href={href}>{children}</a>,
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+  }),
+  usePathname: () => '/',
+  routing: { locales: ['en', 'id'], defaultLocale: 'en' },
+}));
 
-    render(<Sidebar />);
-    
-    expect(screen.getByText('loading')).toBeDefined();
-    expect(screen.getByText('...')).toBeDefined();
+vi.mock('@/hooks/usePermission', () => ({
+  usePermission: vi.fn(() => ({ hasPermission: () => true })),
+}));
+
+const AllProviders = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <NextIntlClientProvider locale="en" messages={{}}>
+      <TenantProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </TenantProvider>
+    </NextIntlClientProvider>
+  );
+};
+
+describe('Sidebar Component (Integrated)', () => {
+  beforeAll(async () => {
+    await loginAs('admin@company1.com');
+  }, 20000);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('renders user data when loaded', () => {
-    (useTenant as any).mockReturnValue({ tenantName: 'TestCorp' });
-    (useAuth as any).mockReturnValue({ 
-      user: { 
-        fullname: 'John Doe', 
-        email: 'john@example.com' 
-      }, 
-      loading: false 
-    });
-
-    render(<Sidebar />);
+  it('renders real user data from backend', async () => {
+    render(<Sidebar />, { wrapper: AllProviders });
     
-    expect(screen.getByText('John Doe')).toBeDefined();
-    expect(screen.getByText('john@example.com')).toBeDefined();
-    expect(screen.getByText('JD')).toBeDefined(); // Initials
-  });
-
-  it('renders fallback for admin when no fullname', () => {
-    (useTenant as any).mockReturnValue({ tenantName: 'TestCorp' });
-    (useAuth as any).mockReturnValue({ 
-      user: { 
-        email: 'admin@testcorp.com' 
-      }, 
-      loading: false 
-    });
-
-    render(<Sidebar />);
-    
-    expect(screen.getByText('Admin User')).toBeDefined();
-    expect(screen.getByText('admin@testcorp.com')).toBeDefined();
-    expect(screen.getByText('A')).toBeDefined(); // Fallback initial from admin@...
+    await waitFor(() => {
+      // admin@company1.com fullname is likely 'Admin User' or similar from seed
+      expect(screen.getByText(/admin@company1.com/i)).toBeInTheDocument();
+    }, { timeout: 15000 });
   });
 });

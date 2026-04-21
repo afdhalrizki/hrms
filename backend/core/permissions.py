@@ -64,17 +64,35 @@ class HasRBACPermission(permissions.BasePermission):
             
         # For non-managers (no direct permission):
         if request.method == 'GET':
-            if view.action == 'list':
+            action = getattr(view, 'action', None)
+            
+            # Allow self-service for raw APIViews (where action is None)
+            # but only if no specific management permission is required.
+            if action is None and getattr(view, 'allow_self_service', False) and not required_perm:
+                return True
+
+            if action == 'list':
                 # List views are restrictive: require management perm OR explicit list self-service
                 if getattr(view, 'allow_self_service_list', False):
                     return True
                 return False
-            # Always allow retrieve (detail) as data isolation is handled by get_queryset
+            
+            # If it's a ViewSet retrieve, allow it (data isolation handled by get_queryset)
+            if action == 'retrieve':
+                return True
+                
+            # If it's a raw APIView (no DRF action) and a permission is required, 
+            # we must NOT allow it to pass through to line 74.
+            if action is None and required_perm:
+                return False
+
+            # Always allow other GETs as data isolation is handled by get_queryset
             return True
         
         # Mutations (POST, PATCH, PUT)
         standard_self_service_actions = ['create', 'retrieve', 'update', 'partial_update']
-        if getattr(view, 'allow_self_service', False) and view.action in standard_self_service_actions:
+        action = getattr(view, 'action', None)
+        if getattr(view, 'allow_self_service', False) and action in standard_self_service_actions:
             return True
 
         # Allow detail actions to bypass global check so they can be handled by has_object_permission
@@ -127,7 +145,8 @@ class HasRBACPermission(permissions.BasePermission):
             
         # Self-service: Owners can only perform standard CRUD
         standard_actions = ['retrieve', 'update', 'partial_update', 'destroy']
-        if is_owner and view.action in standard_actions:
+        action = getattr(view, 'action', None)
+        if is_owner and action in standard_actions:
             return True
             
         return False

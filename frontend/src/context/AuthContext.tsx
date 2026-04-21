@@ -21,8 +21,8 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  login: (email: string, password: string) => Promise<UserProfile | null>;
+  refreshProfile: () => Promise<UserProfile | null>;
   logout: () => void;
 }
 
@@ -33,19 +33,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (): Promise<UserProfile | null> => {
     try {
       setLoading(true);
       setError(null);
       const data = await apiFetch('/users/me');
       setUser(data);
+      return data;
     } catch (err: any) {
-      console.error('Failed to fetch profile:', err);
       // Don't set error on 401/403 as it's expected if not logged in
       if (!err.message?.includes('401') && !err.message?.includes('403')) {
         setError(err.message || 'Failed to load user profile');
       }
       setUser(null);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -66,6 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
       setUser(data);
+      // Re-fetch full profile to get employee data (fullname, etc) 
+      // which is not included in the basic login response
+      return await fetchProfile();
     } catch (err: any) {
       setError(err.message || 'Login failed');
       throw err;

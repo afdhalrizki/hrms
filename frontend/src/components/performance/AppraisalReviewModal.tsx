@@ -35,10 +35,8 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
     const fetchMe = async () => {
       try {
         const userData = await apiFetch('/users/me');
-        // We need the employee ID associated with this user
-        const employees = await apiFetch(`/core/employees?email=${userData.email}`);
-        if (employees.length > 0) {
-          setEmployeeId(employees[0].id);
+        if (userData.employee_id) {
+          setEmployeeId(userData.employee_id);
         }
       } catch (error) {
         toast.error('Failed to identify your employee profile');

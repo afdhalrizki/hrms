@@ -32,9 +32,10 @@ test.describe.serial('Payroll Management (Employee View)', () => {
     await viewBtn.click();
     
     // Verify Modal Details
-    await expect(page.getByText(/Payslip Details|Payslip Breakdown/i)).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/Basic Salary/i)).toBeVisible();
-    await expect(page.getByText(/15,000,000/)).toBeVisible();
+    const modal = page.getByRole('dialog');
+    await expect(modal.getByText(/Payslip Details|Payslip Breakdown/i)).toBeVisible({ timeout: 10000 });
+    await expect(modal.getByText(/Basic Salary/i)).toBeVisible();
+    await expect(modal.getByText(/15,000,000/)).toBeVisible();
   });
 
   test('should support downloading payslip as PDF', async ({ page }) => {

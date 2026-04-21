@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { 
   Receipt, 
@@ -27,7 +27,8 @@ interface ReimbursementCategory {
 
 interface Reimbursement {
   id: number;
-  category: { name: string };
+  category: number;
+  category_name: string;
   date: string;
   amount: string;
   approved_amount: string | null;
@@ -45,6 +46,8 @@ export default function ReimbursementsPage() {
   const [claims, setClaims] = React.useState<Reimbursement[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const isFetching = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = React.useState({
     category: '',
@@ -54,23 +57,30 @@ export default function ReimbursementsPage() {
     attachment: null as File | null,
   });
 
-  const fetchData = React.useCallback(async () => {
+  const fetchData = useCallback(async () => {
+    if (isFetching.current) return;
     try {
+      isFetching.current = true;
       setIsLoading(true);
-      const [catData, claimData] = await Promise.all([
-        apiFetch('/reimbursement-categories'),
-        apiFetch('/reimbursements'),
+      const [reimData, catData] = await Promise.all([
+        apiFetch('/reimbursements/'),
+        apiFetch('/reimbursement-categories/')
       ]);
+      setClaims(reimData || []);
       setCategories(catData || []);
-      setClaims(claimData || []);
+      if (catData && catData.length === 0) {
+        console.warn('[Reimbursements] Categories fetched but list is empty');
+      }
       
       if (catData && catData.length > 0) {
         setFormData(prev => ({ ...prev, category: catData[0].id.toString() }));
       }
     } catch (error) {
+      console.error('[Reimbursements] Failed to fetch data:', error);
       toast.error('Failed to load reimbursement data');
     } finally {
       setIsLoading(false);
+      isFetching.current = false;
     }
   }, []);
 
@@ -80,26 +90,42 @@ export default function ReimbursementsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     try {
-      const data = new FormData();
-      data.append('category', formData.category);
-      data.append('amount', formData.amount);
-      data.append('date', formData.date);
-      data.append('description', formData.description);
+      setIsSubmitting(true);
+      console.log('[Reimbursements] Submitting claim:', formData);
+      
+      const payload = new FormData();
+      payload.append('category', formData.category);
+      payload.append('amount', formData.amount);
+      payload.append('description', formData.description);
+      payload.append('date', formData.date);
       if (formData.attachment) {
-        data.append('attachment', formData.attachment);
+        payload.append('attachment', formData.attachment);
       }
 
-      await apiFetch('/reimbursements', {
+      const response = await apiFetch('/reimbursements/', {
         method: 'POST',
-        body: data,
+        body: payload,
       });
-      
-      toast.success(t('form.success'));
+
+      console.log('[Reimbursements] Submit success:', response);
+      toast.success('Claim submitted successfully!');
       setIsModalOpen(false);
+      setFormData({
+        category: categories[0]?.id.toString() || '',
+        amount: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+        attachment: null,
+      });
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Submission failed');
+    } catch (error) {
+      console.error('[Reimbursements] Submit failed:', error);
+      toast.error('Failed to submit reimbursement claim');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -121,7 +147,11 @@ export default function ReimbursementsPage() {
             <p className="text-muted-foreground">Submit and track your business expense claims.</p>
           </div>
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              if (categories.length === 0) fetchData();
+            }}
+            data-testid="new-claim-button"
             className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
           >
             <Plus size={20} />
@@ -184,7 +214,7 @@ export default function ReimbursementsPage() {
                   <tr><td colSpan={6} className="p-12 text-center text-gray-500 italic">No claims found.</td></tr>
                 ) : claims.map((claim) => (
                   <tr key={claim.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 font-bold text-white">{claim.category?.name || 'General'}</td>
+                    <td className="px-6 py-4 font-bold text-white">{claim.category_name || 'General'}</td>
                     <td className="px-6 py-4 text-sm text-gray-400">{claim.date}</td>
                     <td className="px-6 py-4 text-sm text-gray-400 truncate max-w-[200px]">{claim.description}</td>
                     <td className="px-6 py-4">
@@ -259,6 +289,7 @@ export default function ReimbursementsPage() {
                     <label htmlFor="category" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('form.category')}</label>
                     <select 
                       id="category"
+                      name="category"
                       className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                       value={formData.category}
                       onChange={(e) => setFormData({...formData, category: e.target.value})}
@@ -271,6 +302,7 @@ export default function ReimbursementsPage() {
                     <label htmlFor="date" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('form.date')}</label>
                     <input 
                       id="date"
+                      name="date"
                       type="date"
                       className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 [color-scheme:dark]"
                       value={formData.date}
@@ -284,6 +316,7 @@ export default function ReimbursementsPage() {
                   <label htmlFor="amount" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('form.amount')} (IDR)</label>
                   <input 
                     id="amount"
+                    name="amount"
                     type="number"
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-2xl font-black text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50"
                     placeholder="0"
@@ -297,6 +330,7 @@ export default function ReimbursementsPage() {
                   <label htmlFor="description" className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 font-mono">{t('form.description')}</label>
                   <textarea 
                     id="description"
+                    name="description"
                     rows={3}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none transition-all"
                     placeholder={t('form.description')}

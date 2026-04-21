@@ -216,6 +216,7 @@ export default function WorkflowsPage() {
                       {selectedConfig.stages.map((stage, idx) => (
                         <motion.div
                           key={stage.id || `temp-${idx}`}
+                          data-testid="stage-row"
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
@@ -237,6 +238,7 @@ export default function WorkflowsPage() {
                               <input 
                                 className="bg-transparent border-none text-xl font-bold outline-none focus:text-primary transition-colors"
                                 value={stage.name}
+                                placeholder="Stage Name"
                                 onChange={(e) => updateStage(idx, 'name', e.target.value)}
                               />
                               <button 
@@ -275,6 +277,7 @@ export default function WorkflowsPage() {
                                   </div>
                                 ) : stage.approver_type === 'ROLE' ? (
                                   <select 
+                                    name={`stages[${idx}].approver_role`}
                                     className="w-full h-10 px-4 rounded-xl glass-card border bg-transparent text-sm"
                                     value={stage.approver_role || ''}
                                     onChange={(e) => updateStage(idx, 'approver_role', e.target.value)}
@@ -284,6 +287,7 @@ export default function WorkflowsPage() {
                                   </select>
                                 ) : (
                                   <select 
+                                    name={`stages[${idx}].approver_employee`}
                                     className="w-full h-10 px-4 rounded-xl glass-card border bg-transparent text-sm"
                                     value={stage.approver_employee || ''}
                                     onChange={(e) => updateStage(idx, 'approver_employee', e.target.value)}

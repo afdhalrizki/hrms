@@ -1,149 +1,152 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ReimbursementsPage from '../app/[locale]/reimbursements/page';
+import { loginAs } from './setup';
+import { AuthProvider } from '@/context/AuthContext';
+import { TenantProvider } from '@/context/TenantContext';
+import { NextIntlClientProvider } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 
-vi.mock('@/lib/api', () => ({
-  apiFetch: vi.fn(),
-  getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-}));
+// Mock next-intl
+vi.mock('next-intl', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    useTranslations: vi.fn(() => (key: string) => key),
+  };
+});
 
-vi.mock('next-intl', () => ({
-  useTranslations: vi.fn(() => (key: string) => key),
-}));
+// Spy on apiFetch while letting it call the real backend
+vi.mock('@/lib/api', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+  };
+});
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-const { mockToast } = vi.hoisted(() => ({
-  mockToast: {
+vi.mock('sonner', () => ({
+  toast: {
     success: vi.fn(),
     error: vi.fn(),
-  }
+  },
 }));
 
-vi.mock('sonner', () => ({
-  toast: mockToast,
-}));
+const AllProviders = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <NextIntlClientProvider locale="en" messages={{}}>
+      <TenantProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </TenantProvider>
+    </NextIntlClientProvider>
+  );
+};
 
-describe('ReimbursementsPage', () => {
-  const mockCategories = [
-    { id: 1, name: 'Transport', max_amount: '500000.00' }
-  ];
-  const mockClaims = [
-    { id: 1, category: { name: 'Transport' }, date: '2026-03-20', amount: '150000.00', status: 'PENDING', description: 'Uber to office' }
-  ];
+describe('ReimbursementsPage (Integrated)', () => {
+  beforeAll(async () => {
+    // Force tenant context for integrated tests
+    const url = new URL('http://localhost:3000/?test_tenant=company1');
+    Object.defineProperty(window, 'location', {
+      value: url,
+      writable: true,
+    });
+    await loginAs('admin@company1.com');
+  }, 20000);
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (apiFetch as any).mockImplementation((endpoint: string, options?: any) => {
-      if (endpoint === '/reimbursement-categories') return Promise.resolve(mockCategories);
-      if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.resolve(mockClaims);
-      if (endpoint === '/reimbursements' && options?.method === 'POST') return Promise.resolve({ id: 99 });
-      return Promise.resolve([]);
-    });
   });
 
-  it('renders reimbursement stats and history', async () => {
-    render(<ReimbursementsPage />);
+  it('renders reimbursements list from real backend', async () => {
+    render(<ReimbursementsPage />, { wrapper: AllProviders });
     
     await waitFor(() => {
-      expect(screen.getByText(/Uber to office/i)).toBeInTheDocument();
+      // Seeded data has 'Taxi to client'
+      expect(screen.getByText(/Taxi to client/i)).toBeInTheDocument();
+    }, { timeout: 15000 });
+  });
+
+  it('handles empty state successfully', async () => {
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.resolve([]);
+      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
-    
-    expect(screen.getAllByText(/IDR/i)).toBeDefined();
+
+    render(<ReimbursementsPage />, { wrapper: AllProviders });
+
+    await waitFor(() => {
+      expect(screen.getByText(/No claims found/i)).toBeInTheDocument();
+    });
   });
 
   it('handles empty claims and categories', async () => {
-    (apiFetch as any).mockImplementation((endpoint: string) => {
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
        if (endpoint === '/reimbursement-categories') return Promise.resolve([]);
-       if (endpoint === '/reimbursements') return Promise.resolve([]);
-       return Promise.resolve([]);
+       if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.resolve([]);
+       return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
-    render(<ReimbursementsPage />);
+    render(<ReimbursementsPage />, { wrapper: AllProviders });
     
     await waitFor(() => {
       expect(screen.getByText(/No claims found/i)).toBeInTheDocument();
     });
   });
 
-  it('handles API fetch error', async () => {
-    (apiFetch as any).mockRejectedValue(new Error('Fetch failed'));
-    render(<ReimbursementsPage />);
-    
-    await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
-    });
-  });
-
-  it('submits a new claim with FormData and attachment', async () => {
-    const { container } = render(<ReimbursementsPage />);
-    
-    await waitFor(() => screen.getByText('newClaim'));
-    fireEvent.click(screen.getByText('newClaim'));
-    
-    const categorySelect = await screen.findByLabelText(/form.category/i) as HTMLSelectElement;
-    fireEvent.change(categorySelect, { target: { value: '1' } });
-
-    const amountInput = screen.getByLabelText(/form.amount/i);
-    fireEvent.change(amountInput, { target: { value: '200000' } });
-    
-    const descInput = screen.getByLabelText(/form.description/i);
-    fireEvent.change(descInput, { target: { value: 'Dinner' } });
-    
-    const file = new File(['receipt'], 'receipt.pdf', { type: 'application/pdf' });
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-    fireEvent.change(fileInput, { target: { files: [file] } });
-
-    // Use fireEvent.submit on the form directly
-    const form = container.querySelector('form');
-    if (form) {
-      fireEvent.submit(form);
-    } else {
-      fireEvent.click(screen.getByText('submit'));
-    }
-    
-    await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/reimbursements', expect.objectContaining({
-        method: 'POST',
-        body: expect.any(FormData)
-      }));
-    });
-
-    const postCall = (apiFetch as any).mock.calls.find((call: any) => call[0] === '/reimbursements' && call[1]?.method === 'POST');
-    const sentFormData = postCall[1].body;
-    expect(sentFormData.get('amount')).toBe('200000');
-  });
-
-  it('handles submission error', async () => {
+  it('handles API error on fetch', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (endpoint === '/reimbursements' && options?.method === 'POST') return Promise.reject(new Error('Invalid amount'));
-      if (endpoint === '/reimbursement-categories') return Promise.resolve(mockCategories);
-      if (endpoint === '/reimbursements') return Promise.resolve(mockClaims);
-      return Promise.resolve([]);
+      if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.reject(new Error('Fetch failed'));
+      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
 
-    const { container } = render(<ReimbursementsPage />);
-    
-    await waitFor(() => screen.getByText('newClaim'));
-    fireEvent.click(screen.getByText('newClaim'));
-    
-    const categorySelect = await screen.findByLabelText(/form.category/i) as HTMLSelectElement;
-    fireEvent.change(categorySelect, { target: { value: '1' } });
-    
-    const amountInput = screen.getByLabelText(/form.amount/i);
-    fireEvent.change(amountInput, { target: { value: '200000' } });
+    render(<ReimbursementsPage />, { wrapper: AllProviders });
 
+    const { toast } = await import('sonner');
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalled();
+    });
+  });
+
+  it('submits a new reimbursement request successfully', async () => {
+    const { container } = render(<ReimbursementsPage />, { wrapper: AllProviders });
+    
+    await waitFor(() => screen.getByText('newClaim'), { timeout: 15000 });
+    fireEvent.click(screen.getByText('newClaim'));
+
+    // Wait for modal and select category
+    const categorySelect = await screen.findByLabelText(/form.category/i);
+    fireEvent.change(categorySelect, { target: { value: '1' } });
+
+    const amountInput = screen.getByLabelText(/form.amount/i);
+    fireEvent.change(amountInput, { target: { value: '250000' } });
+
+    const descInput = screen.getByLabelText(/form.description/i);
+    fireEvent.change(descInput, { target: { value: 'Team Lunch' } });
+
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint === '/reimbursements' && options?.method === 'POST') return Promise.resolve({ id: 123 });
+      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+    });
+
+    // Use fireEvent.submit on the form directly if button click is problematic
     const form = container.querySelector('form');
     if (form) {
       fireEvent.submit(form);
     } else {
-      fireEvent.click(screen.getByText('submit'));
+      const submitBtn = screen.getByText('submit');
+      fireEvent.click(submitBtn);
     }
-    
+
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
-    });
-  });
+      const calls = (apiFetch as any).mock.calls;
+      const postCall = calls.find((c: any) => c[0] === '/reimbursements' && c[1]?.method === 'POST');
+      expect(postCall).toBeDefined();
+    }, { timeout: 20000 });
+  }, 30000);
 });

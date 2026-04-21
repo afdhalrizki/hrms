@@ -1,6 +1,7 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { log, COLORS, spawnStream, ensureDir } from '../../scripts/lib.mjs';
+import { readFileSync } from 'node:fs';
+import { log, COLORS, spawnStream, ensureDir, parseMetrics } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BackendDir = resolve(__dirname, '..');
@@ -12,6 +13,9 @@ async function main() {
   const dockerOnly = args.includes('--docker-only');
   const resetDocker = args.includes('--reset-docker');
   const skipDocker = args.includes('--skip-docker');
+
+  const orchestratorFlags = ['--skip-e2e', '--skip-unit'];
+  const forwardArgs = args.filter(a => !orchestratorFlags.includes(a));
 
   log("========================================", COLORS.cyan);
   log("🏆 HARIKERJA BACKEND TEST ORCHESTRATOR", COLORS.cyan);
@@ -28,12 +32,7 @@ async function main() {
   // 1. Run Unit Tests
   if (!skipUnit) {
     log("\n🧪 [1/2] Running Unit Tests (Pytest)...", COLORS.yellow);
-    const unitArgs = [];
-    if (dockerOnly) unitArgs.push('--docker-only');
-    if (resetDocker) unitArgs.push('--reset-docker');
-    if (skipDocker) unitArgs.push('--skip-docker');
-    
-    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_unit_tests.mjs'), ...unitArgs], { 
+    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_unit_tests.mjs'), ...forwardArgs], { 
       cwd: BackendDir, 
       logFile: masterLogFile 
     });
@@ -48,10 +47,7 @@ async function main() {
   // 2. Run E2E Tests
   if (allPassed && !skipE2E && !dockerOnly) {
     log("\n🌐 [2/2] Running E2E Tests (Pytest)...", COLORS.yellow);
-    const e2eArgs = [];
-    if (skipDocker) e2eArgs.push('--skip-docker');
-    
-    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_e2e_tests.mjs'), ...e2eArgs], { 
+    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_e2e_tests.mjs'), ...forwardArgs], { 
       cwd: BackendDir, 
       logFile: masterLogFile 
     });
@@ -62,6 +58,25 @@ async function main() {
       log("✅ E2E Tests Passed.", COLORS.green);
     }
   }
+
+  // 3. Final Summary
+  const logContent = readFileSync(masterLogFile, 'utf8');
+  const metrics = parseMetrics(logContent, 'Backend');
+
+  log('\n' + '='.repeat(60), COLORS.cyan);
+  log('           TOTAL HARIKERJA BACKEND TEST SUMMARY', COLORS.cyan);
+  log('='.repeat(60), COLORS.cyan);
+
+  const statusColor = (metrics.f === 0 && metrics.e === 0 && allPassed) ? COLORS.green : COLORS.red;
+  const statusText = (metrics.f === 0 && metrics.e === 0 && allPassed) ? "PASSED" : "FAILED";
+
+  log(`Overall Status: ${statusText}`, statusColor);
+  log("-".repeat(60), COLORS.gray);
+  log(`Total Passed:   ${metrics.p}`, COLORS.green);
+  log(`Total Failed:   ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
+  log(`Total Errored:  ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
+  log(`Total Warnings: ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log('='.repeat(60), COLORS.cyan);
 
   if (allPassed) {
     log("\n🏆 ALL HARIKERJA BACKEND TESTS PASSED.", COLORS.green);

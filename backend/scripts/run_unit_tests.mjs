@@ -11,6 +11,7 @@ import {
   getDockerComposeCommand,
   ensureDockerRunning,
   getPythonExec,
+  parseMetrics,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -223,41 +224,24 @@ async function main() {
   );
 
   // 6. Summary
-  log('\n' + '='.repeat(60), COLORS.gray);
-  log('                TEST RUN SUMMARY', COLORS.cyan);
-  log(' (Exit: ' + exitCode + ')', COLORS.gray);
-  log('='.repeat(60), COLORS.gray);
-
   const logContent = readFileSync(logFile, 'utf8');
-  const finalLines = logContent.split(/\r?\n/).slice(-10).join('\n');
-  const summaryMatch = finalLines.match(
-    /==.* (passed|failed|error|skipped|warning|xfailed|xpassed) in .*/,
-  );
+  const metrics = parseMetrics(logContent, 'Backend');
 
-  if (summaryMatch) {
-    const cleanSummary = summaryMatch[0].replace(/[= ]/g, ' ').trim();
-    log(' DETAILS : ' + cleanSummary, COLORS.white);
+  log('\n' + '='.repeat(60), COLORS.cyan);
+  log('                TEST RUN SUMMARY (BACKEND)', COLORS.cyan);
+  log('='.repeat(60), COLORS.cyan);
 
-    if (cleanSummary.match(/failed|error/)) {
-      log(' STATUS  : ❌ TESTS FAILED OR ENCOUNTERED ERRORS', COLORS.red);
-    } else if (cleanSummary.match(/warning/)) {
-      log(' STATUS  : ⚠️ PASSED WITH WARNINGS', COLORS.yellow);
-    } else if (exitCode === 0) {
-      log(' STATUS  : ✅ ALL TESTS PASSED', COLORS.green);
-    } else {
-      log(
-        ' STATUS  : ❌ UNKNOWN FAILURE (Exit Code: ' + exitCode + ')',
-        COLORS.red,
-      );
-    }
-  } else {
-    if (exitCode === 0) {
-      log(' STATUS  : ✅ ALL TESTS PASSED', COLORS.green);
-    } else {
-      log(' STATUS  : ❌ EXECUTION FAILED', COLORS.red);
-    }
-  }
-  log('='.repeat(60), COLORS.gray);
+  const statusColor = (metrics.f === 0 && metrics.e === 0 && exitCode === 0) ? COLORS.green : COLORS.red;
+  const statusText = (metrics.f === 0 && metrics.e === 0 && exitCode === 0) ? "SUCCESS" : "FAILURE";
+
+  log(`Status:         ${statusText}`, statusColor);
+  log(`Exit Code:      ${exitCode}`, exitCode === 0 ? COLORS.white : COLORS.red);
+  log("-".repeat(60), COLORS.gray);
+  log(`Tests Passed:   ${metrics.p}`, COLORS.green);
+  log(`Tests Failed:   ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
+  log(`Tests Errored:  ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
+  log(`Warnings:       ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log('='.repeat(60), COLORS.cyan);
 
   process.exit(exitCode);
 }

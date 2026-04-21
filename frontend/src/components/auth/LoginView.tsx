@@ -35,10 +35,15 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
     try {
       setIsLoading(true);
       setError(null);
-      await login(email, password);
+      const profile = await login(email, password);
+      console.log('[Login] Profile received:', JSON.stringify(profile));
       
       // Redirect based on role or home
-      router.push('/');
+      if (profile?.is_global_admin) {
+        router.push('/admin/registrations');
+      } else {
+        router.push('/');
+      }
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');

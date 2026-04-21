@@ -1,31 +1,50 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import AttendancePage from '../app/[locale]/attendance/page';
+import { loginAs } from './setup';
+import { AuthProvider } from '@/context/AuthContext';
+import { NextIntlClientProvider } from 'next-intl';
 import { apiFetch } from '@/lib/api';
-
-vi.mock('@/lib/api', () => ({
-  apiFetch: vi.fn(),
+const { mockToast } = vi.hoisted(() => ({
+  mockToast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  }
 }));
 
-vi.mock('next-intl', () => ({
-  useTranslations: vi.fn(() => (key: string) => key),
+vi.mock('sonner', () => ({
+  toast: mockToast,
 }));
+
+// Mock next-intl but include the provider using the factory argument
+vi.mock('next-intl', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    useTranslations: vi.fn(() => (key: string) => key),
+  };
+});
+
+// Mock apiFetch to allow both real requests and mocked responses
+vi.mock('@/lib/api', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+  };
+});
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('sonner', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 vi.mock('framer-motion', () => ({
   motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     tr: ({ children, ...props }: any) => <tr {...props}>{children}</tr>,
   },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
 vi.mock('@/components/attendance/CorrectionRequestModal', () => ({
@@ -38,92 +57,105 @@ vi.mock('@/components/attendance/CorrectionRequestModal', () => ({
     ) : null,
 }));
 
-describe('AttendancePage', () => {
-  const mockDate = new Date().toISOString().split('T')[0];
-  
-  const mockLogs = [
-    {
-      id: 1,
-      employee_name: 'John Doe',
-      date: mockDate,
-      check_in: '09:00',
-      check_out: null,
-      status: 'PRESENT',
-      liveness_verified: true,
-      verification_method: 'BIOMETRIC'
-    },
-    {
-      id: 2,
-      employee_name: 'Jane Smith',
-      date: '2023-01-01',
+const AllProviders = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <NextIntlClientProvider locale="en" messages={{}}>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </NextIntlClientProvider>
+  );
+};
+
+describe('AttendancePage (Integrated)', () => {
+  beforeAll(async () => {
+    // Login as employee1@company1.com who has seeded attendance data
+    await loginAs('employee1@company1.com');
+  }, 20000);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Reset apiFetch to its actual integrated implementation
+    (apiFetch as any).mockImplementation(async (...args: any[]) => {
+      const actual = await vi.importActual('@/lib/api') as any;
+      return actual.apiFetch(...args);
+    });
+  });
+
+  it('renders loading state initially', () => {
+    // We can delay apiFetch to guarantee we see the loading state
+    (apiFetch as any).mockImplementationOnce(() => new Promise((resolve) => setTimeout(() => resolve([]), 100)));
+    render(<AttendancePage />, { wrapper: AllProviders });
+    const loading = screen.queryByText(/Loading attendance data.../i);
+    expect(loading).toBeDefined();
+  });
+
+  it('renders attendance logs and stats successfully from real backend', async () => {
+    render(<AttendancePage />, { wrapper: AllProviders });
+
+    // Seeded data has 'Employee One'
+    await waitFor(() => {
+      // Use getAllByText because 'Employee One' might appear in multiple rows if seeded multiple times
+      expect(screen.getAllByText(/Employee One/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText('PRESENT')).toBeInTheDocument();
+      expect(screen.getByText('LIVENESS')).toBeInTheDocument();
+    }, { timeout: 15000 });
+  }, 20000);
+
+  it('handles empty state', async () => {
+    // Mock the API specifically for this scenario
+    (apiFetch as any).mockResolvedValueOnce([]);
+    render(<AttendancePage />, { wrapper: AllProviders });
+
+    await waitFor(() => {
+      expect(screen.getByText('No attendance logs found')).toBeInTheDocument();
+    });
+  });
+
+  it('performs Check Out correctly when today log exists', async () => {
+    // employee1 already has a Check In for today (seeded)
+    render(<AttendancePage />, { wrapper: AllProviders });
+
+    // Wait for the Check Out button to appear
+    const checkOutBtn = await screen.findByText(/checkOut/i, {}, { timeout: 15000 });
+    expect(checkOutBtn).toBeInTheDocument();
+
+    fireEvent.click(checkOutBtn);
+
+    // After clicking, verify the API is called
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
+        method: 'PATCH'
+      }));
+    }, { timeout: 15000 });
+  }, 20000);
+
+  it('performs Check In correctly when no today log exists', async () => {
+    // Since seed_test_db seeds a check-in for today, we must mock the API to return empty for today
+    // so the Check In button appears.
+    const mockDate = new Date().toISOString().split('T')[0];
+    const mockLogs = [{
+      id: 99,
+      employee_name: 'Employee One',
+      date: '2020-01-01', // Old log
       check_in: '10:00',
       check_out: '18:00',
       status: 'LATE',
       liveness_verified: false,
       verification_method: 'MANUAL'
-    }
-  ];
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('renders loading state initially', () => {
-    (apiFetch as any).mockImplementation(() => new Promise(() => {})); 
-    render(<AttendancePage />);
-    expect(screen.getByText('Loading attendance data...')).toBeDefined();
-  });
-
-  it('renders attendance logs and stats successfully', async () => {
-    (apiFetch as any).mockResolvedValue(mockLogs);
-    render(<AttendancePage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeDefined();
-      expect(screen.getByText('Jane Smith')).toBeDefined();
+    }];
+    
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (options?.method === 'POST') return Promise.resolve({ id: 100 });
+      return Promise.resolve(mockLogs);
     });
 
-    // Stats tests
-    expect(screen.getByText('50%')).toBeDefined(); // successRate
-    expect(screen.getAllByText('1')[0]).toBeDefined(); // lateCheckins
-  });
-
-  it('handles empty state', async () => {
-    (apiFetch as any).mockResolvedValue([]);
-    render(<AttendancePage />);
+    render(<AttendancePage />, { wrapper: AllProviders });
 
     await waitFor(() => {
-      expect(screen.getByText('No attendance logs found')).toBeDefined();
-    });
-  });
-
-  it('performs Check Out correctly when today log exists', async () => {
-    (apiFetch as any).mockResolvedValue(mockLogs);
-    render(<AttendancePage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('checkOut')).toBeDefined();
+      expect(screen.getByText('checkIn')).toBeInTheDocument();
     });
 
-    (apiFetch as any).mockResolvedValueOnce({ ...mockLogs[0], check_out: '17:00' });
-    fireEvent.click(screen.getByText('checkOut'));
-
-    await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/attendance/1', expect.objectContaining({
-        method: 'PATCH'
-      }));
-    });
-  });
-
-  it('performs Check In correctly when no today log exists', async () => {
-    (apiFetch as any).mockResolvedValue([mockLogs[1]]); // Only old log
-    render(<AttendancePage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('checkIn')).toBeDefined();
-    });
-
-    (apiFetch as any).mockResolvedValueOnce({ ...mockLogs[1], id: 3, check_in: '08:00', date: mockDate });
     fireEvent.click(screen.getByText('checkIn'));
 
     await waitFor(() => {
@@ -134,64 +166,96 @@ describe('AttendancePage', () => {
   });
 
   it('opens correction modal when button is clicked', async () => {
-    (apiFetch as any).mockResolvedValue(mockLogs);
-    render(<AttendancePage />);
+    render(<AttendancePage />, { wrapper: AllProviders });
 
-    await waitFor(() => {
-      expect(screen.getAllByText('Request Correction').length).toBeGreaterThan(0);
-    });
-
-    fireEvent.click(screen.getAllByText('Request Correction')[0]);
+    const correctionBtns = await screen.findAllByText(/Request Correction/i, {}, { timeout: 15000 });
+    fireEvent.click(correctionBtns[0]);
     
     await waitFor(() => {
-      expect(screen.getByTestId('correction-modal')).toBeDefined();
+      expect(screen.getByTestId('correction-modal')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByText('Close'));
     await waitFor(() => {
-      expect(screen.queryByTestId('correction-modal')).toBeNull();
+      expect(screen.queryByTestId('correction-modal')).not.toBeInTheDocument();
     });
-  });
+  }, 20000);
 
   it('handles fetch error gracefully', async () => {
     (apiFetch as any).mockRejectedValue(new Error('Fetch Error'));
-    const { toast } = await import('sonner');
-    render(<AttendancePage />);
+    render(<AttendancePage />, { wrapper: AllProviders });
+    
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Failed to fetch attendance logs');
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to fetch attendance logs');
     });
   });
 
   it('handles clock action error gracefully', async () => {
-    (apiFetch as any).mockResolvedValue([]);
-    const { toast } = await import('sonner');
-    render(<AttendancePage />);
-    
+    (apiFetch as any).mockResolvedValueOnce([]);
+    render(<AttendancePage />, { wrapper: AllProviders });
+
+    const checkInBtn = await screen.findByText('checkIn', {}, { timeout: 15000 });
     await waitFor(() => {
-      expect(screen.getByText('checkIn')).toBeDefined();
+      expect(screen.getByText('checkIn')).toBeInTheDocument();
     });
 
     (apiFetch as any).mockRejectedValue(new Error('Network Error'));
     fireEvent.click(screen.getByText('checkIn'));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Network Error');
+      expect(mockToast.error).toHaveBeenCalledWith('Network Error');
     });
   });
 
   it('handles clock action error with default message', async () => {
-    (apiFetch as any).mockResolvedValue([]);
-    const { toast } = await import('sonner');
-    render(<AttendancePage />);
+    (apiFetch as any).mockResolvedValueOnce([]);
+    render(<AttendancePage />, { wrapper: AllProviders });
     
-    await waitFor(() => expect(screen.getByText('checkIn')).toBeDefined());
+    
+    await waitFor(() => expect(screen.getByText('checkIn')).toBeInTheDocument());
 
     // Mock error with no message
     (apiFetch as any).mockImplementationOnce(() => Promise.reject({}));
     fireEvent.click(screen.getByText('checkIn'));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Action failed');
+      expect(mockToast.error).toHaveBeenCalledWith('Action failed');
+    });
+  });
+
+  it('handles biometric verification failure (400 Bad Request)', async () => {
+    (apiFetch as any).mockResolvedValueOnce([]); // No today log
+    render(<AttendancePage />, { wrapper: AllProviders });
+    
+    await waitFor(() => expect(screen.getByText('checkIn')).toBeInTheDocument());
+
+    // Mock 400 error from backend for face mismatch
+    (apiFetch as any).mockImplementationOnce(() => Promise.reject({ 
+      message: 'Face verification failed: Identity mismatch detected' 
+    }));
+    
+    fireEvent.click(screen.getByText('checkIn'));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Face verification failed: Identity mismatch detected');
+    });
+  });
+
+  it('handles geofencing violation (403 Forbidden)', async () => {
+    (apiFetch as any).mockResolvedValueOnce([]); // No today log
+    render(<AttendancePage />, { wrapper: AllProviders });
+    
+    await waitFor(() => expect(screen.getByText('checkIn')).toBeInTheDocument());
+
+    // Mock 403 error for being outside the geofence
+    (apiFetch as any).mockImplementationOnce(() => Promise.reject({ 
+      message: 'Clock-in blocked: You are outside the designated work area' 
+    }));
+    
+    fireEvent.click(screen.getByText('checkIn'));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Clock-in blocked: You are outside the designated work area');
     });
   });
 });

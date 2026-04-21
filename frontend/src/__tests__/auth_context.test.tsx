@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -25,6 +25,7 @@ const TestComponent = () => {
 describe('AuthProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('fetches and provides user profile on mount', async () => {
@@ -131,8 +132,8 @@ describe('AuthProvider', () => {
     );
 
     const loginButton = screen.getByTestId('do-login');
-    loginButton.click();
-
+    fireEvent.click(loginButton);
+    
     await waitFor(() => {
       expect(screen.getByTestId('user-email').textContent).toBe('newuser@example.com');
       expect(localStorage.getItem('access_token')).toBe('new-access-token');
@@ -140,7 +141,7 @@ describe('AuthProvider', () => {
     });
 
     const logoutButton = screen.getByTestId('do-logout');
-    logoutButton.click();
+    fireEvent.click(logoutButton);
 
     await waitFor(() => {
       expect(localStorage.getItem('access_token')).toBeNull();

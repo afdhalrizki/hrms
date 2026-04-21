@@ -21,12 +21,13 @@ import { cn } from '@/lib/utils';
 import { PayslipDetailModal } from '@/components/payroll/PayslipDetailModal';
 import { GeneratePayrollModal } from '@/components/payroll/GeneratePayrollModal';
 import { usePermission } from '@/hooks/usePermission';
-import * as perms from '@/core/constants';
+
 
 interface Payslip {
   id: number;
   employee_name: string;
-  period_display: string;
+  period_display?: string;
+  period_name?: string;
   basic_salary: string;
   net_pay: string;
   pph21_tax: string;
@@ -199,7 +200,7 @@ export default function PayrollPage() {
                             </div>
                             <div>
                               <p className="text-sm font-bold text-white">{row.employee_name}</p>
-                              <p className="text-[10px] text-gray-500 font-mono uppercase tracking-tighter">{row.period_display}</p>
+                              <p className="text-[10px] text-gray-500 font-mono uppercase tracking-tighter">{row.period_display || row.period_name}</p>
                             </div>
                           </div>
                         </td>

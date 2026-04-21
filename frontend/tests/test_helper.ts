@@ -33,38 +33,89 @@ export const TEST_USERS = {
   }
 };
 
-export const BASE_URL = 'http://127.0.0.1:3000';
+export const BASE_URL = 'http://127.0.0.1:3001';
 export const DEFAULT_TENANT = 'company1';
 
 /**
  * Navigates to the login page and performs a full login flow.
  */
 export async function login(page: Page, email: string, password = 'password123', tenant = DEFAULT_TENANT) {
+  // Debug: Log all browser console messages
+  page.on('console', msg => {
+    console.log(`BROWSER [${msg.type()}]: ${msg.text()}`);
+  });
+
+  page.on('request', request => {
+    if (request.url().includes('/api/') && process.env.NODE_ENV === 'test') {
+      console.log(`REQ [${request.method()}]: ${request.url()}`);
+    }
+  });
+
+  page.on('response', response => {
+    const url = response.url();
+    const status = response.status();
+    // Ignore expected 401 on initial session check for users/me
+    if (url.includes('/api/') && status >= 400) {
+      if (status === 401 && url.includes('/api/users/me/')) return;
+      console.log(`RES [${status}]: ${url}`);
+    }
+  });
+
+  page.on('requestfailed', request => {
+    const errorText = request.failure()?.errorText;
+    const url = request.url();
+    // Silence aborted requests and Next.js internal RSC requests to reduce noise
+    if (errorText !== 'net::ERR_ABORTED' && !url.includes('_rsc=')) {
+      console.log(`REQ FAILED: ${url} - ${errorText}`);
+    }
+  });
+  
+  page.on('pageerror', err => {
+    console.error(`BROWSER ERROR: ${err.message}`);
+  });
+
   // 1. First, navigate to the base URL to ensure we are in the correct origin context
-  // This allows us to set sessionStorage before the full login page loads
+  await page.goto(BASE_URL);
+  await page.evaluate(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+  
   await page.goto(`${BASE_URL}/en/login/portal-admin?test_tenant=${tenant}`);
   
-  // 2. Explicitly set the test_tenant_e2e in sessionStorage to prevent race conditions
+  // Wait for the form to be ready to ensure page is loaded
+  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 15000 });
+
+  // 2. Persist tenant for subsequent API calls via X-Tenant header
+  // Using addInitScript ensures it is set for every page load/navigation
+  await page.context().addInitScript((t) => {
+    sessionStorage.setItem('test_tenant_e2e', t);
+  }, tenant);
+  
+  // Also set it immediately for the current page state
   await page.evaluate((t) => {
-    if (t === 'public') {
-      sessionStorage.removeItem('test_tenant_e2e');
-    } else {
-      sessionStorage.setItem('test_tenant_e2e', t);
-    }
+    sessionStorage.setItem('test_tenant_e2e', t);
   }, tenant);
 
   // 3. Perform login as usual
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
+  
   await page.click('button[type="submit"]');
-
-  // Wait for the dashboard/sidebar to be visible
-  await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
   
-  // Wait for network to settle to avoid race conditions in subsequent steps
-  await page.waitForLoadState('networkidle');
+  // Wait for the URL to change to the dashboard (any language)
+  await page.waitForURL(/.*\/en|.*\/id/, { timeout: 20000 });
   
-  console.log(`--- Login successful for ${email} ---`);
+  // 4. Wait for the dashboard/sidebar to be visible
+  try {
+    await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
+    console.log(`--- Login successful for ${email} ---`);
+  } catch (e) {
+    console.error(`--- Login failed for ${email}. Current URL: ${page.url()} ---`);
+    await page.screenshot({ path: `login-fail-${email}.png`, fullPage: true });
+    // Also log browser console errors
+    throw e;
+  }
 }
 
 /**
@@ -90,7 +141,8 @@ export async function logout(page: Page) {
 /**
  * Helper to construct a tenant-specific URL.
  */
-export function getTenantUrl(path: string, tenant = DEFAULT_TENANT) {
-  const separator = path.includes('?') ? '&' : '?';
-  return `${BASE_URL}${path}${separator}test_tenant=${tenant}`;
-}
+export const getTenantUrl = (path: string, tenant: string = 'company1') => {
+  const url = new URL(`${BASE_URL}${path}`);
+  url.searchParams.set('test_tenant', tenant);
+  return url.toString();
+};

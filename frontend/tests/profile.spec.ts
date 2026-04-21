@@ -68,8 +68,8 @@ test.describe.serial('ESS Profile Management', () => {
     // Find the hidden file input
     const ktpInput = page.locator('input#ktp-upload');
     
-    // Create a dummy file buffer
-    const buffer = Buffer.from('fake image data for integration test');
+    // Create a valid 1x1 transparent PNG buffer
+    const buffer = Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082', 'hex');
     
     // Upload files
     await ktpInput.setInputFiles({

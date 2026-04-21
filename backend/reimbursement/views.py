@@ -106,6 +106,9 @@ class ReimbursementViewSet(AuditModelMixin, viewsets.ModelViewSet):
             elif action == 'REJECTED':
                 reimbursement.status = 'REJECTED'
                 reimbursement.save()
+            elif action == 'RETURNED':
+                reimbursement.status = 'RETURNED'
+                reimbursement.save()
         return Response({
             'status': f'Action {action} processed',
             'current_status': reimbursement.status
@@ -134,10 +137,18 @@ class ReimbursementViewSet(AuditModelMixin, viewsets.ModelViewSet):
         import csv
         from django.http import HttpResponse
         
+        # Security: Only allow managers/staff to export full reports
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_reimbursement'))
+        
+        if not is_manager:
+            return Response({'detail': 'Permission denied. Only managers can export reports.'}, status=403)
+
         month = request.query_params.get('month')
         year = request.query_params.get('year')
         
-        queryset = Reimbursement.objects.filter(status='APPROVED')
+        queryset = self.get_queryset().filter(status='APPROVED')
         if month and year:
             queryset = queryset.filter(date__month=month, date__year=year)
             

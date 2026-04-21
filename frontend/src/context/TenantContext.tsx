@@ -94,10 +94,29 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
               ...prev,
               tenantName: data.name || initialName,
               logo: data.logo,
+              themePrimaryColor: data.theme_primary_color,
+              themeSecondaryColor: data.theme_secondary_color,
+              address: data.address,
+              phone: data.phone,
+              subscriptionStatus: data.subscription_status,
+              expiryDate: data.expiry_date,
+              planType: data.plan_type,
               enabledModules: data.enabled_modules,
               isSubscriptionActive: data.is_subscription_active,
+              storageUsedBytes: data.storage_used_bytes,
+              totalStorageCapacityMb: data.total_storage_capacity_mb,
+              employeeCount: data.employee_count,
+              totalEmployeeCapacity: data.total_employee_capacity,
+              lateDeductionRate: data.late_deduction_rate,
+              absenceDeductionRate: data.absence_deduction_rate,
+              jkkRate: data.jkk_rate,
+              reimbursementApprovalLevel: data.reimbursement_approval_level,
+              overtimeRate: data.overtime_rate,
+              payrollOvertimeDivisor: data.payroll_overtime_divisor,
+              leaveApprovalLevel: data.leave_approval_level,
+              overtimeApprovalLevel: data.overtime_approval_level,
+              isBiometricEnabled: data.is_biometric_enabled,
               isLoading: false,
-              planType: data.plan_type,
             }));
           })
           .catch(() => setTenant(prev => ({ ...prev, isLoading: false })));
@@ -163,7 +182,6 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
               }));
             })
             .catch((err) => {
-              console.error('Failed to fetch tenant settings:', err);
               setTenant(prev => ({ ...prev, isLoading: false }));
             });
         }

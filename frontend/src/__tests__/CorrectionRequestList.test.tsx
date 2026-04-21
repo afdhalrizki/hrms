@@ -76,7 +76,7 @@ describe('CorrectionRequestList', () => {
     fireEvent.click(approveButton);
 
     await waitFor(() => {
-      expect(mockApiFetch).toHaveBeenCalledWith('/attendance-correction-requests/req-1', expect.anything());
+      expect(mockApiFetch).toHaveBeenCalledWith('/attendance-corrections/req-1', expect.anything());
     });
 
     expect(mockToast.success).toHaveBeenCalled();

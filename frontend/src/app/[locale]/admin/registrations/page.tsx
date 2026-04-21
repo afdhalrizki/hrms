@@ -17,6 +17,7 @@ import {
 import { apiFetch } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface RegistrationRequest {
   id: number;
@@ -55,6 +56,7 @@ export default function RegistrationsPage() {
       });
       // Refresh list
       fetchRequests();
+      toast.success(`Registration ${action}d successfully`);
     } catch (error: any) {
       alert(`Action failed: ${error.message}`);
     } finally {

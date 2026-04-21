@@ -125,6 +125,14 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         from django.http import HttpResponse
         from django.db.models import Count, Q
         
+        # Security: Only allow managers/staff to export full reports
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        
+        if not is_manager:
+            return Response({'detail': 'Permission denied. Only managers can export reports.'}, status=403)
+
         month = request.query_params.get('month')
         year = request.query_params.get('year')
         

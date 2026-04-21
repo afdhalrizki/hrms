@@ -26,7 +26,7 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveRequest
         fields = ['id', 'employee', 'employee_name', 'start_date', 'end_date', 'leave_type', 'reason', 'status', 'supervisor_status', 'hr_status', 'attachment', 'remaining_balance']
-        read_only_fields = ['status', 'supervisor_status', 'hr_status']
+        read_only_fields = ['status', 'supervisor_status', 'hr_status', 'employee']
 
     def get_remaining_balance(self, obj):
         balance = LeaveBalance.objects.filter(employee=obj.employee, year=obj.start_date.year).first()

@@ -13,6 +13,7 @@ import {
   getDockerComposeCommand,
   ensureDockerRunning,
   getPythonExec,
+  killPortProcess,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -130,6 +131,8 @@ async function main() {
   }
 
   const dbPort = process.env.DATABASE_URL?.includes(':6432/') ? 6432 : 5432;
+  process.env.DB_PORT = dbPort.toString();
+
   log(
     `Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:${dbPort}...`,
     COLORS.gray,

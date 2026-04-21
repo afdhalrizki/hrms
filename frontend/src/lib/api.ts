@@ -33,8 +33,10 @@ export const getBaseUrl = () => {
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const baseUrl = getBaseUrl();
-  // Ensure trailing slash for Django compatibility
-  const normalizedEndpoint = endpoint.endsWith('/') ? endpoint : `${endpoint}/`;
+  // Ensure trailing slash for Django compatibility (if no query string)
+  const normalizedEndpoint = endpoint.includes('?') 
+    ? endpoint 
+    : (endpoint.endsWith('/') ? endpoint : `${endpoint}/`);
   const url = `${baseUrl}${normalizedEndpoint.startsWith('/') ? '' : '/'}${normalizedEndpoint}`;
   
   const isFormData = options.body instanceof FormData;
@@ -81,7 +83,7 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     // Handle Token Refresh (401 Unauthorized)
-    if (response.status === 401 && typeof window !== 'undefined') {
+    if (response.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/token/refresh')) {
       const refreshToken = localStorage.getItem('refresh_token');
       if (refreshToken && !url.includes('/auth/token/refresh')) {
         try {
@@ -109,18 +111,40 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
             localStorage.removeItem('refresh_token');
           }
         } catch (refreshError) {
-          console.error('Token Refresh Failed:', refreshError);
+          // Token refresh failed, likely expired or invalid
         }
       }
     }
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `API Error: ${response.statusText}`);
+      const text = await response.text().catch(() => '');
+      let detail = `API Error: ${response.statusText}`;
+      try {
+        if (text) {
+          const json = JSON.parse(text);
+          if (json.detail) {
+            detail = json.detail;
+          } else {
+            // DRF Validation error dict
+            detail = Object.entries(json)
+              .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+              .join(' | ');
+          }
+        }
+      } catch (e) {}
+      throw new Error(detail);
     }
-    return await response.json();
+
+    if (response.status === 204) {
+      return null as any;
+    }
+
+    const text = await response.text();
+    if (!text) {
+      return null as any;
+    }
+    return JSON.parse(text);
   } catch (error) {
-    console.error('API Fetch Error:', error);
     throw error;
   }
 };
@@ -130,7 +154,11 @@ export const apiDownload = async (endpoint: string, filename: string) => {
   const url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
   
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+      }
+    });
     if (!response.ok) {
       throw new Error(`Download Error: ${response.statusText}`);
     }
@@ -145,7 +173,6 @@ export const apiDownload = async (endpoint: string, filename: string) => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(downloadUrl);
   } catch (error) {
-    console.error('API Download Error:', error);
     throw error;
   }
 };

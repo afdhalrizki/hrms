@@ -54,6 +54,7 @@ describe('apiFetch', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true }),
+      text: async () => JSON.stringify({ success: true }),
     });
 
     const data = await apiFetch('/test-endpoint');
@@ -73,6 +74,7 @@ describe('apiFetch', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true }),
+      text: async () => JSON.stringify({ success: true }),
     });
 
     const formData = new FormData();
@@ -98,6 +100,7 @@ describe('apiFetch', () => {
       ok: false,
       statusText: 'Not Found',
       json: async () => ({ detail: 'Custom error message' }),
+      text: async () => JSON.stringify({ detail: 'Custom error message' }),
     });
 
     await expect(apiFetch('/fail')).rejects.toThrow('Custom error message');
@@ -108,6 +111,7 @@ describe('apiFetch', () => {
       ok: false,
       statusText: 'Internal Server Error',
       json: async () => { throw new Error('No JSON'); },
+      text: async () => 'Internal Server Error',
     });
 
     await expect(apiFetch('/fail')).rejects.toThrow('API Error: Internal Server Error');

@@ -48,7 +48,8 @@ export default function AttendancePage() {
       const data = await apiFetch('/attendance');
       setLogs(data);
 
-      const today = new Date().toISOString().split('T')[0];
+      // Use local date string (YYYY-MM-DD) instead of UTC to match server date.today()
+      const today = new Date().toLocaleDateString('en-CA'); 
       const todayRecord = data.find((l: AttendanceLog) => l.date === today);
       setTodayAttendance(todayRecord || null);
     } catch (error) {
@@ -62,7 +63,8 @@ export default function AttendancePage() {
     setIsProcessing(true);
     try {
       const today = new Date().toISOString().split('T')[0];
-      const time = new Date().toLocaleTimeString('id-ID', { hour12: false });
+      const now = new Date();
+      const time = now.toTimeString().split(' ')[0]; // Returns HH:mm:ss
 
       if (!todayAttendance) {
         // Check In

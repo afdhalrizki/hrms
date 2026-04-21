@@ -100,13 +100,22 @@
       "type": "Leave Type",
       "startDate": "Start Date",
       "endDate": "End Date",
+      "annual": "Annual Leave",
+      "sick": "Sick Leave",
+      "emergency": "Emergency / Personal",
       "maternity": "Maternity Leave",
+      "cuti": "Annual Leave",
+      "sakit": "Sick Leave",
+      "darurat": "Emergency / Personal",
+      "melahirkan": "Maternity Leave",
+      "reason": "Reason / Justification",
       "reasonPlaceholder": "Briefly explain your reason...",
       "success": "Leave request submitted successfully!"
     }
   },
   "Reimbursement": {
     "title": "Expense Reimbursement",
+    "subtitle": "Submit and track your professional expense claims.",
     "newClaim": "New Reimbursement Claim",
     "history": "Claim History",
     "stats": {

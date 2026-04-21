@@ -41,7 +41,7 @@ export const CorrectionRequestModal: React.FC<CorrectionRequestModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      await apiFetch('/attendance-correction-requests', {
+      await apiFetch('/attendance-corrections', {
         method: 'POST',
         body: JSON.stringify({
           attendance: attendance.id,

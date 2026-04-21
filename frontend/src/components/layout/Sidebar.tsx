@@ -27,7 +27,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getBaseUrl } from '@/lib/api';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { usePermission } from '@/hooks/usePermission';
-import * as perms from '@/core/constants';
+
 
 const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
@@ -48,17 +48,19 @@ const menuItems = [
 ];
 
 export function Sidebar() {
+  const t = useTranslations('Navigation');
+  const tCommon = useTranslations('Common');
   const { enabledModules, planType } = useTenant();
-  
+
   const filteredItems = menuItems.filter(item => {
     if (planType === 'ENTERPRISE') return true;
     if (!item.module) return true;
     return enabledModules?.includes(item.module);
   });
-  const t = useTranslations('Navigation');
   const { logo, tenantName } = useTenant();
   const { user, loading } = useAuth();
   const { hasPermission } = usePermission();
+  const pathname = usePathname();
 
   const getInitials = (name: string | null) => {
     if (!name) return '??';
@@ -141,7 +143,7 @@ export function Sidebar() {
               {loading ? '...' : getInitials(user?.fullname || user?.email || 'Admin')}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-bold truncate group-hover/user:text-accent transition-colors">
+              <p data-testid="sidebar-fullname" className="text-sm font-bold truncate group-hover/user:text-accent transition-colors">
                 {loading ? tCommon('loading') : (user?.fullname || 'Admin User')}
               </p>
               <p className="text-[10px] text-muted-foreground truncate font-medium uppercase tracking-tight opacity-60">

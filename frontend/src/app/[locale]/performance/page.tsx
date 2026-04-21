@@ -26,7 +26,7 @@ import { AppraisalReviewModal } from '@/components/performance/AppraisalReviewMo
 
 interface KPITarget {
   id: number;
-  title: string;
+  kpi_name: string;
   target_value: string;
   current_value: string;
   unit: string;
@@ -167,11 +167,14 @@ export default function PerformancePage() {
                         {target.status}
                       </span>
                     </div>
-                    <h3 className="text-xl font-black text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{target.title}</h3>
+                    <h3 className="text-xl font-black text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{target.kpi_name}</h3>
                     <div className="flex items-end justify-between gap-4">
                       <div>
                         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Progress</p>
-                        <div className="text-3xl font-black text-white tracking-tighter">{target.current_value}<span className="text-sm text-gray-500 ml-1">/ {target.target_value} {target.unit}</span></div>
+                        <div className="text-3xl font-black text-white tracking-tighter">
+                          {parseFloat(target.current_value).toLocaleString()}
+                          <span className="text-sm text-gray-500 ml-1">/ {parseFloat(target.target_value).toLocaleString()} {target.unit}</span>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Weight</p>

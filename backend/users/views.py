@@ -71,8 +71,20 @@ class LoginAPIView(viewsets.GenericViewSet):
         
         user = authenticate(request, username=email, password=password)
         if user:
-            login(request, user)  # Set session cookie for web clients using top-level import
+            # Multi-tenant isolation check: Ensure user belongs to the current tenant
+            current_tenant = getattr(request, 'tenant', None)
+            if (current_tenant and current_tenant.schema_name != 'public' and 
+                not user.is_superuser and not getattr(user, 'is_global_admin', False)):
+                
+                if not user.tenants.filter(id=current_tenant.id).exists():
+                    return Response(
+                        {'detail': f'Akses ditolak. Anda tidak terdaftar di tenant {current_tenant.name}.'}, 
+                        status=status.HTTP_401_UNAUTHORIZED
+                    )
+
+            login(request, user)  # Set session cookie for web clients
             
+            from rest_framework_simplejwt.tokens import RefreshToken
             refresh = RefreshToken.for_user(user)
             data = UserSerializer(user).data
             data['access'] = str(refresh.access_token)

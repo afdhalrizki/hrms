@@ -104,7 +104,7 @@ describe('CorrectionRequestModal', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockApiFetch).toHaveBeenCalledWith('/attendance-correction-requests', expect.anything());
+      expect(mockApiFetch).toHaveBeenCalledWith('/attendance-corrections', expect.anything());
     });
 
     expect(mockToast.success).toHaveBeenCalledWith('success');

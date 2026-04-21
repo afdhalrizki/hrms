@@ -22,28 +22,41 @@ test.describe('Branding and Identity', () => {
     await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });
     
     // Modify a color - using the first color input (Primary Color)
-    const primaryColorInput = page.locator('input[type="color"]').first();
+    // We target the input specifically within the label context if possible, 
+    // or just use the first two inputs for Primary and Secondary.
+    const primaryColorInput = page.getByTestId('primary-color-input');
+    const secondaryColorInput = page.getByTestId('secondary-color-input');
+    
     await primaryColorInput.fill('#ff0000');
+    await secondaryColorInput.fill('#00ff00');
     
     // Update - using the button defined in the UI
     const applyBtn = page.getByRole('button', { name: /Apply Changes/i });
     await expect(applyBtn).toBeVisible();
     
     // Explicitly wait for the backend response to ensure timing is correct
+    // We use a more flexible URL check to handle potential variations in base URL or trailing slashes
     const responsePromise = page.waitForResponse(response => 
-      response.url().includes('/api/tenant/settings') && response.request().method() === 'PATCH'
+      response.url().includes('tenant/settings') && response.request().method() === 'PATCH',
+      { timeout: 30000 }
     );
     
     await applyBtn.click();
-    await responsePromise;
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
     
     // Verify persistence/success message from backend
-    // Relaxed check to avoid timing/i18n flake in toasts
-    await expect(page.locator('body')).toContainText(/successfully|success|branding/i, { timeout: 15000 });
+    await expect(page.locator('body')).toContainText(/successfully|success/i, { timeout: 15000 });
+    
+    // Additional wait for the state to settle
+    await page.waitForTimeout(2000);
     
     // Verify the input still has the value after reload to confirm persistence
     await page.reload();
     await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('input[type="color"]').first()).toHaveValue('#ff0000', { timeout: 15000 });
+    
+    // Re-locate inputs after reload
+    await expect(page.getByTestId('primary-color-input')).toHaveValue('#ff0000', { timeout: 20000 });
+    await expect(page.getByTestId('secondary-color-input')).toHaveValue('#00ff00', { timeout: 20000 });
   });
 });

@@ -8,11 +8,20 @@ class KPISerializer(serializers.ModelSerializer):
 
 class KPITargetSerializer(serializers.ModelSerializer):
     kpi_name = serializers.ReadOnlyField(source='kpi.name')
+    unit = serializers.ReadOnlyField(source='kpi.unit')
+    current_value = serializers.ReadOnlyField(source='actual_value')
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
+    status = serializers.SerializerMethodField()
+    weight = serializers.IntegerField(default=25, read_only=True) # Mocked weight
 
     class Meta:
         model = KPITarget
         fields = '__all__'
+
+    def get_status(self, obj):
+        if obj.actual_value >= obj.target_value:
+            return 'COMPLETED'
+        return 'IN_PROGRESS'
 
 class AppraisalReviewSerializer(serializers.ModelSerializer):
     reviewer_name = serializers.ReadOnlyField(source='reviewer.fullname')

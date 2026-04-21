@@ -16,7 +16,8 @@ interface PayslipDetail {
 interface Payslip {
   id: number;
   employee_name: string;
-  period_display: string;
+  period_display?: string;
+  period_name?: string;
   basic_salary: string;
   net_pay: string;
   pph21_tax: string;
@@ -39,6 +40,8 @@ export function PayslipDetailModal({ payslip, onClose }: Props) {
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        role="dialog"
+        aria-modal="true"
         className="glass-card w-full max-w-2xl bg-[#0f172a] rounded-[32px] border border-white/10 shadow-2xl overflow-hidden"
       >
         <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
@@ -48,7 +51,7 @@ export function PayslipDetailModal({ payslip, onClose }: Props) {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white tracking-tight">{t('detailTitle')}</h2>
-              <p className="text-sm text-muted-foreground">{payslip.employee_name} • {payslip.period_display}</p>
+              <p className="text-sm text-muted-foreground">{payslip.employee_name} • {payslip.period_display || payslip.period_name}</p>
             </div>
           </div>
           <button 

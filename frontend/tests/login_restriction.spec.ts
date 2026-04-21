@@ -14,7 +14,9 @@ test.describe('Login & Tenant Restriction', () => {
   test('should allow login with valid credentials for correct tenant', async ({ page }) => {
     await login(page, admin.email, admin.password);
     await expect(page.locator('aside')).toBeVisible();
-    await expect(page.getByText(admin.fullname)).toBeVisible();
+    // Wait for the specific name to appear in the sidebar area
+    const sidebarProfile = page.getByTestId('sidebar-fullname');
+    await expect(sidebarProfile).toHaveText(admin.fullname, { timeout: 15000 });
   });
 
   test('should fail login for wrong tenant context', async ({ page }) => {

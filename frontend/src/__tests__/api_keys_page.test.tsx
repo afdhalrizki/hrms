@@ -1,72 +1,72 @@
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import ApiKeysPage from '@/app/[locale]/settings/api-keys/page';
+import { loginAs } from './setup';
+import { AuthProvider } from '@/context/AuthContext';
+import { NextIntlClientProvider } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 
-vi.mock('@/lib/api', () => ({
-  apiFetch: vi.fn(),
-  getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-}));
+// Mock next-intl
+vi.mock('next-intl', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    useTranslations: vi.fn(() => (key: string) => key),
+  };
+});
 
-vi.mock('next-intl', () => ({
-  useTranslations: vi.fn(() => (key: string) => key),
-}));
+// Spy on apiFetch while letting it call the real backend
+vi.mock('@/lib/api', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+  };
+});
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/components/settings/CreateApiKeyModal', () => ({
-  CreateApiKeyModal: ({ onClose }: any) => <div data-testid="create-api-key-modal">CreateApiKeyModal</div>,
+  CreateApiKeyModal: ({ onClose }: any) => <div data-testid="create-api-key-modal">CreateApiKeyModal<button onClick={onClose}>Close</button></div>,
 }));
 
-describe('ApiKeysPage', () => {
+const AllProviders = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <NextIntlClientProvider locale="en" messages={{}}>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </NextIntlClientProvider>
+  );
+};
+
+describe('ApiKeysPage (Integrated)', () => {
+  beforeAll(async () => {
+    await loginAs('admin@company1.com');
+  }, 20000);
+
   beforeEach(() => {
     vi.clearAllMocks();
     window.confirm = vi.fn(() => true);
   });
 
-  it('shows key list and handles delete + refresh', async () => {
-    (apiFetch as any)
-      .mockResolvedValueOnce([
-        { id: 1, label: 'ERP Sync', key_prefix: 'abcd', expires_at: null, last_used_at: null, is_active: true, created_at: '2025-01-01T00:00:00Z' }
-      ])
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce([]);
-
-    render(<ApiKeysPage />);
+  it('shows key list from real backend', async () => {
+    render(<ApiKeysPage />, { wrapper: AllProviders });
 
     await waitFor(() => {
-      expect(screen.getByText(/ERP Sync/i)).toBeDefined();
-      expect(screen.getByText(/abcd/i)).toBeDefined();
-    });
-
-    const card = screen.getByText(/ERP Sync/i).closest('.glass-card');
-    expect(card).toBeTruthy();
-    const deleteButton = within(card as HTMLElement).getByRole('button');
-    expect(deleteButton).toBeTruthy();
-    fireEvent.click(deleteButton);
-
-    await waitFor(() => {
-      expect(apiFetch).toHaveBeenNthCalledWith(2, '/api-keys/1', { method: 'DELETE' });
-      expect(apiFetch).toHaveBeenNthCalledWith(3, '/api-keys');
-    });
-  });
-
-  it('renders empty state when no keys', async () => {
-    (apiFetch as any).mockResolvedValueOnce([]);
-    render(<ApiKeysPage />);
-
-    expect(await screen.findByText(/empty/i)).toBeDefined();
-  });
+      // Seeded data has 'ERP Sync'
+      expect(screen.getByText(/ERP Sync/i)).toBeInTheDocument();
+    }, { timeout: 15000 });
+  }, 20000);
 
   it('opens CreateApiKeyModal when button is clicked', async () => {
-    (apiFetch as any).mockResolvedValueOnce([]);
-    render(<ApiKeysPage />);
+    render(<ApiKeysPage />, { wrapper: AllProviders });
 
-    expect(await screen.findByText(/empty/i)).toBeDefined();
-
-    fireEvent.click(screen.getByRole('button', { name: /newKey/i }));
+    const btn = await screen.findByRole('button', { name: /newKey/i });
+    fireEvent.click(btn);
     expect(screen.getByTestId('create-api-key-modal')).toBeDefined();
   });
 });

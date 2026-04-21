@@ -165,3 +165,9 @@ class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         # request.tenant is injected by TenantMainMiddleware
         return self.request.tenant
+
+    def perform_update(self, serializer):
+        from django_tenants.utils import schema_context
+        # Ensure we are in the public schema when saving the shared Tenant model
+        with schema_context('public'):
+            serializer.save()

@@ -31,7 +31,14 @@ export default function BrandingPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { hasPermission } = usePermission();
   const isAdmin = hasPermission('manage_settings');
-  const [isLoading, setIsLoading] = React.useState(false); // No need to fetch profile separately
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  // Sync state with tenant context when it loads
+  React.useEffect(() => {
+    if (tenant.themePrimaryColor) setPrimaryColor(tenant.themePrimaryColor);
+    if (tenant.themeSecondaryColor) setSecondaryColor(tenant.themeSecondaryColor);
+    if (tenant.logo) setPreviewUrl(tenant.logo);
+  }, [tenant.themePrimaryColor, tenant.themeSecondaryColor, tenant.logo]);
 
   // No need for separate checkAccess as usePermission uses AuthContext which is already loaded
 
@@ -155,12 +162,14 @@ export default function BrandingPage() {
                       value={primaryColor}
                       onChange={(e) => setPrimaryColor(e.target.value)}
                       className="h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer"
+                      data-testid="primary-color-picker"
                     />
                     <input 
                       type="text" 
                       value={primaryColor}
                       onChange={(e) => setPrimaryColor(e.target.value)}
                       className="bg-transparent text-sm font-mono text-white focus:outline-none w-20"
+                      data-testid="primary-color-input"
                     />
                   </div>
                 </div>
@@ -175,12 +184,14 @@ export default function BrandingPage() {
                       value={secondaryColor}
                       onChange={(e) => setSecondaryColor(e.target.value)}
                       className="h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer"
+                      data-testid="secondary-color-picker"
                     />
                     <input 
                       type="text" 
                       value={secondaryColor}
                       onChange={(e) => setSecondaryColor(e.target.value)}
                       className="bg-transparent text-sm font-mono text-white focus:outline-none w-20"
+                      data-testid="secondary-color-input"
                     />
                   </div>
                 </div>

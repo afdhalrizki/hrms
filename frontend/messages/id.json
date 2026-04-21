@@ -98,15 +98,21 @@
       "type": "Jenis Cuti",
       "startDate": "Tanggal Mulai",
       "endDate": "Tanggal Selesai",
-      "reason": "Alasan",
-      "annual": "Cuti Tahunan",
       "sick": "Sakit",
-      "emergency": "Darurat",
-      "maternity": "Cuti Melahirkan"
+      "emergency": "Darurat / Keperluan Pribadi",
+      "maternity": "Cuti Melahirkan",
+      "cuti": "Cuti Tahunan",
+      "sakit": "Sakit",
+      "darurat": "Darurat / Keperluan Pribadi",
+      "melahirkan": "Cuti Melahirkan",
+      "reason": "Alasan / Justifikasi",
+      "reasonPlaceholder": "Jelaskan alasan Anda secara singkat...",
+      "success": "Pengajuan cuti berhasil dikirim!"
     }
   },
   "Reimbursement": {
     "title": "Reimbursement Biaya",
+    "subtitle": "Ajukan dan pantau klaim biaya profesional Anda.",
     "newClaim": "Klaim Reimbursement Baru",
     "history": "Riwayat Klaim",
     "stats": {

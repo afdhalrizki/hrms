@@ -93,7 +93,7 @@ export default function Home() {
     { 
       nameKey: 'today_attendance', 
       value: statsData?.attendance_today?.present || 0, 
-      change: '100%', 
+      change: `${statsData?.attendance_percent || 0}%`, 
       trend: 'up' as const, 
       icon: UserCheck,
       color: 'bg-emerald-500/10 text-emerald-500'

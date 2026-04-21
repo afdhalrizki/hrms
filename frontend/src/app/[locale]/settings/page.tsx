@@ -14,7 +14,12 @@ import {
   Clock,
   Percent,
   Camera,
-  ShieldCheck
+  ShieldCheck,
+  AlertCircle,
+  CheckCircle2,
+  Save,
+  Shield,
+  ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';

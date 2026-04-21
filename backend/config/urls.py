@@ -79,7 +79,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/tenant/settings/', TenantSettingsAPIView.as_view(), name='tenant-settings'),
-    path('api/dashboard-stats/', DashboardStatsAPIView.as_view(), name='dashboard-stats'),
+    path('api/core/dashboard-stats/', DashboardStatsAPIView.as_view(), name='dashboard-stats'),
     # API Schema & Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

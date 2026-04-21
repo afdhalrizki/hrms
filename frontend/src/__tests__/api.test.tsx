@@ -73,6 +73,7 @@ describe('lib/api', () => {
     const fetchMock = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({ message: 'ok' }),
+      text: async () => JSON.stringify({ message: 'ok' }),
     });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -98,14 +99,17 @@ describe('lib/api', () => {
       status: 401,
       statusText: 'Unauthorized',
       json: async () => ({ detail: 'Unauthorized' }),
+      text: async () => JSON.stringify({ detail: 'Unauthorized' }),
     };
     const refreshResponse = {
       ok: true,
       json: async () => ({ access: 'new-token' }),
+      text: async () => JSON.stringify({ access: 'new-token' }),
     };
     const finalResponse = {
       ok: true,
       json: async () => ({ data: 'success' }),
+      text: async () => JSON.stringify({ data: 'success' }),
     };
 
     const fetchMock = vi.fn()
@@ -126,6 +130,7 @@ describe('lib/api', () => {
       ok: false,
       statusText: 'Not Found',
       json: async () => ({ detail: 'Does not exist' }),
+      text: async () => JSON.stringify({ detail: 'Does not exist' }),
     });
     vi.stubGlobal('fetch', fetchMock);
 

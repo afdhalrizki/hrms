@@ -1,0 +1,205 @@
+{
+  "config": {
+    "configFile": "/home/afdhal/data/hr/hrms/frontend/playwright.config.ts",
+    "rootDir": "/home/afdhal/data/hr/hrms/frontend/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/afdhal/data/hr/hrms/frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "branding.spec.ts",
+      "file": "branding.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Branding and Identity",
+          "file": "branding.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should update company branding and apply theme instantly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 19088,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"color\"]').first()\nExpected: \u001b[32m\"#\u001b[7mff0000\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"#\u001b[7m6366f1\u001b[27m\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"color\"]').first()\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"color\" value=\"#6366f1\" class=\"h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer\"/>\u001b[22m\n\u001b[2m       - unexpected value \"#6366f1\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"color\"]').first()\nExpected: \u001b[32m\"#\u001b[7mff0000\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"#\u001b[7m6366f1\u001b[27m\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"color\"]').first()\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"color\" value=\"#6366f1\" class=\"h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer\"/>\u001b[22m\n\u001b[2m       - unexpected value \"#6366f1\"\u001b[22m\n\n    at /home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts:47:63",
+                        "location": {
+                          "file": "/home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts",
+                          "column": 63,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await page.reload();\n  46 |     await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });\n> 47 |     await expect(page.locator('input[type=\"color\"]').first()).toHaveValue('#ff0000', { timeout: 15000 });\n     |                                                               ^\n  48 |   });\n  49 | });\n  50 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts",
+                            "column": 63,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"color\"]').first()\nExpected: \u001b[32m\"#\u001b[7mff0000\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"#\u001b[7m6366f1\u001b[27m\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"color\"]').first()\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"color\" value=\"#6366f1\" class=\"h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer\"/>\u001b[22m\n\u001b[2m       - unexpected value \"#6366f1\"\u001b[22m\n\n\n  45 |     await page.reload();\n  46 |     await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });\n> 47 |     await expect(page.locator('input[type=\"color\"]').first()).toHaveValue('#ff0000', { timeout: 15000 });\n     |                                                               ^\n  48 |   });\n  49 | });\n  50 |\n    at /home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts:47:63"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "--- Login successful for admin@company1.com ---\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-20T20:33:28.007Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results/branding-Branding-and-Iden-ab612-g-and-apply-theme-instantly-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts",
+                        "column": 63,
+                        "line": 47
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 22179,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"color\"]').first()\nExpected: \u001b[32m\"#\u001b[7mff0000\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"#\u001b[7m6366f1\u001b[27m\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"color\"]').first()\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"color\" value=\"#6366f1\" class=\"h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer\"/>\u001b[22m\n\u001b[2m       - unexpected value \"#6366f1\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"color\"]').first()\nExpected: \u001b[32m\"#\u001b[7mff0000\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"#\u001b[7m6366f1\u001b[27m\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"color\"]').first()\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"color\" value=\"#6366f1\" class=\"h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer\"/>\u001b[22m\n\u001b[2m       - unexpected value \"#6366f1\"\u001b[22m\n\n    at /home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts:47:63",
+                        "location": {
+                          "file": "/home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts",
+                          "column": 63,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await page.reload();\n  46 |     await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });\n> 47 |     await expect(page.locator('input[type=\"color\"]').first()).toHaveValue('#ff0000', { timeout: 15000 });\n     |                                                               ^\n  48 |   });\n  49 | });\n  50 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts",
+                            "column": 63,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"color\"]').first()\nExpected: \u001b[32m\"#\u001b[7mff0000\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"#\u001b[7m6366f1\u001b[27m\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"color\"]').first()\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"color\" value=\"#6366f1\" class=\"h-10 w-10 rounded-lg bg-transparent border-none cursor-pointer\"/>\u001b[22m\n\u001b[2m       - unexpected value \"#6366f1\"\u001b[22m\n\n\n  45 |     await page.reload();\n  46 |     await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });\n> 47 |     await expect(page.locator('input[type=\"color\"]').first()).toHaveValue('#ff0000', { timeout: 15000 });\n     |                                                               ^\n  48 |   });\n  49 | });\n  50 |\n    at /home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts:47:63"
+                        },
+                        {
+                          "message": "Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, open '/home/afdhal/data/hr/hrms/frontend/e2e/test-results/.playwright-artifacts-1/traces/c7f19e806919ac620bf8-69c61ffb85c02ef4485e-retry1.trace'"
+                        },
+                        {
+                          "message": "Error: ENOENT: no such file or directory, open '/home/afdhal/data/hr/hrms/frontend/e2e/test-results/.playwright-artifacts-1/548a9a10fbb5e02685ccc9518b03c283.zip'"
+                        },
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "--- Login successful for admin@company1.com ---\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-20T20:33:49.280Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results/branding-Branding-and-Iden-ab612-g-and-apply-theme-instantly-chromium-retry1/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/afdhal/data/hr/hrms/frontend/tests/branding.spec.ts",
+                        "column": 63,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "c7f19e806919ac620bf8-69c61ffb85c02ef4485e",
+              "file": "branding.spec.ts",
+              "line": 18,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-20T20:33:21.866Z",
+    "duration": 79927.302,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

@@ -1,424 +1,413 @@
-import os, django, sys
-from pathlib import Path
+import os
+import sys
+import django
+from datetime import date, timedelta
 from dotenv import load_dotenv
+from pathlib import Path
 
-# 1. Adjust paths because script is now in backend/scripts/
-SCRIPT_DIR = Path(__file__).resolve().parent
-BACKEND_DIR = SCRIPT_DIR.parent
+# Setup paths
+BACKEND_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BACKEND_DIR.parent
+ENV_FILE = ROOT_DIR / 'deploy' / 'environments' / '.env.local'
 
-# 2. Load environment variables from the root environments folder
-env_path = ROOT_DIR / 'deploy' / 'environments' / '.env.local'
-load_dotenv(env_path)
+# Load environment variables
+if ENV_FILE.exists():
+    print(f"Loading env from {ENV_FILE}")
+    load_dotenv(ENV_FILE)
+    
+    # Overrides for local native run
+    if os.environ.get('DB_HOST') == 'db':
+        os.environ['DB_HOST'] = '127.0.0.1'
+    if os.environ.get('DB_PORT') == '5432':
+        os.environ['DB_PORT'] = '5433'
+else:
+    print(f"Warning: .env.local not found at {ENV_FILE}")
 
-# 3. Add backend directory to sys.path so 'config.settings' can be found
+# Setup Django environment
 sys.path.append(str(BACKEND_DIR))
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
-os.environ['DB_HOST'] = 'localhost'
+
+print(f"DEBUG: DB_HOST={os.environ.get('DB_HOST')}")
+print(f"DEBUG: DB_PORT={os.environ.get('DB_PORT')}")
+
 django.setup()
 
 from django.contrib.auth import get_user_model
-from tenants.models import Tenant
-from core.models import Employee, Department, Role, Golongan, AccessRole, Branch
+from tenants.models import Tenant, Domain
 from django_tenants.utils import schema_context
-from datetime import date
 
 User = get_user_model()
 
-# Check database connection before proceeding
-import socket
-from django.db import connections
-from django.db.utils import OperationalError
+print("--- Seeding Test Database ---")
 
-def is_db_reachable(host=None, port=None, timeout=0.5):
-    host = host or os.getenv('DB_HOST', 'localhost')
-    if port is None:
-        db_url = os.getenv('DATABASE_URL', '')
-        if ':6432/' in db_url:
-            port = 6432
-        else:
-            port = int(os.getenv('DB_PORT', 5432))
-    
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(timeout)
-        s.connect((host, port))
-        s.close()
-        return True
-    except (socket.timeout, ConnectionRefusedError, OSError):
-        return False
+# 1. Public Tenant
+public_tenant, created = Tenant.objects.get_or_create(schema_name='public', defaults={'name': 'Public'})
+Domain.objects.filter(domain='localhost').delete()
 
-if not is_db_reachable():
-    print("Database connection failed (Socket Refused). Skipping seeding (this is expected in Mock Mode).")
-    sys.exit(0)
+# 2. Company 1
+tenant1, created = Tenant.objects.get_or_create(
+    schema_name='company1', 
+    defaults={'name': 'Company One', 'plan_type': 'ENTERPRISE'}
+)
+Domain.objects.update_or_create(domain='company1.localhost', defaults={'tenant': tenant1, 'is_primary': True})
+Domain.objects.update_or_create(domain='localhost', defaults={'tenant': tenant1, 'is_primary': False})
+Domain.objects.update_or_create(domain='127.0.0.1', defaults={'tenant': tenant1, 'is_primary': False})
 
-db_conn = connections['default']
-try:
-    db_conn.cursor()
-except OperationalError:
-    print("Database connection failed (Django OperationalError). Skipping seeding.")
-    sys.exit(0)
+# 2.1 Company 2 (for tenant isolation tests)
+tenant2, created = Tenant.objects.get_or_create(
+    schema_name='company2', 
+    defaults={'name': 'Company Two', 'plan_type': 'PROFESSIONAL'}
+)
+Domain.objects.update_or_create(domain='company2.localhost', defaults={'tenant': tenant2, 'is_primary': True})
 
-try:
-    public_tenant = Tenant.objects.get(schema_name='public')
-except Tenant.DoesNotExist:
-    public_tenant = Tenant.objects.create(schema_name='public', name='Public Tenant')
-    from tenants.models import Domain
-    Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
-    Domain.objects.get_or_create(domain='127.0.0.1', tenant=public_tenant, is_primary=False)
-    
-    # Registration Requests for Superadmin tests
-    from tenants.models import RegistrationRequest
-    RegistrationRequest.objects.all().delete()
-    RegistrationRequest.objects.create(
-        company_name='Pending Corp', 
-        subdomain_prefix='pending', 
-        admin_email='admin@pending.com', 
-        status='PENDING'
-    )
-    RegistrationRequest.objects.create(
-        company_name='Approved Inc', 
-        subdomain_prefix='approved', 
-        admin_email='admin@approved.com', 
-        status='APPROVED'
-    )
-    print("Seeded RegistrationRequests in public schema.")
-
-try:
-    tenant = Tenant.objects.get(schema_name='company1')
-    tenant.plan_type = 'ENTERPRISE'
-    tenant.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
-    tenant.late_deduction_rate = 50000
-    tenant.absence_deduction_rate = 100000
-    tenant.save()
-except Tenant.DoesNotExist:
-    tenant = Tenant.objects.create(
-        schema_name='company1', 
-        name='Company One',
-        plan_type='ENTERPRISE',
-        enabled_modules=['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance'],
-        late_deduction_rate=50000,
-        absence_deduction_rate=100000
-    )
-
-from tenants.models import Domain
-# For E2E tests on local environment, map localhost and 127.0.0.1 to company1
-Domain.objects.update_or_create(domain='company1.localhost', defaults={'tenant': tenant, 'is_primary': True})
-Domain.objects.update_or_create(domain='localhost', defaults={'tenant': tenant, 'is_primary': False})
-Domain.objects.update_or_create(domain='127.0.0.1', defaults={'tenant': tenant, 'is_primary': False})
-
-try:
-    tenant2 = Tenant.objects.get(schema_name='company2')
-except Tenant.DoesNotExist:
-    tenant2 = Tenant.objects.create(schema_name='company2', name='Company Two')
-    from tenants.models import Domain
-    Domain.objects.create(domain='company2.localhost', tenant=tenant2, is_primary=True)
-
-test_users = [
-    # Public / Platform
-    {'email': 'superadmin@harikerja.com', 'is_staff': True, 'is_superuser': True, 'tenant': public_tenant},
-    # Company 1
-    {'email': 'admin@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
-    {'email': 'manager1@company1.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant},
-    {'email': 'employee1@company1.com', 'is_staff': False, 'is_superuser': False, 'tenant': tenant},
-    # Company 2
-    {'email': 'admin@company2.com', 'is_staff': True, 'is_superuser': False, 'tenant': tenant2},
-]
-
-for user_data in test_users:
-    user, created = User.objects.get_or_create(
-        email=user_data['email'],
-        defaults={
-            'is_staff': user_data['is_staff'],
-            'is_superuser': user_data['is_superuser'],
-        }
-    )
-    user.is_staff = user_data['is_staff']
-    user.is_superuser = user_data['is_superuser']
-    user.set_password('password123')
-    user.tenants.clear() # Ensure strict isolation for E2E tests
-    user.tenants.add(user_data['tenant'])
-    user.save()
-    print(f"{'Created' if created else 'Updated'} user: {user.email}")
-
-# Now ensure Employee records exist in company1 schema
+# 3. Seeding within company1
 with schema_context('company1'):
-    # Cleanup mutated state from previous test runs
-    from attendance.models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance
+    from core.models import Employee, Department, Role, Golongan, WorkflowConfig, AccessRole
+    from attendance.models import Attendance, LeaveBalance, LeaveRequest
     from payroll.models import PayrollPeriod, Payslip
-    from performance.models import AppraisalReview, Appraisal
-    from core.models import WorkflowConfig, WorkflowStage
-    from reimbursement.models import Reimbursement, ReimbursementCategory
+    from reimbursement.models import ReimbursementCategory, Reimbursement
+    from performance.models import KPI, KPITarget, Appraisal, AppraisalReview
+    from core.models import Branch, APIKey
     
+    # Nuclear Cleanup to ensure clean state
+    # Deleting employees first due to foreign keys, then metadata models
+    Employee.objects.all().delete()
     Attendance.objects.all().delete()
+    AppraisalReview.objects.all().delete()
+    Appraisal.objects.all().delete()
+    KPITarget.objects.all().delete()
+    KPI.objects.all().delete()
     LeaveRequest.objects.all().delete()
-    Overtime.objects.all().delete()
+    LeaveBalance.objects.all().delete()
     Reimbursement.objects.all().delete()
     ReimbursementCategory.objects.all().delete()
     Payslip.objects.all().delete()
     PayrollPeriod.objects.all().delete()
-    AppraisalReview.objects.all().delete()
-    Appraisal.objects.all().delete()
-    WorkflowStage.objects.all().delete()
+    Branch.objects.all().delete()
     WorkflowConfig.objects.all().delete()
-    Shift.objects.all().delete()
+    APIKey.objects.all().delete()
     
-    # Cleanup core master data to avoid unique constraint violations
-    Employee.objects.all().delete()
+    # Metadata cleanup (careful with dependencies)
+    AccessRole.objects.all().delete()
     Role.objects.all().delete()
     Department.objects.all().delete()
     Golongan.objects.all().delete()
-    AccessRole.objects.all().delete()
-    Branch.objects.all().delete()
-
-    dept, _ = Department.objects.get_or_create(name="Engineering")
-    role_se, _ = Role.objects.get_or_create(name="Software Engineer", department=dept)
-    gol, _ = Golongan.objects.get_or_create(
-        name="3A", 
+    
+    dept_eng, _ = Department.objects.get_or_create(name='Engineering')
+    role_mgr, _ = Role.objects.get_or_create(name='Manager', department=dept_eng)
+    role_se, _ = Role.objects.get_or_create(name='Software Engineer', department=dept_eng)
+    gol_3a, _ = Golongan.objects.update_or_create(
+        name='3A', 
         defaults={
-            'base_salary': 5000000,
+            'base_salary': 15000000,
             'meal_allowance': 50000,
             'transport_allowance': 30000
         }
     )
     
-    branch_jkt, _ = Branch.objects.get_or_create(
-        name="Jakarta Office",
-        defaults={
-            "address": "Jl. Sudirman No. 1",
-            "latitude": -6.208800,
-            "longitude": 106.845600,
-            "radius_meters": 100,
-            "timezone": "Asia/Jakarta"
-        }
-    )
-    branch_bdg, _ = Branch.objects.get_or_create(
-        name="Bandung Hub",
-        defaults={
-            "address": "Jl. Asia Afrika No. 10",
-            "latitude": -6.917500,
-            "longitude": 107.619100,
-            "radius_meters": 50,
-            "timezone": "Asia/Jakarta"
-        }
-    )
-    
-    # Roles
-    admin_role, _ = AccessRole.objects.get_or_create(
-        name="Admin",
-        defaults={'permissions': {
-            'manage_performance': True, 
-            'manage_attendance': True, 
-            'manage_payroll': True, 
-            'manage_branding': True,
-            'manage_settings': True,
-            'manage_hr': True,
-            'view_audit': True
-        }}
-    )
-    manager_role, _ = AccessRole.objects.get_or_create(
-        name="Manager",
-        defaults={'permissions': {
-            'manage_performance': True, 
-            'manage_attendance': True, 
-            'view_payroll': True,
-            'view_performance': True
-        }}
-    )
-    staff_role, _ = AccessRole.objects.get_or_create(
-        name="Staff",
-        defaults={'permissions': {
-            'manage_performance': False, 
-            'manage_attendance': False, 
-            'view_payroll': False,
-            'manage_settings': False,
-            'manage_hr': False
-        }}
-    )
-
-    # Admin (Employee record) - Seeded first for ID 1
-    admin_emp, _ = Employee.objects.get_or_create(
+    # 1. Admin User
+    admin_user, created = User.objects.get_or_create(
         email='admin@company1.com',
+        defaults={'is_staff': True, 'is_active': True}
+    )
+
+    # 0. Access Roles
+    ar_admin, _ = AccessRole.objects.get_or_create(
+        name='Administrator',
         defaults={
-            'nik': 'ADM001',
+            'permissions': {
+                'manage_hr': True,
+                'manage_attendance': True,
+                'manage_payroll': True,
+                'manage_reimbursement': True,
+                'manage_performance': True,
+                'manage_settings': True,
+                'change_tenant_settings': True,
+                'view_audit_logs': True,
+                'manage_api_keys': True
+            },
+            'is_default': False
+        }
+    )
+    ar_hr, _ = AccessRole.objects.get_or_create(
+        name='HR Manager',
+        defaults={'permissions': {'manage_hr': True, 'manage_attendance': True}, 'is_default': False}
+    )
+    ar_fin, _ = AccessRole.objects.get_or_create(
+        name='Finance Staff',
+        defaults={'permissions': {'manage_payroll': True}, 'is_default': False}
+    )
+    admin_user.set_password('password123')
+    admin_user.save()
+    if not admin_user.tenants.filter(id=tenant1.id).exists():
+        admin_user.tenants.add(tenant1)
+
+    admin_emp, _ = Employee.objects.update_or_create(
+        email=admin_user.email,
+        defaults={
             'fullname': 'Admin One',
-            'department': dept,
+            'nik': 'ADM001',
+            'ktp_number': '1234567890123456',
+            'join_date': '2023-01-01',
+            'department': dept_eng,
             'role': role_se,
-            'golongan': gol,
-            'join_date': date(2025, 1, 1),
-            'ktp_number': 'ADM123',
-            'branch': branch_jkt
+            'golongan': gol_3a,
+            'access_role': ar_admin
         }
     )
-    admin_emp.access_role = admin_role
-    admin_emp.save()
     
-    # Manager
-    manager_emp, _ = Employee.objects.get_or_create(
+    # 2. Manager User
+    mgr_user, _ = User.objects.get_or_create(
         email='manager1@company1.com',
+        defaults={'is_staff': False, 'is_active': True}
+    )
+    mgr_user.set_password('password123')
+    mgr_user.save()
+    if not mgr_user.tenants.filter(id=tenant1.id).exists():
+        mgr_user.tenants.add(tenant1)
+
+    mgr_emp, _ = Employee.objects.update_or_create(
+        email=mgr_user.email,
         defaults={
-            'nik': 'MGR001',
             'fullname': 'Manager One',
-            'department': dept,
-            'role': role_se,
-            'golongan': gol,
-            'join_date': date(2025, 1, 1),
-            'ktp_number': 'MGR123'
+            'nik': 'MGR001',
+            'ktp_number': '1234567890123458',
+            'join_date': '2023-01-01',
+            'department': dept_eng,
+            'role': role_mgr,
+            'golongan': gol_3a,
+            'supervisor': admin_emp,
+            'access_role': ar_hr
         }
     )
-    manager_emp.access_role = manager_role
-    manager_emp.save()
-    
-    # Employee
-    employee_emp, _ = Employee.objects.get_or_create(
+
+    # 3. Regular Employee User
+    emp1_user, _ = User.objects.get_or_create(
         email='employee1@company1.com',
+        defaults={'is_staff': False, 'is_active': True}
+    )
+    emp1_user.set_password('password123')
+    emp1_user.save()
+    if not emp1_user.tenants.filter(id=tenant1.id).exists():
+        emp1_user.tenants.add(tenant1)
+        
+    emp1, _ = Employee.objects.update_or_create(
+        email=emp1_user.email,
         defaults={
-            'nik': 'EMP001',
             'fullname': 'Employee One',
-            'department': dept,
+            'nik': 'EMP001', # Tests expect EMP001
+            'ktp_number': '1234567890123457',
+            'join_date': '2023-01-01',
+            'department': dept_eng,
             'role': role_se,
-            'golongan': gol,
-            'join_date': date(2025, 1, 1),
-            'ktp_number': 'EMP123',
-            'supervisor': manager_emp
+            'golongan': gol_3a,
+            'supervisor': mgr_emp
         }
     )
-    employee_emp.access_role = staff_role
-    employee_emp.save()
     
-    # Reimbursement Categories
-    med_cat, _ = ReimbursementCategory.objects.get_or_create(name="Medical", defaults={'max_amount': 1000000})
-    travel_cat, _ = ReimbursementCategory.objects.get_or_create(name="Travel", defaults={'max_amount': 5000000})
-    
-    # Shifts & Schedules
-    shift, _ = Shift.objects.get_or_create(
-        name="Standard", 
-        defaults={'start_time': "09:00:00", 'end_time': "18:00:00", 'work_days': [0,1,2,3,4]}
-    )
-    # Seed schedules for both admin and employee
-    Schedule.objects.get_or_create(employee=admin_emp, shift=shift, date=date.today())
-    Schedule.objects.get_or_create(employee=employee_emp, shift=shift, date=date.today())
-    
-    # Leave Balance
-    lb1, _ = LeaveBalance.objects.get_or_create(employee=admin_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
-    lb2, _ = LeaveBalance.objects.get_or_create(employee=employee_emp, year=2026, defaults={'total_days': 12, 'used_days': 0})
-    print(f"Seeded LeaveBalances for {admin_emp.email} and {employee_emp.email}")
-
-    # Attendance
-    from django.utils import timezone
-    import datetime
-    today_date = timezone.now().date()
-    # Seeding an active Check In for employee1 for today
-    Attendance.objects.get_or_create(
-        employee=employee_emp,
-        date=today_date,
+    # 3.5 Branches
+    branch_jakarta, _ = Branch.objects.get_or_create(
+        name='Jakarta Office',
         defaults={
-            'check_in': datetime.time(9, 0),
-            'status': 'PRESENT',
-            'liveness_verified': True,
-            'verification_method': 'LIVENESS'
+            'address': 'Jl. Sudirman No. 1, Jakarta',
+            'latitude': -6.2088,
+            'longitude': 106.8456,
+            'radius_meters': 100,
+            'timezone': 'Asia/Jakarta'
         }
     )
-    print(f"Seeded active Check-In for {employee_emp.email} for today.")
+    branch_bandung, _ = Branch.objects.get_or_create(
+        name='Bandung Hub',
+        defaults={
+            'address': 'Jl. Dago No. 50, Bandung',
+            'latitude': -6.9175,
+            'longitude': 107.6191,
+            'radius_meters': 150,
+            'timezone': 'Asia/Jakarta'
+        }
+    )
+    
+    # Update employees to have a branch
+    admin_emp.branch = branch_jakarta
+    admin_emp.save()
+    mgr_emp.branch = branch_jakarta
+    mgr_emp.save()
+    emp1.branch = branch_jakarta
+    emp1.save()
 
-    # Add Appraisal Data for performance test
-    from performance.models import KPI, KPITarget, Appraisal
-    kpi, _ = KPI.objects.get_or_create(name="Sales Target", unit=KPI.Unit.CURRENCY)
-    print(f"Seeded KPI: {kpi.name}")
-    
-    # Employee Appraisal
-    kt, _ = KPITarget.objects.get_or_create(
-        employee=employee_emp,
-        kpi=kpi,
-        period=date(2026, 1, 1),
-        defaults={'target_value': 1000000, 'actual_value': 0}
-    )
-    print(f"Seeded KPITarget for {employee_emp.email}")
-    app, _ = Appraisal.objects.get_or_create(
-        employee=employee_emp,
-        period_name="Q1 2026",
-        defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'DRAFT'}
-    )
-    print(f"Seeded Appraisal for {employee_emp.email}")
-    
-    # Admin Appraisal
-    kt2, _ = KPITarget.objects.get_or_create(
-        employee=admin_emp,
-        kpi=kpi,
-        period=date(2026, 1, 1),
-        defaults={'target_value': 5000000, 'actual_value': 0}
-    )
-    print(f"Seeded KPITarget for {admin_emp.email}")
-    app2, _ = Appraisal.objects.get_or_create(
-        employee=admin_emp,
-        period_name="Q1 2026",
-        defaults={'start_date': date(2026, 1, 1), 'end_date': date(2026, 3, 31), 'status': 'PUBLISHED'}
-    )
-    print(f"Seeded Appraisal for {admin_emp.email}")
-    
-    # Payslips for Admin
-    from payroll.models import PayrollPeriod, Payslip
-    from datetime import date
+    # 4. Attendance Logs
     from django.utils import timezone
-    
-    today = timezone.now().date()
-    current_month = today.month
-    current_year = today.year
-    
-    period, _ = PayrollPeriod.objects.get_or_create(
-        month=current_month,
-        year=current_year,
-        defaults={'start_date': date(current_year, current_month, 1), 'end_date': today, 'is_closed': False}
+    today = timezone.localdate()
+    Attendance.objects.create(
+        employee=emp1,
+        date=today,
+        check_in='08:00:00',
+        status='PRESENT',
+        liveness_verified=True,
+        verification_method='LIVENESS'
     )
-    print(f"Seeded PayrollPeriod: {period}")
+    Attendance.objects.create(
+        employee=emp1,
+        date=today - timedelta(days=1),
+        check_in='09:30:00',
+        check_out='18:00:00',
+        status='LATE',
+        liveness_verified=False,
+        verification_method='MANUAL'
+    )
+
+    # 5. Payroll
+    period, _ = PayrollPeriod.objects.get_or_create(
+        month=4,
+        year=2026,
+        defaults={
+            'start_date': '2026-04-01', 
+            'end_date': '2026-04-30', 
+            'is_closed': False
+        }
+    )
     
-    ps, _ = Payslip.objects.get_or_create(
+    Payslip.objects.update_or_create(
         employee=admin_emp,
         period=period,
         defaults={
-            'basic_salary': 15000000.00,
-            'total_allowance': 2000000.00,
-            'total_deduction': 500000.00,
-            'net_pay': 16500000.00,
-            'payment_date': date(2026, 3, 31)
+            'basic_salary': 15000000,
+            'net_pay': 16500000,
+            'payment_date': '2026-03-31'
         }
     )
-    print(f"Seeded Payslip for {admin_emp.email}")
 
+    # 6. Reimbursements
+    cat_travel = ReimbursementCategory.objects.create(name='Travel', max_amount=5000000)
+    cat_transport = ReimbursementCategory.objects.create(name='Transport', max_amount=2000000)
+    cat_food = ReimbursementCategory.objects.create(name='Food', max_amount=1000000)
+    cat_medical = ReimbursementCategory.objects.create(name='Medical', max_amount=1000000)
 
-with schema_context('company2'):
-    from attendance.models import Attendance, LeaveRequest, Overtime
-    # Ensure company2 tenant also has enterprise features
-    t2 = Tenant.objects.get(schema_name='company2')
-    t2.plan_type = 'ENTERPRISE'
-    t2.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'analytics', 'audit', 'performance']
-    t2.save()
-    from core.models import Employee, Department, Role, Golongan
-    Attendance.objects.all().delete()
-    LeaveRequest.objects.all().delete()
-    Overtime.objects.all().delete()
-    Employee.objects.all().delete()
-    Department.objects.all().delete()
-    Role.objects.all().delete()
-    Golongan.objects.all().delete()
-
-    # Create minimal master data for company2 admin
-    dept2, _ = Department.objects.get_or_create(name="Management")
-    role2, _ = Role.objects.get_or_create(name="Regional Manager", department=dept2)
-    gol2, _ = Golongan.objects.get_or_create(name="4A", defaults={'base_salary': 10000000})
-
-    Employee.objects.get_or_create(
-        email='admin@company2.com',
+    Reimbursement.objects.update_or_create(
+        employee=emp1,
+        category=cat_transport,
+        date=today - timedelta(days=2),
         defaults={
-            'nik': 'ADM002',
-            'fullname': 'Admin Two',
-            'department': dept2,
-            'role': role2,
-            'golongan': gol2,
-            'join_date': date(2025, 1, 1),
-            'ktp_number': 'ADM456'
+            'amount': 250000,
+            'description': 'Taxi to client',
+            'status': 'APPROVED',
+            'approved_amount': 250000
         }
     )
 
-print("Successfully seeded all test users and employee records.")
+    # 7. Leaves
+    LeaveBalance.objects.update_or_create(
+        employee=emp1,
+        year=2026,
+        defaults={
+            'total_days': 12,
+            'used_days': 0
+        }
+    )
+    
+    # 8. Performance
+    kpi_sales = KPI.objects.create(name='Sales Target', category='Sales', unit='CURRENCY')
+    KPITarget.objects.update_or_create(
+        employee=emp1,
+        kpi=kpi_sales,
+        period=date(2026, 1, 1),
+        defaults={'target_value': 1000000, 'actual_value': 850000}
+    )
+    
+    appraisal, _ = Appraisal.objects.update_or_create(
+        employee=emp1,
+        period_name='Q1 2026',
+        defaults={
+            'status': 'SUBMITTED',
+            'start_date': date(2026, 1, 1),
+            'end_date': date(2026, 3, 31)
+        }
+    )
+    AppraisalReview.objects.update_or_create(
+        appraisal=appraisal,
+        reviewer=emp1,
+        reviewer_type='SELF',
+        defaults={'ratings': {'Sales Target': 4}, 'comments': 'Achieved 85% of target'}
+    )
+
+    # 9. Workflows (Required for workflows.spec.ts)
+    WorkflowConfig.objects.update_or_create(
+        model_type='LEAVE',
+        defaults={'name': 'Leave Approval Workflow', 'is_active': True}
+    )
+    WorkflowConfig.objects.update_or_create(
+        model_type='REIMBURSEMENT',
+        defaults={'name': 'Reimbursement Workflow', 'is_active': True}
+    )
+
+    # 10. API Keys
+    APIKey.objects.update_or_create(
+        label='ERP Sync',
+        defaults={
+            'is_active': True,
+            'key_prefix': 'erp_sync',
+            'key_hash': 'sha256$hashed$secret'
+        }
+    )
+
+    print("Seeded company1 data successfully.")
+
+# 4. Public Schema Data (Superadmin & Registrations)
+with schema_context('public'):
+    from tenants.models import RegistrationRequest
+    
+    # 4.1 Superadmin User
+    super_user, _ = User.objects.update_or_create(
+        email='superadmin@harikerja.com',
+        defaults={
+            'is_staff': True, 
+            'is_superuser': True, 
+            'is_active': True,
+            'is_global_admin': True
+        }
+    )
+    super_user.set_password('password123')
+    super_user.save()
+
+    # 4.2 Registration Requests (Required for superadmin.spec.ts)
+    RegistrationRequest.objects.all().delete()
+    RegistrationRequest.objects.create(
+        company_name='Pending Corp',
+        subdomain_prefix='pending',
+        admin_email='admin@pending.com',
+        status='PENDING'
+    )
+    RegistrationRequest.objects.create(
+        company_name='Approved Inc',
+        subdomain_prefix='approved',
+        admin_email='admin@approved.com',
+        status='APPROVED'
+    )
+    
+    print("Seeded public schema data (superadmin & registrations) successfully.")
+
+# 5. Seeding within company2
+with schema_context('company2'):
+    from core.models import Employee, Department, Role, Golongan
+    
+    # 5.1 Admin User for Company 2
+    admin2_user, _ = User.objects.get_or_create(
+        email='admin@company2.com',
+        defaults={'is_staff': True, 'is_active': True}
+    )
+    admin2_user.set_password('password123')
+    admin2_user.save()
+    if not admin2_user.tenants.filter(id=tenant2.id).exists():
+        admin2_user.tenants.add(tenant2)
+
+    # Basic Employee Record for Admin 2
+    Employee.objects.update_or_create(
+        email=admin2_user.email,
+        defaults={
+            'fullname': 'Admin Two',
+            'nik': 'ADM002',
+            'ktp_number': '2234567890123456',
+            'join_date': '2023-01-01',
+        }
+    )
+    print("Seeded company2 data successfully.")

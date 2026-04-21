@@ -17,12 +17,21 @@ test.describe.serial('Superadmin (Platform) Management', () => {
 
   test.beforeEach(async ({ page }) => {
     // Login as Platform Superadmin on the public domain
+    console.log(`--- Navigating to portal-admin login ---`);
     await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    console.log(`--- Filling login form ---`);
     await page.fill('input[type="email"]', platformAdmin.email);
     await page.fill('input[type="password"]', platformAdmin.password);
+    console.log(`--- Submitting login form ---`);
     await page.click('button[type="submit"]');
-
+    console.log(`--- Login submitted for ${platformAdmin.email} ---`);
+    
+    // Wait for navigation and sidebar
+    console.log(`--- Waiting for redirection to registrations ---`);
+    await page.waitForURL(/\/(analytics|admin\/registrations)/, { timeout: 30000 });
+    console.log(`--- Portal Admin redirected to: ${page.url()} ---`);
     await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
+    console.log(`--- Sidebar visible ---`);
   });
 
   test('should allow superadmin to review and approve registration requests', async ({ page }) => {
@@ -47,11 +56,15 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     await expect(approveBtn).toBeVisible({ timeout: 10000 });
     await approveBtn.click();
 
-    // Verify success toast from real backend
-    await expect(page.getByText(/Registration approved successfully/i)).toBeVisible({ timeout: 20000 });
-    
-    // Verify status change in the row
-    await expect(pendingRow.getByText(/APPROVED/i)).toBeVisible({ timeout: 15000 });
+    // Verify success (use toPass to handle potential async updates)
+    await expect(async () => {
+      // Check for success toast or status update in the table
+      const successIndicator = page.getByText(/Registration approved|APPROVED/i);
+      await expect(successIndicator.first()).toBeVisible();
+      
+      // Specifically verify the row status
+      await expect(pendingRow.getByText(/APPROVED/i)).toBeVisible();
+    }).toPass({ timeout: 20000 });
   });
 
   test('should allow superadmin to reject registration requests', async ({ page }) => {

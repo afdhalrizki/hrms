@@ -36,15 +36,15 @@ test.describe('RBAC Security & Permissions', () => {
     await page.goto(getTenantUrl('/en/performance'));
     await page.waitForLoadState('networkidle');
 
-    const performanceHeader = page.locator('h1').getByText(/Performance/i);
-    await expect(performanceHeader).toBeVisible({ timeout: 15000 });
+    const performanceHeader = page.getByRole('heading', { name: /Performance/i, level: 1 });
+    await expect(performanceHeader).toBeVisible({ timeout: 20000 });
 
     console.log('--- Testing Manager Restriction for Branding ---');
     // Should NOT have access to Branding
     await page.goto(getTenantUrl('/en/settings/branding'));
-    await page.waitForLoadState('networkidle');
-
-    await expect(page.getByText(/Restricted Access|Premium Feature/i)).toBeVisible({ timeout: 10000 });
+    
+    // Explicitly wait for the restriction message or the heading
+    await expect(page.getByRole('heading', { name: /Restricted Access|Denied/i })).toBeVisible({ timeout: 20000 });
   });
 
   test('Admin should have full access to multiple modules', async ({ page }) => {

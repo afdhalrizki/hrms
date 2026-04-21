@@ -68,6 +68,8 @@ export function GeneratePayrollModal({ onClose, onSuccess }: Props) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
+        role="dialog"
+        aria-modal="true"
         className="glass-card w-full max-w-md bg-[#0f172a] p-8 rounded-[40px] border border-white/20 shadow-2xl"
       >
         <div className="flex items-center justify-between mb-8">
@@ -97,7 +99,7 @@ export function GeneratePayrollModal({ onClose, onSuccess }: Props) {
             {isLoadingPeriods ? (
               <div className="h-14 bg-white/5 animate-pulse rounded-2xl" />
             ) : (
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {periods.map(period => (
                   <button
                     key={period.id}

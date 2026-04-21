@@ -66,6 +66,7 @@ export default function BranchesPage() {
           body: JSON.stringify(payload),
         });
       }
+      toast.success(editingBranch ? 'Branch updated successfully' : 'Branch created successfully');
       setIsModalOpen(false);
       fetchBranches();
     } catch (err) {
@@ -84,9 +85,11 @@ export default function BranchesPage() {
     if (!confirm('Are you sure you want to delete this branch?')) return;
     try {
       await apiFetch(`/branches/${id}`, { method: 'DELETE' });
+      toast.success('Branch deleted successfully');
       fetchBranches();
     } catch (err) {
       console.error(err);
+      toast.error('Failed to delete branch');
     }
   };
 
@@ -151,12 +154,14 @@ export default function BranchesPage() {
                 >
                   <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <button 
+                      data-testid={`edit-branch-${branch.name}`}
                       onClick={() => { setEditingBranch(branch); setIsModalOpen(true); }}
                       className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button 
+                      data-testid={`delete-branch-${branch.name}`}
                       onClick={() => deleteBranch(branch.id)}
                       className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors"
                     >

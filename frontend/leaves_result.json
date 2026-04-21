@@ -1,0 +1,248 @@
+{
+  "config": {
+    "configFile": "/home/afdhal/data/hr/hrms/frontend/playwright.config.ts",
+    "rootDir": "/home/afdhal/data/hr/hrms/frontend/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/afdhal/data/hr/hrms/frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "leaves.spec.ts",
+      "file": "leaves.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Leaves Management",
+          "file": "leaves.spec.ts",
+          "line": 4,
+          "column": 15,
+          "specs": [
+            {
+              "title": "should display leave balances and empty history initially",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3374,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('12')\nExpected: visible\nError: strict mode violation: getByText('12') resolved to 2 elements:\n    1) <span data-testid=\"remaining-days-value\" class=\"text-5xl font-black text-white leading-none\">12</span> aka getByTestId('remaining-days-value')\n    2) <p class=\"text-sm font-bold text-white\">12</p> aka getByRole('paragraph').filter({ hasText: '12' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('12')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('12')\nExpected: visible\nError: strict mode violation: getByText('12') resolved to 2 elements:\n    1) <span data-testid=\"remaining-days-value\" class=\"text-5xl font-black text-white leading-none\">12</span> aka getByTestId('remaining-days-value')\n    2) <p class=\"text-sm font-bold text-white\">12</p> aka getByRole('paragraph').filter({ hasText: '12' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('12')\u001b[22m\n\n    at /home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts:22:40",
+                        "location": {
+                          "file": "/home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts",
+                          "column": 40,
+                          "line": 22
+                        },
+                        "snippet": "  20 |     \n  21 |     // 1. Check remaining days from real seeded backend (12 days total, 0 used)\n> 22 |     await expect(page.getByText('12')).toBeVisible({ timeout: 15000 });\n     |                                        ^\n  23 |     \n  24 |     // 2. Check history table (should be empty or show \"No data\")\n  25 |     const table = page.locator('table');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts",
+                            "column": 40,
+                            "line": 22
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('12')\nExpected: visible\nError: strict mode violation: getByText('12') resolved to 2 elements:\n    1) <span data-testid=\"remaining-days-value\" class=\"text-5xl font-black text-white leading-none\">12</span> aka getByTestId('remaining-days-value')\n    2) <p class=\"text-sm font-bold text-white\">12</p> aka getByRole('paragraph').filter({ hasText: '12' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('12')\u001b[22m\n\n\n  20 |     \n  21 |     // 1. Check remaining days from real seeded backend (12 days total, 0 used)\n> 22 |     await expect(page.getByText('12')).toBeVisible({ timeout: 15000 });\n     |                                        ^\n  23 |     \n  24 |     // 2. Check history table (should be empty or show \"No data\")\n  25 |     const table = page.locator('table');\n    at /home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts:22:40"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "--- Login successful for employee1@company1.com ---\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-20T20:40:04.521Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results/leaves-Leaves-Management-s-b4f15-and-empty-history-initially-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts",
+                        "column": 40,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 4017,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('12')\nExpected: visible\nError: strict mode violation: getByText('12') resolved to 2 elements:\n    1) <span data-testid=\"remaining-days-value\" class=\"text-5xl font-black text-white leading-none\">12</span> aka getByTestId('remaining-days-value')\n    2) <p class=\"text-sm font-bold text-white\">12</p> aka getByRole('paragraph').filter({ hasText: '12' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('12')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('12')\nExpected: visible\nError: strict mode violation: getByText('12') resolved to 2 elements:\n    1) <span data-testid=\"remaining-days-value\" class=\"text-5xl font-black text-white leading-none\">12</span> aka getByTestId('remaining-days-value')\n    2) <p class=\"text-sm font-bold text-white\">12</p> aka getByRole('paragraph').filter({ hasText: '12' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('12')\u001b[22m\n\n    at /home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts:22:40",
+                        "location": {
+                          "file": "/home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts",
+                          "column": 40,
+                          "line": 22
+                        },
+                        "snippet": "  20 |     \n  21 |     // 1. Check remaining days from real seeded backend (12 days total, 0 used)\n> 22 |     await expect(page.getByText('12')).toBeVisible({ timeout: 15000 });\n     |                                        ^\n  23 |     \n  24 |     // 2. Check history table (should be empty or show \"No data\")\n  25 |     const table = page.locator('table');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts",
+                            "column": 40,
+                            "line": 22
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('12')\nExpected: visible\nError: strict mode violation: getByText('12') resolved to 2 elements:\n    1) <span data-testid=\"remaining-days-value\" class=\"text-5xl font-black text-white leading-none\">12</span> aka getByTestId('remaining-days-value')\n    2) <p class=\"text-sm font-bold text-white\">12</p> aka getByRole('paragraph').filter({ hasText: '12' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('12')\u001b[22m\n\n\n  20 |     \n  21 |     // 1. Check remaining days from real seeded backend (12 days total, 0 used)\n> 22 |     await expect(page.getByText('12')).toBeVisible({ timeout: 15000 });\n     |                                        ^\n  23 |     \n  24 |     // 2. Check history table (should be empty or show \"No data\")\n  25 |     const table = page.locator('table');\n    at /home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts:22:40"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "--- Login successful for employee1@company1.com ---\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-20T20:40:09.817Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results/leaves-Leaves-Management-s-b4f15-and-empty-history-initially-chromium-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/afdhal/data/hr/hrms/frontend/e2e/test-results/leaves-Leaves-Management-s-b4f15-and-empty-history-initially-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/afdhal/data/hr/hrms/frontend/tests/leaves.spec.ts",
+                        "column": 40,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "4dfdd69d5196c3f04057-3fa71d385dbbf50f94f5",
+              "file": "leaves.spec.ts",
+              "line": 18,
+              "column": 7
+            },
+            {
+              "title": "should submit a new leave request successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-20T20:40:08.102Z",
+                      "annotations": [],
+                      "attachments": []
+                    },
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-20T20:40:14.239Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4dfdd69d5196c3f04057-181570cafc3cb09d6a10",
+              "file": "leaves.spec.ts",
+              "line": 32,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-20T20:40:00.181Z",
+    "duration": 14105.673,
+    "expected": 0,
+    "skipped": 1,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}
