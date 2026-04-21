@@ -65,7 +65,7 @@ test.describe.serial('Workflow Configurations', () => {
       if (count <= 1) throw new Error('Roles not loaded yet');
     }).toPass({ timeout: 20000 });
 
-    await roleSelect.selectOption({ label: 'Manager' });
+    await roleSelect.selectOption({ label: 'HR Manager' });
 
     // 5. Save changes
     const saveChangesBtn = page.getByRole('button', { name: /Save Changes/i });

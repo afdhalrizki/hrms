@@ -54,7 +54,7 @@ class DashboardStatsTestCase(TenantTestCase):
             role=self.role,
             golongan=self.gol,
             access_role=self.admin_role,
-            join_date=timezone.now().date(),
+            join_date=timezone.localdate(),
             ktp_number="1234567890123456"
         )
         
@@ -66,14 +66,14 @@ class DashboardStatsTestCase(TenantTestCase):
             role=self.role,
             golongan=self.gol,
             access_role=self.staff_role,
-            join_date=timezone.now().date() - timezone.timedelta(days=40), # Not a new hire
+            join_date=timezone.localdate() - timezone.timedelta(days=40), # Not a new hire
             ktp_number="9876543210987654"
         )
 
         # 5. Setup Attendance for Today
         Attendance.objects.create(
             employee=self.emp_admin,
-            date=timezone.now().date(),
+            date=timezone.localdate(),
             status='PRESENT'
         )
         # emp_staff is absent (not created)
@@ -82,22 +82,22 @@ class DashboardStatsTestCase(TenantTestCase):
         LeaveRequest.objects.create(
             employee=self.emp_staff,
             leave_type='CUTI',
-            start_date=timezone.now().date() + timezone.timedelta(days=1),
-            end_date=timezone.now().date() + timezone.timedelta(days=2),
+            start_date=timezone.localdate() + timezone.timedelta(days=1),
+            end_date=timezone.localdate() + timezone.timedelta(days=2),
             reason="Holiday",
             status='PENDING'
         )
         LeaveRequest.objects.create(
             employee=self.emp_admin,
             leave_type='SAKIT',
-            start_date=timezone.now().date() + timezone.timedelta(days=5),
-            end_date=timezone.now().date() + timezone.timedelta(days=6),
+            start_date=timezone.localdate() + timezone.timedelta(days=5),
+            end_date=timezone.localdate() + timezone.timedelta(days=6),
             reason="Fever",
             status='APPROVED' # Should NOT be counted as pending
         )
 
         # 7. Setup Payroll for Current Month
-        today = timezone.now().date()
+        today = timezone.localdate()
         self.period = PayrollPeriod.objects.create(
             month=today.month,
             year=today.year,

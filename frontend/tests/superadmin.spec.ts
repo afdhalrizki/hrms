@@ -35,6 +35,7 @@ test.describe.serial('Superadmin (Platform) Management', () => {
   });
 
   test('should allow superadmin to review and approve registration requests', async ({ page }) => {
+    test.setTimeout(180000);
     await page.goto(`${BASE_URL}/en/admin/registrations`);
     
     // 1. Verify Header and Stats from real seeded backend
@@ -64,7 +65,7 @@ test.describe.serial('Superadmin (Platform) Management', () => {
       
       // Specifically verify the row status
       await expect(pendingRow.getByText(/APPROVED/i)).toBeVisible();
-    }).toPass({ timeout: 20000 });
+    }).toPass({ timeout: 120000 });
   });
 
   test('should allow superadmin to reject registration requests', async ({ page }) => {

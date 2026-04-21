@@ -58,6 +58,7 @@ export default function RegistrationsPage() {
       fetchRequests();
       toast.success(`Registration ${action}d successfully`);
     } catch (error: any) {
+      console.error(`[E2E_DEBUG] Action failed for ${action}:`, error);
       alert(`Action failed: ${error.message}`);
     } finally {
       setActionLoading(null);

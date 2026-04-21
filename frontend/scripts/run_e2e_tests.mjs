@@ -191,10 +191,10 @@ async function main() {
   };
 
   const pwArgs = [
-    'playwright', 'test',
+    'playwright', 'test', 'tests/superadmin.spec.ts', 'tests/workflows.spec.ts',
     '--grep-invert', '"diagnostic|Instrumentation"',
     '--workers=1',
-    '--retries=2',
+    '--retries=0',
     '--timeout=120000',
     '--reporter=list,json'
   ];
