@@ -75,7 +75,7 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles empty state successfully', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.resolve([]);
+      if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
       return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
 
@@ -88,8 +88,8 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles empty claims and categories', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-       if (endpoint === '/reimbursement-categories') return Promise.resolve([]);
-       if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.resolve([]);
+       if (endpoint.includes('/reimbursement-categories')) return Promise.resolve([]);
+       if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
        return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
     render(<ReimbursementsPage />, { wrapper: AllProviders });
@@ -101,7 +101,7 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles API error on fetch', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (endpoint === '/reimbursements' && (!options || options.method === 'GET')) return Promise.reject(new Error('Fetch failed'));
+      if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.reject(new Error('Fetch failed'));
       return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
 
@@ -130,7 +130,7 @@ describe('ReimbursementsPage (Integrated)', () => {
     fireEvent.change(descInput, { target: { value: 'Team Lunch' } });
 
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (endpoint === '/reimbursements' && options?.method === 'POST') return Promise.resolve({ id: 123 });
+      if (endpoint.includes('/reimbursements') && options?.method === 'POST') return Promise.resolve({ id: 123 });
       return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
     });
 
@@ -145,7 +145,7 @@ describe('ReimbursementsPage (Integrated)', () => {
 
     await waitFor(() => {
       const calls = (apiFetch as any).mock.calls;
-      const postCall = calls.find((c: any) => c[0] === '/reimbursements' && c[1]?.method === 'POST');
+      const postCall = calls.find((c: any) => c[0].includes('/reimbursements') && c[1]?.method === 'POST');
       expect(postCall).toBeDefined();
     }, { timeout: 20000 });
   }, 30000);

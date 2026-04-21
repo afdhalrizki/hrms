@@ -67,8 +67,13 @@ async function main() {
   const failedFiles = [];
   const metrics = { passed: 0, failed: 0, errors: 0, warnings: 0 };
 
-  for (const file of files) {
-    log(`\nRunning: ${file}`, COLORS.white);
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const currentNum = i + 1;
+    const totalNum = files.length;
+    const percentage = Math.round((currentNum / totalNum) * 100);
+    
+    log(`\n[${currentNum}/${totalNum} - ${percentage}%] Running: ${file}`, COLORS.white);
     
     const vitestArgs = [
       'vitest', 'run', file,

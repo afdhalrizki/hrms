@@ -124,6 +124,12 @@ describe('AuthProvider', () => {
     };
 
     (api.apiFetch as any).mockResolvedValueOnce(loginUser);
+    (api.apiFetch as any).mockResolvedValueOnce({
+      id: 99,
+      email: 'newuser@example.com',
+      fullname: 'New User',
+      employee_nik: null
+    });
 
     render(
       <AuthProvider>

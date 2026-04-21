@@ -148,14 +148,21 @@ describe('WorkflowsPage (Integrated)', () => {
 
     // Add a stage first so we can remove it
     fireEvent.click(screen.getByText('Add Approval Level'));
-    await waitFor(() => screen.getByDisplayValue(/Stage/i));
+    
+    let stagesBefore = 0;
+    await waitFor(() => {
+      const stages = screen.getAllByDisplayValue(/Stage/i);
+      expect(stages.length).toBeGreaterThan(0);
+      stagesBefore = stages.length;
+    });
 
     const deleteBtns = document.querySelectorAll('button svg.lucide-trash2');
     expect(deleteBtns.length).toBeGreaterThan(0);
     fireEvent.click(deleteBtns[deleteBtns.length - 1].parentElement!);
 
     await waitFor(() => {
-      expect(screen.queryByDisplayValue(/Stage 1/i)).toBeNull();
+      const stagesAfter = screen.queryAllByDisplayValue(/Stage/i).length;
+      expect(stagesAfter).toBe(stagesBefore - 1);
     });
   });
 
