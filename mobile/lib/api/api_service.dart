@@ -265,6 +265,7 @@ class ApiService {
       'latitude_in': latitude,
       'longitude_in': longitude,
       'check_in': checkInTime,
+      'platform': 'mobile',
     };
 
     final response = await _authenticatedRequest((token) => _client.post(

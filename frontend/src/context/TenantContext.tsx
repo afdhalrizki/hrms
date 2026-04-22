@@ -33,6 +33,7 @@ interface TenantContextType {
   leaveApprovalLevel?: string;
   overtimeApprovalLevel?: string;
   isBiometricEnabled?: boolean;
+  attendancePlatformPolicy?: 'MOBILE' | 'BOTH';
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
@@ -116,6 +117,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
               leaveApprovalLevel: data.leave_approval_level,
               overtimeApprovalLevel: data.overtime_approval_level,
               isBiometricEnabled: data.is_biometric_enabled,
+              attendancePlatformPolicy: data.attendance_platform_policy,
               isLoading: false,
             }));
           })
@@ -178,6 +180,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 leaveApprovalLevel: data.leave_approval_level,
                 overtimeApprovalLevel: data.overtime_approval_level,
                 isBiometricEnabled: data.is_biometric_enabled,
+                attendancePlatformPolicy: data.attendance_platform_policy,
                 isLoading: false,
               }));
             })

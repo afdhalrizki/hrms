@@ -561,3 +561,60 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         res2 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
         self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('already recorded', str(res2.data))
+
+    def test_attendance_platform_policy_restriction(self):
+        """Verify that web clock-in is rejected when policy is MOBILE."""
+        with schema_context(self.tenant.schema_name):
+            self.tenant.attendance_platform_policy = 'MOBILE'
+            self.tenant.save()
+            
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        payload = {
+            'date': str(self.today + timedelta(days=40)),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+            'platform': 'web' # Explicitly web
+        }
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn('restricted to the mobile application', response.data['error'])
+
+    def test_attendance_platform_policy_allowed(self):
+        """Verify that web clock-in is allowed when policy is BOTH."""
+        with schema_context(self.tenant.schema_name):
+            self.tenant.attendance_platform_policy = 'BOTH'
+            self.tenant.save()
+        
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        payload = {
+            'date': str(self.today + timedelta(days=41)),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+            'platform': 'web'
+        }
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['status'], 'PRESENT')
+
+    def test_attendance_mobile_always_allowed(self):
+        """Verify that mobile clock-in is always allowed regardless of policy."""
+        # Test with MOBILE policy
+        with schema_context(self.tenant.schema_name):
+            self.tenant.attendance_platform_policy = 'MOBILE'
+            self.tenant.save()
+        
+        self.client.force_login(self.user)
+        url = reverse('attendance-list')
+        payload = {
+            'date': str(self.today + timedelta(days=42)),
+            'check_in': '08:00:00',
+            'latitude_in': -6.2088,
+            'longitude_in': 106.8456,
+            'platform': 'mobile'
+        }
+        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

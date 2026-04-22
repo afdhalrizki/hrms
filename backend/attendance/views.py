@@ -71,6 +71,17 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if not employee:
             return Response({'error': 'No employee profile found for this user.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Enforce Platform Policy
+        from django.db import connection
+        from django_tenants.utils import get_tenant_model
+        tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+        
+        platform = request.data.get('platform', 'mobile') # Default to mobile if not specified
+        if tenant.attendance_platform_policy == 'MOBILE' and platform == 'web':
+            return Response({
+                'error': 'Clock-in is restricted to the mobile application only.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
         # Allow managers to specify target employee
         target_employee = employee
         if request.data.get('employee'):

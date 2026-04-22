@@ -15,6 +15,8 @@ import {
   Percent,
   Camera,
   ShieldCheck,
+  Smartphone,
+  MonitorSmartphone,
   AlertCircle,
   CheckCircle2,
   Save,
@@ -35,7 +37,8 @@ export default function SettingsPage() {
     absenceDeductionRate: initialAbsence,
     jkkRate: initialJkk,
     reimbursementApprovalLevel: initialReimbursementLevel,
-    isBiometricEnabled: initialBioEnabled
+    isBiometricEnabled: initialBioEnabled,
+    attendancePlatformPolicy: initialPlatformPolicy
   } = useTenant();
   
   const [name, setName] = useState(tenantName || '');
@@ -46,6 +49,7 @@ export default function SettingsPage() {
   const [jkkRate, setJkkRate] = useState(initialJkk || 0.0024);
   const [reimbursementLevel, setReimbursementLevel] = useState(initialReimbursementLevel || 'BOTH');
   const [isBioEnabled, setIsBioEnabled] = useState(initialBioEnabled !== false);
+  const [attendancePlatformPolicy, setAttendancePlatformPolicy] = useState(initialPlatformPolicy || 'MOBILE');
   
   const [logoPreview, setLogoPreview] = useState<string | null>(initialLogo ? `${getBaseUrl().replace('/api', '')}${initialLogo}` : null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -63,6 +67,7 @@ export default function SettingsPage() {
     if (initialJkk !== undefined) setJkkRate(initialJkk);
     if (initialReimbursementLevel) setReimbursementLevel(initialReimbursementLevel);
     if (initialBioEnabled !== undefined) setIsBioEnabled(initialBioEnabled);
+    if (initialPlatformPolicy) setAttendancePlatformPolicy(initialPlatformPolicy);
     if (initialLogo) {
        // Support relative paths from backend
        setLogoPreview(initialLogo.startsWith('http') ? initialLogo : `${getBaseUrl().replace('/api', '')}${initialLogo}`);
@@ -93,6 +98,7 @@ export default function SettingsPage() {
       formData.append('jkk_rate', jkkRate.toString());
       formData.append('reimbursement_approval_level', reimbursementLevel);
       formData.append('is_biometric_enabled', isBioEnabled.toString());
+      formData.append('attendance_platform_policy', attendancePlatformPolicy);
       if (selectedFile) {
         formData.append('logo', selectedFile);
       }
@@ -329,6 +335,56 @@ export default function SettingsPage() {
                       >
                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isBioEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                       </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 font-medium">
+                            <MonitorSmartphone size={18} className="text-muted-foreground" />
+                            Attendance Platform Restriction
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Control where employees can record their attendance.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => setAttendancePlatformPolicy('MOBILE')}
+                          className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
+                            attendancePlatformPolicy === 'MOBILE' 
+                              ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' 
+                              : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
+                          }`}
+                        >
+                          <Smartphone size={20} />
+                          <div className="text-left">
+                            <div className="text-sm font-bold">Mobile Only</div>
+                            <div className="text-[10px] opacity-70">App only</div>
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setAttendancePlatformPolicy('BOTH')}
+                          className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
+                            attendancePlatformPolicy === 'BOTH' 
+                              ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' 
+                              : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
+                          }`}
+                        >
+                          <MonitorSmartphone size={20} />
+                          <div className="text-left">
+                            <div className="text-sm font-bold">Web & Mobile</div>
+                            <div className="text-[10px] opacity-70">Flexible access</div>
+                          </div>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

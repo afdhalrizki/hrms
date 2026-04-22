@@ -51,8 +51,12 @@ export async function login(page: Page, email: string, password = 'password123',
       if (text.includes('Failed to load resource') && text.includes('401')) return;
       
       // Whitelist 403 on dashboard-stats for regular employees (benign)
-      if (text.includes('403 (Forbidden)') && text.includes('/api/core/dashboard-stats/')) {
-        console.log(`[STRICT MODE - WHITELISTED] Expected 403 for regular employee on stats: ${text}`);
+      if (text.includes('403 (Forbidden)') && (
+          text.includes('/api/core/dashboard-stats/') || 
+          text.includes('/api/tenant/settings/') ||
+          text.includes('company2.localhost')
+      )) {
+        console.log(`[STRICT MODE - WHITELISTED] Expected 403 for isolation/permission test: ${text}`);
         return;
       }
       if (text.includes('Failed to fetch stats Error: You do not have permission')) {

@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { CorrectionRequestModal } from '@/components/attendance/CorrectionRequestModal';
 import { Attendance } from '@/types/core';
+import { useTenant } from '@/context/TenantContext';
 
 interface AttendanceLog {
   id: number;
@@ -41,6 +42,8 @@ export default function AttendancePage() {
   const [selectedAttendance, setSelectedAttendance] = React.useState<Attendance | null>(null);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const { attendancePlatformPolicy } = useTenant();
+  const isWebRestricted = attendancePlatformPolicy === 'MOBILE';
 
   const fetchLogs = React.useCallback(async () => {
     try {
@@ -60,42 +63,79 @@ export default function AttendancePage() {
   }, []);
 
   const handleClockAction = async () => {
-    setIsProcessing(true);
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const now = new Date();
-      const time = now.toTimeString().split(' ')[0]; // Returns HH:mm:ss
-
-      if (!todayAttendance) {
-        // Check In
-        const data = await apiFetch('/attendance', {
-          method: 'POST',
-          body: JSON.stringify({
-            date: today,
-            check_in: time,
-            latitude_in: '-6.200000', // Mock data
-            longitude_in: '106.816666'
-          })
-        });
-        toast.success(t('success'));
-        setTodayAttendance(data);
-      } else {
-        // Check Out
-        const data = await apiFetch(`/attendance/${todayAttendance.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({
-            check_out: time
-          })
-        });
-        toast.success(t('success'));
-        setTodayAttendance(data);
-      }
-      fetchLogs();
-    } catch (error: any) {
-      toast.error(error.message || 'Action failed');
-    } finally {
-      setIsProcessing(false);
+    if (isWebRestricted) {
+      toast.error('Clock-in is restricted to the mobile application only.');
+      return;
     }
+
+    setIsProcessing(true);
+    
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      setIsProcessing(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const today = new Date().toISOString().split('T')[0];
+          const now = new Date();
+          const time = now.toTimeString().split(' ')[0]; // Returns HH:mm:ss
+
+          if (!todayAttendance) {
+            // Check In
+            const data = await apiFetch('/attendance', {
+              method: 'POST',
+              body: JSON.stringify({
+                date: today,
+                check_in: time,
+                latitude_in: latitude.toFixed(6),
+                longitude_in: longitude.toFixed(6),
+                platform: 'web'
+              })
+            });
+            toast.success(t('success'));
+            setTodayAttendance(data);
+          } else {
+            // Check Out
+            const data = await apiFetch(`/attendance/${todayAttendance.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({
+                check_out: time,
+                platform: 'web'
+              })
+            });
+            toast.success(t('success'));
+            setTodayAttendance(data);
+          }
+          fetchLogs();
+        } catch (error: any) {
+          toast.error(error.message || 'Action failed');
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      (error) => {
+        setIsProcessing(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('User denied the request for Geolocation.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Location information is unavailable.');
+            break;
+          case error.TIMEOUT:
+            toast.error('The request to get user location timed out.');
+            break;
+          default:
+            toast.error('An unknown error occurred.');
+            break;
+        }
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
   };
 
   React.useEffect(() => {
@@ -129,8 +169,9 @@ export default function AttendancePage() {
               Audit Log
             </a>
             <button 
+              data-testid="clock-btn"
               onClick={handleClockAction}
-              disabled={isProcessing || !!(todayAttendance && todayAttendance.check_out)}
+              disabled={isProcessing || isWebRestricted || !!(todayAttendance && todayAttendance.check_out)}
               className={cn(
                 "px-8 py-2 rounded-xl font-bold shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100",
                 !todayAttendance ? "bg-primary text-white shadow-primary/20" : "bg-emerald-500 text-white shadow-emerald-500/20"
@@ -141,6 +182,8 @@ export default function AttendancePage() {
                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Processing...
                 </div>
+              ) : isWebRestricted ? (
+                'Mobile Only'
               ) : !todayAttendance ? (
                 t('checkIn')
               ) : (

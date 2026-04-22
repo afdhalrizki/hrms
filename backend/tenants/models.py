@@ -66,6 +66,17 @@ class Tenant(TenantMixin):
     storage_used_bytes = models.PositiveBigIntegerField(default=0, help_text="Current storage usage in bytes")
     employee_count = models.PositiveIntegerField(default=0, help_text="Current number of employees in this tenant")
     is_biometric_enabled = models.BooleanField(default=True, help_text="Allow clock-in without photo if disabled (Emergency Storage Fallback)")
+    
+    ATTENDANCE_PLATFORM_CHOICES = [
+        ('MOBILE', 'Mobile Only'),
+        ('BOTH', 'Mobile & Web'),
+    ]
+    attendance_platform_policy = models.CharField(
+        max_length=10, 
+        choices=ATTENDANCE_PLATFORM_CHOICES, 
+        default='MOBILE',
+        help_text="Control which platform is allowed for clock-in/out."
+    )
 
     from django.core.validators import MinValueValidator, MaxValueValidator
     max_admins = models.IntegerField(

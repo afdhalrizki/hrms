@@ -71,7 +71,8 @@ tenant1, created = Tenant.objects.get_or_create(
         'name': 'Company One', 
         'plan_type': 'ENTERPRISE',
         'late_deduction_rate': 50000,
-        'absence_deduction_rate': 100000
+        'absence_deduction_rate': 100000,
+        'attendance_platform_policy': 'BOTH'
     }
 )
 Domain.objects.update_or_create(domain='company1.localhost', defaults={'tenant': tenant1, 'is_primary': True})
@@ -84,7 +85,11 @@ Domain.objects.update_or_create(domain='localhost', defaults={'tenant': public_t
 # 2.1 Company 2 (for tenant isolation tests)
 tenant2, created = Tenant.objects.get_or_create(
     schema_name='company2', 
-    defaults={'name': 'Company Two', 'plan_type': 'PROFESSIONAL'}
+    defaults={
+        'name': 'Company Two', 
+        'plan_type': 'PROFESSIONAL',
+        'attendance_platform_policy': 'BOTH'
+    }
 )
 Domain.objects.update_or_create(domain='company2.localhost', defaults={'tenant': tenant2, 'is_primary': True})
 
