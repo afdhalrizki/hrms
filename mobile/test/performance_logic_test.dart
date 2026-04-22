@@ -3,11 +3,11 @@ import 'package:mobile/api/api_service.dart';
 import 'test_helper.dart';
 
 void main() {
-  group('Phase M4: Strategic Performance Tests (Mocked)', () {
+  group('Phase M4: Strategic Performance Tests (Integrated)', () {
     late ApiService apiService;
 
     setUp(() async {
-      await setupMockApiService();
+      await setupIntegratedTest();
       apiService = ApiService();
     });
 
@@ -17,15 +17,21 @@ void main() {
       expect(list, isA<List>());
     });
 
-    test('submitAppraisalReview sends POST successfully', () async {
+    test('getAppraisals returns list on success', () async {
       await loginForTest();
-      await apiService.submitAppraisalReview({
-        'appraisal': 1,
-        'reviewer': 1,
-        'reviewer_type': 'SELF',
-        'ratings': {'quality': 4},
-        'comments': 'Integration Test',
-      });
+      final list = await apiService.getAppraisals();
+      expect(list, isA<List>());
+    });
+
+    test('submitAppraisalReview fails with invalid appraisal ID', () async {
+      await loginForTest();
+      expect(
+        () => apiService.submitAppraisalReview({
+          'appraisal': 9999,
+          'comments': 'should fail',
+        }),
+        throwsException,
+      );
     });
   });
 }

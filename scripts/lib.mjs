@@ -19,6 +19,8 @@ export const COLORS = {
   gray: '\x1b[90m',
   white: '\x1b[37m',
   magenta: '\x1b[35m',
+  black: '\x1b[30m',
+  bold: '\x1b[1m',
 };
 
 export function log(msg, color = COLORS.white, noNewLine = false) {

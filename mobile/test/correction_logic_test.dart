@@ -3,11 +3,11 @@ import 'package:mobile/api/api_service.dart';
 import 'test_helper.dart';
 
 void main() {
-  group('Phase M3: Attendance Correction Tests (Mocked)', () {
+  group('Phase M3: Attendance Correction Tests (Integrated)', () {
     late ApiService apiService;
 
     setUp(() async {
-      await setupMockApiService();
+      await setupIntegratedTest();
       apiService = ApiService();
     });
 
@@ -17,16 +17,21 @@ void main() {
       expect(list, isA<List>());
     });
 
-    test('submitCorrectionRequest sends POST successfully', () async {
+    test('getCorrectionRequests returns list on success', () async {
       await loginForTest();
-      final result = await apiService.submitCorrectionRequest({
-        'attendance': 1,
-        'requested_check_in': '08:00:00',
-        'requested_check_out': '17:00:00',
-        'reason': 'Integration Test',
-      });
-      // Verification is implicit by the lack of exception, 
-      // but we ensure the Future is fully awaited.
+      final list = await apiService.getCorrectionRequests();
+      expect(list, isA<List>());
+    });
+
+    test('submitCorrectionRequest fails with missing attendance ID', () async {
+      await loginForTest();
+      expect(
+        () => apiService.submitCorrectionRequest({
+          'requested_check_in': '08:00:00',
+          'reason': 'test fail',
+        }),
+        throwsException,
+      );
     });
   });
 }

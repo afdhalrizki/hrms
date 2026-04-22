@@ -1,166 +1,192 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ensureDir, log, COLORS } from '../../scripts/lib.mjs';
+import { existsSync, readdirSync, writeFileSync, appendFileSync, readFileSync } from 'node:fs';
+import { spawn, exec } from 'node:child_process';
+import { promisify } from 'node:util';
+import {
+  ensureDir,
+  log,
+  COLORS,
+  spawnStream,
+  spawnBackground,
+  waitForHttp,
+  waitForPort,
+  isPortInUse,
+  getPythonExec,
+  ensureDockerRunning,
+  getDockerComposeCommand
+} from '../../scripts/lib.mjs';
 
+const execAsync = promisify(exec);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MobileDir = resolve(__dirname, '..');
+const RootDir = resolve(MobileDir, '..');
+const BackendDir = join(RootDir, 'backend');
 
-async function runUnitTests() {
-  log('🚀 Starting Mobile Unit Test Suite (Merged) ...', COLORS.cyan);
+async function testBackendHealth() {
+  try {
+    return await waitForHttp('http://127.0.0.1:8000/api/', 5000, 'Backend Health');
+  } catch (e) {
+    return false;
+  }
+}
+
+async function ensureBackendStarted() {
+  log('[1/3] Ensuring Backend is running and seeded...', COLORS.yellow);
+
+  const inUse = await isPortInUse(8000);
+  if (inUse) {
+    const healthy = await testBackendHealth();
+    if (healthy) {
+      log('✅ Backend is already available and healthy.', COLORS.green);
+      log('Re-seeding for consistency...', COLORS.gray);
+      const pythonExec = getPythonExec(BackendDir);
+      await spawnStream(pythonExec, [join(BackendDir, 'scripts/seed_test_db.py')], { cwd: BackendDir });
+    } else {
+      log('⚠️ Port 8000 is in use but backend is not healthy.', COLORS.red);
+      return false;
+    }
+  } else {
+    log('🚀 Backend not ready. Starting via run_dev.mjs...', COLORS.yellow);
+    spawnBackground('node', [join(BackendDir, 'scripts/run_dev.mjs'), '--seed'], { cwd: BackendDir });
+
+    log('Waiting for backend (max 180s)...', COLORS.gray);
+    const ready = await waitForHttp('http://127.0.0.1:8000/api/', 180000, 'Backend');
+    if (!ready) {
+      log('❌ ERROR: Backend failed to start.', COLORS.red);
+      return false;
+    }
+  }
+  return true;
+}
+
+async function main() {
+  log("--- Mobile Integrated Unit Test Automation ---", COLORS.cyan);
+
+  if (!(await ensureBackendStarted())) {
+    process.exit(1);
+  }
 
   const logDir = join(MobileDir, 'logs');
   await ensureDir(logDir);
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[:.]/g, '-')
-    .slice(0, 19)
-    .replace('T', '_');
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
   const logFile = join(logDir, `unit_test_${timestamp}.log`);
 
-  log(
-    'Running flutter test with JSON reporter (all unit tests)...',
-    COLORS.yellow,
-  );
+  log(`\n[2/3] Launching Flutter Test Suite (Sequential Mode)...`, COLORS.cyan);
   log(`Logging output to: ${logFile}`, COLORS.gray);
 
-  // Run all unit tests except e2e_test.dart (which runs separately)
-  // Includes: api_service, attendance_logic, basic, correction_logic,
-  // face_verification, file_service, l10n, leave_logic, location_service,
-  // model, payslip_logic, performance_logic, profile_logic, reimbursement_logic,
-  // screens_widget, service, settings_screen tests
-  const testFiles = [
-    'test/api_service_test.dart',
-    'test/attendance_logic_test.dart',
-    'test/basic_test.dart',
-    'test/correction_logic_test.dart',
-    'test/face_verification_test.dart',
-    'test/file_service_test.dart',
-    'test/l10n_additional_test.dart',
-    'test/leave_logic_test.dart',
-    'test/location_service_test.dart',
-    'test/model_test.dart',
-    'test/models_additional_test.dart',
-    'test/models_test.dart',
-    'test/payslip_logic_test.dart',
-    'test/performance_logic_test.dart',
-    'test/profile_logic_test.dart',
-    'test/reimbursement_logic_test.dart',
-    'test/screens_widget_test.dart',
-    'test/service_test.dart',
-    'test/settings_screen_test.dart',
-  ];
-  const flutterArgs = ['test', '--reporter', 'json', ...testFiles];
+  const testFiles = readdirSync(join(MobileDir, 'test'))
+    .filter(f => f.endsWith('_test.dart') && f !== 'e2e_test.dart')
+    .map(f => join('test', f));
 
-  let filePassed = 0;
-  let fileFailed = 0;
-  let fileErrors = 0;
-  let hasWarning = false;
-  let foundResults = false;
-  const testNames = new Map();
-  const fileReasons = [];
+  log(`Found ${testFiles.length} test files. Pre-scanning for test names...`, COLORS.gray);
 
-  const { exec } = await import('node:child_process');
-  const command = `flutter ${flutterArgs.join(' ')}`;
-
-  const fs = await import('node:fs');
-  const logStream = fs.createWriteStream(logFile, { flags: 'a' });
-
-  try {
-    const { stdout, stderr } = await new Promise((resolve, reject) => {
-      exec(
-        command,
-        { cwd: MobileDir, timeout: 120000 },
-        (error, stdout, stderr) => {
-          logStream.write(stdout);
-          logStream.write(stderr);
-          if (error && error.code !== 0) {
-            reject(error);
-          } else {
-            resolve({ stdout, stderr });
-          }
-        },
-      );
-    });
-
-    // Parse stdout for JSON
-    const lines = stdout.split(/\r?\n/);
-    for (let line of lines) {
-      line = line.trim();
-      if (!line) continue;
-
-      if (line.toLowerCase().includes('warning')) {
-        hasWarning = true;
-        if (!line.startsWith('{')) fileReasons.push(`    ⚠️ ${line}`);
+  const allTestNames = [];
+  for (const file of testFiles) {
+    try {
+      const content = readFileSync(join(MobileDir, file), 'utf8');
+      // Match test('name' and testWidgets('name'
+      // Handles both single and double quotes
+      const matches = content.matchAll(/(?:test|testWidgets)\s*\(\s*['"](.*?)['"]/g);
+      for (const match of matches) {
+        if (match[1]) allTestNames.push(match[1]);
       }
-
-      if (line.startsWith('{') && line.endsWith('}')) {
-        try {
-          const evt = JSON.parse(line);
-          if (evt.type === 'testStart' && evt.test.name) {
-            testNames.set(evt.test.id, evt.test.name);
-            if (!evt.test.name.includes('loading')) {
-              process.stdout.write(`🧪 ${evt.test.name} ... `);
-            }
-          }
-
-          if (evt.type === 'error') {
-            const name = testNames.get(evt.testID) || 'Unknown Test';
-            log(`❌ ERROR`, COLORS.red);
-            fileReasons.push(`    ❌ [${name}]: ${evt.error}`);
-          }
-
-          if (evt.type === 'testDone') {
-            if (evt.testID === 0) continue;
-            foundResults = true;
-            if (evt.result === 'success') {
-              filePassed++;
-              log(`✅`, COLORS.green);
-            } else if (evt.result === 'failure') {
-              fileFailed++;
-              log(`❌`, COLORS.red);
-            } else if (evt.result === 'error') {
-              fileErrors++;
-              log(`⚠️`, COLORS.magenta);
-            }
-          }
-        } catch (e) {}
-      }
-    }
-  } catch (error) {
-    if (error.code === 'ETIMEDOUT') {
-      log(
-        'Timeout: Flutter test took too long, assuming no tests found',
-        COLORS.yellow,
-      );
-    } else {
-      log(`Flutter test failed: ${error.message}`, COLORS.red);
-    }
+    } catch (e) { }
   }
 
-  log('\n========================================', COLORS.white);
-  log('🏁 FINAL MOBILE UNIT SUMMARY', COLORS.cyan);
-  log('========================================', COLORS.white);
-  log(`✅ TOTAL PASSED:   ${filePassed}`, COLORS.green);
-  log(`❌ TOTAL FAILED:   ${fileFailed}`, COLORS.red);
-  log(`⚠️ TOTAL ERRORS:   ${fileErrors}`, COLORS.magenta);
-  log(`🔍 WARNINGS:       ${hasWarning ? 1 : 0}`, COLORS.yellow);
-  log('========================================', COLORS.white);
+  const totalTests = allTestNames.length || 100;
+  log(`Detected ${totalTests} individual test scenarios.`, COLORS.gray);
 
-  fileReasons.forEach((r) => log(r, COLORS.gray));
+  const flutterArgs = [
+    'test',
+    '-j', '1',
+    '--reporter=expanded',
+    '--dart-define=INTEGRATED_TEST=true',
+    ...testFiles
+  ];
 
-  if (fileFailed === 0 && fileErrors === 0 && foundResults) {
-    log('🏆 100% SUCCESS', COLORS.green);
-    process.exit(0);
-  } else if (fileFailed === 0 && fileErrors === 0 && !foundResults) {
-    log('ℹ️ NO TESTS FOUND OR RUN', COLORS.blue);
+  log(`\nExecuting: flutter ${flutterArgs.join(' ')}\n`, COLORS.gray);
+
+  let passCount = 0;
+  let failCount = 0;
+  let lastProcessedName = "";
+  const completedNames = new Set();
+
+  const exitCode = await new Promise((resolve) => {
+    const child = spawn('flutter', flutterArgs, {
+      cwd: MobileDir,
+      shell: true,
+    });
+
+    child.stdout.on('data', (data) => {
+      const line = data.toString();
+      appendFileSync(logFile, data);
+
+      // Match: +<num> -<num>: <name>
+      const match = line.match(/\+(\d+)\s*(?:-(\d+))?:\s*(.*)/);
+      if (match) {
+        passCount = parseInt(match[1]);
+        failCount = parseInt(match[2] || "0");
+        const fullDesc = match[3].trim();
+
+        // Skip "loading ..." lines
+        if (fullDesc.startsWith('loading ')) return;
+
+        // Extract the test title (after the .dart: part)
+        let displayTitle = fullDesc;
+        const dartMatch = fullDesc.match(/.*\.dart:\s*(.*)/);
+        if (dartMatch) {
+          displayTitle = dartMatch[1];
+        }
+
+        // Find accurate index from pre-scanned list
+        let testIdx = allTestNames.findIndex(name => displayTitle.includes(name));
+        if (testIdx === -1) {
+          testIdx = passCount + failCount - 1;
+        }
+
+        const completed = Math.min(testIdx + 1, totalTests);
+        const pct = Math.round((completed / totalTests) * 100);
+        const color = failCount > 0 ? COLORS.red : COLORS.green;
+
+        // Print each unique test result on a new line (no \r)
+        if (!completedNames.has(displayTitle)) {
+          completedNames.add(displayTitle);
+          const progressLine = `${COLORS.cyan}[${completed}/${totalTests} - ${pct}%]${COLORS.white} ${color}PASS: ${passCount} FAIL: ${failCount}${COLORS.white} | ${COLORS.white}${displayTitle}${COLORS.white}\n`;
+          process.stdout.write(progressLine);
+        }
+      } else if (line.includes('DEBUG') || line.includes('HTTP')) {
+        // Show debug/http as warnings (Yellow)
+        process.stdout.write(`${COLORS.white}${line}${COLORS.white}`);
+      } else {
+        // Errors or failures in red
+        process.stdout.write(`${COLORS.red}${line}${COLORS.white}`);
+      }
+    });
+
+    child.stderr.on('data', (data) => {
+      process.stderr.write(data);
+      appendFileSync(logFile, data);
+    });
+
+    child.on('close', resolve);
+  });
+
+  log("\n" + "=".repeat(50), COLORS.cyan);
+  log("MOBILE UNIT TEST EXECUTION SUMMARY", COLORS.cyan);
+  log("=".repeat(50), COLORS.cyan);
+  log(`Total Scenarios: ${totalTests} (approx)`, COLORS.white);
+  log(`Tests Passed:    ${passCount}`, COLORS.green);
+  log(`Tests Failed:    ${failCount}`, failCount > 0 ? COLORS.red : COLORS.white);
+  log("=".repeat(50), COLORS.cyan);
+
+  if (exitCode === 0 && failCount === 0) {
+    log("\n✅ All integrated unit tests passed.", COLORS.green);
     process.exit(0);
   } else {
-    log('💀 SOME TESTS FAILED', COLORS.red);
+    log(`\n❌ Test suite failed with ${failCount} failures.`, COLORS.red);
     process.exit(1);
   }
 }
 
-runUnitTests().catch((err) => {
-  log(`FATAL ERROR: ${err.message}`, COLORS.red);
-  process.exit(1);
-});
+main().catch(console.error);

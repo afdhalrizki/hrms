@@ -3,22 +3,43 @@ import 'package:mobile/api/api_service.dart';
 import 'test_helper.dart';
 
 void main() {
-  group('Phase M2: Profile & Documents Tests (Mocked)', () {
-    late ApiService apiService;
+  final apiService = ApiService();
 
+  group('Phase M2: Profile & Documents Tests (Integrated)', () {
     setUp(() async {
-      await setupMockApiService();
-      apiService = ApiService();
+      await setupIntegratedTest();
     });
 
-    test('updateProfile sends PATCH successfully', () async {
+    test('getEmployeeProfile returns current user data', () async {
       await loginForTest();
-      await apiService.updateProfile(101, {'phone': '08123456789'});
+      final profile = await apiService.getEmployeeProfile();
+      expect(profile['email'], isNotNull);
     });
 
-    test('uploadDocument sends multipart request successfully', () async {
+    test('updateProfile allows updating own data', () async {
       await loginForTest();
-      await apiService.uploadDocument(101, 'ktp_image', [1, 2, 3], 'test.jpg');
+      final profile = await apiService.getEmployeeProfile();
+      final id = profile['employee_id'];
+      await apiService.updateProfile(id, {'phone': '081299998888'});
+    });
+
+    test('updateProfile fails with invalid data type (nik as object)', () async {
+      await loginForTest();
+      final profile = await apiService.getEmployeeProfile();
+      expect(
+        () => apiService.updateProfile(profile['employee_id'], {'nik': {'invalid': 1}}),
+        throwsException,
+      );
+    });
+
+    test('uploadDocument fails with invalid image data', () async {
+      await loginForTest();
+      final profile = await apiService.getEmployeeProfile();
+      final id = profile['employee_id'];
+      expect(
+        () => apiService.uploadDocument(id, 'ktp_image', [1, 2, 3, 4], 'test.png'),
+        throwsException,
+      );
     });
   });
 }

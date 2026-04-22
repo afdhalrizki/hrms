@@ -258,6 +258,7 @@ class ApiService {
     required double longitude,
     required String checkInTime,
     bool isClockIn = true,
+    String? date,
   }) async {
     final tenant = await getTenant();
     final payload = {
@@ -266,6 +267,7 @@ class ApiService {
       'longitude_in': longitude,
       'check_in': checkInTime,
       'platform': 'mobile',
+      if (date != null) 'date': date,
     };
 
     final response = await _authenticatedRequest((token) => _client.post(
@@ -317,6 +319,19 @@ class ApiService {
     if (response.statusCode != 201) throw Exception('Failed to apply leave: ${response.body}');
   }
 
+  Future<void> updateLeaveStatus(int id, String action, String comment) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.patch(
+      Uri.parse("$baseUrl/leave-requests/$id/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode({
+        'action': action,
+        'comment': comment,
+      }),
+    ));
+    if (response.statusCode != 200) throw Exception('Failed to update leave status: ${response.body}');
+  }
+
   Future<List<dynamic>> getLeaveBalances() async {
     final tenant = await getTenant();
     final response = await _authenticatedRequest((token) => _client.get(
@@ -358,6 +373,19 @@ class ApiService {
     if (response.statusCode != 201) throw Exception('Failed to submit reimbursement: ${response.body}');
   }
 
+  Future<void> updateReimbursementStatus(int id, String action, String comment) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.post(
+      Uri.parse("$baseUrl/reimbursements/$id/process_action/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode({
+        'action': action,
+        'comment': comment,
+      }),
+    ));
+    if (response.statusCode != 200) throw Exception('Failed to update reimbursement status: ${response.body}');
+  }
+
   // Phase M2: Profile & Documents
   Future<Map<String, dynamic>> updateProfile(int employeeId, Map<String, dynamic> data) async {
     final tenant = await getTenant();
@@ -395,7 +423,7 @@ class ApiService {
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode != 200) {
-      print('DEBUG E2E: Response error for getLeaveRequests: ${response.statusCode} - ${response.body}');
+      print('DEBUG E2E: Response error for uploadDocument: ${response.statusCode} - ${response.body}');
       throw Exception('Failed to upload document: ${response.body}');
     }
   }
@@ -431,6 +459,39 @@ class ApiService {
     if (response.statusCode != 201) {
        throw Exception('Failed to submit correction: ${response.body}');
     }
+  }
+
+  Future<void> updateCorrectionStatus(int id, String action, String comment) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.patch(
+      Uri.parse("$baseUrl/attendance-corrections/$id/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode({
+        'action': action,
+        'comment': comment,
+      }),
+    ));
+    if (response.statusCode != 200) throw Exception('Failed to update correction status: ${response.body}');
+  }
+
+  Future<List<dynamic>> getOvertimes() async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.get(
+      Uri.parse("$baseUrl/overtime/"),
+      headers: _headers(tenant, token),
+    ));
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to fetch overtimes');
+  }
+
+  Future<void> applyOvertime(Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.post(
+      Uri.parse("$baseUrl/overtime/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    ));
+    if (response.statusCode != 201) throw Exception('Failed to apply overtime: ${response.body}');
   }
 
   // Phase M4: Strategic Performance

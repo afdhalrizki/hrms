@@ -14,6 +14,9 @@ void main() {
         'fullname': 'Test User',
         'role_name': 'Employee',
         'employee_id': 101,
+        'is_staff': false,
+        'role': 'EMPLOYEE',
+        'permissions': {'manage_hr': true}
       };
       final user = User.fromJson(json);
       expect(user.id, 1);
@@ -21,6 +24,28 @@ void main() {
       expect(user.fullname, 'Test User');
       expect(user.roleName, 'Employee');
       expect(user.employeeId, 101);
+      expect(user.hasPermission('manage_hr'), isTrue);
+    });
+
+    test('User: handles missing role_name with default', () {
+      final json = {'id': 1, 'email': 'x@y.com', 'is_staff': false};
+      final user = User.fromJson(json);
+      expect(user.roleName, 'Employee');
+    });
+
+    test('User: toJson contains all fields', () {
+      final user = User(
+        id: 1, 
+        email: 'a@b.com', 
+        fullname: 'A B', 
+        employeeId: 5, 
+        isStaff: false, 
+        role: 'EMPLOYEE',
+        permissions: {}
+      );
+      final json = user.toJson();
+      expect(json['id'], 1);
+      expect(json['employee_id'], 5);
     });
   });
 

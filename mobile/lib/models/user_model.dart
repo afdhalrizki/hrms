@@ -33,7 +33,7 @@ class User {
       employeeId: json['employee_id'],
       employeeNik: json['employee_nik'],
       fullname: json['fullname'],
-      roleName: json['role_name'],
+      roleName: json['role_name'] ?? 'Employee',
       departmentName: json['department_name'],
     );
   }

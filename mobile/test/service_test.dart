@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/location_service.dart';
 import 'package:mobile/api/file_service.dart';
+import 'test_helper.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    await setupTestEnvironment();
+  });
 
   group('LocationService Tests', () {
     test('Initialization and calculation', () {

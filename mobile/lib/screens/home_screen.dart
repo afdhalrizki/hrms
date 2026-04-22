@@ -14,6 +14,7 @@ import 'performance_dashboard_screen.dart';
 import 'settings_screen.dart';
 import '../api/api_service.dart';
 import '../api/location_service.dart';
+import '../models/user_model.dart';
 import '../widgets/loading_indicator.dart';
 import '../models/activity_model.dart';
 

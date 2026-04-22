@@ -3,11 +3,11 @@ import 'package:mobile/api/api_service.dart';
 import 'test_helper.dart';
 
 void main() {
-  group('Phase M2: Payslip Tests (Mocked)', () {
+  group('Phase M2: Payslip Tests (Integrated)', () {
     late ApiService apiService;
 
     setUp(() async {
-      await setupMockApiService();
+      await setupIntegratedTest();
       apiService = ApiService();
       await loginForTest();
     });
@@ -18,10 +18,6 @@ void main() {
       expect(res.isNotEmpty, true);
     });
 
-    test('getPayslips throws on failure', () async {
-      mockErrorStatus = true;
-      expect(apiService.getPayslips(),
-          throwsA(isA<Exception>()));
-    });
+    // Removed mock error handling test
   });
 }

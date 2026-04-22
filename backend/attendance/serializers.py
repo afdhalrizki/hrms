@@ -32,13 +32,24 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         balance = LeaveBalance.objects.filter(employee=obj.employee, year=obj.start_date.year).first()
         return balance.remaining_days if balance else 12.0
 
+    def validate(self, data):
+        if data.get('start_date') and data.get('end_date'):
+            if data['start_date'] > data['end_date']:
+                raise serializers.ValidationError("End date cannot be before start date.")
+        return data
+
 class OvertimeSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
     
     class Meta:
         model = Overtime
         fields = ['id', 'employee', 'employee_name', 'date', 'hours', 'reason', 'status', 'supervisor_status', 'hr_status']
-        read_only_fields = ['status', 'supervisor_status', 'hr_status']
+        read_only_fields = ['status', 'supervisor_status', 'hr_status', 'employee']
+
+    def validate_hours(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Hours must be greater than zero.")
+        return value
 
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:

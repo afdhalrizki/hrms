@@ -91,6 +91,9 @@ mobile/build/
 mobile/logs/
 mobile/logs/archive/
 mobile/test-results/
+mobile/latest_e2e.log
+mobile/test.txt
+mobile/test.pdf
 mobile/playwright-report/
 mobile/.nyc_output/
 

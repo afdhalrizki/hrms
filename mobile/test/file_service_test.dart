@@ -1,8 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/file_service.dart';
 
+import 'test_helper.dart';
+
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    await setupTestEnvironment();
+  });
 
   test('FileService.openBytes handles platform differences gracefully', () async {
     const bytes = <int>[0, 1, 2, 3];

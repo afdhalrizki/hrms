@@ -22,5 +22,26 @@ void main() {
       expect(id.leaves, 'Cuti');
       expect(id.performance, 'Performa');
     });
+
+    test('AppLocalizations: Profile translations', () {
+      final en = AppLocalizationsEn();
+      final id = AppLocalizationsId();
+      expect(en.profile, 'Profile');
+      expect(id.profile, 'Profil');
+    });
+
+    test('AppLocalizations: Attendance translations', () {
+      final en = AppLocalizationsEn();
+      final id = AppLocalizationsId();
+      expect(en.clockIn, 'Clock In');
+      expect(id.clockIn, 'Absen Masuk');
+    });
+
+    test('AppLocalizations: Generic translations', () {
+      final en = AppLocalizationsEn();
+      final id = AppLocalizationsId();
+      expect(en.error, 'Error');
+      expect(id.error, 'Kesalahan');
+    });
   });
 }

@@ -61,12 +61,14 @@ void main() {
       expect(balance.remainingDays, 9.0);
     });
 
-    test('Reimbursement models fromJson/toJson behaviors', () {
+    test('ReimbursementCategory: fromJson parses correctly', () {
       final category = ReimbursementCategory.fromJson({'id': 1, 'name': 'Travel', 'max_amount': 400});
       expect(category.id, 1);
       expect(category.name, 'Travel');
       expect(category.maxAmount, 400.0);
+    });
 
+    test('Reimbursement: fromJson parses correctly with nested category', () {
       final reimbursement = Reimbursement.fromJson({
         'id': 10,
         'category': {'id': 1, 'name': 'Travel'},
@@ -83,7 +85,19 @@ void main() {
       expect(reimbursement.categoryName, 'Travel');
       expect(reimbursement.amount, 125.0);
       expect(reimbursement.status, 'APPROVED');
+    });
 
+    test('Reimbursement: toJson handles category mapping', () {
+      final reimbursement = Reimbursement.fromJson({
+        'id': 10,
+        'category': {'id': 1, 'name': 'Travel'},
+        'category_name': 'Travel',
+        'date': '2026-04-01',
+        'amount': 125.0,
+        'description': 'Taxi fare',
+        'status': 'APPROVED',
+        'receipt_number': 'R-001',
+      });
       final json = reimbursement.toJson();
       expect(json['category'], 1);
       expect(json['date'], '2026-04-01');

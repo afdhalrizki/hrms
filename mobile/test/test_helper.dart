@@ -5,7 +5,17 @@ import 'package:mobile/api/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void initTestHttpOverrides() {}
+class _TestHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+void initTestHttpOverrides() {
+  HttpOverrides.global = _TestHttpOverrides();
+}
 
 class FakeCameraController extends Fake {
   @override
@@ -50,8 +60,23 @@ void setupSystemChannelMocks() {
 
   messenger.setMockMethodCallHandler(pathProviderChannel, (call) async {
     if (call.method == 'getApplicationDocumentsDirectory') return Future.value('.');
+    if (call.method == 'getTemporaryDirectory') return Future.value('.');
     return Future.value(null);
   });
+
+  // Mock platform-specific channels for path_provider
+  const List<String> platformChannels = [
+    'plugins.flutter.io/path_provider_linux',
+    'plugins.flutter.io/path_provider_macos',
+    'plugins.flutter.io/path_provider_windows',
+  ];
+  for (final channelName in platformChannels) {
+    messenger.setMockMethodCallHandler(MethodChannel(channelName), (call) async {
+      if (call.method == 'getApplicationDocumentsDirectory') return Future.value('.');
+      if (call.method == 'getTemporaryDirectory') return Future.value('.');
+      return Future.value(null);
+    });
+  }
 
   messenger.setMockMethodCallHandler(textInputChannel, (call) async => Future.value(null));
   messenger.setMockMethodCallHandler(platformViewsChannel, (call) async => Future.value(null));
@@ -59,6 +84,7 @@ void setupSystemChannelMocks() {
 
 Future<void> setupTestEnvironment() async {
   TestWidgetsFlutterBinding.ensureInitialized();
+  initTestHttpOverrides();
   ApiService.reset();
   ApiService(); // Real client
   SharedPreferences.setMockInitialValues({});
@@ -68,19 +94,26 @@ Future<void> setupTestEnvironment() async {
 }
 
 Future<void> loginForTest() async {
-  mockSecureStorage['jwt_token'] = 'mock_access';
-  mockSecureStorage['tenant'] = 'company1';
-
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('tenant_subdomain', 'company1');
+  // For integrated tests, we perform a real login to get a valid token
+  final api = ApiService();
+  try {
+    final result = await api.login('admin@company1.com', 'password123', 'company1');
+    mockSecureStorage['jwt_token'] = result['access'] ?? result['token'];
+    mockSecureStorage['tenant'] = 'company1';
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('tenant_subdomain', 'company1');
+  } catch (e) {
+    print('LOGIN FOR TEST FAILED: $e');
+    // Fallback to mock for non-integrated environments or first run
+    mockSecureStorage['jwt_token'] = 'mock_access';
+    mockSecureStorage['tenant'] = 'company1';
+  }
 }
 
-// Mock variables for controlling behavior
-bool mockErrorStatus = false;
-String mockErrorMessage = 'Error';
-bool mockEmptyResponse = false;
+// Integrated mode uses real backend data
 
-Future<void> setupMockApiService({bool isWidgetTest = false}) async {
+Future<void> setupIntegratedTest({bool isWidgetTest = false}) async {
   await setupTestEnvironment();
   // We use a real ApiService but in tests we should have used a mock client.
   // Since the code uses factory ApiService({http.Client? client}), 
@@ -89,6 +122,6 @@ Future<void> setupMockApiService({bool isWidgetTest = false}) async {
   // to fix the missing method which likely contained mock setup logic.
 }
 
-Future<void> tearDownMockApiService() async {
+Future<void> tearDownIntegratedTest() async {
   ApiService.reset();
 }

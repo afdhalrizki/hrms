@@ -6,7 +6,7 @@ import 'test_helper.dart';
 void main() {
   group('ApiService Integration Tests', () {
     setUp(() async {
-      await setupMockApiService();
+      await setupIntegratedTest();
       await loginForTest();
     });
 
