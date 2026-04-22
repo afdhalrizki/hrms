@@ -38,7 +38,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:3001',
+    baseURL: 'http://localhost:3001',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -56,7 +56,7 @@ export default defineConfig({
     {
       // Frontend server
       command: 'next start --port 3001',
-      url: 'http://127.0.0.1:3001/en/',
+      url: 'http://localhost:3001/en/',
       env: {
         NODE_ENV: 'test',
         NODE_OPTIONS: '--max-old-space-size=1536'
@@ -69,7 +69,7 @@ export default defineConfig({
     {
       // Backend server (Django)
       command: 'npm run start:backend:test',
-      url: 'http://127.0.0.1:8000/api/schema/',
+      url: 'http://localhost:8000/api/schema/',
       reuseExistingServer: true,
       stdout: 'pipe',
       stderr: 'pipe',

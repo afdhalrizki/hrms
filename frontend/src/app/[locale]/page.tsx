@@ -48,17 +48,27 @@ export default function Home() {
   }, [user, authLoading, isPublic, router]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchStats = async () => {
       try {
-        const data = await apiFetch('/core/dashboard-stats/');
+        const data = await apiFetch('/core/dashboard-stats/', { signal: controller.signal });
         setStatsData(data);
-      } catch (err) {
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
         console.error('Failed to fetch stats', err);
       } finally {
         setStatsLoading(false);
       }
     };
-    if (user) fetchStats();
+
+    const canViewStats = user?.is_staff || user?.permissions?.manage_hr;
+    if (user && canViewStats) {
+      fetchStats();
+    } else if (user) {
+      setStatsLoading(false);
+    }
+
+    return () => controller.abort();
   }, [user]);
 
   if (authLoading || statsLoading) {

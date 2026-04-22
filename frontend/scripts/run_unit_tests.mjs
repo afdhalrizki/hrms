@@ -1,6 +1,6 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, writeFileSync, appendFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { ensureDir, log, COLORS, spawnStream, spawnBackground, waitForHttp, isPortInUse, parseMetrics } from '../../scripts/lib.mjs';
 
@@ -98,12 +98,14 @@ async function main() {
         const str = data.toString();
         fileOutput += str;
         process.stdout.write(data);
+        appendFileSync(logFile, data);
       });
 
       child.stderr.on('data', (data) => {
         const str = data.toString();
         fileOutput += str;
         process.stderr.write(data);
+        appendFileSync(logFile, data);
       });
 
       child.on('close', resolve);
@@ -142,6 +144,17 @@ async function main() {
   log(`Tests Errored:  ${metrics.errors}`, metrics.errors > 0 ? COLORS.red : COLORS.white);
   log(`Warnings:       ${metrics.warnings}`, metrics.warnings > 0 ? COLORS.yellow : COLORS.white);
   log("=".repeat(50), COLORS.cyan);
+
+  // Save metrics to JSON for the master orchestrator
+  const unitResults = {
+    numPassedTests: metrics.passed,
+    numFailedTests: metrics.failed,
+    numTotalTests: metrics.passed + metrics.failed,
+    numErroredTests: metrics.errors,
+    warnings: metrics.warnings
+  };
+  const unitResultsPath = join(logDir, 'unit_results.json');
+  writeFileSync(unitResultsPath, JSON.stringify(unitResults, null, 2));
 
   if (totalFailedFiles === 0) {
     log("\nAll integrated unit tests passed.", COLORS.green);

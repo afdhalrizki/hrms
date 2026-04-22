@@ -226,33 +226,28 @@ class DashboardStatsAPIView(views.APIView):
     required_rbac_permission = 'manage_hr'
 
     def get(self, request):
-        # 1. Headcount & Dept Cost
+        from attendance.models import Attendance
+        today = timezone.localdate()
+
+        # Full Organization Stats for HR/Managers
         total_employees = Employee.objects.count()
-        
         dept_stats = Department.objects.annotate(
             employee_count=Count('employees'),
         ).values('name', 'employee_count')
 
-        # 2. Attendance Health (Today)
-        from attendance.models import Attendance
-        today = timezone.localdate()
         attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
         present_count = Attendance.objects.filter(date=today, status='PRESENT').count()
         
-        # 3. Pending Requests & New Hires
         from attendance.models import LeaveRequest
         pending_leaves = LeaveRequest.objects.filter(status='PENDING').count()
         
         thirty_days_ago = today - timezone.timedelta(days=30)
         new_hires = Employee.objects.filter(join_date__gte=thirty_days_ago).count()
 
-        # 4. Payroll/Salary Overview
         from payroll.models import Payslip
-        current_month = today.month
-        current_year = today.year
         payroll_totals = Payslip.objects.filter(
-            period__month=current_month,
-            period__year=current_year,
+            period__month=today.month,
+            period__year=today.year,
             payment_date__isnull=False
         ).aggregate(
             total_salary=Sum('net_pay'),
@@ -261,7 +256,7 @@ class DashboardStatsAPIView(views.APIView):
 
         attendance_percent = (present_count / total_employees * 100) if total_employees > 0 else 0
         
-        response_data = {
+        return Response({
             'total_employees': total_employees,
             'attendance_today': list(attendance_stats),
             'pending_leaves': pending_leaves,
@@ -276,6 +271,4 @@ class DashboardStatsAPIView(views.APIView):
                 'headcount': [total_employees] * 6,
             },
             'attendance_percent': round(attendance_percent, 1)
-        }
-        
-        return Response(response_data)
+        })

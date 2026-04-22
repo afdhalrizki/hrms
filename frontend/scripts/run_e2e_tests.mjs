@@ -64,6 +64,65 @@ async function cleanupPort(port) {
   }
 }
 
+function printE2ESummary(jsonPath) {
+  if (!existsSync(jsonPath)) {
+    log("\nWarning: E2E results JSON not found, cannot generate summary.", COLORS.yellow);
+    return;
+  }
+
+  try {
+    const data = JSON.parse(readFileSync(jsonPath, 'utf8'));
+    const stats = data.stats || {};
+    const errors = data.errors || [];
+    
+    let warningCount = stats.flaky || 0;
+    
+    // Recursive scan for browser warnings in stdout
+    function countWarnings(obj) {
+      let count = 0;
+      if (Array.isArray(obj)) {
+        for (const item of obj) {
+          count += countWarnings(item);
+        }
+      } else if (obj && typeof obj === 'object') {
+        if (obj.text && typeof obj.text === 'string' && obj.text.includes('BROWSER [warning]')) {
+          count++;
+        }
+        for (const key in obj) {
+          count += countWarnings(obj[key]);
+        }
+      }
+      return count;
+    }
+    
+    warningCount += countWarnings(data.suites);
+
+    const passed = stats.expected || 0;
+    const failed = stats.unexpected || 0;
+    const errored = errors.length;
+    const total = passed + failed + (stats.skipped || 0);
+
+    log("\n" + "=".repeat(50), COLORS.cyan);
+    log("E2E TEST EXECUTION SUMMARY (FRONTEND)", COLORS.cyan);
+    log("=".repeat(50), COLORS.cyan);
+    
+    const statusColor = (failed === 0 && errored === 0) ? COLORS.green : COLORS.red;
+    const statusText = (failed === 0 && errored === 0) ? "SUCCESS" : "FAILURE";
+
+    log(`Status:         ${statusText}`, statusColor);
+    log(`Total Tests:    ${total}`, COLORS.white);
+    log("-".repeat(50), COLORS.gray);
+    log(`Tests Passed:   ${passed}`, COLORS.green);
+    log(`Tests Failed:   ${failed}`, failed > 0 ? COLORS.red : COLORS.white);
+    log(`Tests Errored:  ${errored}`, errored > 0 ? COLORS.red : COLORS.white);
+    log(`Warnings:       ${warningCount}`, warningCount > 0 ? COLORS.yellow : COLORS.white);
+    log("=".repeat(50), COLORS.cyan);
+
+  } catch (e) {
+    log(`\nError parsing E2E results: ${e.message}`, COLORS.red);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const skipInstall = args.includes('--skip-install');
@@ -184,14 +243,14 @@ async function main() {
   const testEnv = {
     ...process.env,
     PORT: "3001",
-    HOSTNAME: "127.0.0.1", // Force IPv4 to avoid EADDRINUSE conflicts
+    HOSTNAME: "localhost", // Use localhost for cookie compatibility
     NODE_OPTIONS: "--max-old-space-size=1536", // Limit memory per worker
     PLAYWRIGHT_JSON_OUTPUT_NAME: "logs/e2e_results.json",
-    NEXT_PUBLIC_API_URL: (live ? 'https://qa.harikerja.web.id/api' : 'http://127.0.0.1:8000/api')
+    NEXT_PUBLIC_API_URL: (live ? 'https://qa.harikerja.web.id/api' : 'http://localhost:8000/api')
   };
 
   const pwArgs = [
-    'playwright', 'test', 'tests/superadmin.spec.ts', 'tests/workflows.spec.ts',
+    'playwright', 'test', 'tests/',
     '--grep-invert', '"diagnostic|Instrumentation"',
     '--workers=1',
     '--retries=0',
@@ -226,6 +285,9 @@ async function main() {
   } else {
     log("\nFAILURE. Some tests failed. Check the Playwright report.", COLORS.red);
   }
+
+  const resultsJson = join(FrontendDir, 'logs', 'e2e_results.json');
+  printE2ESummary(resultsJson);
 
   process.exit(exitCode);
 }

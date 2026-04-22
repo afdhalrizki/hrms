@@ -82,24 +82,26 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
             # 4. Auto-provision HR Master Data for the new tenant
             with schema_context(tenant.schema_name):
                 # Create Default Department
-                dept = Department.objects.create(
+                dept, _ = Department.objects.get_or_create(
                     name="Management",
-                    description="Default department for administrative staff"
+                    defaults={'description': "Default department for administrative staff"}
                 )
                 
                 # Create Default Role (Jabatan)
-                role = Role.objects.create(
+                role, _ = Role.objects.get_or_create(
                     name="Company Admin",
                     department=dept,
-                    description="Top-level administrative role"
+                    defaults={'description': "Top-level administrative role"}
                 )
                 
                 # Create Default Golongan (for payroll stub)
-                gol = Golongan.objects.create(
+                gol, _ = Golongan.objects.get_or_create(
                     name="G1",
-                    base_salary=10000000,
-                    meal_allowance=50000,
-                    transport_allowance=30000
+                    defaults={
+                        'base_salary': 10000000,
+                        'meal_allowance': 50000,
+                        'transport_allowance': 30000
+                    }
                 )
 
                 # Initialize all foundational roles if they don't exist yet (fallback for signal delay)
@@ -108,17 +110,19 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
 
                 # Create Employee record for the admin
                 from datetime import date
-                Employee.objects.create(
-                    nik="ADMIN-001",
-                    fullname=registration.company_name + " Admin",
+                Employee.objects.get_or_create(
                     email=registration.admin_email,
-                    department=dept,
-                    role=role,
-                    golongan=gol,
-                    access_role=admin_role,
-                    status='PERMANENT',
-                    join_date=date.today(),
-                    ktp_number=f"ADM-{registration.id}" # Unique placeholder
+                    defaults={
+                        'nik': "ADMIN-001",
+                        'fullname': registration.company_name + " Admin",
+                        'department': dept,
+                        'role': role,
+                        'golongan': gol,
+                        'access_role': admin_role,
+                        'status': 'PERMANENT',
+                        'join_date': date.today(),
+                        'ktp_number': f"ADM-{registration.id}" # Unique placeholder
+                    }
                 )
 
             # 5. Update status

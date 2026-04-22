@@ -40,18 +40,46 @@ User = get_user_model()
 
 print("--- Seeding Test Database ---")
 
+# Nuclear Cleanup: Remove all existing tenants and domains (except public) using raw SQL to bypass signal issues
+from django.db import connection
+with connection.cursor() as cursor:
+    # 1. Get all schema names to drop them manually (bypassing signals)
+    cursor.execute("SELECT schema_name FROM tenants_tenant WHERE schema_name NOT IN ('public', 'shared')")
+    schemas = [row[0] for row in cursor.fetchall()]
+    
+    # 2. Drop schemas
+    for schema in schemas:
+        try:
+            cursor.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        except Exception as e:
+            print(f"Warning: Failed to drop schema {schema}: {e}")
+            
+    # 3. Truncate tables with CASCADE to handle all foreign keys (Domain -> Tenant etc)
+    cursor.execute("TRUNCATE TABLE users_user_tenants, tenants_domain, tenants_tenant RESTART IDENTITY CASCADE")
+
+
+
 # 1. Public Tenant
 public_tenant, created = Tenant.objects.get_or_create(schema_name='public', defaults={'name': 'Public'})
-Domain.objects.filter(domain='localhost').delete()
+
+
 
 # 2. Company 1
 tenant1, created = Tenant.objects.get_or_create(
     schema_name='company1', 
-    defaults={'name': 'Company One', 'plan_type': 'ENTERPRISE'}
+    defaults={
+        'name': 'Company One', 
+        'plan_type': 'ENTERPRISE',
+        'late_deduction_rate': 50000,
+        'absence_deduction_rate': 100000
+    }
 )
 Domain.objects.update_or_create(domain='company1.localhost', defaults={'tenant': tenant1, 'is_primary': True})
-Domain.objects.update_or_create(domain='localhost', defaults={'tenant': tenant1, 'is_primary': False})
 Domain.objects.update_or_create(domain='127.0.0.1', defaults={'tenant': tenant1, 'is_primary': False})
+
+# Ensure localhost points to public for superadmin/onboarding
+Domain.objects.update_or_create(domain='localhost', defaults={'tenant': public_tenant, 'is_primary': True})
+
 
 # 2.1 Company 2 (for tenant isolation tests)
 tenant2, created = Tenant.objects.get_or_create(
@@ -69,31 +97,8 @@ with schema_context('company1'):
     from performance.models import KPI, KPITarget, Appraisal, AppraisalReview
     from core.models import Branch, APIKey
     
-    # Nuclear Cleanup to ensure clean state
-    # Deleting employees first due to foreign keys, then metadata models
-    Employee.objects.all().delete()
-    Attendance.objects.all().delete()
-    AppraisalReview.objects.all().delete()
-    Appraisal.objects.all().delete()
-    KPITarget.objects.all().delete()
-    KPI.objects.all().delete()
-    LeaveRequest.objects.all().delete()
-    LeaveBalance.objects.all().delete()
-    Reimbursement.objects.all().delete()
-    ReimbursementCategory.objects.all().delete()
-    Payslip.objects.all().delete()
-    PayrollPeriod.objects.all().delete()
-    Branch.objects.all().delete()
-    WorkflowConfig.objects.all().delete()
-    APIKey.objects.all().delete()
-    
-    # Metadata cleanup (careful with dependencies)
-    AccessRole.objects.all().delete()
-    Role.objects.all().delete()
-    Department.objects.all().delete()
-    Golongan.objects.all().delete()
-    
     dept_eng, _ = Department.objects.get_or_create(name='Engineering')
+
     role_mgr, _ = Role.objects.get_or_create(name='Manager', department=dept_eng)
     role_se, _ = Role.objects.get_or_create(name='Software Engineer', department=dept_eng)
     gol_3a, _ = Golongan.objects.update_or_create(

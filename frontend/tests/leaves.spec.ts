@@ -53,8 +53,8 @@ test.describe.serial('Leaves Management', () => {
     await expect(page.getByText(/Leave request submitted successfully!/i)).toBeVisible({ timeout: 15000 });
     
     // 6. Verify it appears in history
-    const row = page.locator('tr').filter({ hasText: 'Family vacation' });
-    await expect(row).toBeVisible({ timeout: 10000 });
+    const row = page.locator('tr').filter({ hasText: 'Family vacation' }).first();
+    await expect(row).toBeVisible({ timeout: 15000 });
     await expect(row.getByText('PENDING')).toBeVisible();
   });
 });

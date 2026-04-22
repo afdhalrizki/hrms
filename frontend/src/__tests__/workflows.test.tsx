@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { TenantProvider } from '@/context/TenantContext';
 import { NextIntlClientProvider } from 'next-intl';
 import { apiFetch } from '@/lib/api';
+import { toast } from 'sonner';
 
 // Mock next-intl
 vi.mock('next-intl', async (importOriginal) => {
@@ -35,6 +36,13 @@ vi.mock('framer-motion', () => ({
     div: ({ children, layout, animate, initial, exit, transition, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
@@ -136,7 +144,7 @@ describe('WorkflowsPage (Integrated)', () => {
       expect(apiFetch).toHaveBeenCalledWith('/workflow-stages', expect.objectContaining({
         method: 'POST'
       }));
-      expect(window.alert).toHaveBeenCalledWith('Workflow saved successfully!');
+      expect(toast.success).toHaveBeenCalledWith('Workflow updated successfully');
     }, { timeout: 15000 });
   });
 
@@ -179,7 +187,7 @@ describe('WorkflowsPage (Integrated)', () => {
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Failed to save workflow.');
+      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('Failed to save workflow'));
     });
   });
 

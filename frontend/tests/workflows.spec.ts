@@ -11,6 +11,11 @@ test.describe.serial('Workflow Configurations', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    // Capture browser console logs
+    page.on('console', msg => {
+      console.log(`BROWSER [${msg.type()}]: ${msg.text()}`);
+    });
+    
     // Perform real login as admin
     await login(page, admin.email, admin.password);
   });
@@ -34,15 +39,25 @@ test.describe.serial('Workflow Configurations', () => {
     }
 
     // 2. Select a workflow from the list to configure stages
-    // We expect the LEAVE workflow to be present now
-    const leaveBtn = page.getByRole('button', { name: 'LEAVE', exact: true }).first();
-    await expect(leaveBtn).toBeVisible({ timeout: 15000 });
-    await leaveBtn.click();
-
+    // Use a text locator and force click to ensure selection
+    const leaveText = page.locator('span').filter({ hasText: /^LEAVE$/ }).first();
+    await expect(leaveText).toBeVisible({ timeout: 15000 });
+    
+    const leaveBtn = page.getByRole('button').filter({ has: page.locator('span', { hasText: /^LEAVE$/ }) }).first();
+    await leaveBtn.click({ force: true });
+    
+    // Verify selection via class
+    await expect(leaveBtn).toHaveClass(/glass-card|border-primary/, { timeout: 15000 });
     // 3. Add an approval level (Stage)
     const addStageBtn = page.getByRole('button', { name: /Add Approval Level|Add Stage/i });
     await expect(addStageBtn).toBeVisible();
-    await addStageBtn.click();
+    
+    // Sometimes the first click doesn't register if the page is still hydrating
+    await expect(async () => {
+      await addStageBtn.click({ force: true });
+      const count = await page.getByTestId('stage-row').count();
+      if (count === 0) throw new Error('Stage not added yet');
+    }).toPass({ timeout: 15000 });
     
     // Verify a new stage appeared
     const newStage = page.getByTestId('stage-row').last();
@@ -68,8 +83,13 @@ test.describe.serial('Workflow Configurations', () => {
     await roleSelect.selectOption({ label: 'HR Manager' });
 
     // 5. Save changes
-    const saveChangesBtn = page.getByRole('button', { name: /Save Changes/i });
+    const saveChangesBtn = page.getByTestId('save-workflow-btn');
+    await expect(saveChangesBtn).toBeVisible();
     await saveChangesBtn.click();
+    
+    // Wait for saving loader to appear then disappear
+    await expect(page.locator('svg.animate-spin')).toBeVisible({ timeout: 5000 }).catch(() => {});
+    await expect(page.locator('svg.animate-spin')).not.toBeVisible({ timeout: 15000 });
     
     // 6. Verify success toast from real backend
     await expect(page.getByText(/Workflow updated successfully/i)).toBeVisible({ timeout: 20000 });

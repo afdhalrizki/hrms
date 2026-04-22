@@ -18,6 +18,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function WorkflowsPage() {
   const [configs, setConfigs] = useState<WorkflowConfig[]>([]);
@@ -116,11 +117,10 @@ export default function WorkflowsPage() {
         }
       }
       
-      alert('Workflow saved successfully!');
+      toast.success('Workflow updated successfully');
       fetchConfigs();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to save workflow.');
+    } catch (err: any) {
+      toast.error(`Failed to save workflow: ${err.message || 'Unknown error'}`);
     } finally {
       setSaving(false);
     }
@@ -136,6 +136,7 @@ export default function WorkflowsPage() {
             <p className="text-muted-foreground mt-1">Design N-level approval routing for company processes.</p>
           </div>
           <button 
+            data-testid="save-workflow-btn"
             onClick={handleSave}
             disabled={saving}
             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all font-semibold shadow-lg shadow-primary/20 disabled:opacity-50"

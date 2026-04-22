@@ -42,11 +42,19 @@ export default function AnalyticsPage() {
     try {
       isFetching.current = true;
       setIsLoading(true);
+      
+      // Additional safety check: only fetch if user likely has permissions
+      // though Analytics page should already be restricted via Sidebar/Middleware.
       const data = await apiFetch('/core/dashboard-stats/');
       setStats(data);
-    } catch (error) {
-      console.error('[Analytics] Failed to fetch stats:', error);
-      toast.error('Failed to load dashboard metrics');
+    } catch (error: any) {
+      // If we still get a 403, handle it gracefully
+      if (error.message?.includes('403')) {
+        console.warn('[Analytics] Access restricted for current user');
+      } else {
+        console.error('[Analytics] Failed to fetch stats:', error);
+        toast.error('Failed to load dashboard metrics');
+      }
     } finally {
       setIsLoading(false);
       isFetching.current = false;

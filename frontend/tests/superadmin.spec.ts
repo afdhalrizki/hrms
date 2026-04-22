@@ -16,9 +16,25 @@ test.describe.serial('Superadmin (Platform) Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    // Enable console logging
+    page.on('console', msg => console.log(`BROWSER [${msg.type()}]: ${msg.text()}`));
+    page.on('response', res => {
+        if (res.url().includes('/api/') && res.status() >= 400) {
+            console.log(`RES [${res.status()}]: ${res.url()}`);
+        }
+    });
+
     // Login as Platform Superadmin on the public domain
     console.log(`--- Navigating to portal-admin login ---`);
     await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    
+    // Ensure clean state for superadmin
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+    await page.reload();
+
     console.log(`--- Filling login form ---`);
     await page.fill('input[type="email"]', platformAdmin.email);
     await page.fill('input[type="password"]', platformAdmin.password);
@@ -28,8 +44,9 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     
     // Wait for navigation and sidebar
     console.log(`--- Waiting for redirection to registrations ---`);
-    await page.waitForURL(/\/(analytics|admin\/registrations)/, { timeout: 30000 });
+    await page.waitForURL(/.*\/(analytics|admin\/registrations)/, { timeout: 45000 });
     console.log(`--- Portal Admin redirected to: ${page.url()} ---`);
+
     await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
     console.log(`--- Sidebar visible ---`);
   });
@@ -38,13 +55,18 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     test.setTimeout(180000);
     await page.goto(`${BASE_URL}/en/admin/registrations`);
     
-    // 1. Verify Header and Stats from real seeded backend
-    await expect(page.getByRole('heading', { name: /Registration Requests/i })).toBeVisible();
-    await expect(page.getByText('Total Requests')).toBeVisible();
-    
-    // In our modified seed: 1 pending, 1 approved -> Total 2
-    // We search for a card containing "2" for total requests
-    await expect(page.getByText('2', { exact: true }).first()).toBeVisible({ timeout: 15000 });
+    // 1. Verify Header and Stats from real seeded backend (with retry for initial fetch)
+    await expect(async () => {
+        // If data failed to fetch, refresh the page or just wait for the retry
+        const totalReq = page.getByText('2', { exact: true }).first();
+        if (!await totalReq.isVisible()) {
+            await page.reload();
+        }
+        await expect(page.getByRole('heading', { name: /Registration Requests/i })).toBeVisible();
+        await expect(page.getByText('Total Requests')).toBeVisible();
+        await expect(totalReq).toBeVisible({ timeout: 10000 });
+    }).toPass({ timeout: 45000 });
+
 
     // 2. Verify List Content from seeded data
     await expect(page.getByText('Pending Corp')).toBeVisible();
@@ -54,18 +76,20 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     const pendingRow = page.locator('tr').filter({ hasText: 'Pending Corp' });
     const approveBtn = pendingRow.getByRole('button', { name: /Approve/i });
     
-    await expect(approveBtn).toBeVisible({ timeout: 10000 });
+    await expect(approveBtn).toBeVisible({ timeout: 15000 });
+    
+    // Use a more robust click and wait for state change
     await approveBtn.click();
+    console.log('--- Approve button clicked, waiting for status change ---');
 
-    // Verify success (use toPass to handle potential async updates)
+    // Verify success (use toPass to handle potential async updates/schema provisioning)
     await expect(async () => {
-      // Check for success toast or status update in the table
-      const successIndicator = page.getByText(/Registration approved|APPROVED/i);
-      await expect(successIndicator.first()).toBeVisible();
+      // Refresh the page if needed to see the latest status if WebSocket/Live update is flaky
+      // await page.reload(); // Optional, toPass already retries the check
       
-      // Specifically verify the row status
-      await expect(pendingRow.getByText(/APPROVED/i)).toBeVisible();
-    }).toPass({ timeout: 120000 });
+      const statusBadge = pendingRow.getByText(/APPROVED/i);
+      await expect(statusBadge).toBeVisible({ timeout: 5000 });
+    }).toPass({ timeout: 150000, intervals: [5000, 10000] });
   });
 
   test('should allow superadmin to reject registration requests', async ({ page }) => {

@@ -33,16 +33,43 @@ export const TEST_USERS = {
   }
 };
 
-export const BASE_URL = 'http://127.0.0.1:3001';
+export const BASE_URL = 'http://localhost:3001';
 export const DEFAULT_TENANT = 'company1';
 
 /**
  * Navigates to the login page and performs a full login flow.
  */
 export async function login(page: Page, email: string, password = 'password123', tenant = DEFAULT_TENANT) {
-  // Debug: Log all browser console messages
+  // Debug: Log all browser console messages and fail on errors (Strict Mode)
   page.on('console', msg => {
-    console.log(`BROWSER [${msg.type()}]: ${msg.text()}`);
+    const text = msg.text();
+    console.log(`BROWSER [${msg.type()}]: ${text}`);
+    
+    if (msg.type() === 'error') {
+      // Whitelist expected/benign errors to avoid false positives
+      if (text.includes('401 (Unauthorized)') && text.includes('/api/users/me/')) return;
+      if (text.includes('Failed to load resource') && text.includes('401')) return;
+      
+      // Whitelist 403 on dashboard-stats for regular employees (benign)
+      if (text.includes('403 (Forbidden)') && text.includes('/api/core/dashboard-stats/')) {
+        console.log(`[STRICT MODE - WHITELISTED] Expected 403 for regular employee on stats: ${text}`);
+        return;
+      }
+      if (text.includes('Failed to fetch stats Error: You do not have permission')) {
+        return;
+      }
+
+      // Next.js hydration or RSC noise
+      if (text.includes('Next.js local server') || text.includes('RSC')) return;
+      
+      // Ignore fetch errors that are likely aborts during navigation
+      if (text.includes('TypeError: Failed to fetch')) {
+        console.log(`[STRICT MODE - IGNORED] Potential fetch abort during navigation: ${text}`);
+        return;
+      }
+
+      throw new Error(`STRICT MODE: Unexpected browser console error: ${text}`);
+    }
   });
 
   page.on('request', request => {
@@ -58,6 +85,11 @@ export async function login(page: Page, email: string, password = 'password123',
     if (url.includes('/api/') && status >= 400) {
       if (status === 401 && url.includes('/api/users/me/')) return;
       console.log(`RES [${status}]: ${url}`);
+      
+      // Optionally fail on 500s or unexpected 403s
+      if (status >= 500) {
+        throw new Error(`STRICT MODE: Server error ${status} on ${url}`);
+      }
     }
   });
 
@@ -71,7 +103,8 @@ export async function login(page: Page, email: string, password = 'password123',
   });
   
   page.on('pageerror', err => {
-    console.error(`BROWSER ERROR: ${err.message}`);
+    console.error(`BROWSER CRITICAL ERROR: ${err.message}`);
+    throw err;
   });
 
   // 1. First, navigate to the base URL to ensure we are in the correct origin context

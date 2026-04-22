@@ -33,11 +33,12 @@ export default function RegistrationsPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (signal?: AbortSignal) => {
     try {
-      const data = await apiFetch('/internal/registrations');
+      const data = await apiFetch('/internal/registrations', { signal });
       setRequests(data);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'AbortError') return;
       console.error('Failed to fetch requests:', error);
     } finally {
       setLoading(false);
@@ -45,7 +46,9 @@ export default function RegistrationsPage() {
   };
 
   useEffect(() => {
-    fetchRequests();
+    const controller = new AbortController();
+    fetchRequests(controller.signal);
+    return () => controller.abort();
   }, []);
 
   const handleAction = async (id: number, action: 'approve' | 'reject') => {
