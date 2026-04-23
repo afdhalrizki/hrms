@@ -1,4 +1,4 @@
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from core.models import Employee, Department, Role, Golongan
 from attendance.models import LeaveRequest

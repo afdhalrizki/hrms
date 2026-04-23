@@ -1,5 +1,5 @@
 from unittest.mock import patch, MagicMock
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from django.urls import reverse
 from django.conf import settings

@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django.test import RequestFactory
 from rest_framework.test import APIClient
 from django.urls import reverse

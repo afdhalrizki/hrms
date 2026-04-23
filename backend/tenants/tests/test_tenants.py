@@ -73,7 +73,7 @@ class TenantModelTestCase(TestCase):
         domain = Domain.objects.create(domain=f'docs.{settings.TENANT_DOMAIN_SUFFIX}', tenant=tenant)
         self.assertEqual(str(domain), f'docs.{settings.TENANT_DOMAIN_SUFFIX}')
 
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse

@@ -1,7 +1,7 @@
 from unittest.mock import Mock, MagicMock
 from django.test import RequestFactory, TestCase
 from django.contrib.auth import get_user_model
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from core.permissions import TenantAccessPermission, HasRBACPermission, FeatureRequiredPermission
 from core.models import Employee, AccessRole
 from tenants.models import Tenant

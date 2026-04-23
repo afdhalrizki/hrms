@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.core.management import call_command
 from django.test import override_settings
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from tenants.models import Tenant, Domain
 from core.models import Department

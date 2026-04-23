@@ -4,7 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django_tenants.utils import schema_context
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from tenants.models import Tenant, Domain
 from core.models import Department
 

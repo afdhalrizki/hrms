@@ -1,5 +1,5 @@
 import datetime
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import Employee, Department, Role, AccessRole

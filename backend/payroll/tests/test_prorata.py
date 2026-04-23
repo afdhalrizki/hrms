@@ -1,6 +1,6 @@
 from decimal import Decimal
 from datetime import date
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from core.models import Employee, Department
 from payroll.models import PayrollPeriod, Payslip

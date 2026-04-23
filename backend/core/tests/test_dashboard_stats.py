@@ -1,4 +1,4 @@
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status

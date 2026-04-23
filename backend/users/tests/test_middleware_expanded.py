@@ -2,7 +2,7 @@ import json
 from unittest.mock import Mock, patch
 from django.test import RequestFactory, override_settings
 from django.contrib.auth import get_user_model
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from users.middleware import SubscriptionMiddleware, TenantAccessMiddleware
 from django.http import HttpResponse
 

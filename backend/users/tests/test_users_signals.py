@@ -1,4 +1,4 @@
-from django_tenants.test.cases import TenantTestCase
+from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django_tenants.utils import schema_context, get_public_schema_name
