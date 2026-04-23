@@ -1,5 +1,4 @@
 from unittest.mock import patch, MagicMock
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from django.urls import reverse
 from django.conf import settings
@@ -9,19 +8,23 @@ from users.models import User
 from users.middleware import TenantAccessMiddleware
 from tenants.models import Tenant, Domain
 from core.models import Department, Role, Golongan, Employee
+from core.tests.base import HRMSTestCase as TenantTestCase
 
 class UserModuleTestCase(TenantTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # User who belongs ONLY to cls.tenant
+        cls.tenant_user = User.objects.create_user(email='user@tenant.com', password='password')
+        cls.tenant_user.tenants.add(cls.tenant)
+        Employee.objects.create(email=cls.tenant_user.email, nik='T01', fullname='Tenant User', join_date='2024-01-01', ktp_number='K1234')
+        
+        cls.staff_user = User.objects.create_user(email='staff@platform.com', password='password', is_staff=True)
+
     def setUp(self):
         super().setUp()
-        self.client = APIClient()
-        
-        # User who belongs ONLY to self.tenant
-        self.tenant_user = User.objects.create_user(email='user@tenant.com', password='password')
-        self.tenant_user.tenants.add(self.tenant)
-        Employee.objects.create(email=self.tenant_user.email, nik='T01', fullname='Tenant User', join_date='2024-01-01', ktp_number='K1234')
-        
-        self.staff_user = User.objects.create_user(email='staff@platform.com', password='password', is_staff=True)
-        self.domain = self.tenant.domains.first().domain
+        # Refresh shared objects to avoid cross-test contamination
+        self.tenant_user.refresh_from_db()
 
     def test_user_creation_logic(self):
         """Verify model manager logic and string representation."""
@@ -35,7 +38,7 @@ class UserModuleTestCase(TenantTestCase):
         
         # 1. Tenant User sees only themselves
         self.client.force_login(self.tenant_user)
-        response = self.client.get(url, SERVER_NAME=self.domain)
+        response = self.client.get(url, SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Filters to own profile
         self.assertEqual(len(response.data), 1)
@@ -58,7 +61,7 @@ class UserModuleTestCase(TenantTestCase):
         
         url = reverse('user-me')
         self.client.force_login(self.tenant_user)
-        response = self.client.get(url, SERVER_NAME=self.domain)
+        response = self.client.get(url, SERVER_NAME=str(self.domain))
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
@@ -74,7 +77,7 @@ class UserModuleTestCase(TenantTestCase):
         """Verify that /api/users/me/ returns 401/403 for unauthenticated users."""
         self.client.logout()
         url = reverse('user-me')
-        response = self.client.get(url, SERVER_NAME=self.domain)
+        response = self.client.get(url, SERVER_NAME=str(self.domain))
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
     def test_user_me_isolation(self):
@@ -100,7 +103,7 @@ class UserModuleTestCase(TenantTestCase):
         self.client.force_login(self.tenant_user)
         
         # Requesting from self.tenant
-        response = self.client.get(url, SERVER_NAME=self.domain)
+        response = self.client.get(url, SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Should return employee data from self.tenant (T01) and NOT from iso_test (OTHER-001)
         self.assertEqual(response.data.get('employee_nik'), 'T01')
@@ -173,11 +176,16 @@ class MiddlewareTestCase(TenantTestCase):
 from django.core.exceptions import ValidationError
 
 class AdminSafeguardTestCase(TenantTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Tenant is already created as cls.tenant from TenantTestCase
+        cls.admin = User.objects.create_user(email='admin_safeguard@test.com', password='password', is_staff=True, is_active=True)
+        cls.admin.tenants.add(cls.tenant)
+
     def setUp(self):
         super().setUp()
-        # Tenant is already created as self.tenant from TenantTestCase
-        self.admin = User.objects.create_user(email='admin_safeguard@test.com', password='password', is_staff=True, is_active=True)
-        self.admin.tenants.add(self.tenant)
+        self.admin.refresh_from_db()
         
     def test_prevent_last_admin_demotion(self):
         """Verify the last admin cannot have is_staff set to False."""
@@ -243,19 +251,22 @@ class AdminSafeguardTestCase(TenantTestCase):
             other_tenant_admin.tenants.add(self.tenant)
 
 class UserAuthenticationTestCase(TenantTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user_password = 'secure_password'
+        cls.user = User.objects.create_user(email='auth_test@test.com', password=cls.user_password)
+        cls.user.tenants.add(cls.tenant)
+
     def setUp(self):
         super().setUp()
-        self.client = APIClient()
-        self.user_password = 'secure_password'
-        self.user = User.objects.create_user(email='auth_test@test.com', password=self.user_password)
-        self.user.tenants.add(self.tenant)
-        self.domain = self.tenant.domains.first().domain
+        self.user.refresh_from_db()
 
     def test_login_success(self):
         """Verify authenticating via /api/auth/login/."""
         url = reverse('auth-login')
         payload = {'email': self.user.email, 'password': self.user_password}
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['email'], self.user.email)
 
@@ -263,7 +274,7 @@ class UserAuthenticationTestCase(TenantTestCase):
         """Verify 401 for wrong credentials."""
         url = reverse('auth-login')
         payload = {'email': self.user.email, 'password': 'wrong_password'}
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_token_refresh(self):
@@ -271,14 +282,14 @@ class UserAuthenticationTestCase(TenantTestCase):
         # 1. Get initial tokens
         login_url = reverse('auth-login')
         login_payload = {'email': self.user.email, 'password': self.user_password}
-        login_response = self.client.post(login_url, login_payload, format='json', SERVER_NAME=self.domain)
+        login_response = self.client.post(login_url, login_payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(login_response.status_code, status.HTTP_200_OK)
         refresh_token = login_response.data['refresh']
         
         # 2. Refresh
         refresh_url = reverse('token_refresh')
         refresh_payload = {'refresh': refresh_token}
-        refresh_response = self.client.post(refresh_url, refresh_payload, format='json', SERVER_NAME=self.domain)
+        refresh_response = self.client.post(refresh_url, refresh_payload, format='json', SERVER_NAME=str(self.domain))
         
         self.assertEqual(refresh_response.status_code, status.HTTP_200_OK)
         self.assertIn('access', refresh_response.data)
@@ -291,7 +302,6 @@ class UserManagementTestCase(TenantTestCase):
 
     def test_staff_list_access(self):
         """Verify staff can see all users while regular users only see themselves."""
-        client = APIClient()
         domain = self.tenant.domains.first().domain
         
         staff = User.objects.create_user(email='staff_access@test.com', password='password', is_staff=True)
@@ -305,25 +315,30 @@ class UserManagementTestCase(TenantTestCase):
         url = reverse('user-list')
         
         # 1. Staff sees all (including self.tenant's default admin if any)
-        client.force_login(staff)
-        response_staff = client.get(url, SERVER_NAME=domain)
+        self.client.force_login(staff)
+        response_staff = self.client.get(url, SERVER_NAME=str(domain))
         self.assertGreaterEqual(len(response_staff.data), 2)
         
         # 2. Regular sees only themselves
-        client.force_login(regular)
-        response_reg = client.get(url, SERVER_NAME=domain)
+        self.client.force_login(regular)
+        response_reg = self.client.get(url, SERVER_NAME=str(domain))
         self.assertEqual(len(response_reg.data), 1)
         self.assertEqual(response_reg.data[0]['email'], regular.email)
 
 class AdminSafeguardExpansionTestCase(TenantTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        with schema_context('public'):
+            cls.other_tenant = Tenant.objects.create(schema_name='other_safeguard', name='Other Safeguard Co')
+            Domain.objects.create(domain=f'other.{settings.TENANT_DOMAIN_SUFFIX}', tenant=cls.other_tenant)
+            
+        cls.multi_admin = User.objects.create_user(email='multi_admin@test.com', password='password', is_staff=True)
+        cls.multi_admin.tenants.add(cls.tenant, cls.other_tenant)
+
     def setUp(self):
         super().setUp()
-        with schema_context('public'):
-            self.other_tenant = Tenant.objects.create(schema_name='other_safeguard', name='Other Safeguard Co')
-            Domain.objects.create(domain=f'other.{settings.TENANT_DOMAIN_SUFFIX}', tenant=self.other_tenant)
-            
-        self.multi_admin = User.objects.create_user(email='multi_admin@test.com', password='password', is_staff=True)
-        self.multi_admin.tenants.add(self.tenant, self.other_tenant)
+        self.multi_admin.refresh_from_db()
 
     def test_prevent_last_admin_deletion_multitenant(self):
         """Verify a user who is the last admin in one tenant cannot be deleted."""

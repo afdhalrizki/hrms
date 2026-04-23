@@ -77,8 +77,8 @@ class AttendanceService:
         """
         Handles the clock-in logic including geofencing and shift mapping.
         """
-        today = date if date else timezone.now().date()
-        now_time = check_in_time if check_in_time else timezone.now().time()
+        today = date if date else timezone.localdate()
+        now_time = check_in_time if check_in_time else timezone.localtime().time()
         
         is_in_bounds, distance = AttendanceService.validate_location(employee, latitude, longitude)
         
@@ -144,8 +144,8 @@ class AttendanceService:
         """
         Handles the clock-out logic for an existing attendance record.
         """
-        today = date if date else timezone.now().date()
-        now_time = check_out_time if check_out_time else timezone.now().time()
+        today = date if date else timezone.localdate()
+        now_time = check_out_time if check_out_time else timezone.localtime().time()
         
         attendance = Attendance.objects.filter(employee=employee, date=today).first()
         if not attendance:

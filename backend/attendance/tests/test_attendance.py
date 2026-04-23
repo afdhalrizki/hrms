@@ -1,65 +1,64 @@
 from datetime import date, time, timedelta
-from django.urls import reverse
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from decimal import Decimal
+from django.urls import reverse
 from django_tenants.utils import schema_context
 from rest_framework import status
-from rest_framework.test import APIClient
 from core.models import Employee, Department, Branch
 from attendance.models import Attendance, Shift, Schedule, LeaveRequest, Overtime, LeaveBalance
 from attendance.services import AttendanceService
 from users.models import User
+from core.tests.base import HRMSTestCase as TenantTestCase
 
 class AttendanceIntegrationTestCase(TenantTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # 0. Setup Branch
+        cls.branch_jakarta = Branch.objects.create(
+            name='Jakarta Office',
+            latitude=Decimal('-6.2088'),
+            longitude=Decimal('106.8456'),
+            radius_meters=100
+        )
+
+        # 1. Setup Master Data
+        cls.dept = Department.objects.create(name='IT')
+        
+        # 2. Setup Shift (08:00 - 17:00)
+        cls.shift_morning = Shift.objects.create(
+            name='Morning Shift',
+            start_time=time(8, 0),
+            end_time=time(17, 0)
+        )
+        
+        # 3. Setup User & Employee
+        cls.user = User.objects.create_user(email='test_user@example.com', password='password')
+        cls.user.tenants.add(cls.tenant)
+        
+        cls.employee = Employee.objects.create(
+            fullname='Test User',
+            email='test_user@example.com',
+            department=cls.dept,
+            branch=cls.branch_jakarta,
+            phone='12345',
+            nik='K001',
+            join_date=date.today(),
+            ktp_number='1234567890'
+        )
+        
+        # 4. Setup Schedule for today (Standard)
+        cls.today = date.today()
+        cls.schedule = Schedule.objects.create(
+            employee=cls.employee,
+            shift=cls.shift_morning,
+            date=cls.today
+        )
+
     def setUp(self):
         super().setUp()
-        self.client = APIClient()
-        
-        # Consistent data setup within tenant context
-        with schema_context(self.tenant.schema_name):
-            # 0. Setup Branch
-            self.branch_jakarta = Branch.objects.create(
-                name='Jakarta Office',
-                latitude=Decimal('-6.2088'),
-                longitude=Decimal('106.8456'),
-                radius_meters=100
-            )
-
-            # 1. Setup Master Data
-            self.dept = Department.objects.create(name='IT')
-            
-            # 2. Setup Shift (08:00 - 17:00)
-            self.shift_morning = Shift.objects.create(
-                name='Morning Shift',
-                start_time=time(8, 0),
-                end_time=time(17, 0)
-            )
-            
-            # 3. Setup User & Employee
-            self.user = User.objects.create_user(email='test_user@example.com', password='password')
-            self.user.tenants.add(self.tenant)
-            
-            self.employee = Employee.objects.create(
-                fullname='Test User',
-                email='test_user@example.com',
-                department=self.dept,
-                branch=self.branch_jakarta,
-                phone='12345',
-                nik='K001',
-                join_date=date.today(),
-                ktp_number='1234567890'
-            )
-            
-            # 4. Setup Schedule for today (Standard)
-            self.today = date.today()
-            self.schedule = Schedule.objects.create(
-                employee=self.employee,
-                shift=self.shift_morning,
-                date=self.today
-            )
-            
-            # Domain for SERVER_NAME
-            self.domain_name = self.tenant.domains.first().domain
+        self.user.refresh_from_db()
+        self.employee.refresh_from_db()
+        self.tenant.refresh_from_db()
 
     def test_haversine_distance_math(self):
         """Verify the distance calculation helper."""
@@ -76,7 +75,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.9147,  # Bandung
             'longitude_in': 107.6098,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'OFF_SITE')
         self.assertTrue(response.data['is_out_of_bounds'])
@@ -94,7 +93,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'PRESENT')
         self.assertFalse(response.data['is_late'])
@@ -104,7 +103,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         # 2. Check-out (PATCH)
         detail_url = reverse('attendance-detail', kwargs={'pk': attendance_id})
         patch_payload = {'check_out': '17:05:00'}
-        patch_response = self.client.patch(detail_url, patch_payload, format='json', SERVER_NAME=self.domain_name)
+        patch_response = self.client.patch(detail_url, patch_payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
         
         # Verify in DB
@@ -124,7 +123,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'LATE')
         self.assertTrue(response.data['is_late'])
@@ -140,11 +139,11 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         }
         
         # First one succeeds
-        response1 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response1 = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
         
         # Second one fails (Integrity/Unique constraint)
-        response2 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response2 = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         # Note: Depending on implementation, this might be 400 (if handled) or 500/Integrity (if raw).
         # Django-REST default for unique_together is 400.
         self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
@@ -164,7 +163,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456
         }
-        response_early = self.client.post(url, payload_early, format='json', SERVER_NAME=self.domain_name)
+        response_early = self.client.post(url, payload_early, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response_early.data['status'], 'PRESENT')
         
         # Case 2: Late (After 08:00) -> LATE
@@ -177,7 +176,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456
         }
-        response_late = self.client.post(url, payload_late, format='json', SERVER_NAME=self.domain_name)
+        response_late = self.client.post(url, payload_late, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response_late.data['status'], 'LATE')
 
     def test_leave_request_workflow(self):
@@ -192,7 +191,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'leave_type': 'SAKIT',
             'reason': 'Medical checkup'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'PENDING')
         
@@ -204,7 +203,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         self.user.save()
         
         detail_url = reverse('leaverequest-detail', kwargs={'pk': leave_id})
-        self.client.patch(detail_url, {'status': 'APPROVED'}, format='json', SERVER_NAME=self.domain_name)
+        self.client.patch(detail_url, {'status': 'APPROVED'}, format='json', SERVER_NAME=str(self.domain))
         
         with schema_context(self.tenant.schema_name):
             leave = LeaveRequest.objects.get(id=leave_id)
@@ -221,7 +220,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'hours': '2.50',
             'reason': 'Project deadline'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(float(response.data['hours']), 2.50)
 
@@ -235,7 +234,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'date': str(self.today + timedelta(days=10)), # Far future to avoid conflicts
             'check_in': '08:00:00'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
         with schema_context(self.tenant.schema_name):
@@ -263,7 +262,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.9147,
             'longitude_in': 107.6098,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Should be OFF_SITE because user is assigned to Jakarta
         self.assertEqual(response.data['status'], 'OFF_SITE')
@@ -289,7 +288,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Should be PRESENT because shift is flexible
         self.assertEqual(response.data['status'], 'PRESENT')
@@ -312,7 +311,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'date': str(self.today + timedelta(days=1)),
             'check_in': '08:00:00'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # However, it should be assigned to self.employee (from self.user.email in perform_create)
         self.assertEqual(response.data['employee'], self.employee.id)
@@ -325,13 +324,13 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.9147,
             'longitude_in': 107.6098,
         }
-        res_off = self.client.post(url, payload_off, format='json', SERVER_NAME=self.domain_name)
+        res_off = self.client.post(url, payload_off, format='json', SERVER_NAME=str(self.domain))
         att_id = res_off.data['id']
         self.assertEqual(res_off.data['status'], 'OFF_SITE')
         
         # Try to PATCH status to PRESENT
         detail_url = reverse('attendance-detail', kwargs={'pk': att_id})
-        res_patch = self.client.patch(detail_url, {'status': 'PRESENT'}, format='json', SERVER_NAME=self.domain_name)
+        res_patch = self.client.patch(detail_url, {'status': 'PRESENT'}, format='json', SERVER_NAME=str(self.domain))
         # PATCH might return 200 but ignore the field, or return 403 on field update
         # In DRF ModelViewSet, it will just update if not read-only.
         # But our RBAC blocks PATCH on sensitive models if not manager.
@@ -360,7 +359,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('APPROVED leave', response.data['detail'])
 
@@ -383,7 +382,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'leave_type': 'CUTI',
             'reason': 'Vacation'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         # Check in the whole response data string to be key-agnostic
         self.assertIn('Insufficient leave balance', str(response.data))
@@ -416,7 +415,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             self.user.save()
             url = reverse('leaverequest-detail', kwargs={'pk': leave.id})
             # This triggers perform_update -> WorkflowService -> sets status to APPROVED
-            self.client.patch(url, {'status': 'APPROVED'}, format='json', SERVER_NAME=self.domain_name)
+            self.client.patch(url, {'status': 'APPROVED'}, format='json', SERVER_NAME=str(self.domain))
             
             balance.refresh_from_db()
             self.assertEqual(balance.used_days, initial_used + 2)
@@ -442,13 +441,13 @@ class AttendanceIntegrationTestCase(TenantTestCase):
                 'latitude_in': -6.2088,
                 'longitude_in': 106.8456,
             }
-            res = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+            res = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
             self.assertEqual(res.status_code, status.HTTP_201_CREATED)
             self.assertEqual(res.data['status'], 'LATE')
             
             # Clock-out at 06:05 next day
             detail_url = reverse('attendance-detail', kwargs={'pk': res.data['id']})
-            res_out = self.client.patch(detail_url, {'check_out': '06:05:00'}, format='json', SERVER_NAME=self.domain_name)
+            res_out = self.client.patch(detail_url, {'check_out': '06:05:00'}, format='json', SERVER_NAME=str(self.domain))
             self.assertEqual(res_out.status_code, status.HTTP_200_OK)
             
             att = Attendance.objects.get(id=res.data['id'])
@@ -470,7 +469,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        res_at = self.client.post(url, payload_at, format='json', SERVER_NAME=self.domain_name)
+        res_at = self.client.post(url, payload_at, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(res_at.data['status'], 'PRESENT')
         
         # 2. Slight mismatch (even 1 meter) -> OFF_SITE
@@ -480,7 +479,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2089, # Slightly different
             'longitude_in': 106.8456,
         }
-        res_near = self.client.post(url, payload_near, format='json', SERVER_NAME=self.domain_name)
+        res_near = self.client.post(url, payload_near, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(res_near.data['status'], 'OFF_SITE')
 
     def test_attendance_invalid_coordinate_type(self):
@@ -493,7 +492,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': 'INVALID_LAT',
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('Invalid coordinate format', str(response.data))
 
@@ -517,7 +516,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         # Should succeed because leave is only PENDING
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'PRESENT')
@@ -537,7 +536,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'latitude_in': -6.2088,
             'longitude_in': 106.8456,
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'PRESENT')
 
@@ -554,11 +553,11 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         }
         
         # 1. First request succeeds
-        res1 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        res1 = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(res1.status_code, status.HTTP_201_CREATED)
         
         # 2. Second request fails (handled by unique constraint)
-        res2 = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        res2 = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('already recorded', str(res2.data))
 
@@ -577,7 +576,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'longitude_in': 106.8456,
             'platform': 'web' # Explicitly web
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('restricted to the mobile application', response.data['error'])
 
@@ -596,7 +595,7 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'longitude_in': 106.8456,
             'platform': 'web'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['status'], 'PRESENT')
 
@@ -616,5 +615,5 @@ class AttendanceIntegrationTestCase(TenantTestCase):
             'longitude_in': 106.8456,
             'platform': 'mobile'
         }
-        response = self.client.post(url, payload, format='json', SERVER_NAME=self.domain_name)
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

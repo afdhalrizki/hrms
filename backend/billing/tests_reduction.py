@@ -1,4 +1,4 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from billing.models import QuotaReductionRequest, SubscriptionInvoice
 from django.utils import timezone
 from rest_framework.test import APIClient

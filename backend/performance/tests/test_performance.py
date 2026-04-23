@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from django.urls import reverse
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -28,36 +28,45 @@ class PerformanceModuleTestCase(TenantTestCase):
 
         # ---- All tenant-schema objects go inside schema_context ----
         with schema_context(self.tenant.schema_name):
-            self.dept = Department.objects.create(name='Engineering')
-
-            # Admin user (is_staff=True can manage performance)
-            self.admin_user = User.objects.create_user(
-                email='admin@perf.com', password='password', is_staff=True
-            )
+            # 1. Setup Admin first to satisfy last-admin constraint during cleanup
+            self.admin_user = User.objects.get_or_create(
+                email='admin_perf@test.com', defaults={'is_staff': True, 'is_active': True}
+            )[0]
+            if not self.admin_user.pk: self.admin_user.save()
             self.admin_user.tenants.add(self.tenant)
+
+            # 2. Clear leftovers (Employee is isolated, User is shared)
+            Employee.objects.all().delete()
+            for u in User.objects.filter(tenants=self.tenant).exclude(pk=self.admin_user.pk):
+                u.tenants.remove(self.tenant)
+
+            self.dept = Department.objects.create(name='Engineering-Perf')
+
             self.admin_emp = Employee.objects.create(
-                nik='ADM-001', fullname='Admin User', email='admin@perf.com',
-                department=self.dept, join_date=date(2023, 1, 1), ktp_number='000000001'
+                nik='ADM-PERF', fullname='Admin User', email=self.admin_user.email,
+                department=self.dept, join_date=date(2023, 1, 1), ktp_number='KTP-PERF-A'
             )
 
             # Regular employee
-            self.emp_user = User.objects.create_user(
-                email='emp@perf.com', password='password'
-            )
+            self.emp_user = User.objects.get_or_create(
+                email='emp_perf@test.com', defaults={'is_active': True}
+            )[0]
+            if not self.emp_user.pk: self.emp_user.save()
             self.emp_user.tenants.add(self.tenant)
             self.emp = Employee.objects.create(
-                nik='EMP-001', fullname='Regular Employee', email='emp@perf.com',
-                department=self.dept, join_date=date(2023, 6, 1), ktp_number='000000002'
+                nik='EMP-PERF-1', fullname='Regular Employee', email=self.emp_user.email,
+                department=self.dept, join_date=date(2023, 6, 1), ktp_number='KTP-PERF-S1'
             )
 
             # Second employee (for isolation tests)
-            self.emp2_user = User.objects.create_user(
-                email='emp2@perf.com', password='password'
-            )
+            self.emp2_user = User.objects.get_or_create(
+                email='emp2_perf@test.com', defaults={'is_active': True}
+            )[0]
+            if not self.emp2_user.pk: self.emp2_user.save()
             self.emp2_user.tenants.add(self.tenant)
             self.emp2 = Employee.objects.create(
-                nik='EMP-002', fullname='Other Employee', email='emp2@perf.com',
-                department=self.dept, join_date=date(2023, 6, 1), ktp_number='000000003'
+                nik='EMP-PERF-2', fullname='Other Employee', email=self.emp2_user.email,
+                department=self.dept, join_date=date(2023, 6, 1), ktp_number='KTP-PERF-S2'
             )
 
             # Shared KPI (created inside schema_context!)

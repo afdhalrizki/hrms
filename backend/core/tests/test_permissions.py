@@ -1,7 +1,7 @@
 from unittest.mock import Mock, MagicMock
 from django.test import RequestFactory, TestCase
 from django.contrib.auth import get_user_model
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from core.permissions import TenantAccessPermission, HasRBACPermission, FeatureRequiredPermission
 from core.models import Employee, AccessRole
 from tenants.models import Tenant
@@ -15,12 +15,12 @@ class PermissionsTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             self.factory = RequestFactory()
             
-            self.regular_user = User.objects.create_user(email='perm_user@test.com', password='pwd')
+            self.regular_user, _ = User.objects.get_or_create(email='perm_user@test.com', defaults={'password': 'pwd'})
             self.regular_user.tenants.add(self.tenant)
-            self.supervisor_user = User.objects.create_user(email='spv@test.com', password='pwd')
+            self.supervisor_user, _ = User.objects.get_or_create(email='spv@test.com', defaults={'password': 'pwd'})
             self.supervisor_user.tenants.add(self.tenant)
-            self.admin_user = User.objects.create_user(email='admin@test.com', password='pwd', is_staff=True)
-            self.global_admin = User.objects.create_user(email='global@test.com', password='pwd', is_superuser=True)
+            self.admin_user, _ = User.objects.get_or_create(email='admin@test.com', defaults={'password': 'pwd', 'is_staff': True})
+            self.global_admin, _ = User.objects.get_or_create(email='global@test.com', defaults={'password': 'pwd', 'is_superuser': True})
             
             self.role_with_perm = AccessRole.objects.create(name='Manager Role', permissions={'manage_attendance': True})
             self.role_without_perm = AccessRole.objects.create(name='Staff Role', permissions={'manage_attendance': False})

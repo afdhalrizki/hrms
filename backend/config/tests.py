@@ -1,4 +1,4 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django.conf import settings
 from django.urls import reverse
 from django.core.cache import cache

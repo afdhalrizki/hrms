@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
 from django.db import IntegrityError
+from rest_framework.test import APIClient
 from tenants.models import Tenant, Domain
 
 class TenantModelTestCase(TestCase):
@@ -73,22 +74,19 @@ class TenantModelTestCase(TestCase):
         domain = Domain.objects.create(domain=f'docs.{settings.TENANT_DOMAIN_SUFFIX}', tenant=tenant)
         self.assertEqual(str(domain), f'docs.{settings.TENANT_DOMAIN_SUFFIX}')
 
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
-from rest_framework.test import APIClient
+from django_tenants.utils import schema_context
 from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from tenants.models import RegistrationRequest, Tenant, Domain
 from core.models import Department, Role, Golongan, Employee
-from django_tenants.utils import schema_context
+from core.tests.base import HRMSTestCase
 
 User = get_user_model()
 
-class RegistrationFlowTestCase(TenantTestCase):
+class RegistrationFlowTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()
-        self.client = APIClient()
-        from django_tenants.utils import schema_context
         
         with schema_context('public'):
             # Ensure public tenant exists (TenantTestCase usually creates one tenant, 
@@ -242,11 +240,9 @@ class RegistrationFlowTestCase(TenantTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('Only pending requests', response.data['error'])
 
-class TenantSettingsTestCase(TenantTestCase):
+class TenantSettingsTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()
-        self.client = APIClient()
-        self.domain_name = self.tenant.domains.first().domain
         self.settings_url = reverse('tenant-settings')
         
         # Admin User
@@ -260,7 +256,7 @@ class TenantSettingsTestCase(TenantTestCase):
     def test_settings_retrieve_public(self):
         """Verify that settings can be retrieved without authentication (for logo/branding)."""
         # Ensure domain matches what middleware expects
-        response = self.client.get(self.settings_url, HTTP_HOST=self.domain_name)
+        response = self.client.get(self.settings_url, SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], self.tenant.name)
 
@@ -274,7 +270,7 @@ class TenantSettingsTestCase(TenantTestCase):
             'theme_primary_color': '#0000FF',
             'enabled_modules': ['core', 'attendance', 'performance']
         }
-        response = self.client.patch(self.settings_url, payload, format='json', HTTP_HOST=self.domain_name)
+        response = self.client.patch(self.settings_url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         self.tenant.refresh_from_db()
@@ -287,7 +283,7 @@ class TenantSettingsTestCase(TenantTestCase):
         """Verify that regular employees are blocked from updating settings."""
         self.client.force_login(self.regular)
         payload = {'name': 'Hacker Corp'}
-        response = self.client.patch(self.settings_url, payload, format='json', HTTP_HOST=self.domain_name)
+        response = self.client.patch(self.settings_url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class ProvisioningDepthTestCase(TestCase):

@@ -1,4 +1,4 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient

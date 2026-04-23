@@ -1,29 +1,29 @@
 from datetime import date, time
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from attendance.models import Attendance
 from core.models import Employee, Department, Branch
 from attendance.services import AttendanceService
 from decimal import Decimal
+from core.tests.base import HRMSTestCase
 
-class StorageFallbackTestCase(TenantTestCase):
+class StorageFallbackTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()
         with schema_context(self.tenant.schema_name):
-            self.dept = Department.objects.create(name='IT')
+            self.dept = Department.objects.create(name='IT-FALLBACK')
             self.branch = Branch.objects.create(
-                name='Office', 
+                name='Office-FALLBACK', 
                 latitude=Decimal('0'), 
                 longitude=Decimal('0'), 
                 radius_meters=100
             )
             self.employee = Employee.objects.create(
-                fullname='Test Employee', 
-                email='test@example.com', 
+                fullname='Test Employee Fallback', 
+                email='fallback@test.com', 
                 department=self.dept, 
                 branch=self.branch,
-                nik='T001', 
-                ktp_number='123456789', 
+                nik='T-FALLBACK', 
+                ktp_number='123456789-F', 
                 join_date=date.today()
             )
 

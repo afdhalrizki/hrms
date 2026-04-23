@@ -1,12 +1,11 @@
 from datetime import date, timedelta
-from django.test import TestCase, Client
-from django.conf import settings
+from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django_tenants.utils import schema_context
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
-from tenants.models import Tenant, Domain
+from tenants.models import Tenant
 from core.models import Department
+from core.tests.base import HRMSTestCase
 
 User = get_user_model()
 
@@ -47,11 +46,9 @@ class SubscriptionLogicTestCase(TestCase):
 
 from rest_framework.test import APIClient
 
-class SubscriptionMiddlewareTestCase(TenantTestCase):
+class SubscriptionMiddlewareTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()
-        self.client = APIClient()
-        self.domain_name = self.tenant.domains.first().domain
         
         # Setup tenant
         self.tenant.name = 'Access Test Corp'
@@ -70,7 +67,7 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         """Active tenant can perform POST requests."""
         with schema_context(self.tenant.schema_name):
             url = reverse('department-list')
-            response = self.client.post(url, {'name': 'New Dept'}, format='json', SERVER_NAME=self.domain_name)
+            response = self.client.post(url, {'name': 'New Dept'}, format='json', SERVER_NAME=str(self.domain))
             # We don't care about success, just that it's not blocked by subscription
             self.assertNotEqual(response.status_code, 402)
 
@@ -82,12 +79,12 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             url = reverse('department-list')
             # POST should be blocked
-            response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=self.domain_name)
+            response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=str(self.domain))
             self.assertEqual(response.status_code, 402)
             self.assertEqual(response.json()['code'], 'SUBSCRIPTION_EXPIRED_READ_ONLY')
             
             # GET should be allowed
-            response = self.client.get(url, SERVER_NAME=self.domain_name)
+            response = self.client.get(url, SERVER_NAME=str(self.domain))
             self.assertNotEqual(response.status_code, 402)
 
     def test_suspended_tenant_blocked(self):
@@ -99,9 +96,9 @@ class SubscriptionMiddlewareTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             url = reverse('department-list')
             # Both GET and POST should be blocked
-            response = self.client.get(url, SERVER_NAME=self.domain_name)
+            response = self.client.get(url, SERVER_NAME=str(self.domain))
             self.assertEqual(response.status_code, 402)
             self.assertEqual(response.json()['code'], 'SUBSCRIPTION_SUSPENDED')
             
-            response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=self.domain_name)
+            response = self.client.post(url, {'name': 'Blocked Dept'}, format='json', SERVER_NAME=str(self.domain))
             self.assertEqual(response.status_code, 402)

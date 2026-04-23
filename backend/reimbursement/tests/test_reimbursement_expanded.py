@@ -1,47 +1,54 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase
 from rest_framework import status
-from rest_framework.test import APIClient
-from core.models import Employee, Department, Role
+from core.models import Employee, Department
 from reimbursement.models import Reimbursement, ReimbursementCategory
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.db import connection
+from rest_framework.test import APIClient
 
 User = get_user_model()
 
-class ReimbursementExpandedTestCase(TenantTestCase):
+class ReimbursementExpandedTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
         
-        # Ensure 'reimbursement' module is enabled and domain exists
-        from tenants.models import Domain
-        if not Domain.objects.filter(tenant=self.tenant).exists():
-            Domain.objects.create(domain='test.localhost', tenant=self.tenant, is_primary=True)
+        # 1. Setup primary admin for this test first to satisfy "last admin" constraint during cleanup
+        self.admin_user = User.objects.get_or_create(
+            email='admin_reim@test.com', 
+            defaults={'is_staff': True, 'is_active': True}
+        )[0]
+        if not self.admin_user.pk: self.admin_user.save()
+        self.admin_user.tenants.add(self.tenant)
+
+        # 2. Clear leftovers (Employee is isolated, User is shared)
+        Employee.objects.all().delete()
+        for u in User.objects.filter(tenants=self.tenant).exclude(pk=self.admin_user.pk):
+            u.tenants.remove(self.tenant)
         
         self.tenant.plan_type = 'PROFESSIONAL'
         self.tenant.enabled_modules = ['core', 'reimbursement']
         self.tenant.save()
         
-        self.host = self.tenant.domains.first().domain
-        self.dept = Department.objects.create(name="Finance")
-        self.cat = ReimbursementCategory.objects.create(name="Travel")
+        self.host = self.domain
+        self.dept = Department.objects.create(name="Finance-REIM")
+        self.cat = ReimbursementCategory.objects.create(name="Travel-REIM")
         
-        self.admin_user = User.objects.create_user(email='admin@com.com', password='pwd', is_staff=True)
         self.admin_emp = Employee.objects.create(
-            email='admin@com.com', fullname="Admin Finance", nik="ADM02",
+            email=self.admin_user.email, fullname="Admin Finance", nik="ADM-REIM",
             department=self.dept, join_date="2024-01-01",
-            ktp_number="KTP-ADM02"
+            ktp_number="KTP-REIM-A"
         )
-        self.admin_user.tenants.add(self.tenant)
         
-        self.staff_user = User.objects.create_user(email='staff@com.com', password='pwd')
-        self.staff_emp = Employee.objects.create(
-            email='staff@com.com', fullname="Staff Reim", nik="STF02",
-            department=self.dept, join_date="2024-01-01",
-            ktp_number="KTP-STF02"
-        )
+        self.staff_user = User.objects.get_or_create(email='staff_reim@test.com', defaults={'is_active': True})[0]
+        if not self.staff_user.pk: self.staff_user.save()
         self.staff_user.tenants.add(self.tenant)
+        
+        self.staff_emp = Employee.objects.create(
+            email=self.staff_user.email, fullname="Staff Reim", nik="STF-REIM",
+            department=self.dept, join_date="2024-01-01",
+            ktp_number="KTP-REIM-S"
+        )
 
     def test_reimbursement_rejection(self):
         """Test the reject action with custom notes."""
@@ -93,7 +100,7 @@ class ReimbursementExpandedTestCase(TenantTestCase):
 
     def test_reimbursement_list_unassigned_user_none_fallback(self):
         """Test queryset returns none for unassigned user (ghost user)."""
-        ghost_user = User.objects.create_user(email='ghost@com.com', password='pwd')
+        ghost_user = User.objects.create_user(email='ghost_reim@test.com', password='pwd')
         ghost_user.tenants.add(self.tenant)
         self.client.force_authenticate(user=ghost_user)
         url = reverse('reimbursement-list')

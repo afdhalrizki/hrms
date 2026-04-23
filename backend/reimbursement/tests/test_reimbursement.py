@@ -1,5 +1,5 @@
 from django.test import Client
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from django.contrib.auth import get_user_model
 from django.urls import reverse

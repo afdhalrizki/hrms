@@ -1,16 +1,17 @@
 from io import StringIO
 import os
+import shutil
 from datetime import timedelta
 from django.utils import timezone
 from django.core.management import call_command
 from django.test import override_settings
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
-from django_tenants.utils import schema_context
+from django_tenants.utils import schema_context, get_public_schema_name
 from tenants.models import Tenant, Domain
 from core.models import Department
 from notifications.models import SystemNotification
+from core.tests.base import HRMSTestCase
 
-class BootstrapTenantsCommandTestCase(TenantTestCase):
+class BootstrapTenantsCommandTestCase(HRMSTestCase):
     def test_bootstrap_tenants_creates_public_if_missing(self):
         from django_tenants.utils import get_public_schema_name
         # We start with public tenant NOT already mapped to a Tenant record (django_tenants creates schema but not Tenant)
@@ -31,7 +32,7 @@ class BootstrapTenantsCommandTestCase(TenantTestCase):
             self.assertIn('Public tenant already exists, skipping', out2.getvalue())
             self.assertIn('company1 tenant already exists, skipping', out2.getvalue())
 
-class CleanupTenantsCommandTestCase(TenantTestCase):
+class CleanupTenantsCommandTestCase(HRMSTestCase):
     def test_cleanup_deletes_expired_suspended_tenants(self):
         from django_tenants.utils import schema_context, get_public_schema_name
         # Create a tenant that is suspended and expired long ago
@@ -68,14 +69,14 @@ class CleanupTenantsCommandTestCase(TenantTestCase):
             self.assertTrue(Tenant.objects.filter(schema_name='valid_co').exists())
 
 
-class ExportTenantDataCommandTestCase(TenantTestCase):
+class ExportTenantDataCommandTestCase(HRMSTestCase):
     def test_export_data_generates_csvs(self):
         # Setup basic data
         with schema_context(self.tenant.schema_name):
             Department.objects.create(name='Exported Department', description='Export Target')
         
         out = StringIO()
-        output_dir = f'/tmp/exports_test_{self.tenant.schema_name}'
+        output_dir = os.path.join(os.getcwd(), f'exports_test_{self.tenant.schema_name}')
         
         with override_settings(TENANT_APPS=['core.apps.CoreConfig', 'attendance.apps.AttendanceConfig', 'payroll.apps.PayrollConfig']):
             # It connects to postgres naturally, but our BaseCommand sets "connection.tenant". We must run in context
@@ -101,7 +102,7 @@ class ExportTenantDataCommandTestCase(TenantTestCase):
         # We can simulate an error by requesting an invalid directory
         # Just ensure it doesn't crash on empty tables, the regular test covers success
         out = StringIO()
-        output_dir = f'/tmp/exports_empty_{self.tenant.schema_name}'
+        output_dir = os.path.join(os.getcwd(), f'exports_empty_{self.tenant.schema_name}')
         
         # Do not create Departments, let it be empty
         from core.models import Department
@@ -116,7 +117,7 @@ class ExportTenantDataCommandTestCase(TenantTestCase):
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
 
-class ProcessSubscriptionsCommandTestCase(TenantTestCase):
+class ProcessSubscriptionsCommandTestCase(HRMSTestCase):
     def test_process_subscriptions_updates_status(self):
         from django_tenants.utils import schema_context, get_public_schema_name
         # Make the current tenant expired

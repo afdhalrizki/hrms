@@ -207,13 +207,18 @@ async function main() {
     .replace('T', '_');
   const logFile = join(logDir, `unit_test_${timestamp}.log`);
 
+  // Auto-enable parallel execution if not specified
+  if (!pytestArgs.some(a => a === '-n' || a.startsWith('-n'))) {
+    log('Parallel execution enabled by default (-n auto).', COLORS.gray);
+    pytestArgs.unshift('-n', 'auto');
+  }
+
   const exitCode = await spawnStream(
     pythonPath,
     [
       '-m',
       'pytest',
       '--color=yes',
-      '--maxfail=1',
       '--durations=20',
       ...pytestArgs,
     ],

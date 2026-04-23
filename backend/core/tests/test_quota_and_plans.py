@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django.test import RequestFactory
 from rest_framework.test import APIClient
 from django.urls import reverse
@@ -15,11 +15,22 @@ class TenantQuotaAndPlansTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-        self.admin = User.objects.create_superuser(email='sysadmin@test.com', password='pwd')
+        
+        # 1. Setup admin first
+        self.admin = User.objects.get_or_create(
+            email='sysadmin_quota@test.com', 
+            defaults={'is_staff': True, 'is_active': True, 'is_superuser': True}
+        )[0]
+        if not self.admin.pk: self.admin.save()
+        self.admin.tenants.add(self.tenant)
         self.client.force_authenticate(user=self.admin)
         
-        self.dept = Department.objects.create(name='IT')
-        self.role = Role.objects.create(name='Staff', department=self.dept)
+        # 2. Clear leftovers (Employee is isolated, User is shared)
+        Employee.objects.all().delete()
+        for u in User.objects.filter(tenants=self.tenant).exclude(pk=self.admin.pk):
+            u.tenants.remove(self.tenant)
+        self.dept = Department.objects.create(name='IT-QUOTA')
+        self.role = Role.objects.create(name='Staff-QUOTA', department=self.dept)
 
     def test_tenant_default_plans_and_quotas(self):
         """Test how tenants assign default modules and quotas on creation, overriding default 1000 limit."""

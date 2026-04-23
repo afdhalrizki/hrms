@@ -1,4 +1,4 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -9,11 +9,25 @@ from payroll.models import Payslip, PayrollPeriod
 from users.models import User
 from decimal import Decimal
 
-class DashboardStatsTestCase(TenantTestCase):
+class DashboardStatsTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-        self.domain = self.tenant.domains.first().domain
+        # self.domain is provided by HRMSTestCase
+
+        # 1. Setup primary admin for this test first to satisfy "last admin" constraint during cleanup
+        self.user_admin = User.objects.get_or_create(email='admin@dashboard.com', defaults={'is_staff': True})[0]
+        if not self.user_admin.pk: self.user_admin.save() 
+        self.user_admin.tenants.add(self.tenant)
+
+        # 2. Clear any leftover data
+        Employee.objects.all().delete()
+        Attendance.objects.all().delete()
+        LeaveRequest.objects.all().delete()
+        Payslip.objects.all().delete()
+        # Remove extra users from this tenant
+        for u in User.objects.filter(tenants=self.tenant).exclude(pk=self.user_admin.pk):
+            u.tenants.remove(self.tenant)
 
         # 1. Setup Roles and Permissions
         self.admin_role = AccessRole.objects.create(
@@ -25,11 +39,9 @@ class DashboardStatsTestCase(TenantTestCase):
             permissions={'manage_hr': False}
         )
 
-        # 2. Setup Users
-        self.user_admin = User.objects.create_user(email='admin@dashboard.com', password='password')
-        self.user_admin.tenants.add(self.tenant)
-        
-        self.user_staff = User.objects.create_user(email='staff@dashboard.com', password='password')
+        # 3. Setup Users (staff)
+        self.user_staff = User.objects.get_or_create(email='staff@dashboard.com', defaults={'is_staff': False})[0]
+        if not self.user_staff.pk: self.user_staff.save()
         self.user_staff.tenants.add(self.tenant)
 
         # 3. Setup Base HR Data
@@ -66,7 +78,7 @@ class DashboardStatsTestCase(TenantTestCase):
             role=self.role,
             golongan=self.gol,
             access_role=self.staff_role,
-            join_date=timezone.localdate() - timezone.timedelta(days=40), # Not a new hire
+            join_date=timezone.localdate() - timezone.timedelta(days=40),
             ktp_number="9876543210987654"
         )
 
@@ -76,7 +88,6 @@ class DashboardStatsTestCase(TenantTestCase):
             date=timezone.localdate(),
             status='PRESENT'
         )
-        # emp_staff is absent (not created)
 
         # 6. Setup Pending Requests
         LeaveRequest.objects.create(
@@ -93,7 +104,7 @@ class DashboardStatsTestCase(TenantTestCase):
             start_date=timezone.localdate() + timezone.timedelta(days=5),
             end_date=timezone.localdate() + timezone.timedelta(days=6),
             reason="Fever",
-            status='APPROVED' # Should NOT be counted as pending
+            status='APPROVED'
         )
 
         # 7. Setup Payroll for Current Month
@@ -110,14 +121,14 @@ class DashboardStatsTestCase(TenantTestCase):
             period=self.period,
             net_pay=Decimal('10000000.00'),
             overtime_pay=Decimal('500000.00'),
-            payment_date=today # Paid
+            payment_date=today
         )
         Payslip.objects.create(
             employee=self.emp_staff,
             period=self.period,
             net_pay=Decimal('8000000.00'),
             overtime_pay=Decimal('0.00'),
-            payment_date=None # Not paid yet, should NOT be counted in totals
+            payment_date=None
         )
 
     def test_dashboard_stats_aggregation(self):
@@ -136,36 +147,30 @@ class DashboardStatsTestCase(TenantTestCase):
         # 2. Attendance
         attendance_today = {item['status']: item['count'] for item in data['attendance_today']}
         self.assertEqual(attendance_today.get('PRESENT'), 1)
-        # 1 present out of 2 total = 50%
         self.assertEqual(data['attendance_percent'], 50.0)
         
         # 3. Pending Requests
         self.assertEqual(data['pending_leaves'], 1)
         
-        # 4. New Hires (join_date within last 30 days)
-        # Admin joined today, Staff joined 40 days ago
+        # 4. New Hires
         self.assertEqual(data['new_hires'], 1)
         
-        # 5. Payroll Summary (Only paid ones)
-        # Only emp_admin's 10M is paid
+        # 5. Payroll Summary
         self.assertEqual(Decimal(str(data['payroll_summary']['total_net_pay'])), Decimal('10000000.00'))
         self.assertEqual(Decimal(str(data['payroll_summary']['total_overtime'])), Decimal('500000.00'))
         
         # 6. Dept Distribution
-        # IT: 1 (emp_staff), HR: 1 (emp_admin)
         dept_dist = {item['name']: item['employee_count'] for item in data['department_distribution']}
         self.assertEqual(dept_dist.get('IT'), 1)
         self.assertEqual(dept_dist.get('HR'), 1)
 
     def test_dashboard_stats_permission(self):
         """Verify that only users with manage_hr permission can access dashboard stats."""
-        # 1. Staff (no manage_hr) -> 403
         self.client.force_authenticate(user=self.user_staff)
         url = reverse('dashboard-stats')
         response = self.client.get(url, SERVER_NAME=self.domain, secure=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
-        # 2. Admin (with manage_hr) -> 200
         self.client.force_authenticate(user=self.user_admin)
         response = self.client.get(url, SERVER_NAME=self.domain, secure=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,4 +1,4 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from core.models import Employee, Department, Role, Golongan
 from attendance.models import LeaveRequest
@@ -12,6 +12,8 @@ class DeepIsolationTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
+        # Clear leftovers from other tests in the same worker
+        Employee.objects.all().delete()
         # Tenant A (self.tenant) is already setup by TenantTestCase
         
         # Create a second tenant for isolation testing

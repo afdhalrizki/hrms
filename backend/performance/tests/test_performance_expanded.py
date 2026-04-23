@@ -1,4 +1,4 @@
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import Employee, Department, Role, AccessRole
@@ -16,7 +16,7 @@ class PerformanceExpandedTestCase(TenantTestCase):
         self.dept = Department.objects.create(name="HR")
         self.kpi = KPI.objects.create(name="Attendance")
         
-        self.admin_user = User.objects.create_user(email='admin@com.com', password='pwd', is_staff=True)
+        self.admin_user, _ = User.objects.get_or_create(email='admin@com.com', defaults={'password': 'pwd', 'is_staff': True})
         self.admin_emp = Employee.objects.create(
             email='admin@com.com', fullname="Admin Performance", nik="ADM03",
             department=self.dept, join_date="2024-01-01",
@@ -24,7 +24,7 @@ class PerformanceExpandedTestCase(TenantTestCase):
         )
         self.admin_user.tenants.add(self.tenant)
         
-        self.staff_user = User.objects.create_user(email='staff@com.com', password='pwd')
+        self.staff_user, _ = User.objects.get_or_create(email='staff@com.com', defaults={'password': 'pwd'})
         self.staff_emp = Employee.objects.create(
             email='staff@com.com', fullname="Staff Perf", nik="STF03",
             department=self.dept, join_date="2024-01-01",
@@ -34,7 +34,7 @@ class PerformanceExpandedTestCase(TenantTestCase):
 
     def test_viewsets_get_queryset_none_fallback(self):
         """Test that list views return empty for users with no employee profile (Coverage for lines 40, 61, 108)."""
-        ghost_user = User.objects.create_user(email='ghost@com.com', password='pwd')
+        ghost_user, _ = User.objects.get_or_create(email='ghost@com.com', defaults={'password': 'pwd'})
         ghost_user.tenants.add(self.tenant)
         self.client.force_authenticate(user=ghost_user)
         

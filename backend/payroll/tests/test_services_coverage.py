@@ -1,5 +1,5 @@
 from decimal import Decimal
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from payroll.services import BPJSManager, TaxEngine, PayrollCalculator
 from payroll.models import PayrollPeriod, SalaryComponent

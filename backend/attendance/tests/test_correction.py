@@ -1,6 +1,6 @@
 from datetime import date, time
 from django.urls import reverse
-from django_tenants.test.cases import FastTenantTestCase as TenantTestCase
+from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from rest_framework import status
 from rest_framework.test import APIClient
