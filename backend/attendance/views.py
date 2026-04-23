@@ -92,41 +92,55 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
                     target_employee_id = target_employee_id.get('id')
                 target_employee = Employee.objects.get(id=target_employee_id)
 
-        lat = request.data.get('latitude_in')
-        lng = request.data.get('longitude_in')
-        photo = request.data.get('photo_in')
+        lat = request.data.get('latitude_in') or request.data.get('latitude_out')
+        lng = request.data.get('longitude_in') or request.data.get('longitude_out')
+        photo = request.data.get('photo_in') or request.data.get('photo_out')
 
         if lat and lng:
             if not target_employee:
                 return Response({'error': 'Target employee record not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
             check_in_str = request.data.get('check_in')
+            check_out_str = request.data.get('check_out')
             date_str = request.data.get('date')
             
-            check_in_time = None
+            check_time = None
             if check_in_str:
-                 check_in_time = datetime.strptime(check_in_str, '%H:%M:%S').time()
+                 check_time = datetime.strptime(check_in_str, '%H:%M:%S').time()
+            elif check_out_str:
+                 check_time = datetime.strptime(check_out_str, '%H:%M:%S').time()
             
             check_date = None
             if date_str:
                  check_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
-            attendance = AttendanceService.process_clock_in(
-                employee=target_employee,
-                latitude=lat,
-                longitude=lng,
-                photo=photo,
-                check_in_time=check_in_time,
-                date=check_date
-            )
+            if check_out_str:
+                attendance = AttendanceService.process_clock_out(
+                    employee=target_employee,
+                    latitude=lat,
+                    longitude=lng,
+                    photo=photo,
+                    check_out_time=check_time,
+                    date=check_date
+                )
+            else:
+                attendance = AttendanceService.process_clock_in(
+                    employee=target_employee,
+                    latitude=lat,
+                    longitude=lng,
+                    photo=photo,
+                    check_in_time=check_time,
+                    date=check_date
+                )
+            
             # Perform manual audit tracing since we bypassed DRF Serializer
             if attendance.created_by is None:
                 attendance.created_by = user
             attendance.updated_by = user
-            attendance.save(update_fields=['created_by', 'updated_by'])
+            attendance.save()
             
             serializer = self.get_serializer(attendance)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED if not check_out_str else status.HTTP_200_OK)
 
         return super().create(request, *args, **kwargs)
 

@@ -256,19 +256,26 @@ class ApiService {
     required int employeeId,
     required double latitude,
     required double longitude,
-    required String checkInTime,
+    required String checkTime,
     bool isClockIn = true,
     String? date,
   }) async {
     final tenant = await getTenant();
     final payload = {
       'employee': employeeId,
-      'latitude_in': latitude,
-      'longitude_in': longitude,
-      'check_in': checkInTime,
       'platform': 'mobile',
       if (date != null) 'date': date,
     };
+
+    if (isClockIn) {
+      payload['latitude_in'] = latitude;
+      payload['longitude_in'] = longitude;
+      payload['check_in'] = checkTime;
+    } else {
+      payload['latitude_out'] = latitude;
+      payload['longitude_out'] = longitude;
+      payload['check_out'] = checkTime;
+    }
 
     final response = await _authenticatedRequest((token) => _client.post(
       Uri.parse("$baseUrl/attendance/"),
@@ -276,7 +283,7 @@ class ApiService {
       body: jsonEncode(payload),
     ));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to submit attendance: ${response.body}');

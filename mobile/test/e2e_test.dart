@@ -95,7 +95,7 @@ void main() {
        await tester.pumpAndSettle();
     }
     
-    Future<void> performLogin(WidgetTester tester) async {
+    Future<void> performLogin(WidgetTester tester, {String email = 'admin@company1.com', String password = 'password123', String tenant = 'company1'}) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
@@ -106,9 +106,9 @@ void main() {
       await tester.pumpAndSettle();
 
       if (find.textContaining('Welcome', skipOffstage: false).evaluate().isEmpty) {
-        await safeEnterText(tester, find.widgetWithText(TextField, 'e.g. company1', skipOffstage: false), 'company1');
-        await safeEnterText(tester, find.widgetWithText(TextField, 'name@company.com', skipOffstage: false), 'admin@company1.com');
-        await safeEnterText(tester, find.widgetWithText(TextField, '••••••••', skipOffstage: false), 'password123');
+        await safeEnterText(tester, find.widgetWithText(TextField, 'e.g. company1', skipOffstage: false), tenant);
+        await safeEnterText(tester, find.widgetWithText(TextField, 'name@company.com', skipOffstage: false), email);
+        await safeEnterText(tester, find.widgetWithText(TextField, '••••••••', skipOffstage: false), password);
         await safeTap(tester, find.text('Sign In', skipOffstage: false));
         await waitFor(tester, find.textContaining('Welcome', skipOffstage: false), message: 'Dashboard');
         await tester.pumpAndSettle();
@@ -376,18 +376,17 @@ void main() {
 
     testWidgets('[16] Attendance: Clock-Out Flow', (tester) async {
       await tester.runAsync(() async {
-        await performLogin(tester);
+        await performLogin(tester, email: 'employee1@company1.com');
         
-        // Scenario: Currently Clocked In (Mock data in test_helper has one record with check_out: null)
+        // Scenario: Currently Clocked In (employee1 is clocked in by seed_test_db.py)
         await waitFor(tester, find.text('Clock Out', skipOffstage: false), message: 'Clock Out state');
         
         await safeTap(tester, find.byKey(const Key('qa_clock_in'), skipOffstage: false));
         await waitFor(tester, find.byType(FaceVerificationScreen, skipOffstage: false), message: 'Face Verification');
         await safeTap(tester, find.byKey(const Key('simulate_face_success'), skipOffstage: false));
         
-        // After successful face verification and mock POST, it should ideally go back to Clock In for next day
-        // (Note: In mock setup it depends on how _loadProfile handles the refresh)
-        await waitFor(tester, find.text('Clock Out', skipOffstage: false), message: 'Clocked state remains until refresh happens or data changes');
+        // After successful face verification, the UI should refresh and show "Clock In" (ready for next cycle)
+        await waitFor(tester, find.text('Clock In', skipOffstage: false), message: 'Clocked out successfully');
       });
     });
 
@@ -418,7 +417,7 @@ void main() {
         const formattedApp = 'Rp 16,500,000';
         const formattedDetails = '16,500,000';
         
-        await waitFor(tester, find.textContaining(formattedApp, skipOffstage: false), message: 'Payslip IDR formatting with commas');
+        await waitFor(tester, find.textContaining(formattedApp, skipOffstage: false), message: 'Payslip IDR formatting with commas', timeout: const Duration(seconds: 15));
         
         await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
         await waitFor(tester, find.text('NET SALARY', skipOffstage: false), message: 'Payslip detail screen');

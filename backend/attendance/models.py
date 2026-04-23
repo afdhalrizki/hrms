@@ -23,8 +23,13 @@ class Attendance(AuditModel):
     # GPS & Photo for Mobile Clock-In
     latitude_in = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude_in = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    # ... previous fields ...
+    latitude_out = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    longitude_out = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     photo_in = models.ImageField(
+        upload_to=attendance_photo_upload_path, 
+        blank=True, null=True
+    )
+    photo_out = models.ImageField(
         upload_to=attendance_photo_upload_path, 
         blank=True, null=True
     )

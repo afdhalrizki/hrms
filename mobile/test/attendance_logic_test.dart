@@ -24,7 +24,7 @@ void main() {
         employeeId: employeeId,
         latitude: -6.123456,
         longitude: 106.123456,
-        checkInTime: "08:00:00",
+        checkTime: "08:00:00",
         isClockIn: true,
         date: '2026-12-31',
       );
@@ -36,14 +36,25 @@ void main() {
       await loginForTest();
       final profile = await apiService.getEmployeeProfile();
       final employeeId = profile['employee_id'];
+      const testDate = '2026-12-30';
+
+      // Ensure a clock-in exists first for the same day
+      await apiService.submitAttendance(
+        employeeId: employeeId,
+        latitude: -6.123456,
+        longitude: 106.123456,
+        checkTime: "08:00:00",
+        isClockIn: true,
+        date: testDate,
+      );
       
       final result = await apiService.submitAttendance(
         employeeId: employeeId,
         latitude: -6.123456,
         longitude: 106.123456,
-        checkInTime: "17:00:00",
+        checkTime: "17:00:00",
         isClockIn: false,
-        date: '2026-12-30',
+        date: testDate,
       );
 
       expect(result['id'], isNotNull);
@@ -60,7 +71,7 @@ void main() {
         employeeId: employeeId,
         latitude: -6.0,
         longitude: 106.0,
-        checkInTime: '08:00:00',
+        checkTime: '08:00:00',
         date: testDate,
       );
 
@@ -70,7 +81,7 @@ void main() {
           employeeId: employeeId,
           latitude: -6.0,
           longitude: 106.0,
-          checkInTime: '09:00:00',
+          checkTime: '09:00:00',
           date: testDate,
         ),
         throwsException,

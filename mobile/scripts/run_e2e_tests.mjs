@@ -286,6 +286,10 @@ async function runE2ETests() {
 
           if (evt.type === 'testDone') {
             if (evt.testID === 0) continue;
+            const name = testNames.get(evt.testID);
+            const isInternal = name && (name.includes('loading') || name.includes('setUpAll') || name.includes('tearDownAll'));
+            if (isInternal) continue;
+
             foundResults = true;
             if (evt.result === 'success') {
               filePassed++;

@@ -108,6 +108,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Sort by timestamp desc
       activities.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      
+      // Ensure attendance records are sorted by date DESC for latest check-in detection
+      attendance.sort((a, b) => (b['date'] ?? '').compareTo(a['date'] ?? ''));
 
       if (!mounted) return;
       setState(() {
@@ -370,7 +373,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     employeeId: employeeId,
                     latitude: position?.latitude ?? -6.2088,
                     longitude: position?.longitude ?? 106.8456,
-                    checkInTime: timeStr,
+                    checkTime: timeStr,
+                    isClockIn: !isCurrentlyClockedIn,
                   );
 
                   if (mounted) {

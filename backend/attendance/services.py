@@ -140,6 +140,32 @@ class AttendanceService:
         return attendance
 
     @staticmethod
+    def process_clock_out(employee, latitude, longitude, photo=None, check_out_time=None, date=None):
+        """
+        Handles the clock-out logic for an existing attendance record.
+        """
+        today = date if date else timezone.now().date()
+        now_time = check_out_time if check_out_time else timezone.now().time()
+        
+        attendance = Attendance.objects.filter(employee=employee, date=today).first()
+        if not attendance:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': 'No clock-in record found for today.'})
+            
+        if attendance.check_out:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': 'Already clocked out for today.'})
+            
+        attendance.check_out = now_time
+        attendance.latitude_out = latitude
+        attendance.longitude_out = longitude
+        if photo:
+            attendance.photo_out = photo
+            
+        attendance.save()
+        return attendance
+
+    @staticmethod
     def recalculate_attendance_status(attendance):
         """
         Force recalculates the status of an existing attendance record.

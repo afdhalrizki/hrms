@@ -96,7 +96,7 @@ Domain.objects.update_or_create(domain='company2.localhost', defaults={'tenant':
 # 3. Seeding within company1
 with schema_context('company1'):
     from core.models import Employee, Department, Role, Golongan, WorkflowConfig, AccessRole
-    from attendance.models import Attendance, LeaveBalance, LeaveRequest
+    from attendance.models import Attendance, LeaveBalance, LeaveRequest, Shift, Schedule
     from payroll.models import PayrollPeriod, Payslip
     from reimbursement.models import ReimbursementCategory, Reimbursement
     from performance.models import KPI, KPITarget, Appraisal, AppraisalReview
@@ -287,7 +287,23 @@ with schema_context('company1'):
         }
     )
 
-    # 6. Reimbursements
+    # 6. Schedules
+    shift_pagi, _ = Shift.objects.get_or_create(
+        name='Shift Pagi',
+        defaults={
+            'start_time': '08:00:00',
+            'end_time': '17:00:00',
+            'work_days': [0, 1, 2, 3, 4]
+        }
+    )
+    
+    Schedule.objects.get_or_create(
+        employee=admin_emp,
+        date=today,
+        defaults={'shift': shift_pagi}
+    )
+
+    # 7. Reimbursements
     cat_travel = ReimbursementCategory.objects.create(name='Travel', max_amount=5000000)
     cat_transport = ReimbursementCategory.objects.create(name='Transport', max_amount=2000000)
     cat_food = ReimbursementCategory.objects.create(name='Food', max_amount=1000000)
@@ -305,7 +321,7 @@ with schema_context('company1'):
         }
     )
 
-    # 7. Leaves
+    # 8. Leaves
     LeaveBalance.objects.update_or_create(
         employee=emp1,
         year=2026,
@@ -315,7 +331,7 @@ with schema_context('company1'):
         }
     )
     
-    # 8. Performance
+    # 9. Performance
     kpi_sales = KPI.objects.create(name='Sales Target', category='Sales', unit='CURRENCY')
     KPITarget.objects.update_or_create(
         employee=emp1,
@@ -340,7 +356,7 @@ with schema_context('company1'):
         defaults={'ratings': {'Sales Target': 4}, 'comments': 'Achieved 85% of target'}
     )
 
-    # 9. Workflows (Required for workflows.spec.ts)
+    # 10. Workflows (Required for workflows.spec.ts)
     WorkflowConfig.objects.update_or_create(
         model_type='LEAVE',
         defaults={'name': 'Leave Approval Workflow', 'is_active': True}
@@ -350,7 +366,7 @@ with schema_context('company1'):
         defaults={'name': 'Reimbursement Workflow', 'is_active': True}
     )
 
-    # 10. API Keys
+    # 11. API Keys
     APIKey.objects.update_or_create(
         label='ERP Sync',
         defaults={

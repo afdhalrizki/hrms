@@ -42,8 +42,13 @@ void setupSystemChannelMocks() {
   const MethodChannel pathProviderChannel = MethodChannel('plugins.flutter.io/path_provider');
   const MethodChannel textInputChannel = MethodChannel('flutter/textinput', JSONMethodCodec());
   const MethodChannel platformViewsChannel = MethodChannel('flutter/platform_views');
+  const MethodChannel openFileChannel = MethodChannel('open_filex');
 
   final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+  // Detect server environment
+  final bool isServer = Platform.environment.containsKey('CI') || 
+                        Platform.environment.containsKey('GITHUB_ACTIONS');
 
   messenger.setMockMethodCallHandler(secureStorageChannel, (call) async {
     if (call.method == 'read') {
@@ -59,10 +64,25 @@ void setupSystemChannelMocks() {
   });
 
   messenger.setMockMethodCallHandler(pathProviderChannel, (call) async {
-    if (call.method == 'getApplicationDocumentsDirectory') return Future.value('.');
-    if (call.method == 'getTemporaryDirectory') return Future.value('.');
+    // On server, use system temp to avoid "garbage" files in workspace.
+    // Locally, use '.' so developer can see the files (test.pdf, test.txt).
+    final String baseDir = isServer ? Directory.systemTemp.path : '.';
+    
+    if (call.method == 'getApplicationDocumentsDirectory') return Future.value(baseDir);
+    if (call.method == 'getTemporaryDirectory') return Future.value(baseDir);
     return Future.value(null);
   });
+
+  // Mock open_filex only on server to prevent GUI errors.
+  // Locally, we don't set a mock handler so it attempts to trigger the real OS opener (or fails gracefully).
+  if (isServer) {
+    messenger.setMockMethodCallHandler(openFileChannel, (call) async {
+      if (call.method == 'open') {
+        return Future.value({'message': 'done', 'type': 0});
+      }
+      return Future.value(null);
+    });
+  }
 
   // Mock platform-specific channels for path_provider
   const List<String> platformChannels = [
@@ -72,8 +92,9 @@ void setupSystemChannelMocks() {
   ];
   for (final channelName in platformChannels) {
     messenger.setMockMethodCallHandler(MethodChannel(channelName), (call) async {
-      if (call.method == 'getApplicationDocumentsDirectory') return Future.value('.');
-      if (call.method == 'getTemporaryDirectory') return Future.value('.');
+      final String baseDir = isServer ? Directory.systemTemp.path : '.';
+      if (call.method == 'getApplicationDocumentsDirectory') return Future.value(baseDir);
+      if (call.method == 'getTemporaryDirectory') return Future.value(baseDir);
       return Future.value(null);
     });
   }
