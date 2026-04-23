@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from django.contrib.auth import login, authenticate
 from .models import User
 from .serializers import UserSerializer
-
 from core.permissions import HasRBACPermission, TenantAccessPermission
+from core.mixins import TenantIsolationMixin
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(TenantIsolationMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, TenantAccessPermission]
@@ -24,8 +24,6 @@ class UserViewSet(viewsets.ModelViewSet):
             return User.objects.filter(id=user.id)
             
         # 2. Management Access
-        # HasRBACPermission handles global access check, but we still need to filter queryset
-        # for safety if they somehow bypass the permission class (e.g. nested calls)
         from core.models import Employee
         employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
         is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_access_roles'))
@@ -41,22 +39,30 @@ class UserViewSet(viewsets.ModelViewSet):
         Returns the current user's profile and linked employee data for the current tenant.
         """
         user = request.user
-        data = UserSerializer(user).data
-        
-        # Link employee data if available in the current tenant schema
         from core.models import Employee
         
-        employee = Employee.objects.filter(email=user.email).first()
-        if employee:
-            data['employee_id'] = employee.id
-            data['employee_nik'] = employee.nik
-            data['fullname'] = employee.fullname
-            data['role_name'] = str(employee.role.name) if employee.role else None
-            data['department_name'] = str(employee.department.name) if employee.department else None
+        # Link employee data ONLY if we are in a tenant schema.
+        # core.Employee is in TENANT_APPS, so it doesn't exist in 'public'.
+        data = UserSerializer(user).data
+        current_tenant = getattr(request, 'tenant', None)
+        is_public = not current_tenant or current_tenant.schema_name == 'public'
+        
+        if not is_public:
+            employee = Employee.objects.filter(email=user.email).select_related('role', 'department', 'role__department', 'golongan', 'access_role', 'supervisor').first()
+            if employee:
+                data['employee_id'] = employee.id
+                data['employee_nik'] = employee.nik
+                data['fullname'] = employee.fullname
+                data['role_name'] = str(employee.role.name) if employee.role else None
+                data['department_name'] = str(employee.department.name) if employee.department else None
+            else:
+                data['employee_id'] = None
+                data['employee_nik'] = None
         else:
             data['employee_id'] = None
             data['employee_nik'] = None
-            
+            data['fullname'] = f"System Admin ({user.email})"
+        
         return Response(data)
 
 class LoginAPIView(viewsets.GenericViewSet):

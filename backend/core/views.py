@@ -18,8 +18,9 @@ from .serializers import (
     WorkflowStageSerializer, WorkflowActionSerializer,
     APIKeySerializer, AuditLogSerializer
 )
+from core.mixins import TenantIsolationMixin
 
-class APIKeyViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class APIKeyViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = APIKey.objects.all()
     serializer_class = APIKeySerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
@@ -40,7 +41,7 @@ class APIKeyViewSet(AuditModelMixin, viewsets.ModelViewSet):
         return APIKey.objects.none()
 
 
-class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+class AuditLogViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
@@ -64,14 +65,14 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         raise PermissionDenied("You do not have permission to view audit logs.")
 
 
-class BranchViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class BranchViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
 
-class WorkflowConfigViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class WorkflowConfigViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = WorkflowConfig.objects.all()
     serializer_class = WorkflowConfigSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
@@ -92,40 +93,68 @@ class WorkflowActionViewSet(AuditModelMixin, viewsets.ReadOnlyModelViewSet):
     required_rbac_permission = 'manage_attendance' # Actors need this to see history
 
 
-class DepartmentViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class DepartmentViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
 
-class RoleViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class RoleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
 
-class GolonganViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class GolonganViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Golongan.objects.all()
     serializer_class = GolonganSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
 
-class AccessRoleViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class AccessRoleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = AccessRole.objects.all()
     serializer_class = AccessRoleSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_access_roles'
 
 
-class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
-    queryset = Employee.objects.all()
+class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
+    queryset = Employee.objects.none()
     serializer_class = EmployeeSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
-    allow_self_service = True  # Enable owner updates (Phase 70)
+    allow_self_service = True
+
+    def get_queryset(self):
+        from django.db import connection
+        # with connection.cursor() as cursor:
+        #     cursor.execute("SHOW search_path")
+        #     sp = cursor.fetchone()
+        # print(f"DEBUG VIEW: Path={self.request.path} Schema={connection.schema_name} SP={sp}")
+        
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+
+        # Managers/HR see everyone
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_hr')):
+            queryset = Employee.objects.all().select_related(
+                'department', 'role', 'role__department', 'golongan', 'branch', 'access_role', 'supervisor'
+            )
+            dept_id = self.request.query_params.get('department')
+            if dept_id:
+                queryset = queryset.filter(department_id=dept_id)
+            return queryset
+            
+        # Employees can only see themselves
+        if employee:
+            return Employee.objects.filter(id=employee.id).select_related(
+                'department', 'role', 'role__department', 'golongan', 'branch', 'access_role', 'supervisor'
+            )
+            
+        return Employee.objects.none()
 
     def get_serializer_class(self):
         if self.request.query_params.get('lite') == 'true':
@@ -140,25 +169,7 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
                 from .serializers import EmployeeProfileSerializer
                 return EmployeeProfileSerializer
                 
-        return super().get_serializer_class()
-
-    def get_queryset(self):
-        user = self.request.user
-        employee = Employee.objects.filter(email=user.email).first()
-
-        # Managers/HR see everyone
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_hr')):
-            queryset = Employee.objects.all()
-            dept_id = self.request.query_params.get('department')
-            if dept_id:
-                queryset = queryset.filter(department_id=dept_id)
-            return queryset
-            
-        # Employees can only see themselves
-        if employee:
-            return Employee.objects.filter(id=employee.id)
-            
-        return Employee.objects.none()
+        return EmployeeSerializer
 
     def create(self, request, *args, **kwargs):
         """
@@ -180,7 +191,6 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        from django.db import transaction
         from users.models import User
         
         try:
@@ -190,9 +200,6 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
                 # 2. Provision User Account if requested
                 if create_user_flag:
-                    # We create/get the User in the shared schema automatically because 
-                    # Users are meant to be shared across tenants, but bound by ManyToMany.
-                    # Django Tenants forces the connection context.
                     user, created = User.objects.get_or_create(
                         email=employee.email,
                         defaults={
@@ -211,7 +218,6 @@ class EmployeeViewSet(AuditModelMixin, viewsets.ModelViewSet):
                         user.save()
 
                     # 3. Bind the User to the current Tenant 
-                    # TenantMainMiddleware injects request.tenant
                     if hasattr(request, 'tenant') and request.tenant:
                         user.tenants.add(request.tenant)
 

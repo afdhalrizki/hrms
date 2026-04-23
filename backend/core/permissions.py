@@ -1,5 +1,8 @@
 from rest_framework import permissions
 from core.models import Employee
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TenantAccessPermission(permissions.BasePermission):
     """
@@ -28,19 +31,24 @@ class HasRBACPermission(permissions.BasePermission):
     If the user is a tenant admin (is_staff), they implicitly have full access.
     """
     def has_permission(self, request, view):
+        from django.db import connection
         if not request.user or not request.user.is_authenticated:
             return False
             
-        # Hard isolation: Never allow API access on public schema
+        # Ensure connection is on the correct tenant before ANY query
+        if hasattr(request, 'tenant') and request.tenant:
+            connection.set_tenant(request.tenant)
+            
+        # Hard isolation: Never allow API access on public schema, UNLESS it's a global admin
         if getattr(request, 'tenant', None) and request.tenant.schema_name == 'public':
-            return False
-
+            return getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
+            
         # Tenant admins (is_staff) override RBAC and have full access
         if request.user.is_staff:
             return True
 
-        # Hard isolation: User MUST have an Employee record in this tenant schema
-        # to be considered authorized for this tenant.
+        # The tenant should already be set by E2ETenantMiddleware using schema_context
+        # We can proceed directly to employee verification.
         has_employee = Employee.objects.filter(email=request.user.email).exists()
         if not has_employee:
             return False

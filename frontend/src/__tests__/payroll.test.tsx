@@ -39,6 +39,15 @@ vi.mock('sonner', () => ({
   },
 }));
 
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    tr: ({ children, ...props }: any) => <tr {...props}>{children}</tr>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <NextIntlClientProvider locale="en" messages={{}}>

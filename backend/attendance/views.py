@@ -20,8 +20,10 @@ from .serializers import (
 
 from .services import AttendanceService
 
+from core.mixins import TenantIsolationMixin
+
 # ── ViewSets ────────────────────────────────────────────────────────────────
-class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -217,7 +219,7 @@ class AttendanceViewSet(AuditModelMixin, viewsets.ModelViewSet):
 
 from core.services import WorkflowService
 
-class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class LeaveRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = LeaveRequest.objects.all()
     serializer_class = LeaveRequestSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -312,7 +314,7 @@ class LeaveRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
                 balance.save()
 
 
-class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class OvertimeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Overtime.objects.all()
     serializer_class = OvertimeSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -364,7 +366,7 @@ class OvertimeViewSet(AuditModelMixin, viewsets.ModelViewSet):
                 del serializer._data
 
 
-class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class ShiftViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -372,7 +374,7 @@ class ShiftViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_feature = 'attendance'
 
 
-class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class ScheduleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -401,7 +403,7 @@ class ScheduleViewSet(AuditModelMixin, viewsets.ModelViewSet):
         if date_param:
             queryset = queryset.filter(date=date_param)
         return queryset
-class LeaveBalanceViewSet(viewsets.ReadOnlyModelViewSet):
+class LeaveBalanceViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
     queryset = LeaveBalance.objects.all()
     serializer_class = LeaveBalanceSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -422,7 +424,7 @@ class LeaveBalanceViewSet(viewsets.ReadOnlyModelViewSet):
         return LeaveBalance.objects.none()
 
 
-class AttendanceCorrectionRequestViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class AttendanceCorrectionRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = AttendanceCorrectionRequest.objects.all()
     serializer_class = AttendanceCorrectionRequestSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]

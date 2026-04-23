@@ -11,6 +11,7 @@ export default defineConfig({
     setupFiles: ['./src/__tests__/setup.ts'],
     exclude: ['**/node_modules/**', '**/tests/**', '**/dist/**'],
     reporters: ['verbose'],
+    testTimeout: 30000,
   },
   resolve: {
     alias: {

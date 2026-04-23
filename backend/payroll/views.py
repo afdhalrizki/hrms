@@ -10,14 +10,16 @@ from .serializers import (
     EmployeeSalaryComponentSerializer
 )
 
-class SalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
+from core.mixins import TenantIsolationMixin
+
+class SalaryComponentViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = SalaryComponent.objects.all()
     serializer_class = SalaryComponentSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
     required_rbac_permission = 'manage_payroll'
     required_feature = 'payroll'
 
-class EmployeeSalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class EmployeeSalaryComponentViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = EmployeeSalaryComponent.objects.all()
     serializer_class = EmployeeSalaryComponentSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -31,7 +33,7 @@ class EmployeeSalaryComponentViewSet(AuditModelMixin, viewsets.ModelViewSet):
             queryset = queryset.filter(employee_id=emp_id)
         return queryset
 
-class PayrollPeriodViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class PayrollPeriodViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayrollPeriod.objects.all()
     serializer_class = PayrollPeriodSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -43,7 +45,7 @@ from rest_framework.response import Response
 from .services import PayrollCalculator
 from core.models import Employee
 
-class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Payslip.objects.all()
     serializer_class = PayslipSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -139,7 +141,7 @@ class PayslipViewSet(AuditModelMixin, viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
 
-class PayslipDetailViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class PayslipDetailViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayslipDetail.objects.all()
     serializer_class = PayslipDetailSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]

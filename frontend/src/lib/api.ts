@@ -73,6 +73,10 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     if (testTenant && (hostname === 'localhost' || hostname === '127.0.0.1')) {
       headers['X-Tenant'] = testTenant;
     }
+    if (process.env.NODE_ENV === 'test') {
+       const authHeader = headers['Authorization'] ? 'Present' : 'Missing';
+       console.log(`[API] ${options.method || 'GET'} ${url} - X-Tenant: ${headers['X-Tenant']} - Auth: ${authHeader}`);
+    }
   }
 
   try {
@@ -132,6 +136,9 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
           }
         }
       } catch (e) {}
+      if (process.env.NODE_ENV === 'test') {
+        console.log(`[API] Error from ${url}: ${response.status} - Body: ${text}`);
+      }
       throw new Error(detail);
     }
 
@@ -140,10 +147,18 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     }
 
     const text = await response.text();
+    if (!response.ok && process.env.NODE_ENV === 'test') {
+       console.log(`[API] Error from ${url}: ${response.status} - Body: ${text}`);
+    }
     if (!text) {
       return null as any;
     }
-    return JSON.parse(text);
+    const data = JSON.parse(text);
+    if (process.env.NODE_ENV === 'test') {
+       const display = Array.isArray(data) ? (data.length === 1 ? JSON.stringify(data[0]) : data.length + ' items') : 'Object';
+       console.log(`[API] Response from ${url}: ${display}`);
+    }
+    return data;
   } catch (error) {
     throw error;
   }

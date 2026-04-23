@@ -9,7 +9,9 @@ from core.services import WorkflowService
 from .models import Reimbursement, ReimbursementCategory
 from .serializers import ReimbursementSerializer, ReimbursementCategorySerializer
 
-class ReimbursementCategoryViewSet(AuditModelMixin, viewsets.ModelViewSet):
+from core.mixins import TenantIsolationMixin
+
+class ReimbursementCategoryViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = ReimbursementCategory.objects.all()
     serializer_class = ReimbursementCategorySerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -17,7 +19,7 @@ class ReimbursementCategoryViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_feature = 'reimbursement'
     allow_self_service_list = True
 
-class ReimbursementViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class ReimbursementViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Reimbursement.objects.all()
     serializer_class = ReimbursementSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]

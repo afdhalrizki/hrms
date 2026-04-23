@@ -11,8 +11,9 @@ from .serializers import (
 )
 from core.models import Employee
 from django.db.models import Q
+from core.mixins import TenantIsolationMixin
 
-class KPIViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class KPIViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPI.objects.all()
     serializer_class = KPISerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -20,7 +21,7 @@ class KPIViewSet(AuditModelMixin, viewsets.ModelViewSet):
     required_feature = 'performance'
     allow_self_service_list = True
 
-class KPITargetViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class KPITargetViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPITarget.objects.all()
     serializer_class = KPITargetSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -41,7 +42,7 @@ class KPITargetViewSet(AuditModelMixin, viewsets.ModelViewSet):
             return KPITarget.objects.filter(employee=employee)
         return KPITarget.objects.none()
 
-class AppraisalViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Appraisal.objects.all()
     serializer_class = AppraisalSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
@@ -105,7 +106,7 @@ class AppraisalViewSet(AuditModelMixin, viewsets.ModelViewSet):
             
         return response
 
-class AppraisalReviewViewSet(AuditModelMixin, viewsets.ModelViewSet):
+class AppraisalReviewViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = AppraisalReview.objects.all()
     serializer_class = AppraisalReviewSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]

@@ -11,20 +11,22 @@ User = get_user_model()
 class PermissionsTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
-        self.factory = RequestFactory()
-        
-        self.regular_user = User.objects.create_user(email='perm_user@test.com', password='pwd')
-        self.regular_user.tenants.add(self.tenant)
-        self.supervisor_user = User.objects.create_user(email='spv@test.com', password='pwd')
-        self.supervisor_user.tenants.add(self.tenant)
-        self.admin_user = User.objects.create_user(email='admin@test.com', password='pwd', is_staff=True)
-        self.global_admin = User.objects.create_user(email='global@test.com', password='pwd', is_superuser=True)
-        
-        self.role_with_perm = AccessRole.objects.create(name='Manager Role', permissions={'manage_attendance': True})
-        self.role_without_perm = AccessRole.objects.create(name='Staff Role', permissions={'manage_attendance': False})
+        from django_tenants.utils import schema_context
+        with schema_context(self.tenant.schema_name):
+            self.factory = RequestFactory()
+            
+            self.regular_user = User.objects.create_user(email='perm_user@test.com', password='pwd')
+            self.regular_user.tenants.add(self.tenant)
+            self.supervisor_user = User.objects.create_user(email='spv@test.com', password='pwd')
+            self.supervisor_user.tenants.add(self.tenant)
+            self.admin_user = User.objects.create_user(email='admin@test.com', password='pwd', is_staff=True)
+            self.global_admin = User.objects.create_user(email='global@test.com', password='pwd', is_superuser=True)
+            
+            self.role_with_perm = AccessRole.objects.create(name='Manager Role', permissions={'manage_attendance': True})
+            self.role_without_perm = AccessRole.objects.create(name='Staff Role', permissions={'manage_attendance': False})
 
-        self.spv_emp = Employee.objects.create(email=self.supervisor_user.email, fullname="Spv", nik="SPV01", join_date="2024-01-01", ktp_number="123")
-        self.user_emp = Employee.objects.create(email=self.regular_user.email, fullname="User", nik="USR01", supervisor=self.spv_emp, join_date="2024-01-01", ktp_number="456", access_role=self.role_without_perm)
+            self.spv_emp = Employee.objects.create(email=self.supervisor_user.email, fullname="Spv", nik="SPV01", join_date="2024-01-01", ktp_number="123")
+            self.user_emp = Employee.objects.create(email=self.regular_user.email, fullname="User", nik="USR01", supervisor=self.spv_emp, join_date="2024-01-01", ktp_number="456", access_role=self.role_without_perm)
 
     def test_tenant_access_permission(self):
         perm = TenantAccessPermission()
@@ -44,10 +46,10 @@ class PermissionsTestCase(TenantTestCase):
         request.tenant = self.tenant
         self.assertTrue(perm.has_permission(request, view))
 
-        # Invalid tenant assignment
-        from django_tenants.utils import schema_context, get_public_schema_name
-        with schema_context(get_public_schema_name()):
-            other_tenant = Tenant.objects.create(schema_name='other', name='Other')
+        # Invalid tenant assignment (unrelated tenant)
+        other_tenant = Mock(spec=Tenant)
+        other_tenant.schema_name = 'other'
+        other_tenant.id = 999
         request.tenant = other_tenant
         self.assertFalse(perm.has_permission(request, view))
 

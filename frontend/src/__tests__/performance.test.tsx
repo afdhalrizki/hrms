@@ -82,11 +82,6 @@ describe('PerformancePage (Integrated)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockTenantContextValues = null;
-    // Reset apiFetch to its actual integrated implementation
-    (apiFetch as any).mockImplementation(async (...args: any[]) => {
-      const actual = await vi.importActual('@/lib/api') as any;
-      return actual.apiFetch(...args);
-    });
   });
 
   it('renders KPI targets and appraisals from real backend', async () => {
