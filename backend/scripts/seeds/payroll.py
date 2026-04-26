@@ -14,12 +14,14 @@ def seed_payroll_data(tenant, employee):
             month=4, year=2026,
             defaults={'start_date': '2026-04-01', 'end_date': '2026-04-30', 'is_closed': False}
         )
+        from django.utils import timezone
+        today = timezone.localdate()
         Payslip.objects.update_or_create(
             employee=employee, period=period,
             defaults={
                 'basic_salary': 15000000, 
                 'net_pay': 16500000, 
-                'payment_date': '2026-03-31'
+                'payment_date': today
             }
         )
         print(f"      ✅ Seeded payroll for {employee.email}")

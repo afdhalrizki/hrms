@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/api/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class _TestHttpOverrides extends HttpOverrides {
   @override
@@ -112,6 +113,7 @@ Future<void> setupTestEnvironment() async {
   setupSystemChannelMocks();
   GoogleFonts.config.allowRuntimeFetching = false;
   mockSecureStorage.clear();
+  Intl.defaultLocale = 'en_US';
 }
 
 Future<void> loginForTest() async {
