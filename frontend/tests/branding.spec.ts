@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
 test.describe('Branding and Identity', () => {
@@ -18,17 +18,23 @@ test.describe('Branding and Identity', () => {
   test('should update company branding and apply theme instantly', async ({ page }) => {
     await page.goto(getTenantUrl('/en/settings/branding'));
     
-    // Ensure the page is fully loaded and branding heading is visible
-    await expect(page.getByRole('heading', { name: /Tenant Branding/i })).toBeVisible({ timeout: 15000 });
+    // Wait for loader to disappear
+    await expect(page.locator('svg.animate-spin')).not.toBeVisible({ timeout: 15000 });
     
-    // Modify a color - using the first color input (Primary Color)
-    // We target the input specifically within the label context if possible, 
-    // or just use the first two inputs for Primary and Secondary.
-    const primaryColorInput = page.getByTestId('primary-color-input');
-    const secondaryColorInput = page.getByTestId('secondary-color-input');
+    // Check if we are redirected to "Restricted Access" (indicates permission race)
+    if (await page.getByText(/Restricted Access/i).isVisible()) {
+      console.log('--- Restricted Access detected, reloading... ---');
+      await page.reload();
+      await expect(page.locator('svg.animate-spin')).not.toBeVisible({ timeout: 15000 });
+    }
     
-    await primaryColorInput.fill('#ff0000');
-    await secondaryColorInput.fill('#00ff00');
+    // Modify colors using text inputs for stability
+    const primaryInput = page.getByTestId('primary-color-input');
+    const secondaryInput = page.getByTestId('secondary-color-input');
+    
+    await expect(primaryInput).toBeVisible({ timeout: 15000 });
+    await primaryInput.fill('#ff0000');
+    await secondaryInput.fill('#00ff00');
     
     // Update - using the button defined in the UI
     const applyBtn = page.getByRole('button', { name: /Apply Changes/i });

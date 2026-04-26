@@ -203,11 +203,13 @@ export function parseMetrics(logContent, suiteName) {
   } else if (suiteName.includes('Frontend')) {
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
-      // Vitest
+      // Vitest (handles both "X failed | Y passed" and "Y passed")
       const vPass = cleanLine.match(/Tests.*?(\d+)\s+passed/);
       const vFail = cleanLine.match(/Tests.*?(\d+)\s+failed/);
-      if (vPass) p += parseInt(vPass[1], 10);
-      if (vFail) f += parseInt(vFail[1], 10);
+      const vErr = cleanLine.match(/Tests.*?(\d+)\s+error/);
+      if (vPass) p = Math.max(p, parseInt(vPass[1], 10));
+      if (vFail) f = Math.max(f, parseInt(vFail[1], 10));
+      if (vErr) e = Math.max(e, parseInt(vErr[1], 10));
       // Playwright
       const pPass = cleanLine.match(/^\s*(\d+)\s+passed/);
       const pFail = cleanLine.match(/^\s*(\d+)\s+failed/);
@@ -330,23 +332,37 @@ export async function isPortInUse(port, host = '127.0.0.1') {
 }
 
 export async function killPortProcess(port) {
-  if (process.platform !== 'win32') return; // Simplified for this environment
-
-  try {
-    const { stdout } = await execAsync(
-      `netstat -ano | findstr :${port} | findstr LISTENING`,
-    );
-    const lines = stdout.split('\n').filter((l) => l.trim().length > 0);
-    for (const line of lines) {
-      const parts = line.trim().split(/\s+/);
-      const pid = parts[parts.length - 1];
-      if (pid && pid !== '0') {
-        log(`Terminating process ${pid} on port ${port}...`, COLORS.yellow);
-        await execAsync(`taskkill /F /PID ${pid}`);
+  if (process.platform === 'win32') {
+    try {
+      const { stdout } = await execAsync(
+        `netstat -ano | findstr :${port} | findstr LISTENING`,
+      );
+      const lines = stdout.split('\n').filter((l) => l.trim().length > 0);
+      for (const line of lines) {
+        const parts = line.trim().split(/\s+/);
+        const pid = parts[parts.length - 1];
+        if (pid && pid !== '0') {
+          log(`Terminating process ${pid} on port ${port}...`, COLORS.yellow);
+          await execAsync(`taskkill /F /PID ${pid}`);
+        }
       }
-    }
-  } catch (e) {
-    // If findstr fails (no process), it's okay
+    } catch (e) {}
+  } else {
+    // Linux/macOS
+    try {
+      log(`Terminating process on port ${port} (Linux/macOS)...`, COLORS.yellow);
+      // Try fuser first
+      try {
+        await execAsync(`fuser -k ${port}/tcp`);
+      } catch (e) {
+        // Fallback to lsof + kill
+        const { stdout } = await execAsync(`lsof -t -i:${port}`);
+        const pids = stdout.split('\n').filter((p) => p.trim().length > 0);
+        for (const pid of pids) {
+          await execAsync(`kill -9 ${pid}`);
+        }
+      }
+    } catch (e) {}
   }
 }
 

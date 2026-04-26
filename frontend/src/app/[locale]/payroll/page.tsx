@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { PayslipDetailModal } from '@/components/payroll/PayslipDetailModal';
 import { GeneratePayrollModal } from '@/components/payroll/GeneratePayrollModal';
 import { usePermission } from '@/hooks/usePermission';
+import { useAuth } from '@/context/AuthContext';
 
 
 interface Payslip {
@@ -43,8 +44,8 @@ export default function PayrollPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedPayslip, setSelectedPayslip] = React.useState<Payslip | null>(null);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
+  const { loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
-
   const canManage = hasPermission('manage_payroll');
   const canViewAll = hasPermission('view_all_payslips');
   const isManagerMode = canManage || canViewAll;
@@ -76,7 +77,7 @@ export default function PayrollPage() {
       <div className="space-y-8">
         {/* Restricted Access View for Employees with no payroll data. 
             Admins always see the page. Employees with data see the page. */}
-        {!isLoading && !isManagerMode && payslips.length === 0 ? (
+        {!(isLoading || authLoading) && !isManagerMode && payslips.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center">
             <div className="h-20 w-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mb-4">
               <Eye size={40} />

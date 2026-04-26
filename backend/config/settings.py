@@ -85,6 +85,7 @@ TENANT_APPS = [
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 MIDDLEWARE = [
+    'users.conn_middleware.ConnectionResetMiddleware',
     'django_tenants.middleware.main.TenantMainMiddleware',
     'users.e2e_middleware.E2ETenantMiddleware',
     'corsheaders.middleware.CorsMiddleware',

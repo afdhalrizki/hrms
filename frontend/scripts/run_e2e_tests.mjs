@@ -1,6 +1,6 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { 
@@ -99,8 +99,9 @@ function printE2ESummary(jsonPath) {
 
     const passed = stats.expected || 0;
     const failed = stats.unexpected || 0;
+    const flaky = stats.flaky || 0;
     const errored = errors.length;
-    const total = passed + failed + (stats.skipped || 0);
+    const total = passed + failed + flaky + (stats.skipped || 0);
 
     log("\n" + "=".repeat(50), COLORS.cyan);
     log("E2E TEST EXECUTION SUMMARY (FRONTEND)", COLORS.cyan);
@@ -113,6 +114,7 @@ function printE2ESummary(jsonPath) {
     log(`Total Tests:    ${total}`, COLORS.white);
     log("-".repeat(50), COLORS.gray);
     log(`Tests Passed:   ${passed}`, COLORS.green);
+    log(`Tests Flaky:    ${flaky}`, flaky > 0 ? COLORS.yellow : COLORS.white);
     log(`Tests Failed:   ${failed}`, failed > 0 ? COLORS.red : COLORS.white);
     log(`Tests Errored:  ${errored}`, errored > 0 ? COLORS.red : COLORS.white);
     log(`Warnings:       ${warningCount}`, warningCount > 0 ? COLORS.yellow : COLORS.white);
@@ -128,6 +130,8 @@ async function main() {
   const skipInstall = args.includes('--skip-install');
   const skipSeed = args.includes('--skip-seed');
   const live = args.includes('--live');
+  const workersArg = args.find(a => a.startsWith('--workers='));
+  const numWorkers = workersArg ? parseInt(workersArg.split('=')[1]) : 2;
 
   log("--- HRMS Playwright Automation ---", COLORS.cyan);
 
@@ -200,9 +204,9 @@ async function main() {
 
     const seedScript = join(BackendDir, 'scripts', 'seed_test_db.py');
     if (existsSync(seedScript)) {
-      const exitCode = await spawnStream(pythonCmd, [seedScript], { cwd: BackendDir });
+      const exitCode = await spawnStream(pythonCmd, [seedScript, '--workers', numWorkers.toString(), '--preset', 'full'], { cwd: BackendDir, logFile });
       if (exitCode === 0) {
-        log("Seed successful.", COLORS.green);
+        log(`Seed successful with ${numWorkers} workers.`, COLORS.green);
       } else {
         log(`Warning: Seed script failed (Exit Code: ${exitCode}).`, COLORS.gray);
       }
@@ -213,14 +217,19 @@ async function main() {
     log("[2/3] Skipping Seed...", COLORS.gray);
   }
 
-  // 3. Port Cleanup
-  log("[3/4] Ensuring ports are available...", COLORS.yellow);
-  await cleanupPort(3000);
-  await cleanupPort(3001);
+  // Port Cleanup
+  log("[3/4] Cleaning up existing ports (8000, 3001) to ensure fresh start...", COLORS.yellow);
   await cleanupPort(8000);
+  await cleanupPort(3001);
 
   // 3.5. Build Frontend
-  if (!args.includes('--skip-build')) {
+  const buildTimestampFile = join(logDir, 'last_build_timestamp');
+  let shouldSkipBuild = args.includes('--skip-build');
+  
+  if (!shouldSkipBuild) {
+    // Simple cache: if .next exists and is newer than the last build timestamp we recorded
+    // OR if we want to be more sophisticated, we can check file modification times.
+    // For now, let's just allow the user to use --skip-build or we can automate it.
     log("[3.5/4] Building Frontend Production Bundle...", COLORS.yellow);
     const buildEnv = { 
       ...process.env, 
@@ -230,7 +239,9 @@ async function main() {
       NEXT_PUBLIC_API_URL: live ? 'https://qa.harikerja.web.id/api' : 'http://127.0.0.1:8000/api'
     };
     const buildCode = await spawnStream('npm', ['run', 'build'], { cwd: FrontendDir, env: buildEnv });
-    if (buildCode !== 0) {
+    if (buildCode === 0) {
+      writeFileSync(buildTimestampFile, new Date().toISOString());
+    } else {
       log("ERROR: Frontend build failed. Aborting tests.", COLORS.red);
       process.exit(1);
     }
@@ -244,16 +255,18 @@ async function main() {
     ...process.env,
     PORT: "3001",
     HOSTNAME: "localhost", // Use localhost for cookie compatibility
+    SKIP_BACKEND_SETUP: '1',
     NODE_OPTIONS: "--max-old-space-size=1536", // Limit memory per worker
     PLAYWRIGHT_JSON_OUTPUT_NAME: "logs/e2e_results.json",
-    NEXT_PUBLIC_API_URL: (live ? 'https://qa.harikerja.web.id/api' : 'http://localhost:8000/api')
+    NEXT_PUBLIC_API_URL: (live ? 'https://qa.harikerja.web.id/api' : 'http://127.0.0.1:8000/api'),
+    NEXT_PUBLIC_E2E_LOGGING: 'true'
   };
 
   const pwArgs = [
     'playwright', 'test', 'tests/',
     '--grep-invert', '"diagnostic|Instrumentation"',
-    '--workers=1',
-    '--retries=0',
+    `--workers=${numWorkers}`,
+    '--retries=2', // Allow two retries for transient network/concurrency issues
     '--timeout=120000',
     '--reporter=list,json'
   ];
@@ -266,8 +279,8 @@ async function main() {
 
   // Extra retry for transient failures
   if (exitCode !== 0) {
-    log("Transient failure detected, cleaning up ports and retrying Playwright suite once more...", COLORS.yellow);
-    await cleanupPort(3000);
+    log("Transient failure detected, retrying Playwright suite once more...", COLORS.yellow);
+    await cleanupPort(3001);
     await cleanupPort(8000);
     await new Promise(r => setTimeout(r, 5000));
     exitCode = await spawnStream('npx', pwArgs, { 

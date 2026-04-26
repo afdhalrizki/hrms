@@ -35,8 +35,10 @@ async function main() {
   const seed = args.includes('--seed') || args.includes('--Seed');
   const coverage = args.includes('--coverage') || args.includes('--Coverage');
   const skipDocker = args.includes('--skip-docker');
+  const skipSetup = process.env.SKIP_BACKEND_SETUP === '1';
 
   log('--- HRMS Backend Local Dev Setup (Node.js) ---', COLORS.cyan);
+  log(`SKIP_BACKEND_SETUP: ${skipSetup} (env: ${process.env.SKIP_BACKEND_SETUP})`, COLORS.gray);
 
   // 1. Env Check
   if (!existsSync(EnvFile)) {
@@ -189,35 +191,45 @@ async function main() {
   }
 
   // 6. Migrations
-  log('[5/5] Checking migrations (shared & tenant)...', COLORS.yellow);
-  try {
-    await spawnStream(
-      pythonPath,
-      ['manage.py', 'migrate_schemas', '--shared', '--noinput'],
-      { cwd: BackendDir },
-    );
-    await spawnStream(
-      pythonPath,
-      ['manage.py', 'migrate_schemas', '--tenant', '--noinput'],
-      { cwd: BackendDir },
-    );
-  } catch (e) {
-    log(
-      "Migration failed. You might need to run 'python manage.py bootstrap_tenants' if this is first run.",
-      COLORS.red,
-    );
-  }
-
-  if (seed) {
-    log('[5+/5] Seeding test data...', COLORS.yellow);
-    const seedScript = join(BackendDir, 'scripts', 'seed_test_db.py');
-    if (existsSync(seedScript)) {
-      await spawnStream(pythonPath, [seedScript], { cwd: BackendDir });
-    } else {
-      log(
-        'WARNING: scripts/seed_test_db.py not found. Skipping seed.',
-        COLORS.yellow,
+  if (skipSetup) {
+    log('[5/5] Skipping migrations and seeding (SKIP_BACKEND_SETUP=1 detected).', COLORS.green);
+  } else {
+    log('[5/5] Checking migrations (shared & tenant)...', COLORS.yellow);
+    try {
+      await spawnStream(
+        pythonPath,
+        ['manage.py', 'migrate_schemas', '--shared', '--noinput'],
+        { cwd: BackendDir },
       );
+      await spawnStream(
+        pythonPath,
+        ['manage.py', 'migrate_schemas', '--tenant', '--noinput'],
+        { cwd: BackendDir },
+      );
+    } catch (e) {
+      log(
+        "Migration failed. You might need to run 'python manage.py bootstrap_tenants' if this is first run.",
+        COLORS.red,
+      );
+    }
+
+    if (seed) {
+      log('[5+/5] Seeding test data...', COLORS.yellow);
+      const seedScript = join(BackendDir, 'scripts', 'seed_test_db.py');
+      if (existsSync(seedScript)) {
+        const workersArg = args.find(a => a.startsWith('--workers='));
+        const numWorkers = workersArg ? workersArg.split('=')[1] : (args.includes('--workers') ? args[args.indexOf('--workers') + 1] : '1');
+        
+        const presetArg = args.find(a => a.startsWith('--preset='));
+        const preset = presetArg ? presetArg.split('=')[1] : (args.includes('--preset') ? args[args.indexOf('--preset') + 1] : 'full');
+
+        await spawnStream(pythonPath, [seedScript, '--workers', numWorkers, '--preset', preset], { cwd: BackendDir });
+      } else {
+        log(
+          'WARNING: scripts/seed_test_db.py not found. Skipping seed.',
+          COLORS.yellow,
+        );
+      }
     }
   }
 
@@ -252,8 +264,20 @@ async function main() {
             COLORS.red,
           );
         }
+        log(`Forcefully killing process on port 8000...`, COLORS.cyan);
         await killPortProcess(8000);
-        await new Promise((r) => setTimeout(r, 2000));
+        log('Waiting for port 8000 to be released...', COLORS.gray);
+        for (let i = 0; i < 5; i++) {
+          await new Promise((r) => setTimeout(r, 1000));
+          if (!(await isPortInUse(8000))) {
+            log('Port 8000 is now free.', COLORS.green);
+            break;
+          }
+          log(`Port 8000 still in use, waiting... (${i+1}/5)`, COLORS.gray);
+          if (i === 4) {
+            log('WARNING: Port 8000 still in use after 5 seconds. Attempting to start anyway...', COLORS.yellow);
+          }
+        }
         shouldStart = true;
       }
     }

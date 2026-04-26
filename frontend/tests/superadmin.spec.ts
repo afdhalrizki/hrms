@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, BASE_URL } from './test_helper';
 
 test.describe.serial('Superadmin (Platform) Management', () => {
@@ -58,13 +58,17 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     // 1. Verify Header and Stats from real seeded backend (with retry for initial fetch)
     await expect(async () => {
         // If data failed to fetch, refresh the page or just wait for the retry
-        const totalReq = page.getByText('2', { exact: true }).first();
-        if (!await totalReq.isVisible()) {
-            await page.reload();
+        if (await page.getByText(/Loading requests/i).isVisible()) {
+             throw new Error('Still loading requests...');
         }
+        
         await expect(page.getByRole('heading', { name: /Registration Requests/i })).toBeVisible();
         await expect(page.getByText('Total Requests')).toBeVisible();
-        await expect(totalReq).toBeVisible({ timeout: 10000 });
+        
+        // Use a more robust check for the count
+        const countValue = page.locator('div:has-text("Total Requests") + div p, div:has-text("Total Requests") p').last();
+        const val = await countValue.innerText();
+        if (parseInt(val) < 2) throw new Error(`Requests not all loaded yet: ${val}`);
     }).toPass({ timeout: 45000 });
 
 
@@ -79,17 +83,16 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     await expect(approveBtn).toBeVisible({ timeout: 15000 });
     
     // Use a more robust click and wait for state change
+    const approvePromise = page.waitForResponse(resp => resp.url().includes('/internal/registrations/') && resp.status() === 200, { timeout: 120000 });
     await approveBtn.click();
     console.log('--- Approve button clicked, waiting for status change ---');
+    await approvePromise;
 
     // Verify success (use toPass to handle potential async updates/schema provisioning)
     await expect(async () => {
-      // Refresh the page if needed to see the latest status if WebSocket/Live update is flaky
-      // await page.reload(); // Optional, toPass already retries the check
-      
       const statusBadge = pendingRow.getByText(/APPROVED/i);
-      await expect(statusBadge).toBeVisible({ timeout: 5000 });
-    }).toPass({ timeout: 150000, intervals: [5000, 10000] });
+      await expect(statusBadge).toBeVisible({ timeout: 10000 });
+    }).toPass({ timeout: 60000, intervals: [5000, 10000] });
   });
 
   test('should allow superadmin to reject registration requests', async ({ page }) => {

@@ -12,8 +12,10 @@ const BackendDir = join(RootDir, 'backend');
 async function main() {
   const args = process.argv.slice(2);
   const skipInstall = args.includes('--skip-install');
+  const skipBackendRestart = args.includes('--skip-backend-restart');
   const coverage = args.includes('--coverage');
   const quick = args.includes('--quick');
+  const numWorkers = 4;
 
   log("--- HRMS Frontend Integrated Unit Test Automation ---", COLORS.cyan);
 
@@ -21,30 +23,45 @@ async function main() {
   log("[1/3] Ensuring Backend is running and seeded...", COLORS.yellow);
   const backendHealthy = await isPortInUse(8000) && await waitForHttp('http://localhost:8000/api/', 2000, 'Backend Check');
   
-  if (!backendHealthy) {
-    log("Backend not detected or unhealthy. Starting local backend...", COLORS.gray);
-    // Start backend in background. We use --seed to ensure fresh data.
-    spawnBackground('node', [join(BackendDir, 'scripts/run_dev.mjs'), '--seed'], { cwd: BackendDir });
-    
-    log("Waiting for backend (max 60s)...", COLORS.gray);
-    const ready = await waitForHttp('http://localhost:8000/api/', 60000, 'Backend');
-    if (!ready) {
-      log("ERROR: Backend failed to start. Integrated tests cannot run.", COLORS.red);
-      process.exit(1);
-    }
-  } else {
-    log("Backend is already running. Re-seeding for consistency...", COLORS.gray);
-    // Run seed script directly
-    const pythonPath = existsSync(join(BackendDir, 'venv/bin/python')) 
-      ? join(BackendDir, 'venv/bin/python') 
-      : 'python3';
-    await spawnStream(pythonPath, [join(BackendDir, 'scripts/seed_test_db.py')], { cwd: BackendDir });
-  }
-
   const logDir = join(FrontendDir, 'logs');
   await ensureDir(logDir);
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
   const logFile = join(logDir, `unit_test_${timestamp}.log`);
+
+  if (!backendHealthy) {
+    log("Backend not detected or unhealthy. Starting local backend...", COLORS.gray);
+    const backendLog = join(logDir, `backend_integrated_${timestamp}.log`);
+    log(`Backend logs will be at: ${backendLog}`, COLORS.gray);
+    // Start backend in background. We use --seed to ensure fresh data.
+    spawnBackground('node', [join(BackendDir, 'scripts/run_dev.mjs'), '--seed', '--workers', numWorkers.toString(), '--force'], { cwd: BackendDir, logFile: backendLog });
+    
+    log("Waiting for backend setup to initialize (15s)...", COLORS.gray);
+    await new Promise(r => setTimeout(r, 15000));
+
+    log("Waiting for backend (max 120s)...", COLORS.gray);
+    const ready = await waitForHttp('http://localhost:8000/api/', 120000, 'Backend');
+    if (!ready) {
+      log("ERROR: Backend failed to start. Integrated tests cannot run.", COLORS.red);
+      process.exit(1);
+    }
+  } else if (!skipBackendRestart) {
+    log("Backend is already running. Restarting and Re-seeding for consistency...", COLORS.gray);
+    const backendLog = join(logDir, `backend_integrated_${timestamp}.log`);
+    log(`Backend logs will be at: ${backendLog}`, COLORS.gray);
+    spawnBackground('node', [join(BackendDir, 'scripts/run_dev.mjs'), '--seed', '--workers', numWorkers.toString(), '--force'], { cwd: BackendDir, logFile: backendLog });
+    
+    log("Waiting for backend restart to initialize (15s)...", COLORS.gray);
+    await new Promise(r => setTimeout(r, 15000));
+
+    log("Waiting for backend restart (max 300s)...", COLORS.gray);
+    const ready = await waitForHttp('http://localhost:8000/api/', 300000, 'Backend');
+    if (!ready) {
+      log("ERROR: Backend failed to restart. Integrated tests cannot run.", COLORS.red);
+      process.exit(1);
+    }
+  } else {
+    log("Backend is already running and skip-backend-restart is set. Skipping restart.", COLORS.green);
+  }
 
   // 2. Dependency Check
   if (!skipInstall) {
@@ -53,79 +70,69 @@ async function main() {
   }
 
   // 3. Execution
-  log("\n[3/3] Launching Vitest Suite (INDIVIDUAL FILE MODE to avoid OOM)...", COLORS.cyan);
+  log("\n[3/3] Launching Vitest Suite (PARALLEL MODE with happy-dom)...", COLORS.cyan);
   log(`Logging output to: ${logFile}`, COLORS.gray);
 
-  const testDir = join(FrontendDir, 'src/__tests__');
-  const files = readdirSync(testDir)
-    .filter(f => f.endsWith('.test.tsx') || f.endsWith('.test.ts'))
-    .map(f => join('src/__tests__', f));
+  const filterArgs = args.filter(a => !a.startsWith('--'));
 
-  log(`Found ${files.length} test files. Running sequentially...`, COLORS.gray);
+  const vitestArgs = [
+    'vitest', 'run',
+    '--environment=happy-dom',
+    '--pool=forks',
+    '--maxWorkers=' + numWorkers,
+    '--reporter=verbose',
+    ...filterArgs
+  ];
 
-  let totalFailedFiles = 0;
-  const failedFiles = [];
-  const metrics = { passed: 0, failed: 0, errors: 0, warnings: 0 };
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const currentNum = i + 1;
-    const totalNum = files.length;
-    const percentage = Math.round((currentNum / totalNum) * 100);
-    
-    log(`\n[${currentNum}/${totalNum} - ${percentage}%] Running: ${file}`, COLORS.white);
-    
-    const vitestArgs = [
-      'vitest', 'run', file,
-      '--environment=jsdom',
-      '--pool=forks',
-      '--reporter=verbose',
-    ];
-
-    let fileOutput = '';
-    const exitCode = await new Promise((resolve) => {
-      const child = spawn('npx', vitestArgs, {
-        cwd: FrontendDir,
-        shell: true,
-        env: {
-          ...process.env,
-          NODE_OPTIONS: '--max-old-space-size=4096',
-          NEXT_PUBLIC_API_URL: 'http://localhost:8000/api'
-        }
-      });
-
-      child.stdout.on('data', (data) => {
-        const str = data.toString();
-        fileOutput += str;
-        process.stdout.write(data);
-        appendFileSync(logFile, data);
-      });
-
-      child.stderr.on('data', (data) => {
-        const str = data.toString();
-        fileOutput += str;
-        process.stderr.write(data);
-        appendFileSync(logFile, data);
-      });
-
-      child.on('close', resolve);
+  let fullOutput = '';
+  const exitCode = await new Promise((resolve) => {
+    const child = spawn('npx', vitestArgs, {
+      cwd: FrontendDir,
+      shell: true,
+      env: {
+        ...process.env,
+        NODE_OPTIONS: '--max-old-space-size=4096',
+        NEXT_PUBLIC_API_URL: 'http://localhost:8000/api',
+        TEST_WORKER_COUNT: numWorkers.toString()
+      }
     });
 
-    // Parse metrics from this file's output
-    const fileMetrics = parseMetrics(fileOutput, 'Frontend');
-    metrics.passed += fileMetrics.p;
-    metrics.failed += fileMetrics.f;
-    metrics.errors += fileMetrics.e;
-    metrics.warnings += fileMetrics.w;
+    child.stdout.on('data', (data) => {
+      const str = data.toString();
+      fullOutput += str;
+      process.stdout.write(data);
+      appendFileSync(logFile, data);
+    });
 
-    if (exitCode !== 0) {
-      totalFailedFiles++;
-      failedFiles.push(file);
-      log(`FAILED: ${file}`, COLORS.red);
-    } else {
-      log(`PASSED: ${file}`, COLORS.green);
+    child.stderr.on('data', (data) => {
+      const str = data.toString();
+      fullOutput += str;
+      process.stderr.write(data);
+      appendFileSync(logFile, data);
+    });
+
+    child.on('close', resolve);
+  });
+
+  const metrics = parseMetrics(fullOutput, 'Frontend');
+  const testFilesDir = join(FrontendDir, 'src', '__tests__');
+  const allTestFiles = existsSync(testFilesDir) ? readdirSync(testFilesDir).filter(f => f.endsWith('.test.tsx') || f.endsWith('.test.ts')) : [];
+  
+  // Extract failed files from output
+  const failedFiles = [];
+  const lines = fullOutput.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.includes('FAIL') && (line.includes('.test.tsx') || line.includes('.test.ts'))) {
+      const match = line.match(/src\/__tests__\/[a-zA-Z0-9._-]+\.test\.tsx?/);
+      if (match && !failedFiles.includes(match[0])) {
+        failedFiles.push(match[0]);
+      }
     }
   }
+
+  const totalFailedFiles = failedFiles.length;
+
 
   // Final Summary Table (Similar to Backend)
   log("\n" + "=".repeat(50), COLORS.cyan);
@@ -136,22 +143,28 @@ async function main() {
   const statusText = totalFailedFiles === 0 ? "SUCCESS" : "FAILURE";
 
   log(`Status:         ${statusText}`, statusColor);
-  log(`Files Scanned:  ${files.length}`, COLORS.white);
+  log(`Files Scanned:  ${allTestFiles.length}`, COLORS.white);
   log(`Files Failed:   ${totalFailedFiles}`, totalFailedFiles > 0 ? COLORS.red : COLORS.white);
   log("-".repeat(50), COLORS.gray);
-  log(`Tests Passed:   ${metrics.passed}`, COLORS.green);
-  log(`Tests Failed:   ${metrics.failed}`, metrics.failed > 0 ? COLORS.red : COLORS.white);
-  log(`Tests Errored:  ${metrics.errors}`, metrics.errors > 0 ? COLORS.red : COLORS.white);
-  log(`Warnings:       ${metrics.warnings}`, metrics.warnings > 0 ? COLORS.yellow : COLORS.white);
+  const m = {
+    passed: metrics.p || 0,
+    failed: metrics.f || 0,
+    errors: metrics.e || 0,
+    warnings: metrics.w || 0
+  };
+  log(`Tests Passed:   ${m.passed}`, COLORS.green);
+  log(`Tests Failed:   ${m.failed}`, m.failed > 0 ? COLORS.red : COLORS.white);
+  log(`Tests Errored:  ${m.errors}`, m.errors > 0 ? COLORS.red : COLORS.white);
+  log(`Warnings:       ${m.warnings}`, m.warnings > 0 ? COLORS.yellow : COLORS.white);
   log("=".repeat(50), COLORS.cyan);
 
   // Save metrics to JSON for the master orchestrator
   const unitResults = {
-    numPassedTests: metrics.passed,
-    numFailedTests: metrics.failed,
-    numTotalTests: metrics.passed + metrics.failed,
-    numErroredTests: metrics.errors,
-    warnings: metrics.warnings
+    numPassedTests: m.passed,
+    numFailedTests: m.failed,
+    numTotalTests: m.passed + m.failed,
+    numErroredTests: m.errors,
+    warnings: m.warnings
   };
   const unitResultsPath = join(logDir, 'unit_results.json');
   writeFileSync(unitResultsPath, JSON.stringify(unitResults, null, 2));

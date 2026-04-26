@@ -16,15 +16,18 @@ vi.mock('next-intl', async (importOriginal) => {
   };
 });
 
-// Spy on apiFetch while letting it call the real backend
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  return {
-    ...actual,
-    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
-    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-  };
-});
+const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
+ 
+ // Spy on apiFetch while letting it call the real backend
+ vi.mock('@/lib/api', async (importOriginal) => {
+   const actual = await importOriginal() as any;
+   realApiFetch.current = actual.apiFetch;
+   return {
+     ...actual,
+     apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+     getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+   };
+ });
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -58,12 +61,6 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => {
 
 describe('ReimbursementsPage (Integrated)', () => {
   beforeAll(async () => {
-    // Force tenant context for integrated tests
-    const url = new URL('http://localhost:3000/?test_tenant=company1');
-    Object.defineProperty(window, 'location', {
-      value: url,
-      writable: true,
-    });
     await loginAs('admin@company1.com');
   }, 20000);
 
@@ -83,7 +80,7 @@ describe('ReimbursementsPage (Integrated)', () => {
   it('handles empty state successfully', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
       if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
-      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+      return realApiFetch.current(endpoint, options);
     });
 
     render(<ReimbursementsPage />, { wrapper: AllProviders });
@@ -97,7 +94,7 @@ describe('ReimbursementsPage (Integrated)', () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
        if (endpoint.includes('/reimbursement-categories')) return Promise.resolve([]);
        if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
-       return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+       return realApiFetch.current(endpoint, options);
     });
     render(<ReimbursementsPage />, { wrapper: AllProviders });
     
@@ -109,7 +106,7 @@ describe('ReimbursementsPage (Integrated)', () => {
   it('handles API error on fetch', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
       if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.reject(new Error('Fetch failed'));
-      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+      return realApiFetch.current(endpoint, options);
     });
 
     render(<ReimbursementsPage />, { wrapper: AllProviders });
@@ -138,7 +135,7 @@ describe('ReimbursementsPage (Integrated)', () => {
 
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
       if (endpoint.includes('/reimbursements') && options?.method === 'POST') return Promise.resolve({ id: 123 });
-      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+      return realApiFetch.current(endpoint, options);
     });
 
     // Use fireEvent.submit on the form directly if button click is problematic

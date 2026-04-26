@@ -63,8 +63,10 @@ describe('Sidebar Component (Integrated)', () => {
     render(<Sidebar />, { wrapper: AllProviders });
     
     await waitFor(() => {
-      // admin@company1.com fullname is likely 'Admin User' or similar from seed
-      expect(screen.getByText(/admin@company1.com/i)).toBeInTheDocument();
-    }, { timeout: 15000 });
+      // The Sidebar should display the logged-in user's email.
+      // We accept either the specific worker email or the default one.
+      const emailPattern = /admin@(worker_\d+|company1)\.com/i;
+      expect(screen.getByText(emailPattern)).toBeInTheDocument();
+    }, { timeout: 20000 });
   });
 });

@@ -69,11 +69,18 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   // Multi-tenant check: if on localhost/127.0.0.1, we might need X-Tenant header for E2E
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    const testTenant = sessionStorage.getItem('test_tenant_e2e');
-    if (testTenant && (hostname === 'localhost' || hostname === '127.0.0.1')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlTenant = searchParams.get('test_tenant');
+    const storageTenant = sessionStorage.getItem('test_tenant_e2e');
+    const testTenant = urlTenant || storageTenant;
+    
+    const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || 
+                    hostname.endsWith('.localhost') || hostname.endsWith('.127.0.0.1');
+    
+    if (testTenant && isLocal) {
       headers['X-Tenant'] = testTenant;
     }
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env.NEXT_PUBLIC_E2E_LOGGING === 'true' || process.env.NODE_ENV === 'test') {
        const authHeader = headers['Authorization'] ? 'Present' : 'Missing';
        console.log(`[API] ${options.method || 'GET'} ${url} - X-Tenant: ${headers['X-Tenant']} - Auth: ${authHeader}`);
     }

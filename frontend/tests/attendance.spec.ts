@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
-test.describe.serial('Attendance Management', () => {
+test.describe('Attendance Management', () => {
   const employee = TEST_USERS.employee;
 
   test.afterEach(async ({ page }, testInfo) => {
@@ -15,6 +15,46 @@ test.describe.serial('Attendance Management', () => {
     await login(page, employee.email, employee.password);
   });
 
+  test.beforeEach(async ({ page }) => {
+    // Mock Geolocation API
+    await page.addInitScript(() => {
+      const mockGeolocation = {
+        getCurrentPosition: (success: any) => {
+          success({
+            coords: {
+              latitude: -6.2088,
+              longitude: 106.8456,
+              accuracy: 10,
+              altitude: null,
+              altitudeAccuracy: null,
+              heading: null,
+              speed: null,
+            },
+            timestamp: Date.now(),
+          });
+        },
+        watchPosition: () => 0,
+        clearWatch: () => {},
+      };
+      // @ts-ignore
+      navigator.geolocation = mockGeolocation;
+    });
+
+    // Log all API requests/responses for debugging
+    page.on('console', msg => console.log(`BROWSER [${msg.type()}]: ${msg.text()}`));
+    
+    page.on('request', request => {
+      if (request.url().includes('/api/')) {
+        console.log(`>> [API REQ] ${request.method()} ${request.url()}`);
+      }
+    });
+    page.on('response', response => {
+      if (response.url().includes('/api/')) {
+        console.log(`<< [API RES] ${response.status()} ${response.url()}`);
+      }
+    });
+  });
+
   test('should verify attendance dashboard and perform check-out', async ({ page }) => {
     // 1. Verify Stats from real backend
     // Go to attendance page with tenant context
@@ -25,28 +65,54 @@ test.describe.serial('Attendance Management', () => {
     
     // We wait for the specific KPI to contain a non-zero or expected value if needed, 
     // but at minimum we wait for the card to be visible.
-    try {
-      // Use more robust locator and check for either uppercase or normal case
-      await expect(page.getByText(/SUCCESS RATE|Success Rate/i)).toBeVisible({ timeout: 15000 });
-    } catch (e) {
-      await page.screenshot({ path: '/home/afdhal/data/hr/hrms/frontend/attendance-fail-debug.png', fullPage: true });
-      const html = await page.content();
-      console.log('--- Page HTML on Failure ---');
-      console.log(html.slice(0, 5000));
-      throw e;
-    }
+    // Use toPass to wait for data fetch to complete and UI to update
+    await expect(async () => {
+      // Check for loader first
+      await expect(page.getByText(/Loading attendance data/i)).not.toBeVisible({ timeout: 5000 });
+      
+      const successRateKpi = page.getByText(/SUCCESS RATE|Success Rate/i);
+      await expect(successRateKpi).toBeVisible({ timeout: 5000 });
+    }).toPass({ timeout: 20000 });
     
     // Wait for any pending attendance fetch to settle 
-    await page.waitForResponse(resp => resp.url().includes('/api/attendance') && resp.status() === 200).catch(() => {});
+    await page.waitForResponse(resp => resp.url().includes('/api/attendance') && resp.status() === 200, { timeout: 10000 }).catch(() => {});
     
     // 2. Perform Check Out 
-    // employee1 is already checked in by the seed script.
-    const checkOutBtn = page.getByRole('button', { name: /Check Out/i });
-    await expect(checkOutBtn).toBeVisible({ timeout: 15000 });
-    await checkOutBtn.click();
+    console.log('--- Waiting for page hydration ---');
+    await page.waitForLoadState('networkidle');
     
+    console.log('--- Checking Out ---');
+    const clockBtn = page.getByTestId('clock-btn');
+    
+    // Wait for button to be visible AND enabled (not processing/mobile-restricted)
+    await expect(clockBtn).toBeVisible({ timeout: 15000 });
+    await expect(async () => {
+      const isDisabled = await clockBtn.isDisabled();
+      if (isDisabled) throw new Error('Clock button is still disabled');
+    }).toPass({ timeout: 10000 });
+
+    console.log('--- Mocking Geolocation in page ---');
+    await page.evaluate(() => {
+      const mockGeolocation = {
+        getCurrentPosition: (success: any) => {
+          success({
+            coords: { latitude: -6.2088, longitude: 106.8456, accuracy: 10 },
+            timestamp: Date.now(),
+          });
+        },
+        watchPosition: () => 0,
+        clearWatch: () => {},
+      };
+      // @ts-ignore
+      navigator.geolocation = mockGeolocation;
+    });
+
+    console.log('--- Clicking Clock Button ---');
+    await clockBtn.click({ force: true });
+    
+    console.log('--- Waiting for API response / success toast ---');
     // Verify success toast from real backend
-    await expect(page.getByText(/Attendance recorded successfully|Clocked out successfully/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Attendance recorded successfully|Clocked out successfully/i)).toBeVisible({ timeout: 30000 });
   });
 
   test('should allow employee to submit a correction request', async ({ page }) => {

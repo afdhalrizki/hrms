@@ -17,16 +17,19 @@ vi.mock('next-intl', async (importOriginal) => {
   };
 });
 
-// Spy on apiFetch while letting it call the real backend
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  return {
-    ...actual,
-    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
-    apiDownload: vi.fn(() => Promise.resolve()),
-    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-  };
-});
+const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
+ 
+ // Spy on apiFetch while letting it call the real backend
+ vi.mock('@/lib/api', async (importOriginal) => {
+   const actual = await importOriginal() as any;
+   realApiFetch.current = actual.apiFetch;
+   return {
+     ...actual,
+     apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+     apiDownload: vi.fn(() => Promise.resolve()),
+     getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+   };
+ });
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -99,10 +102,15 @@ describe('Integrated Payroll Tests', () => {
     it('shows no payslips message when server returns empty data', async () => {
       (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
         if (endpoint === '/payslips' || endpoint.startsWith('/payslips?')) return Promise.resolve([]);
-        return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+        return realApiFetch.current(endpoint, options);
       });
 
       render(<PayrollPage />, { wrapper: AllProviders });
+
+      // Wait for loading to finish first
+      await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+      }, { timeout: 10000 });
 
       const emptyMessage = await screen.findByText(/No payslips found for this period./i);
       expect(emptyMessage).toBeInTheDocument();
@@ -124,7 +132,7 @@ describe('Integrated Payroll Tests', () => {
     it('handles API fetch error gracefully', async () => {
        (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
         if (endpoint === '/payslips' || endpoint.startsWith('/payslips?')) return Promise.reject(new Error('Fetch failed'));
-        return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+        return realApiFetch.current(endpoint, options);
       });
       
       render(<PayrollPage />, { wrapper: AllProviders });
@@ -149,7 +157,7 @@ describe('Integrated Payroll Tests', () => {
     it('shows error toast when payroll generation fails', async () => {
       (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
         if (endpoint === '/payslips/generate') return Promise.reject(new Error('Generation failed'));
-        return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+        return realApiFetch.current(endpoint, options);
       });
 
       render(<GeneratePayrollModal onClose={() => {}} onSuccess={() => {}} />, { wrapper: AllProviders });

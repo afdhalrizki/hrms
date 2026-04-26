@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
 test.describe('Login & Tenant Restriction', () => {
@@ -42,7 +42,7 @@ test.describe('Login & Tenant Restriction', () => {
     // We expect the system to either block access or keep showing company1 data
     // Usually, the tenant context is derived from headers or URL
     // If it detects a mismatch, it should show a restriction message
-    await expect(page.getByText(/Restricted Access|Access Denied/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Restricted Access|Access Denied|Akses ditolak/i)).toBeVisible({ timeout: 15000 });
   });
 
   test('should prevent login for non-existent users', async ({ page }) => {

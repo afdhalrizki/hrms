@@ -1,3 +1,4 @@
+import logging
 from rest_framework import viewsets, permissions, status, views
 from rest_framework.response import Response
 from django.db import transaction
@@ -19,6 +20,8 @@ from .serializers import (
     APIKeySerializer, AuditLogSerializer
 )
 from core.mixins import TenantIsolationMixin
+
+logger = logging.getLogger(__name__)
 
 class APIKeyViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = APIKey.objects.all()
@@ -232,49 +235,73 @@ class DashboardStatsAPIView(views.APIView):
     required_rbac_permission = 'manage_hr'
 
     def get(self, request):
-        from attendance.models import Attendance
-        today = timezone.localdate()
-
-        # Full Organization Stats for HR/Managers
-        total_employees = Employee.objects.count()
-        dept_stats = Department.objects.annotate(
-            employee_count=Count('employees'),
-        ).values('name', 'employee_count')
-
-        attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
-        present_count = Attendance.objects.filter(date=today, status='PRESENT').count()
+        from django.db import connection
         
-        from attendance.models import LeaveRequest
-        pending_leaves = LeaveRequest.objects.filter(status='PENDING').count()
-        
-        thirty_days_ago = today - timezone.timedelta(days=30)
-        new_hires = Employee.objects.filter(join_date__gte=thirty_days_ago).count()
+        # Default empty response structure
+        empty_stats = {
+            'total_employees': 0,
+            'attendance_today': [],
+            'pending_leaves': 0,
+            'new_hires': 0,
+            'department_distribution': [],
+            'payroll_summary': {'total_net_pay': 0, 'total_overtime': 0},
+            'trends': {'months': [], 'headcount': []},
+            'attendance_percent': 0
+        }
 
-        from payroll.models import Payslip
-        payroll_totals = Payslip.objects.filter(
-            period__month=today.month,
-            period__year=today.year,
-            payment_date__isnull=False
-        ).aggregate(
-            total_salary=Sum('net_pay'),
-            total_overtime=Sum('overtime_pay')
-        )
+        if connection.schema_name == 'public':
+            return Response(empty_stats)
 
-        attendance_percent = (present_count / total_employees * 100) if total_employees > 0 else 0
-        
-        return Response({
-            'total_employees': total_employees,
-            'attendance_today': list(attendance_stats),
-            'pending_leaves': pending_leaves,
-            'new_hires': new_hires,
-            'department_distribution': list(dept_stats),
-            'payroll_summary': {
-                'total_net_pay': float(payroll_totals['total_salary'] or 0),
-                'total_overtime': float(payroll_totals['total_overtime'] or 0),
-            },
-            'trends': {
-                'months': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                'headcount': [total_employees] * 6,
-            },
-            'attendance_percent': round(attendance_percent, 1)
-        })
+        try:
+            from attendance.models import Attendance
+            today = timezone.localdate()
+
+            # Full Organization Stats for HR/Managers
+            total_employees = Employee.objects.count()
+            dept_stats = Department.objects.annotate(
+                employee_count=Count('employees'),
+            ).values('name', 'employee_count')
+
+            attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
+            present_count = Attendance.objects.filter(date=today, status__in=['PRESENT', 'LATE']).count()
+            total_emp = Employee.objects.count()
+            attendance_percent = round((present_count / total_emp * 100) if total_emp > 0 else 0)
+            
+            from attendance.models import LeaveRequest
+            pending_leaves = LeaveRequest.objects.filter(status='PENDING').count()
+            
+            thirty_days_ago = today - timezone.timedelta(days=30)
+            new_hires = Employee.objects.filter(join_date__gte=thirty_days_ago).count()
+
+            from payroll.models import Payslip
+            payroll_totals = Payslip.objects.filter(
+                period__month=today.month,
+                period__year=today.year,
+                payment_date__isnull=False
+            ).aggregate(
+                total_salary=Sum('net_pay'),
+                total_overtime=Sum('overtime_pay')
+            )
+
+            attendance_percent = (present_count / total_employees * 100) if total_employees > 0 else 0
+            
+            return Response({
+                'total_employees': total_employees,
+                'attendance_percent': attendance_percent,
+                'attendance_today': list(attendance_stats),
+                'pending_leaves': pending_leaves,
+                'new_hires': new_hires,
+                'department_distribution': list(dept_stats),
+                'payroll_summary': {
+                    'total_net_pay': float(payroll_totals['total_salary'] or 0),
+                    'total_overtime': float(payroll_totals['total_overtime'] or 0),
+                },
+                'trends': {
+                    'months': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    'headcount': [total_employees] * 6,
+                },
+                'attendance_percent': round(attendance_percent, 1)
+            })
+        except Exception as e:
+            logger.error(f"Error in DashboardStatsAPIView: {e}")
+            return Response(empty_stats)

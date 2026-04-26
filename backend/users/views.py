@@ -92,6 +92,11 @@ class LoginAPIView(viewsets.GenericViewSet):
             
             from rest_framework_simplejwt.tokens import RefreshToken
             refresh = RefreshToken.for_user(user)
+            
+            # Multi-tenant isolation: Bind token to the current tenant
+            if current_tenant:
+                refresh['tenant_id'] = current_tenant.id
+                
             data = UserSerializer(user).data
             data['access'] = str(refresh.access_token)
             data['refresh'] = str(refresh)

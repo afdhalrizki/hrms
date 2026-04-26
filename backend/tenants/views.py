@@ -39,116 +39,118 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
-        registration = self.get_object()
-        
-        if registration.status != 'PENDING':
-            return Response({'error': 'Only pending requests can be approved.'}, status=status.HTTP_400_BAD_REQUEST)
+        with schema_context('public'):
+            registration = self.get_object()
+            
+            if registration.status != 'PENDING':
+                return Response({'error': 'Only pending requests can be approved.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            # 1. Create Tenant
-            # Convert prefix to a valid schema name (snake_case)
-            schema_name = registration.subdomain_prefix.replace('-', '_').lower()
-            
-            tenant = Tenant.objects.create(
-                schema_name=schema_name,
-                name=registration.company_name
-            )
-            
-            # 2. Create Domain
-            from django.conf import settings
-            domain_name = f"{registration.subdomain_prefix}.{settings.TENANT_DOMAIN_SUFFIX}"
-            domain = Domain.objects.create(
-                domain=domain_name,
-                tenant=tenant,
-                is_primary=True
-            )
-            
-            # 3. Handle Admin User
-            # User is in SHARED_APPS, so we create it once in 'public'
-            admin_user, created = User.objects.get_or_create(
-                email=registration.admin_email,
-                defaults={
-                    'first_name': registration.company_name + " Admin",
-                    'is_staff': True, # Allow login to admin if needed
-                }
-            )
-            if created:
-                admin_user.set_password('change-me-123')
-                admin_user.save()
-            
-            # Assign user to the new tenant
-            admin_user.tenants.add(tenant)
-
-            # 4. Auto-provision HR Master Data for the new tenant
-            with schema_context(tenant.schema_name):
-                # Create Default Department
-                dept, _ = Department.objects.get_or_create(
-                    name="Management",
-                    defaults={'description': "Default department for administrative staff"}
+            try:
+                # 1. Create Tenant
+                # Convert prefix to a valid schema name (snake_case)
+                schema_name = registration.subdomain_prefix.replace('-', '_').lower()
+                
+                tenant = Tenant.objects.create(
+                    schema_name=schema_name,
+                    name=registration.company_name
                 )
                 
-                # Create Default Role (Jabatan)
-                role, _ = Role.objects.get_or_create(
-                    name="Company Admin",
-                    department=dept,
-                    defaults={'description': "Top-level administrative role"}
+                # 2. Create Domain
+                from django.conf import settings
+                domain_name = f"{registration.subdomain_prefix}.{settings.TENANT_DOMAIN_SUFFIX}"
+                domain = Domain.objects.create(
+                    domain=domain_name,
+                    tenant=tenant,
+                    is_primary=True
                 )
                 
-                # Create Default Golongan (for payroll stub)
-                gol, _ = Golongan.objects.get_or_create(
-                    name="G1",
-                    defaults={
-                        'base_salary': 10000000,
-                        'meal_allowance': 50000,
-                        'transport_allowance': 30000
-                    }
-                )
-
-                # Initialize all foundational roles if they don't exist yet (fallback for signal delay)
-                from core.services import RoleService
-                admin_role, staff_role = RoleService.initialize_default_roles()
-
-                # Create Employee record for the admin
-                from datetime import date
-                Employee.objects.get_or_create(
+                # 3. Handle Admin User
+                # User is in SHARED_APPS, so we create it once in 'public'
+                admin_user, created = User.objects.get_or_create(
                     email=registration.admin_email,
                     defaults={
-                        'nik': "ADMIN-001",
-                        'fullname': registration.company_name + " Admin",
-                        'department': dept,
-                        'role': role,
-                        'golongan': gol,
-                        'access_role': admin_role,
-                        'status': 'PERMANENT',
-                        'join_date': date.today(),
-                        'ktp_number': f"ADM-{registration.id}" # Unique placeholder
+                        'first_name': registration.company_name + " Admin",
+                        'is_staff': True, # Allow login to admin if needed
                     }
                 )
+                if created:
+                    admin_user.set_password('change-me-123')
+                    admin_user.save()
+                
+                # Assign user to the new tenant
+                admin_user.tenants.add(tenant)
 
-            # 5. Update status
-            registration.status = 'APPROVED'
-            registration.save()
-            
-            # Stub: Send welcome email to admin_email with login instructions
-            # send_mail('Welcome to HRMS', f'Your schema {domain_name} is ready. Login with {registration.admin_email}.', 'noreply@hrms.com', [registration.admin_email])
+                # 4. Auto-provision HR Master Data for the new tenant
+                with schema_context(tenant.schema_name):
+                    # Create Default Department
+                    dept, _ = Department.objects.get_or_create(
+                        name="Management",
+                        defaults={'description': "Default department for administrative staff"}
+                    )
+                    
+                    # Create Default Role (Jabatan)
+                    role, _ = Role.objects.get_or_create(
+                        name="Company Admin",
+                        department=dept,
+                        defaults={'description': "Top-level administrative role"}
+                    )
+                    
+                    # Create Default Golongan (for payroll stub)
+                    gol, _ = Golongan.objects.get_or_create(
+                        name="G1",
+                        defaults={
+                            'base_salary': 10000000,
+                            'meal_allowance': 50000,
+                            'transport_allowance': 30000
+                        }
+                    )
 
-            return Response({
-                'message': f'Tenant {registration.company_name} approved and provisioned as Admin-Employee.',
-                'domain': domain_name,
-                'admin_email': registration.admin_email
-            })
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    # Initialize all foundational roles if they don't exist yet (fallback for signal delay)
+                    from core.services import RoleService
+                    admin_role, staff_role = RoleService.initialize_default_roles()
+
+                    # Create Employee record for the admin
+                    from datetime import date
+                    Employee.objects.get_or_create(
+                        email=registration.admin_email,
+                        defaults={
+                            'nik': "ADMIN-001",
+                            'fullname': registration.company_name + " Admin",
+                            'department': dept,
+                            'role': role,
+                            'golongan': gol,
+                            'access_role': admin_role,
+                            'status': 'PERMANENT',
+                            'join_date': date.today(),
+                            'ktp_number': f"ADM-{registration.id}" # Unique placeholder
+                        }
+                    )
+
+                # 5. Update status
+                registration.status = 'APPROVED'
+                registration.save()
+                
+                # Stub: Send welcome email to admin_email with login instructions
+                # send_mail('Welcome to HRMS', f'Your schema {domain_name} is ready. Login with {registration.admin_email}.', 'noreply@hrms.com', [registration.admin_email])
+
+                return Response({
+                    'message': f'Tenant {registration.company_name} approved and provisioned as Admin-Employee.',
+                    'domain': domain_name,
+                    'admin_email': registration.admin_email
+                })
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'])
     def reject(self, request, pk=None):
-        registration = self.get_object()
-        if registration.status != 'PENDING':
-             return Response({'error': 'Only pending requests can be rejected.'}, status=status.HTTP_400_BAD_REQUEST)
-             
-        registration.status = 'REJECTED'
-        registration.save()
-        return Response({'message': 'Registration request rejected.'})
+        with schema_context('public'):
+            registration = self.get_object()
+            if registration.status != 'PENDING':
+                 return Response({'error': 'Only pending requests can be rejected.'}, status=status.HTTP_400_BAD_REQUEST)
+                 
+            registration.status = 'REJECTED'
+            registration.save()
+            return Response({'message': 'Registration request rejected.'})
 
 class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
     """

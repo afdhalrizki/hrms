@@ -95,7 +95,13 @@ class WorkflowService:
                 sequence__gt=current_stage.sequence
             ).first()
 
-            if next_stage:
+            # Admin Bypass: If the actor is a tenant admin (has manage_settings), 
+            # they can finalize the approval in one step, bypassing subsequent stages.
+            is_admin = False
+            if actor_employee and actor_employee.access_role:
+                is_admin = actor_employee.access_role.permissions.get('manage_settings', False)
+
+            if next_stage and not is_admin:
                 instance.current_stage = next_stage
                 instance.status = 'PENDING'
                 instance.save()
@@ -110,7 +116,7 @@ class WorkflowService:
                 if approver:
                     service.notify_pending_approval(instance, approver)
             else:
-                # No more stages, final approval
+                # No more stages OR Admin Bypass, final approval
                 instance.status = 'APPROVED'
                 instance.save()
                 service.notify_workflow_status_change(instance, actor_employee, 'APPROVED')

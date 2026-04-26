@@ -152,7 +152,7 @@ async function ensureBackendStarted(isIntegrated) {
       });
 
       log('🔗 Running seed_test_db.py...', COLORS.gray);
-      await execAsync(`${pythonExec} scripts/seed_test_db.py`, {
+      await execAsync(`${pythonExec} scripts/seed_test_db.py --preset mobile`, {
         cwd: backendDir,
         env: integratedEnv,
       });

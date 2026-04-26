@@ -42,6 +42,7 @@ export default function WorkflowsPage() {
       if (data.length > 0) setSelectedConfig(data[0]);
     } catch (err) {
       console.error(err);
+      toast.error('Failed to fetch workflow configurations');
     } finally {
       setLoading(false);
     }
@@ -57,6 +58,7 @@ export default function WorkflowsPage() {
       setEmployees(eData);
     } catch (err) {
       console.error(err);
+      toast.error('Failed to fetch support data for workflows');
     }
   };
 

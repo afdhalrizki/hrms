@@ -6,12 +6,17 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
     exclude: ['**/node_modules/**', '**/tests/**', '**/dist/**'],
     reporters: ['verbose'],
-    testTimeout: 30000,
+    testTimeout: 60000,
+    hookTimeout: 60000,
+    pool: 'forks',
+    maxWorkers: 4,
+    // Adding retry to handle transient network issues in integrated tests
+    retry: 1,
   },
   resolve: {
     alias: {

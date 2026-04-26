@@ -142,6 +142,7 @@ describe('lib/api', () => {
     const fetchMock = vi.fn().mockResolvedValueOnce({
       ok: true,
       blob: async () => blob,
+      text: async () => ''
     });
     vi.stubGlobal('fetch', fetchMock);
 

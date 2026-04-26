@@ -20,7 +20,21 @@ class TenantAccessPermission(permissions.BasePermission):
             
         current_tenant = getattr(request, 'tenant', None)
         if current_tenant and current_tenant.schema_name != 'public':
-            return request.user.tenants.filter(id=current_tenant.id).exists()
+            # Check 1: User must belong to the tenant
+            if not request.user.tenants.filter(id=current_tenant.id).exists():
+                return False
+                
+            # Check 2: Token must be issued for this tenant
+            # request.auth is the validated token object in DRF (SimpleJWT)
+            auth = getattr(request, 'auth', None)
+            if auth:
+                # SimpleJWT Token objects have a .get() method for claims
+                token_tenant_id = getattr(auth, 'get', lambda k: None)('tenant_id')
+                if token_tenant_id and token_tenant_id != current_tenant.id:
+                    logger.warning(f"Cross-tenant token attempt: User {request.user.email} (token tenant {token_tenant_id}) accessing tenant {current_tenant.id}")
+                    return False
+            
+            return True
             
         return True
 
@@ -35,22 +49,26 @@ class HasRBACPermission(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
             
-        # Ensure connection is on the correct tenant before ANY query
-        if hasattr(request, 'tenant') and request.tenant:
-            connection.set_tenant(request.tenant)
             
-        # Hard isolation: Never allow API access on public schema, UNLESS it's a global admin
-        if getattr(request, 'tenant', None) and request.tenant.schema_name == 'public':
-            return getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
+
+        # 2. Check if we have a valid tenant context
+        current_tenant = getattr(request, 'tenant', None)
+        if not current_tenant or current_tenant.schema_name == 'public':
+            is_global = getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
+            return is_global
             
-        # Tenant admins (is_staff) override RBAC and have full access
         if request.user.is_staff:
             return True
 
-        # The tenant should already be set by E2ETenantMiddleware using schema_context
-        # We can proceed directly to employee verification.
-        has_employee = Employee.objects.filter(email=request.user.email).exists()
-        if not has_employee:
+        # The tenant should already be set by E2ETenantMiddleware or TenantMainMiddleware.
+        # Proceed to employee verification.
+        try:
+            has_employee = Employee.objects.filter(email=request.user.email).exists()
+            if not has_employee:
+                return False
+        except Exception as e:
+            # Table doesn't exist or other DB error - likely wrong schema context
+            logger.error(f"Error checking employee permission on tenant {current_tenant.schema_name}: {e}")
             return False
             
         required_perm = getattr(view, 'required_rbac_permission', None)
@@ -98,7 +116,7 @@ class HasRBACPermission(permissions.BasePermission):
             return True
         
         # Mutations (POST, PATCH, PUT)
-        standard_self_service_actions = ['create', 'retrieve', 'update', 'partial_update']
+        standard_self_service_actions = ['create', 'retrieve', 'update', 'partial_update', 'me']
         action = getattr(view, 'action', None)
         if getattr(view, 'allow_self_service', False) and action in standard_self_service_actions:
             return True

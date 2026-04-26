@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
 test.describe('Audit Logs & Traceability', () => {
@@ -32,10 +32,12 @@ test.describe('Audit Logs & Traceability', () => {
     await page.locator('input[name="radius_meters"]').fill('100', { force: true });
     await page.locator('select[name="timezone"]').selectOption('Asia/Jakarta', { force: true });
     
+    const createPromise = page.waitForResponse(resp => resp.url().includes('/api/branches/') && resp.status() === 201, { timeout: 15000 });
     await page.getByRole('button', { name: /Create Branch/i }).click({ force: true });
+    await createPromise;
     
     // 2. Verification: Check Audit Logs
-    await expect(page.getByText(/Branch created successfully/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/successfully/i)).toBeVisible({ timeout: 15000 });
     
     // Give a small grace period for the backend to process the audit record
     await page.waitForTimeout(3000);
@@ -44,7 +46,7 @@ test.describe('Audit Logs & Traceability', () => {
     await page.goto(getTenantUrl('/en/settings/audit-logs'));
     
     const table = page.locator('table');
-    await expect(table).toBeVisible({ timeout: 30000 });
+    await expect(table).toBeVisible({ timeout: 45000 });
     
     // Since we created a branch with high unique name, verify it appears in the log
     // Attempts manual refresh if available

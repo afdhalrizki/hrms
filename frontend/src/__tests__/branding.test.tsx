@@ -16,15 +16,18 @@ vi.mock('next-intl', async (importOriginal) => {
   };
 });
 
-// Spy on apiFetch while letting it call the real backend
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  return {
-    ...actual,
-    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
-    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-  };
-});
+const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
+ 
+ // Spy on apiFetch while letting it call the real backend
+ vi.mock('@/lib/api', async (importOriginal) => {
+   const actual = await importOriginal() as any;
+   realApiFetch.current = actual.apiFetch;
+   return {
+     ...actual,
+     apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+     getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+   };
+ });
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -120,7 +123,7 @@ describe('BrandingPage (Integrated)', () => {
 
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') return Promise.resolve({});
-      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+      return realApiFetch.current(endpoint, options);
     });
 
     const button = screen.getByRole('button', { name: /updateBtn/i });
@@ -139,7 +142,7 @@ describe('BrandingPage (Integrated)', () => {
 
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') return Promise.reject(new Error('Update failed'));
-      return vi.importActual('@/lib/api').then((mod: any) => mod.apiFetch(endpoint, options));
+      return realApiFetch.current(endpoint, options);
     });
 
     const button = screen.getByRole('button', { name: /updateBtn/i });

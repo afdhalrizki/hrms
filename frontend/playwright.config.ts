@@ -8,15 +8,15 @@ export default defineConfig({
   /* Directory for artifacts like screenshots and traces. */
   outputDir: './e2e/test-results',
   /* Run tests in files in parallel */
-  fullyParallel: false,
+  fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 1, // At least 1 retry for flakey tests
+  retries: 2, 
   /* Opt out of parallel tests. */
-  workers: 1, // Must be 1 because tests share the same seeded database schema
+  workers: process.env.CI ? 2 : 4, 
   /* Timeout for each test in milliseconds. */
-  // timeout: 90000,
+  timeout: 300000,
   reporter: ([
     ['list'],
     ['html', { open: 'never', outputFolder: './e2e/report' }],
@@ -38,7 +38,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3001',
+    baseURL: 'http://127.0.0.1:3001',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -60,7 +60,7 @@ export default defineConfig({
     {
       // Frontend server
       command: 'next start --port 3001',
-      url: 'http://localhost:3001/en/',
+      url: 'http://127.0.0.1:3001/en/',
       env: {
         NODE_ENV: 'test',
         NODE_OPTIONS: '--max-old-space-size=1536'
@@ -74,6 +74,9 @@ export default defineConfig({
       // Backend server (Django)
       command: 'npm run start:backend:test',
       url: 'http://localhost:8000/api/schema/',
+      env: {
+        SKIP_BACKEND_SETUP: process.env.SKIP_BACKEND_SETUP || '0',
+      },
       reuseExistingServer: true,
       stdout: 'pipe',
       stderr: 'pipe',

@@ -1,6 +1,6 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync, unlinkSync } from 'node:fs';
 import { ensureDir, log, COLORS, spawnStream, stripAnsi } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -54,6 +54,14 @@ async function main() {
   const unitResultsFile = join(logDir, 'unit_results.json');
   const e2eResultsFile = join(logDir, 'e2e_results.json');
 
+  // Clear stale results
+  if (existsSync(unitResultsFile)) {
+    try { unlinkSync(unitResultsFile); } catch (e) {}
+  }
+  if (existsSync(e2eResultsFile)) {
+    try { unlinkSync(e2eResultsFile); } catch (e) {}
+  }
+
   // 1. Dependency Check
   if (!skipInstall) {
     log("[0/2] Checking Frontend Dependencies...", COLORS.yellow);
@@ -84,8 +92,10 @@ async function main() {
         const latestUnitLog = getLatestLog('unit_test_');
         unitMetrics.warnings = countWarnings(latestUnitLog);
       } catch (e) {
-        log("Warning: Failed to parse unit results JSON.", COLORS.gray);
+        log(`Warning: Failed to parse unit results JSON: ${e.message}`, COLORS.yellow);
       }
+    } else {
+      log("Warning: unit_results.json NOT FOUND. Metrics might be incomplete.", COLORS.yellow);
     }
   }
 
@@ -94,6 +104,7 @@ async function main() {
     log("\n🌐 [2/2] Running E2E Tests (Playwright)...", COLORS.yellow);
     const e2eArgs = ['--skip-install'];
     if (live) e2eArgs.push('--live');
+    if (args.includes('--skip-build')) e2eArgs.push('--skip-build');
     
     const exitCode = await spawnStream('node', [join(FrontendDir, 'scripts/run_e2e_tests.mjs'), ...e2eArgs], { cwd: FrontendDir });
     if (exitCode !== 0) {
@@ -150,10 +161,10 @@ async function main() {
   log(`OVERALL SUCCESS: ${overallPercent}%`, overallPercent === 100 ? COLORS.green : COLORS.red);
   log(`TOTAL ERRORS   : ${totalErrors}`, totalErrors > 0 ? COLORS.red : COLORS.gray);
 
-  if (overallPercent === 100) {
+  if (overallPercent === 100 && allPassed) {
     log(" STATUS  : ✅ ALL TESTS PASSED", COLORS.green);
   } else {
-    log(" STATUS  : ❌ SOME TESTS FAILED OR SKIPPED", COLORS.red);
+    log(` STATUS  : ❌ ${!allPassed ? 'EXECUTION FAILED' : 'SOME TESTS FAILED OR SKIPPED'}`, COLORS.red);
   }
   log("=".repeat(60), COLORS.gray);
 

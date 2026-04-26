@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, getTenantUrl } from './test_helper';
 import { execSync } from 'child_process';
 
@@ -8,7 +8,7 @@ test.describe.serial('Branch Management', () => {
   test.beforeAll(async () => {
     // Reset database once before the whole suite
     try {
-      execSync('/home/afdhal/data/hr/hrms/backend/venv/bin/python /home/afdhal/data/hr/hrms/backend/scripts/seed_test_db.py');
+      execSync('/home/afdhal/data/hr/hrms/backend/venv/bin/python /home/afdhal/data/hr/hrms/backend/scripts/seed_test_db.py --preset full');
     } catch (error) {
       console.error('Failed to seed DB:', error);
     }

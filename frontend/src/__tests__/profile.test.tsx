@@ -75,7 +75,7 @@ describe('ProfilePage (Integrated)', () => {
     render(<ProfilePage />, { wrapper: AllProviders });
 
     await waitFor(() => {
-      expect(screen.getByText(/Employee One/i)).toBeInTheDocument();
+      expect(screen.getByText(/Employee 1/i)).toBeInTheDocument();
       expect(screen.getByText(/EMP001/i)).toBeInTheDocument();
     }, { timeout: 15000 });
 
@@ -86,7 +86,7 @@ describe('ProfilePage (Integrated)', () => {
     render(<ProfilePage />, { wrapper: AllProviders });
 
     // Wait for data to load
-    await screen.findByDisplayValue(/employee1@company1.com/i, {}, { timeout: 15000 });
+    await screen.findByDisplayValue(/employee1@company1.com/i, {}, { timeout: 30000 });
 
     const phoneInput = screen.getByPlaceholderText('+62...');
     const addressInput = screen.getByPlaceholderText('Write your home address...');

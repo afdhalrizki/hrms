@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { login, TEST_USERS, getTenantUrl } from './test_helper';
 
 test.describe.serial('Employee Management', () => {
@@ -18,16 +18,24 @@ test.describe.serial('Employee Management', () => {
   test('should display employee list and search for existing records', async ({ page }) => {
     await page.goto(getTenantUrl('/en/employees'));
     
-    // 1. Verify list from real seeded backend
-    // Manager One and Employee One should be visible
-    await expect(page.getByText('Manager One')).toBeVisible({ timeout: 20000 });
-    await expect(page.getByText('Employee One')).toBeVisible();
+    // Wait for loader to disappear
+    await expect(page.getByText(/Loading employee data/i)).not.toBeVisible({ timeout: 15000 });
+
+    // Manager One and Employee 1 should be visible
+    await expect(async () => {
+      await expect(page.getByText('Manager One')).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText('Employee 1')).toBeVisible({ timeout: 5000 });
+    }).toPass({ timeout: 20000 });
     
     // 2. Search functionality
+    console.log('--- Searching for "Manager" ---');
     const searchInput = page.getByPlaceholder(/Search by name/i);
     await searchInput.fill('Manager');
-    await expect(page.getByText('Manager One')).toBeVisible();
-    await expect(page.getByText('Employee One')).not.toBeVisible();
+    
+    await expect(async () => {
+      await expect(page.getByText('Manager One')).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText('Employee 1')).not.toBeVisible();
+    }).toPass({ timeout: 15000 });
   });
 
   test('should provision a new employee successfully', async ({ page }) => {

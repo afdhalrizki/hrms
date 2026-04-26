@@ -41,7 +41,7 @@ async function ensureBackendStarted() {
       log('✅ Backend is already available and healthy.', COLORS.green);
       log('Re-seeding for consistency...', COLORS.gray);
       const pythonExec = getPythonExec(BackendDir);
-      await spawnStream(pythonExec, [join(BackendDir, 'scripts/seed_test_db.py')], { cwd: BackendDir });
+      await spawnStream(pythonExec, [join(BackendDir, 'scripts/seed_test_db.py'), '--preset', 'mobile'], { cwd: BackendDir });
     } else {
       log('⚠️ Port 8000 is in use but backend is not healthy.', COLORS.red);
       return false;

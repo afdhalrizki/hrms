@@ -18,6 +18,7 @@ import { useTenant } from '@/context/TenantContext';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { usePermission } from '@/hooks/usePermission';
+import { useAuth } from '@/context/AuthContext';
 
 export default function BrandingPage() {
   const t = useTranslations('Branding');
@@ -29,6 +30,7 @@ export default function BrandingPage() {
   const [primaryColor, setPrimaryColor] = React.useState(tenant.themePrimaryColor || '#6366f1');
   const [secondaryColor, setSecondaryColor] = React.useState(tenant.themeSecondaryColor || '#4f46e5');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { user, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
   const isAdmin = hasPermission('manage_settings');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -73,7 +75,7 @@ export default function BrandingPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">

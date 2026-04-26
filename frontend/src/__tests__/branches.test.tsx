@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import BranchesPage from '../app/[locale]/branches/page';
 import { apiFetch } from '@/lib/api';
+import { toast } from 'sonner';
 
 vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(),
@@ -47,6 +48,9 @@ describe('BranchesPage', () => {
       return Promise.resolve({});
     });
     // Default confirmation to true for delete
+    if (typeof window !== 'undefined' && !window.confirm) {
+      window.confirm = vi.fn();
+    }
     vi.spyOn(window, 'confirm').mockImplementation(() => true);
   });
 
@@ -128,9 +132,9 @@ describe('BranchesPage', () => {
       expect(screen.getByText('Jakarta HQ')).toBeDefined();
     });
 
-    const editBtns = container.querySelectorAll('button:has(svg.lucide-pen)');
-    expect(editBtns.length).toBeGreaterThan(0);
-    fireEvent.click(editBtns[0]);
+    const editBtn = container.querySelector('.lucide-pen')?.closest('button');
+    expect(editBtn).toBeDefined();
+    fireEvent.click(editBtn!);
 
     await waitFor(() => {
       expect(screen.getByText('Edit Branch')).toBeDefined();
@@ -156,13 +160,13 @@ describe('BranchesPage', () => {
       expect(screen.getByText('Jakarta HQ')).toBeDefined();
     });
 
-    const deleteBtns = container.querySelectorAll('button:has(svg.lucide-trash2)');
-    expect(deleteBtns.length).toBeGreaterThan(0);
+    const deleteBtn = container.querySelector('.lucide-trash2')?.closest('button');
+    expect(deleteBtn).toBeDefined();
 
     (apiFetch as any).mockResolvedValueOnce({}); // DELETE ok
     (apiFetch as any).mockResolvedValueOnce([mockBranches[1]]); // Reload ok
 
-    fireEvent.click(deleteBtns[0]);
+    fireEvent.click(deleteBtn!);
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalled();
@@ -171,14 +175,18 @@ describe('BranchesPage', () => {
   });
 
   it('handles fetch error gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     (apiFetch as any).mockRejectedValueOnce(new Error('Fetch Failed'));
     render(<BranchesPage />);
     await waitFor(() => {
       expect(screen.getByText('Branches')).toBeDefined();
     });
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 
   it('handles save error gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     (apiFetch as any).mockResolvedValue(mockBranches); 
     render(<BranchesPage />);
     await screen.findByText('Add Branch');
@@ -188,19 +196,26 @@ describe('BranchesPage', () => {
     fireEvent.submit(screen.getByText('Create Branch').closest('form')!);
     
     await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Failed to save branch');
       expect(screen.getByText('Add New Branch')).toBeDefined(); // Modal stays open
     });
+    consoleSpy.mockRestore();
   });
 
   it('handles delete error gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     (apiFetch as any).mockResolvedValue(mockBranches);
     const { container } = render(<BranchesPage />);
     await screen.findByText('Jakarta HQ');
     
     (apiFetch as any).mockRejectedValueOnce(new Error('Delete Failed'));
-    const deleteBtns = container.querySelectorAll('button:has(svg.lucide-trash2)');
-    fireEvent.click(deleteBtns[0]);
-    // Verifying it doesn't crash component
+    const deleteBtn = container.querySelector('.lucide-trash2')?.closest('button');
+    fireEvent.click(deleteBtn!);
+    
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Failed to delete branch');
+    });
+    consoleSpy.mockRestore();
   });
 
   it('closes modal correctly', async () => {
@@ -245,8 +260,8 @@ describe('BranchesPage', () => {
     // Mock confirmation to return false
     vi.mocked(window.confirm).mockReturnValueOnce(false);
     
-    const deleteBtns = container.querySelectorAll('button:has(svg.lucide-trash2)');
-    fireEvent.click(deleteBtns[0]);
+    const deleteBtn = container.querySelector('.lucide-trash2')?.closest('button');
+    fireEvent.click(deleteBtn!);
     
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalled();

@@ -19,11 +19,18 @@ class ConfigSmokeTestCase(TenantTestCase):
         self.assertNotIn('payroll', settings.SHARED_APPS)
 
     def test_middleware_order(self):
-        """TenantMainMiddleware must be at the top."""
-        self.assertEqual(
-            settings.MIDDLEWARE[0],
-            'django_tenants.middleware.main.TenantMainMiddleware'
-        )
+        """TenantMainMiddleware must be near the top, after ConnectionResetMiddleware if present."""
+        first_middleware = settings.MIDDLEWARE[0]
+        if first_middleware == 'users.conn_middleware.ConnectionResetMiddleware':
+            self.assertEqual(
+                settings.MIDDLEWARE[1],
+                'django_tenants.middleware.main.TenantMainMiddleware'
+            )
+        else:
+            self.assertEqual(
+                first_middleware,
+                'django_tenants.middleware.main.TenantMainMiddleware'
+            )
 
     def test_auth_configuration(self):
         """Verify custom user model is set."""

@@ -190,7 +190,7 @@ async function main() {
     log('Seeding test database...', COLORS.yellow);
     const seedResult = await spawnStream(
       pythonPath,
-      [join('scripts', 'seed_test_db.py')],
+      [join('scripts', 'seed_test_db.py'), '--workers', workers.toString(), '--preset', 'full'],
       { cwd: BackendDir },
     );
     if (seedResult !== 0) {
