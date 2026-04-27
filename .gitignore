@@ -118,9 +118,11 @@ mobile/ios/Flutter/.last_build_id
 mobile/ios/Runner/GoogleService-Info.plist
 mobile/ios/ServiceDefinitions.json
 
-# Docker
+# Docker & Backups
 .docker_data/
 **/data/db/
+backups/
+*.sql.gz
 
 # Tools (SDKs & Portables) - Large Binaries
 # Ignore all subdirectories in tools/ except for documentation

@@ -25,6 +25,7 @@ While the Django backend and Next.js frontend are lightweight, the **QA Environm
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
 - **QA Domain:** `harikerja.web.id`
+- **DNS Setup:** Please refer to **[DNS Setup Guide](../common/dns_setup.md)** before proceeding.
 
 ---
 
@@ -148,14 +149,26 @@ NEXT_PUBLIC_API_URL=https://harikerja.web.id/api
 
 We will use the primary `docker-compose.yml` because the recommended specifications (8GB RAM) are highly capable of handling the resource isolation limits feature.
 
-### 1. Run Built-in Commands (*Makefile* / Script)
-If using the project's built-in *Makefile*:
+### 1. Run Safe Deployment (Recommended)
+We have provided a script `deploy/qa/safe_deploy_qa.sh` which handles the entire update process safely in one command:
+- Runs a Database Backup (via `backup_qa.sh`).
+- Pulls the latest code (`git pull`).
+- Rebuilds the Docker images.
+- Runs the Database Migrations.
+
+**Usage:**
+```bash
+./deploy/qa/safe_deploy_qa.sh
+```
+
+### 2. Manual Alternative (If needed)
+If you prefer to run steps manually or are using the built-in *Makefile*:
 ```bash
 make qa
 ```
 *(Or you can run it manually via Docker Compose:)*
 ```bash
-docker compose -f docker-compose.yml up -d --build
+docker compose --env-file deploy/environments/.env.qa up -d --build
 ```
 
 The build process will take about **2 - 5 minutes**. You can monitor the RAM consumption using the `htop` command in a separate terminal window simultaneously.
@@ -197,6 +210,27 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Backend Admin Panel
+    location /admin/ {
+        proxy_pass http://127.0.0.1:8000/admin/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Static files (for Django Admin CSS/JS)
+    location /static/ {
+        proxy_pass http://127.0.0.1:8000/static/;
+        proxy_set_header Host $http_host;
+    }
+
+    # Media files (for user uploads)
+    location /media/ {
+        proxy_pass http://127.0.0.1:8000/media/;
+        proxy_set_header Host $http_host;
     }
 
     # Frontend Routing (Next.js)
@@ -253,17 +287,36 @@ If all steps are successful, validate from your Browser:
 
 ---
 
-## Stage 7: Maintenance & Solo-Dev "Health Checks"
+## Stage 7: Maintenance & Automated Backups
 
-Since you are managing this alone, use these commands to keep the server healthy:
+Since you are managing this alone, keeping the data safe is a priority. We have provided a backup script to automate this.
 
-### 1. Simple Database Backup
-Run this once a week or before big updates:
+### 1. Database Backup Script
+We have provided a script at `deploy/qa/backup_qa.sh` that automatically:
+- Reads database credentials from `.env.qa`.
+- Creates a compressed `.sql.gz` backup.
+- Stores it in the `backups/` directory at the project root.
+- Deletes backups older than 7 days to save disk space.
+
+**How to run manually:**
 ```bash
-docker exec hrms-db-1 pg_dump -U hrms_qa_user hrms_qa > qa_backup_$(date +%F).sql
+# Make sure you are in the project root
+./deploy/qa/backup_qa.sh
 ```
 
-### 2. Cleaning Disk Space (Docker)
+### 2. Automating Backups with Cron
+To ensure your data is always safe without manual intervention, set up a cron job to run the backup every night (e.g., at 02:00 AM).
+
+1. Open the crontab editor:
+   ```bash
+   crontab -e
+   ```
+2. Add the following line at the bottom (adjust the path to your actual project location):
+   ```bash
+   0 2 * * * /opt/hrms/deploy/qa/backup_qa.sh >> /opt/hrms/backups/backup_log.log 2>&1
+   ```
+
+### 3. Cleaning Disk Space (Docker)
 Docker can eat up your SSD quickly. Run this monthly:
 ```bash
 # Remove unused images, containers, and networks
@@ -273,7 +326,7 @@ docker system prune -a --volumes -f
 du -sh /var/lib/docker
 ```
 
-### 3. Checking Resource Usage
+### 4. Checking Resource Usage
 ```bash
 # Live view of container CPU/RAM
 docker stats

@@ -13,16 +13,25 @@ The infrastructure is organized by target environment:
 
 ### 2. [QA (Quality Assurance)](./qa/qa.md)
 *   **Path**: `deploy/qa/`
-*   **Purpose**: Functional testing on `harikerja.web.id` (IDCloudHost/Biznet).
-*   **Automation**: Includes [deploy_qa.sh](./qa/deploy_qa.sh) for automated server provisioning.
+*   **Purpose**: Functional testing on `harikerja.web.id`.
 
-### 3. [Staging](./staging/staging.md)
+### 3. [Production 10K (Scaling VPS)](./production-10k/production-10k.md)
+*   **Path**: `deploy/production-10k/`
+*   **Purpose**: Initial market launch (up to 10k users) on high-spec VPS.
+*   **Automation**: Includes [deploy_10k.sh](./production-10k/deploy_10k.sh).
+
+### 4. [Staging (Paused)](./staging/staging.md)
 *   **Path**: `deploy/staging/`
-*   **Purpose**: Stress testing (1M users) on AWS infrastructure identical to production.
+*   **Status**: On hold until Phase 3.
 
-### 4. [Production](./production/production.md)
+### 5. [Enterprise AWS](./production/production.md)
 *   **Path**: `deploy/production/`
-*   **Purpose**: High-availability enterprise cluster on AWS (EKS/RDS/S3).
+*   **Purpose**: High-availability enterprise cluster for 100k+ users.
+
+---
+
+## 🗺️ Strategy & Roadmap
+See the full infrastructure journey in **[Roadmap.md](./roadmap.md)**.
 
 ## 🛠️ Deployment Utilities
 
@@ -30,7 +39,7 @@ The infrastructure is organized by target environment:
 | :--- | :--- | :--- | :--- |
 | **`up.ps1`** | `/` (Root) | `.\up.ps1 [env]` | Windows helper to start the platform. |
 | **`Makefile`** | `/` (Root) | `make [env]` | Standard orchestration for Linux servers. |
-| **`deploy_qa.sh`** | `deploy/qa/` | `sudo ./deploy_qa.sh` | Automated Ubuntu VPS setup for QA. |
+| **DNS Guide** | `deploy/common/` | **[Read Guide](./common/dns_setup.md)** | **Domain & Wildcard DNS Setup.** |
 | **`.env` files** | `deploy/environments/` | N/A | Centralized secrets and configurations. |
 
 ## 🧩 Core Infrastructure Components

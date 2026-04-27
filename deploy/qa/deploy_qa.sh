@@ -141,6 +141,7 @@ server {
 
     client_max_body_size 100M;
 
+    # Backend API Routing (Django Rest Framework)
     location /api/ {
         proxy_pass http://127.0.0.1:8000/api/;
         proxy_set_header Host \$http_host;
@@ -149,6 +150,28 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
+    # Backend Admin Panel
+    location /admin/ {
+        proxy_pass http://127.0.0.1:8000/admin/;
+        proxy_set_header Host \$http_host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    # Static files (for Django Admin CSS/JS)
+    location /static/ {
+        proxy_pass http://127.0.0.1:8000/static/;
+        proxy_set_header Host \$http_host;
+    }
+
+    # Media files (for user uploads)
+    location /media/ {
+        proxy_pass http://127.0.0.1:8000/media/;
+        proxy_set_header Host \$http_host;
+    }
+
+    # Frontend Routing (Next.js)
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_set_header Host \$http_host;
