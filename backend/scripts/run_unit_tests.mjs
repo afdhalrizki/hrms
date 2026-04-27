@@ -233,7 +233,7 @@ async function main() {
   const metrics = parseMetrics(logContent, 'Backend');
 
   log('\n' + '='.repeat(60), COLORS.cyan);
-  log('                TEST RUN SUMMARY (BACKEND)', COLORS.cyan);
+  log('                UNIT TEST RUN SUMMARY (BACKEND)', COLORS.cyan);
   log('='.repeat(60), COLORS.cyan);
 
   const statusColor = (metrics.f === 0 && metrics.e === 0 && exitCode === 0) ? COLORS.green : COLORS.red;

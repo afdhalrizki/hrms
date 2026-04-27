@@ -141,10 +141,10 @@ async function main() {
 
           if (evt.type === 'testStart' && evt.test.name) {
             testNames.set(evt.test.id, evt.test.name);
-            const isInternal = evt.test.name.startsWith('loading ') || 
-                               evt.test.name.includes('setUpAll') || 
-                               evt.test.name.includes('tearDownAll');
-            
+            const isInternal = evt.test.name.startsWith('loading ') ||
+              evt.test.name.includes('setUpAll') ||
+              evt.test.name.includes('tearDownAll');
+
             if (!isInternal) {
               currentTestCount++;
               log(`\n[${currentTestCount}/${Math.max(totalTests, currentTestCount)}] 🏃 Unit Testing: ${evt.test.name}`, COLORS.cyan);
@@ -202,7 +202,7 @@ async function main() {
   });
 
   log('\n========================================', COLORS.white);
-  log('🏁 UNIT TEST SUMMARY', COLORS.cyan);
+  log('🏁 UNIT TEST SUMMARY (MOBILE INTEGRATED)', COLORS.cyan);
   log('========================================', COLORS.white);
   log(`✅ TOTAL PASSED:   ${filePassed}`, COLORS.green);
   log(`❌ TOTAL FAILED:   ${fileFailed}`, COLORS.red);

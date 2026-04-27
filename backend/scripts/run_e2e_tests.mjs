@@ -233,7 +233,7 @@ async function main() {
   const metrics = parseMetrics(logContent, 'Backend');
 
   log('\n' + '='.repeat(60), COLORS.cyan);
-  log('                E2E TEST RUN SUMMARY', COLORS.cyan);
+  log('                E2E TEST RUN SUMMARY (BACKEND)', COLORS.cyan);
   log('='.repeat(60), COLORS.cyan);
 
   const statusColor =

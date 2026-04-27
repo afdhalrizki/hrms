@@ -160,7 +160,7 @@ async function ensureBackendStarted(isIntegrated) {
       // Smoke test: Login check
       log('💨 Running pre-flight smoke test (Login check)...', COLORS.yellow);
       const smokeTestCmd = `curl -s -X POST -H "X-Tenant-Domain: company1.localhost" -H "Host: company1.localhost:8000" -H "Content-Type: application/json" -d '{"email": "admin@company1.com", "password": "password123"}' http://127.0.0.1:8000/api/auth/login/`;
-      
+
       const { stdout, stderr } = await execAsync(smokeTestCmd);
       if (stdout.includes("access")) {
         log('✅ Smoke test passed: Backend is reachable and login works.', COLORS.green);
@@ -328,7 +328,7 @@ async function runE2ETests() {
   });
 
   log('\n========================================', COLORS.white);
-  log('🏁 E2E TEST SUMMARY', COLORS.cyan);
+  log('🏁 E2E TEST SUMMARY (MOBILE)', COLORS.cyan);
   log('========================================', COLORS.white);
   log(`✅ TOTAL PASSED:   ${filePassed}`, COLORS.green);
   log(`❌ TOTAL FAILED:   ${fileFailed}`, COLORS.red);
