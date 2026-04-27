@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   Clock, 
   FileText,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -121,6 +122,16 @@ export default function PerformancePage() {
             <p className="text-gray-400 font-medium text-lg max-w-2xl">{t('subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
+            <button 
+              onClick={async () => {
+                const { apiDownload } = await import('@/lib/api');
+                apiDownload('/appraisals/export_csv/', 'Performance_Recap.csv');
+              }}
+              className="px-6 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-2xl font-bold hover:bg-emerald-500/20 transition-all flex items-center gap-2"
+            >
+              <FileText size={20} />
+              Excel Summary
+            </button>
             <div className="px-6 py-3 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Current Period</span>
               <span className="text-white font-black">Q1 2026</span>
@@ -273,14 +284,26 @@ export default function PerformancePage() {
                               </div>
                             </td>
                             <td className="px-10 py-8 text-right">
-                              <button 
-                                onClick={() => setSelectedAppraisalId(appraisal.id)}
-                                data-testid={`submit-review-btn-${appraisal.id}`}
-                                className="px-6 py-2.5 rounded-xl bg-white/5 text-xs font-black text-gray-400 uppercase tracking-widest hover:bg-primary hover:text-white transition-all transform hover:scale-105 shadow-xl hover:shadow-primary/20 flex items-center justify-center ml-auto gap-2 group/btn"
-                              >
-                                {t('modal.submitReview')}
-                                <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                              </button>
+                              <div className="flex justify-end gap-2">
+                                <button 
+                                  onClick={async () => {
+                                    const { apiDownload } = await import('@/lib/api');
+                                    apiDownload(`/appraisals/${appraisal.id}/download_pdf`, `Appraisal_${appraisal.period_name.replace(' ', '_')}.pdf`);
+                                  }}
+                                  className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-primary hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
+                                  title="Download Report PDF"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </button>
+                                <button 
+                                  onClick={() => setSelectedAppraisalId(appraisal.id)}
+                                  data-testid={`submit-review-btn-${appraisal.id}`}
+                                  className="px-6 py-2.5 rounded-xl bg-white/5 text-xs font-black text-gray-400 uppercase tracking-widest hover:bg-primary hover:text-white transition-all transform hover:scale-105 shadow-xl hover:shadow-primary/20 flex items-center justify-center gap-2 group/btn"
+                                >
+                                  {t('modal.submitReview')}
+                                  <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );

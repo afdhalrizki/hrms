@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+from django.utils import timezone
 from rest_framework import viewsets, permissions
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission, FeatureRequiredPermission
@@ -127,10 +129,39 @@ class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSe
             return Payslip.objects.filter(employee=employee)
         return Payslip.objects.none()
 
+    @action(detail=False, methods=['get'])
+    def export_recap_xlsx(self, request):
+        import pandas as pd
+        from io import BytesIO
+        
+        queryset = self.filter_queryset(self.get_queryset())
+        data = []
+        for payslip in queryset:
+            data.append({
+                'Employee': payslip.employee.fullname,
+                'Period': payslip.period.name,
+                'Basic Salary': payslip.basic_salary,
+                'Allowances': payslip.allowances,
+                'Overtime': payslip.overtime_pay,
+                'Deductions': payslip.deductions,
+                'Net Pay': payslip.net_pay
+            })
+            
+        df = pd.DataFrame(data)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Payroll')
+            
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="Payroll_Recap_{timezone.now().strftime("%Y%m%d")}.xlsx"'
+        return response
+
     @action(detail=True, methods=['get'])
     def download_pdf(self, request, pk=None):
         from .pdf_generator import PayslipPDFGenerator
-        from django.http import HttpResponse
         
         payslip = self.get_object()
         generator = PayslipPDFGenerator(payslip)
@@ -139,6 +170,64 @@ class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSe
         response = HttpResponse(pdf_content, content_type='application/pdf')
         filename = f"Payslip_{payslip.employee.nik}_{payslip.period.get_month_display()}_{payslip.period.year}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=True, methods=['get'])
+    def download_docx(self, request, pk=None):
+        from .docx_generator import PayslipDOCXGenerator
+        
+        payslip = self.get_object()
+        generator = PayslipDOCXGenerator()
+        docx_content = generator.generate(payslip)
+        
+        response = HttpResponse(
+            docx_content, 
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+        filename = f"Payslip_{payslip.employee.nik}_{payslip.period.get_month_display()}_{payslip.period.year}.docx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def export_recap_csv(self, request):
+        import csv
+        from django.http import HttpResponse
+        
+        # Security: Only allow managers/staff to export full reports
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_payroll'))
+        
+        if not is_manager:
+            return Response({'detail': 'Permission denied.'}, status=403)
+
+        period_id = request.query_params.get('period_id')
+        if not period_id:
+            return Response({'error': 'Period ID is required.'}, status=400)
+            
+        payslips = Payslip.objects.filter(period_id=period_id).select_related('employee', 'period')
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="payroll_recap_{period_id}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Employee Name', 'NIK', 'Basic Salary', 'Allowance', 'Overtime', 'Deductions', 'Net Pay'])
+        
+        for p in payslips:
+            # Calculate total allowance and deductions from details
+            allowances = 0
+            deductions = 0
+            for d in p.details.all():
+                if d.is_deduction:
+                    deductions += d.amount
+                else:
+                    allowances += d.amount
+                    
+            writer.writerow([
+                p.employee.fullname, p.employee.nik, 
+                p.basic_salary, allowances, p.overtime_pay, deductions, p.net_pay
+            ])
+            
         return response
 
 class PayslipDetailViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):

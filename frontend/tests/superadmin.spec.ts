@@ -28,10 +28,11 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     console.log(`--- Navigating to portal-admin login ---`);
     await page.goto(`${BASE_URL}/en/login/portal-admin`);
     
-    // Ensure clean state for superadmin
+    // Ensure clean state for superadmin and force public tenant
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
+      sessionStorage.setItem('test_tenant_e2e', 'public');
     });
     await page.reload();
 

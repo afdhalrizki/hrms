@@ -129,6 +129,22 @@ describe('Integrated Payroll Tests', () => {
       }, { timeout: 10000 });
     }, 20000);
 
+    it('calls apiDownload when export recap button is clicked', async () => {
+      render(<PayrollPage />, { wrapper: AllProviders });
+
+      await waitFor(() => screen.getByText(/Export Recap/i), { timeout: 15000 });
+      const exportBtn = screen.getByText(/Export Recap/i);
+      fireEvent.click(exportBtn);
+
+      const { apiDownload } = await import('@/lib/api');
+      await waitFor(() => {
+        expect(apiDownload).toHaveBeenCalledWith(
+          expect.stringContaining('/payslips/export_recap_csv/'),
+          expect.stringContaining('Payroll_Recap_')
+        );
+      }, { timeout: 10000 });
+    });
+
     it('handles API fetch error gracefully', async () => {
        (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
         if (endpoint === '/payslips' || endpoint.startsWith('/payslips?')) return Promise.reject(new Error('Fetch failed'));

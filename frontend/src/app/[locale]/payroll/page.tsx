@@ -29,6 +29,12 @@ interface Payslip {
   employee_name: string;
   period_display?: string;
   period_name?: string;
+  period_id?: number;
+  period?: {
+    id: number;
+    month: number;
+    year: number;
+  };
   basic_salary: string;
   net_pay: string;
   pph21_tax: string;
@@ -96,15 +102,29 @@ export default function PayrollPage() {
                 <h1 className="text-3xl font-black tracking-tight text-gray-900">{t('title')}</h1>
                 <p className="text-muted-foreground">{t('subtitle')}</p>
               </div>
-              {canManage && (
-                <button 
-                  onClick={() => setIsGenerateModalOpen(true)}
-                  className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
-                >
-                  <Play size={20} fill="currentColor" />
-                  {t('runPayroll')}
-                </button>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {canManage && (
+                  <button 
+                    onClick={() => {
+                      const periodId = payslips[0]?.period?.id || payslips[0]?.period_id || 1;
+                      apiDownload(`/payslips/export_recap_csv/?period_id=${periodId}`, `Payroll_Recap_${periodId}.csv`);
+                    }}
+                    className="px-6 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-2xl font-bold hover:bg-emerald-500/20 transition-all flex items-center gap-2"
+                  >
+                    <FileText size={20} />
+                    Export Recap
+                  </button>
+                )}
+                {canManage && (
+                  <button 
+                    onClick={() => setIsGenerateModalOpen(true)}
+                    className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
+                  >
+                    <Play size={20} fill="currentColor" />
+                    {t('runPayroll')}
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Stats Grid */}
@@ -233,6 +253,14 @@ export default function PayrollPage() {
                               className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-primary hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
                             >
                               <Download size={18} />
+                            </button>
+                            <button 
+                              onClick={() => apiDownload(`/payslips/${row.id}/download_docx`, `Payslip_${row.employee_name.replace(' ', '_')}.docx`)}
+                              aria-label={`download-docx-${row.id}`}
+                              className="h-10 w-10 rounded-xl bg-white/5 text-gray-400 hover:text-blue-400 hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
+                              title="Download Word (DOCX)"
+                            >
+                              <FileText size={18} />
                             </button>
                           </div>
                         </td>

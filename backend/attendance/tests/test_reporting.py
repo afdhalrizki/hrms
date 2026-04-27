@@ -66,3 +66,25 @@ class AttendanceReportingTestCase(TenantTestCase):
         url = reverse('attendance-export-csv')
         response = self.client.get(url, SERVER_NAME=self.domain_name)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_attendance_download_pdf_self(self):
+        """Verify individual PDF report download for self."""
+        self.client.force_login(self.user)
+        url = reverse('attendance-download-pdf')
+        params = {'month': self.today.month, 'year': self.today.year}
+        
+        response = self.client.get(url, params, SERVER_NAME=self.domain_name)
+        assert response.status_code == status.HTTP_200_OK
+        assert response['Content-Type'] == 'application/pdf'
+        assert f'Attendance_{self.employee.nik}' in response['Content-Disposition']
+
+    def test_attendance_export_summary_pdf(self):
+        """Verify company-wide summary PDF report download."""
+        self.client.force_login(self.user)
+        url = reverse('attendance-export-summary-pdf')
+        params = {'month': self.today.month, 'year': self.today.year}
+        
+        response = self.client.get(url, params, SERVER_NAME=self.domain_name)
+        assert response.status_code == status.HTTP_200_OK
+        assert response['Content-Type'] == 'application/pdf'
+        assert 'Attendance_Summary' in response['Content-Disposition']

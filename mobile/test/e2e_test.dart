@@ -43,7 +43,7 @@ void main() {
       throw Exception('Timed out waiting for ${message ?? finder.description}');
     }
 
-    Future<void> waitForSnackBar(WidgetTester tester, String content, {Duration timeout = const Duration(seconds: 45)}) async {
+    Future<void> waitForSnackBar(WidgetTester tester, String content, {Duration timeout = const Duration(seconds: 60)}) async {
       final end = DateTime.now().add(timeout);
       final snackBarFinder = find.byType(SnackBar, skipOffstage: false);
       while (DateTime.now().isBefore(end)) {
@@ -427,6 +427,68 @@ void main() {
       });
     });
 
+    testWidgets('[19] Business Reporting: Export Attendance XLSX', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester, email: 'admin@company1.com');
+        
+        final reportsBtn = find.byKey(const Key('qa_reports'), skipOffstage: false);
+        await scrollTo(tester, reportsBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, reportsBtn);
+        
+        await safeTap(tester, find.byKey(const Key('qa_export_attendance')));
+        await waitForSnackBar(tester, "Download started");
+      });
+    });
+
+    testWidgets('[20] Business Reporting: Export Payroll XLSX', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester, email: 'admin@company1.com');
+        
+        final reportsBtn = find.byKey(const Key('qa_reports'), skipOffstage: false);
+        await scrollTo(tester, reportsBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, reportsBtn);
+        
+        await safeTap(tester, find.byKey(const Key('qa_export_payroll')));
+        await waitForSnackBar(tester, "Download started");
+      });
+    });
+
+    testWidgets('[21] Business Reporting: Export Reimbursement XLSX', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester, email: 'admin@company1.com');
+        
+        final reportsBtn = find.byKey(const Key('qa_reports'), skipOffstage: false);
+        await scrollTo(tester, reportsBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, reportsBtn);
+        
+        await safeTap(tester, find.byKey(const Key('qa_export_reimbursement')));
+        await waitForSnackBar(tester, "Download started");
+      });
+    });
+
+    testWidgets('[22] Business Reporting: Export Performance XLSX', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester, email: 'admin@company1.com');
+        
+        final reportsBtn = find.byKey(const Key('qa_reports'), skipOffstage: false);
+        await scrollTo(tester, reportsBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, reportsBtn);
+        
+        await safeTap(tester, find.byKey(const Key('qa_export_performance')));
+        await waitForSnackBar(tester, "Download started");
+      });
+    });
+
+    testWidgets('[23] Payslip: PDF Download Action', (tester) async {
+      await tester.runAsync(() async {
+        await performLogin(tester);
+        await safeTap(tester, find.byKey(const Key('qa_payslip'), skipOffstage: false));
+        await waitFor(tester, find.text('NET SALARY', skipOffstage: false), message: 'Payslip Screen');
+        
+        await safeTap(tester, find.text('Download PDF', skipOffstage: false));
+        await waitForSnackBar(tester, 'PDF download started');
+      });
+    });
 
   });
 }

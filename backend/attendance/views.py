@@ -147,6 +147,119 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
         return super().create(request, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
+    def download_pdf(self, request):
+        from .pdf_generator import AttendancePDFGenerator
+        from django.http import HttpResponse
+        
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        
+        month = request.query_params.get('month')
+        year = request.query_params.get('year')
+        target_employee_id = request.query_params.get('employee_id')
+        
+        if not (month and year):
+            return Response({'error': 'Month and year are required.'}, status=400)
+
+        # Permission check
+        if target_employee_id:
+            is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+            if not is_manager:
+                return Response({'error': 'Permission denied.'}, status=403)
+            target_employee = Employee.objects.get(id=target_employee_id)
+        else:
+            target_employee = employee
+
+        if not target_employee:
+            return Response({'error': 'Employee profile not found.'}, status=404)
+
+        attendance_records = Attendance.objects.filter(
+            employee=target_employee,
+            date__month=month,
+            date__year=year
+        ).order_by('date')
+
+        from django.db import connection
+        generator = AttendancePDFGenerator(connection.tenant.name)
+        pdf_content = generator.generate_individual_report(target_employee, month, year, attendance_records)
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = f"Attendance_{target_employee.nik}_{month}_{year}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def export_xlsx(self, request):
+        import pandas as pd
+        from io import BytesIO
+        from django.http import HttpResponse
+        from django.utils import timezone
+        
+        queryset = self.filter_queryset(self.get_queryset())
+        data = []
+        for att in queryset:
+            data.append({
+                'Employee': att.employee.fullname,
+                'Date': att.date,
+                'Check In': att.check_in,
+                'Check Out': att.check_out,
+                'Status': att.status,
+                'Late (Min)': att.late_minutes,
+                'Total Hours': att.total_hours
+            })
+            
+        df = pd.DataFrame(data)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Attendance')
+            
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="Attendance_Recap_{timezone.now().strftime("%Y%m%d")}.xlsx"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def export_summary_pdf(self, request):
+        from .pdf_generator import AttendancePDFGenerator
+        from django.http import HttpResponse
+        from django.db.models import Count, Q
+        
+        # Security: Only allow managers/staff to export full reports
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        
+        if not is_manager:
+            return Response({'detail': 'Permission denied.'}, status=403)
+
+        month = request.query_params.get('month')
+        year = request.query_params.get('year')
+        
+        if not (month and year):
+            return Response({'error': 'Month and year are required.'}, status=400)
+            
+        stats = Attendance.objects.filter(
+            date__month=month, 
+            date__year=year
+        ).values('employee__fullname', 'employee__nik').annotate(
+            total_present=Count('id', filter=Q(status='PRESENT')),
+            total_late=Count('id', filter=Q(status='LATE')),
+            total_offsite=Count('id', filter=Q(status='OFF_SITE')),
+            total_absent=Count('id', filter=Q(status='ABSENT')),
+        )
+
+        from django.db import connection
+        generator = AttendancePDFGenerator(connection.tenant.name)
+        pdf_content = generator.generate_summary_report(month, year, stats)
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = f"Attendance_Summary_{month}_{year}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
     def export_csv(self, request):
         import csv
         from django.http import HttpResponse
@@ -253,7 +366,6 @@ class LeaveRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelV
         # Explicitly return refreshed data to ensure workflow status is reflected
         instance.refresh_from_db()
         data = self.get_serializer(instance).data
-        print(f"DEBUG: LeaveRequest updated, final status in DB: {instance.status}, in response: {data['status']}")
         return Response(data)
 
     def perform_create(self, serializer):

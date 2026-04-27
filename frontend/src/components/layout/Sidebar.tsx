@@ -41,6 +41,7 @@ const menuItems = [
   { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   requiredPermission: 'manage_payroll' },
   { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', requiredPermission: 'manage_settings' },
   { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', requiredPermission: 'manage_hr' },
+  { nameKey: 'reports',   icon: FileText,        href: '/reports',   requiredPermission: 'manage_hr' },
   { nameKey: 'settings',  icon: Settings,         href: '/settings',  requiredPermission: 'manage_settings' },
   { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', requiredPermission: 'view_audit_logs', module: 'audit' },
   { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', requiredPermission: 'manage_settings', module: 'core' },

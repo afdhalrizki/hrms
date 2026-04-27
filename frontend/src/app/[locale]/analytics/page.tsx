@@ -65,19 +65,20 @@ export default function AnalyticsPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleExport = (type: 'attendance' | 'performance') => {
-    const baseUrl = getBaseUrl().replace('/api', '');
+  const handleExport = async (type: 'attendance' | 'performance' | 'payroll' | 'reimbursement') => {
+    const { apiDownload } = await import('@/lib/api');
     const month = new Date().getMonth() + 1;
     const year = new Date().getFullYear();
     
-    let url = '';
     if (type === 'attendance') {
-      url = `${baseUrl}/api/attendance/attendances/export_csv?month=${month}&year=${year}`;
-    } else {
-      url = `${baseUrl}/api/performance/appraisals/export_csv`;
+      await apiDownload(`/attendance/attendance/export_csv/?month=${month}&year=${year}`, `Attendance_Recap_${month}_${year}.csv`);
+    } else if (type === 'performance') {
+      await apiDownload('/appraisals/export_csv/', 'Performance_Recap.csv');
+    } else if (type === 'payroll') {
+      await apiDownload(`/payslips/export_recap_csv/?month=${month}&year=${year}`, `Payroll_Recap_${month}_${year}.csv`);
+    } else if (type === 'reimbursement') {
+      await apiDownload('/reimbursements/export_csv/', 'Reimbursement_Recap.csv');
     }
-    
-    window.open(url, '_blank');
   };
 
   if (isLoading) {
@@ -113,19 +114,33 @@ export default function AnalyticsPage() {
             <p className="text-gray-400 font-medium max-w-2xl">{t('subtitle')}</p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button 
               onClick={() => handleExport('attendance')}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-white/10 transition-all"
+              className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all"
             >
-              <Download size={16} className="text-primary" />
+              <Download size={14} className="text-primary" />
               {t('exportAttendance')}
             </button>
             <button 
-              onClick={() => handleExport('performance')}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary text-white font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+              onClick={() => handleExport('payroll')}
+              className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all"
             >
-              <Download size={16} />
+              <Download size={14} className="text-emerald-500" />
+              {t('exportPayroll')}
+            </button>
+            <button 
+              onClick={() => handleExport('reimbursement')}
+              className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all"
+            >
+              <Download size={14} className="text-amber-500" />
+              {t('exportExpense')}
+            </button>
+            <button 
+              onClick={() => handleExport('performance')}
+              className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-primary text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+            >
+              <Download size={14} />
               {t('exportPerformance')}
             </button>
           </div>

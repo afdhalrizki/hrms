@@ -71,9 +71,72 @@ class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
         return Appraisal.objects.none()
 
     @action(detail=False, methods=['get'])
+    def export_xlsx(self, request):
+        import pandas as pd
+        from io import BytesIO
+        from django.http import HttpResponse
+        from django.utils import timezone
+        
+        queryset = self.filter_queryset(self.get_queryset())
+        data = []
+        for a in queryset:
+            data.append({
+                'Employee': a.employee.fullname,
+                'Period': a.period_name,
+                'Status': a.status,
+                'Start Date': a.start_date,
+                'End Date': a.end_date
+            })
+            
+        df = pd.DataFrame(data)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Appraisals')
+            
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="Performance_Recap_{timezone.now().strftime("%Y%m%d")}.xlsx"'
+        return response
+
+    @action(detail=True, methods=['get'])
+    def download_pdf(self, request, pk=None):
+        from .pdf_generator import AppraisalPDFGenerator
+        from django.http import HttpResponse
+        
+        appraisal = self.get_object()
+        generator = AppraisalPDFGenerator(appraisal)
+        pdf_content = generator.generate()
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = f"Performance_Report_{appraisal.id}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=True, methods=['get'])
+    def download_docx(self, request, pk=None):
+        from .docx_generator import AppraisalDOCXGenerator
+        from django.http import HttpResponse
+        
+        appraisal = self.get_object()
+        generator = AppraisalDOCXGenerator(appraisal)
+        docx_content = generator.generate()
+        
+        response = HttpResponse(
+            docx_content, 
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+        filename = f"Performance_Report_{appraisal.id}.docx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
     def export_csv(self, request):
         import csv
         from django.http import HttpResponse
+        from .models import KPITarget
+        from django.db.models import Avg
         
         # Security: Only allow managers/staff to export full reports
         user = self.request.user
@@ -96,12 +159,27 @@ class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
         response['Content-Disposition'] = 'attachment; filename="appraisal_summary.csv"'
         
         writer = csv.writer(response)
-        writer.writerow(['Employee Name', 'Period', 'Status', 'Start Date', 'End Date'])
+        writer.writerow(['Employee Name', 'NIK', 'Period', 'Status', 'Start Date', 'End Date', 'Avg KPI Achievement (%)'])
         
         for a in queryset:
+            # Calculate average KPI achievement for this period
+            targets = KPITarget.objects.filter(
+                employee=a.employee,
+                period__gte=a.start_date,
+                period__lte=a.end_date
+            )
+            
+            avg_achievement = 0
+            if targets.exists():
+                total_ach = 0
+                for t in targets:
+                    if t.target_value > 0:
+                        total_ach += (t.actual_value / t.target_value) * 100
+                avg_achievement = total_ach / targets.count()
+
             writer.writerow([
-                a.employee.fullname, a.period_name, a.get_status_display(),
-                a.start_date, a.end_date
+                a.employee.fullname, a.employee.nik, a.period_name, a.get_status_display(),
+                a.start_date, a.end_date, f"{avg_achievement:.2f}"
             ])
             
         return response

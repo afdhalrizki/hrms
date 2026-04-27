@@ -23,6 +23,10 @@ class PayrollPeriod(AuditModel):
     end_date = models.DateField()
     is_closed = models.BooleanField(default=False)
 
+    @property
+    def name(self):
+        return f"{self.month}/{self.year}"
+
     def __str__(self):
         return f"Periode: {self.month}/{self.year}"
 
@@ -58,6 +62,14 @@ class Payslip(AuditModel):
     net_pay = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     
     payment_date = models.DateField(null=True, blank=True)
+
+    @property
+    def allowances(self):
+        return self.total_allowance
+
+    @property
+    def deductions(self):
+        return self.total_deduction
 
     class Meta:
         unique_together = ('employee', 'period')

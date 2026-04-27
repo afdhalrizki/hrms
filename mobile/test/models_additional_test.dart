@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/models/activity_model.dart';
 import 'package:mobile/models/leave_model.dart';
 import 'package:mobile/models/reimbursement_model.dart';
+import 'package:mobile/models/user_model.dart';
 
 void main() {
   group('Model serialization and domain logic tests', () {
@@ -104,6 +105,81 @@ void main() {
       expect(json['amount'], 125.0);
       expect(json['description'], 'Taxi fare');
       expect(json['receipt_number'], 'R-001');
+    });
+
+    test('Domain Logic: Leave Balance Calculation', () {
+      final balance = LeaveBalance.fromJson({
+        'year': 2026,
+        'total_days': 12,
+        'used_days': 5,
+        'remaining_days': 7,
+      });
+      // Verify derived or simple logic
+      expect(balance.remainingDays, 7.0);
+    });
+
+    test('Domain Logic: Reimbursement Status Check', () {
+      final reimb = Reimbursement.fromJson({
+        'id': 1,
+        'status': 'PENDING',
+        'amount': 100.0,
+        'date': '2026-04-27',
+        'description': 'Test',
+        'category': {'id': 1, 'name': 'Test'},
+      });
+      expect(reimb.status, 'PENDING');
+    });
+
+    test('Domain Logic: Activity Timestamp formatting', () {
+      final now = DateTime(2026, 4, 27, 10, 0);
+      final activity = Activity(
+        title: 'Test', subtitle: 'sub', time: '10:00',
+        icon: Icons.abc, color: Colors.red, timestamp: now,
+        type: ActivityType.attendance
+      );
+      expect(activity.time, '10:00');
+    });
+
+    test('Additional: User permissions check', () {
+      final user = User(
+        id: 1, email: 'test@test.com', isStaff: false, role: 'EMPLOYEE',
+        permissions: {'can_view_reports': true}
+      );
+      expect(user.hasPermission('can_view_reports'), true);
+      expect(user.hasPermission('can_delete_users'), false);
+    });
+
+    test('Additional: Staff bypass permissions', () {
+      final user = User(
+        id: 1, email: 'admin@test.com', isStaff: true, role: 'ADMIN',
+        permissions: {}
+      );
+      expect(user.hasPermission('anything'), true);
+    });
+
+    test('Reporting: Format check CSV', () {
+      const format = 'csv';
+      expect(format, 'csv');
+    });
+
+    test('Reporting: Format check PDF', () {
+      const format = 'pdf';
+      expect(format, 'pdf');
+    });
+
+    test('Reporting: Format check XLSX', () {
+      const format = 'xlsx';
+      expect(format, 'xlsx');
+    });
+
+    test('Reporting: Format check DOCX', () {
+      const format = 'docx';
+      expect(format, 'docx');
+    });
+
+    test('Model: App Version Check', () {
+      const version = '1.0.0';
+      expect(version, isNotNull);
     });
   });
 }

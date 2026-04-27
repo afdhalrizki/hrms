@@ -5,6 +5,7 @@ import { apiFetch, getBaseUrl } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(),
+  apiDownload: vi.fn(),
   getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
 }));
 
@@ -83,21 +84,29 @@ describe('AnalyticsPage', () => {
   });
 
   it('calls export functions correctly', async () => {
+    const { apiDownload } = await import('@/lib/api');
     (apiFetch as any).mockResolvedValue(mockStats);
+    
     render(<AnalyticsPage />);
     
-    window.open = vi.fn();
-
     await waitFor(() => {
       expect(screen.getByText('exportAttendance')).toBeDefined();
     });
 
     fireEvent.click(screen.getByText('exportAttendance'));
-    expect(window.open).toHaveBeenCalledTimes(1);
-    expect((window.open as any).mock.calls[0][0]).toContain('/api/attendance/attendances/export_csv');
+    await waitFor(() => {
+      expect(apiDownload).toHaveBeenCalledWith(
+        expect.stringContaining('/attendance/attendance/export_csv/'),
+        expect.stringContaining('Attendance_Recap')
+      );
+    });
 
     fireEvent.click(screen.getByText('exportPerformance'));
-    expect(window.open).toHaveBeenCalledTimes(2);
-    expect((window.open as any).mock.calls[1][0]).toContain('/api/performance/appraisals/export_csv');
+    await waitFor(() => {
+      expect(apiDownload).toHaveBeenCalledWith(
+        expect.stringContaining('/appraisals/export_csv/'),
+        expect.stringContaining('Performance_Recap')
+      );
+    });
   });
 });

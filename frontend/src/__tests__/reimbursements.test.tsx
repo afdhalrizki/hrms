@@ -25,6 +25,7 @@ const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as an
    return {
      ...actual,
      apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+      apiDownload: vi.fn(() => Promise.resolve()),
      getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
    };
  });
@@ -153,4 +154,36 @@ describe('ReimbursementsPage (Integrated)', () => {
       expect(postCall).toBeDefined();
     }, { timeout: 20000 });
   }, 30000);
+
+  it('calls apiDownload when excel recap button is clicked', async () => {
+    render(<ReimbursementsPage />, { wrapper: AllProviders });
+
+    await waitFor(() => screen.getByText(/Excel Recap/i), { timeout: 15000 });
+    fireEvent.click(screen.getByText(/Excel Recap/i));
+
+    const { apiDownload } = await import('@/lib/api');
+    await waitFor(() => {
+      expect(apiDownload).toHaveBeenCalledWith(
+        expect.stringContaining('/reimbursements/export_csv/'),
+        expect.stringContaining('Reimbursement_Recap.csv')
+      );
+    });
+  });
+
+  it('calls apiDownload when download voucher button is clicked', async () => {
+    render(<ReimbursementsPage />, { wrapper: AllProviders });
+
+    // Wait for the download button in the table
+    await waitFor(() => screen.getAllByTitle(/Download Voucher/i), { timeout: 15000 });
+    const downloadBtns = screen.getAllByTitle(/Download Voucher/i);
+    fireEvent.click(downloadBtns[0]);
+
+    const { apiDownload } = await import('@/lib/api');
+    await waitFor(() => {
+      expect(apiDownload).toHaveBeenCalledWith(
+        expect.stringContaining('/reimbursements/'),
+        expect.stringContaining('Reimbursement_Voucher_')
+      );
+    });
+  });
 });

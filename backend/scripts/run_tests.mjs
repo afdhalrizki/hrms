@@ -32,9 +32,9 @@ async function main() {
   // 1. Run Unit Tests
   if (!skipUnit) {
     log("\n🧪 [1/2] Running Unit Tests (Pytest)...", COLORS.yellow);
-    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_unit_tests.mjs'), ...forwardArgs], { 
-      cwd: BackendDir, 
-      logFile: masterLogFile 
+    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_unit_tests.mjs'), ...forwardArgs], {
+      cwd: BackendDir,
+      logFile: masterLogFile
     });
     if (exitCode !== 0) {
       log("❌ Unit Tests Failed.", COLORS.red);
@@ -47,9 +47,9 @@ async function main() {
   // 2. Run E2E Tests
   if (allPassed && !skipE2E && !dockerOnly) {
     log("\n🌐 [2/2] Running E2E Tests (Pytest)...", COLORS.yellow);
-    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_e2e_tests.mjs'), ...forwardArgs], { 
-      cwd: BackendDir, 
-      logFile: masterLogFile 
+    const exitCode = await spawnStream('node', [join(BackendDir, 'scripts/run_e2e_tests.mjs'), ...forwardArgs], {
+      cwd: BackendDir,
+      logFile: masterLogFile
     });
     if (exitCode !== 0) {
       log("❌ E2E Tests Failed.", COLORS.red);
@@ -64,7 +64,7 @@ async function main() {
   const metrics = parseMetrics(logContent, 'Backend');
 
   log('\n' + '='.repeat(60), COLORS.cyan);
-  log('           TOTAL HARIKERJA BACKEND TEST SUMMARY', COLORS.cyan);
+  log('           TOTAL HARIKERJA BACKEND TESTS SUMMARY', COLORS.cyan);
   log('='.repeat(60), COLORS.cyan);
 
   const statusColor = (metrics.f === 0 && metrics.e === 0 && allPassed) ? COLORS.green : COLORS.red;

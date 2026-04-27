@@ -56,10 +56,10 @@ async function main() {
 
   // Clear stale results
   if (existsSync(unitResultsFile)) {
-    try { unlinkSync(unitResultsFile); } catch (e) {}
+    try { unlinkSync(unitResultsFile); } catch (e) { }
   }
   if (existsSync(e2eResultsFile)) {
-    try { unlinkSync(e2eResultsFile); } catch (e) {}
+    try { unlinkSync(e2eResultsFile); } catch (e) { }
   }
 
   // 1. Dependency Check
@@ -73,7 +73,7 @@ async function main() {
     log("\n🧪 [1/2] Running Unit Tests (Vitest)...", COLORS.yellow);
     const unitArgs = ['--skip-install'];
     if (coverage) unitArgs.push('--coverage');
-    
+
     const exitCode = await spawnStream('node', [join(FrontendDir, 'scripts/run_unit_tests.mjs'), ...unitArgs], { cwd: FrontendDir });
     if (exitCode !== 0) {
       log("❌ Unit Tests Failed.", COLORS.red);
@@ -88,7 +88,7 @@ async function main() {
         unitMetrics.passed = unitJson.numPassedTests || 0;
         unitMetrics.failed = unitJson.numFailedTests || 0;
         unitMetrics.total = unitJson.numTotalTests || 0;
-        
+
         const latestUnitLog = getLatestLog('unit_test_');
         unitMetrics.warnings = countWarnings(latestUnitLog);
       } catch (e) {
@@ -105,7 +105,7 @@ async function main() {
     const e2eArgs = ['--skip-install'];
     if (live) e2eArgs.push('--live');
     if (args.includes('--skip-build')) e2eArgs.push('--skip-build');
-    
+
     const exitCode = await spawnStream('node', [join(FrontendDir, 'scripts/run_e2e_tests.mjs'), ...e2eArgs], { cwd: FrontendDir });
     if (exitCode !== 0) {
       log("❌ E2E Tests Failed.", COLORS.red);
@@ -132,7 +132,7 @@ async function main() {
 
   // Summary Table
   log("\n" + "=".repeat(60), COLORS.gray);
-  log("                TEST RUN SUMMARY", COLORS.cyan);
+  log("                TOTAL HARIKERJA FRONTEND TESTS SUMMARY", COLORS.cyan);
   log("=".repeat(60), COLORS.gray);
 
   const printBreakdown = (label, metrics) => {

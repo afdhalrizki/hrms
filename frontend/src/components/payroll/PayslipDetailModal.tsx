@@ -18,6 +18,12 @@ interface Payslip {
   employee_name: string;
   period_display?: string;
   period_name?: string;
+  period_id?: number;
+  period?: {
+    id: number;
+    month: number;
+    year: number;
+  };
   basic_salary: string;
   net_pay: string;
   pph21_tax: string;

@@ -113,6 +113,8 @@ class _PayslipScreenState extends State<PayslipScreen> {
               _buildComponentItem("Total Deduction", "-Rp ${NumberFormat('#,###').format(double.tryParse(_selectedPayslip?['total_deduction']?.toString() ?? '0'))}", isNegative: true),
               const SizedBox(height: 48),
               _buildDownloadButton(),
+              const SizedBox(height: 12),
+              _buildWordButton(),
             ],
           ),
         ),
@@ -250,13 +252,12 @@ class _PayslipScreenState extends State<PayslipScreen> {
       onPressed: () async {
         if (_selectedPayslip == null) return;
         try {
-          await ApiService().downloadPdf(
-            "/payslips/${_selectedPayslip['id']}/download_pdf/", 
-            'Payslip_${_selectedPayslip['period_name'] ?? _selectedPayslip['period']}.pdf'
+          await ApiService().downloadFile(
+            "/payslips/${_selectedPayslip['id']}/download_pdf/"
           );
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Payslip download started...')),
+              const SnackBar(content: Text('PDF download started...')),
             );
           }
         } catch (e) {
@@ -268,8 +269,40 @@ class _PayslipScreenState extends State<PayslipScreen> {
           }
         }
       },
-      icon: Icon(Icons.download, size: 20),
+      icon: const Icon(Icons.picture_as_pdf, size: 20),
       label: const Text('Download PDF'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white.withOpacity(0.05),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: Colors.white10)),
+        elevation: 0,
+      ),
+    );
+  }
+
+  Widget _buildWordButton() {
+    return ElevatedButton.icon(
+      onPressed: () async {
+        if (_selectedPayslip == null) return;
+        try {
+          await ApiService().downloadPayslipDOCX(_selectedPayslip['id']);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Word download started...')),
+            );
+          }
+        } catch (e) {
+          debugPrint('Download error: $e');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to download: $e')),
+            );
+          }
+        }
+      },
+      icon: const Icon(Icons.description, size: 20),
+      label: const Text('Download Word (DOCX)'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,

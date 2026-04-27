@@ -10,7 +10,8 @@ import {
   Clock,
   FileText,
   DollarSign,
-  PieChart
+  PieChart,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -146,17 +147,30 @@ export default function ReimbursementsPage() {
             <h1 className="text-3xl font-bold tracking-tight text-white">{t('title')}</h1>
             <p className="text-muted-foreground">Submit and track your business expense claims.</p>
           </div>
-          <button 
-            onClick={() => {
-              setIsModalOpen(true);
-              if (categories.length === 0) fetchData();
-            }}
-            data-testid="new-claim-button"
-            className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
-          >
-            <Plus size={20} />
-            {t('newClaim')}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button 
+              onClick={async () => {
+                const { apiDownload } = await import('@/lib/api');
+                const now = new Date();
+                apiDownload(`/reimbursements/export_csv/?month=${now.getMonth()+1}&year=${now.getFullYear()}`, `Reimbursement_Recap.csv`);
+              }}
+              className="px-6 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-2xl font-bold hover:bg-emerald-500/20 transition-all flex items-center gap-2"
+            >
+              <FileText size={20} />
+              Excel Recap
+            </button>
+            <button 
+              onClick={() => {
+                setIsModalOpen(true);
+                if (categories.length === 0) fetchData();
+              }}
+              data-testid="new-claim-button"
+              className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <Plus size={20} />
+              {t('newClaim')}
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -239,19 +253,28 @@ export default function ReimbursementsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
                         {claim.attachment ? (
                           <a 
                             href={claim.attachment.startsWith('http') ? claim.attachment : `${getBaseUrl().replace('/api', '')}${claim.attachment}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-primary"
+                            title="View Receipt"
                           >
-                            <FileText size={18} />
+                            <Receipt size={18} />
                           </a>
-                        ) : (
-                          <span className="text-gray-600 italic text-xs">No file</span>
-                        )}
+                        ) : null}
+                        <button 
+                          onClick={async () => {
+                            const { apiDownload } = await import('@/lib/api');
+                            apiDownload(`/reimbursements/${claim.id}/download_pdf`, `Reimbursement_Voucher_${claim.id}.pdf`);
+                          }}
+                          className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-emerald-500"
+                          title="Download Voucher"
+                        >
+                          <Download size={18} />
+                        </button>
                       </div>
                     </td>
                   </tr>

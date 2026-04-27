@@ -138,6 +138,45 @@ export default function AttendancePage() {
     );
   };
 
+    const handleExportSummary = async () => {
+    const { apiDownload } = await import('@/lib/api');
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    try {
+      await apiDownload(`/attendance/attendance/export_summary_pdf/?month=${month}&year=${year}`, `Attendance_Summary_${month}_${year}.pdf`);
+      toast.success('Summary PDF downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download summary PDF');
+    }
+  };
+
+  const handleExportIndividual = async () => {
+    const { apiDownload } = await import('@/lib/api');
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    try {
+      await apiDownload(`/attendance/attendance/download_pdf/?month=${month}&year=${year}`, `Attendance_Log_${month}_${year}.pdf`);
+      toast.success('Your Attendance PDF downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download individual PDF');
+    }
+  };
+
+  const handleExportCSV = async () => {
+    const { apiDownload } = await import('@/lib/api');
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    try {
+      await apiDownload(`/attendance/attendance/export_csv/?month=${month}&year=${year}`, `Attendance_Recap_${month}_${year}.csv`);
+      toast.success('Attendance CSV downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download CSV');
+    }
+  };
+
   React.useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
@@ -190,9 +229,26 @@ export default function AttendancePage() {
                 t('checkOut')
               )}
             </button>
-            <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 rounded-xl font-medium hover:bg-white/10 transition-transform">
-              Export Log
-            </button>
+            <div className="flex gap-1">
+              <button 
+                onClick={handleExportIndividual}
+                className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 transition-transform flex items-center gap-2"
+              >
+                PDF Log
+              </button>
+              <button 
+                onClick={handleExportSummary}
+                className="px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-xl font-medium hover:bg-primary/20 transition-transform flex items-center gap-2"
+              >
+                Summary PDF
+              </button>
+              <button 
+                onClick={handleExportCSV}
+                className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-xl font-medium hover:bg-emerald-500/20 transition-transform flex items-center gap-2"
+              >
+                Excel Recap
+              </button>
+            </div>
           </div>
         </div>
 

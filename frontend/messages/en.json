@@ -25,6 +25,7 @@
     "payroll": "Payroll",
     "workflows": "Workflows",
     "analytics": "Analytics",
+    "reports": "Reports",
     "settings": "Settings",
     "leaves": "Leaves",
     "reimbursements": "Reimbursements",
@@ -81,8 +82,10 @@
     "payrollSection": "Financial Overview",
     "attendanceSection": "Attendance Health",
     "headcountSection": "Headcount Trend",
-    "exportAttendance": "Export Attendance (CSV)",
-    "exportPerformance": "Export Appraisals (CSV)",
+    "exportAttendance": "Export Attendance",
+    "exportPerformance": "Export Appraisals",
+    "exportPayroll": "Export Payroll",
+    "exportExpense": "Export Expense",
     "totalPayroll": "Total Payroll",
     "totalHeadcount": "Total Headcount",
     "overtimeCost": "Overtime Cost",
@@ -285,6 +288,11 @@
       "uploading": "Uploading..."
     },
     "success": "Profile updated successfully"
+  },
+  "Reports": {
+    "title": "Reporting Center",
+    "subtitle": "Access and export comprehensive business reports for web or mobile review.",
+    "loading": "Loading report summaries..."
   },
   "Common": {
     "submit": "Submit",

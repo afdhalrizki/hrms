@@ -58,6 +58,7 @@ backend/nosetests.xml
 backend/*.mo
 backend/*.pot
 backend/local_settings.py
+backend/error_body.html
 
 # Frontend (Next.js/Node)
 frontend/next-env.d.ts

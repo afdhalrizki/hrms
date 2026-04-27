@@ -11,6 +11,7 @@ import 'profile_edit_screen.dart';
 import 'profile_documents_screen.dart';
 import 'correction_request_screen.dart';
 import 'performance_dashboard_screen.dart';
+import 'reports_screen.dart';
 import 'settings_screen.dart';
 import '../api/api_service.dart';
 import '../api/location_service.dart';
@@ -476,6 +477,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'key': 'qa_performance',
         'permission': 'view_performance_report',
       },
+      {
+        'icon': Icons.bar_chart,
+        'label': 'Reports',
+        'color': const Color(0xFF3B82F6),
+        'key': 'qa_reports',
+        'permission': 'manage_hr',
+      },
     ];
 
     // Filter items based on permissions
@@ -554,6 +562,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       PerformanceDashboardScreen(userData: userData.toJson()),
                 ),
               ).then((_) => _loadProfile());
+            } else if (userData != null &&
+                item['label'] == 'Reports') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ReportsScreen(userData: userData.toJson()),
+                ),
+              );
             }
           },
           borderRadius: BorderRadius.circular(20),

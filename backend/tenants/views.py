@@ -33,9 +33,12 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
     """
     Internal API for admins to review and approve registrations.
     """
-    queryset = RegistrationRequest.objects.all()
     serializer_class = RegistrationRequestSerializer
     permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        with schema_context('public'):
+            return RegistrationRequest.objects.all()
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):

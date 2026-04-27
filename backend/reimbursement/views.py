@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+from django.utils import timezone
 from django.db import models, connection
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -133,6 +135,66 @@ class ReimbursementViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.Model
         reimbursement.notes = request.data.get('notes', 'Rejected by admin')
         reimbursement.save()
         return Response({'status': 'Rejected'})
+
+    @action(detail=False, methods=['get'])
+    def export_xlsx(self, request):
+        import pandas as pd
+        from io import BytesIO
+        from django.http import HttpResponse
+        from django.utils import timezone
+        
+        queryset = self.filter_queryset(self.get_queryset())
+        data = []
+        for r in queryset:
+            data.append({
+                'Employee': r.employee.fullname,
+                'Category': r.category.name,
+                'Amount': r.amount,
+                'Date': r.date,
+                'Description': r.description,
+                'Status': r.status
+            })
+            
+        df = pd.DataFrame(data)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Reimbursements')
+            
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="Reimbursement_Recap_{timezone.now().strftime("%Y%m%d")}.xlsx"'
+        return response
+
+    @action(detail=True, methods=['get'])
+    def download_pdf(self, request, pk=None):
+        from .pdf_generator import ReimbursementPDFGenerator
+        
+        reimbursement = self.get_object()
+        generator = ReimbursementPDFGenerator(reimbursement)
+        pdf_content = generator.generate()
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = f"Reimbursement_Voucher_{reimbursement.id}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=True, methods=['get'])
+    def download_docx(self, request, pk=None):
+        from .docx_generator import ReimbursementDOCXGenerator
+        
+        reimbursement = self.get_object()
+        generator = ReimbursementDOCXGenerator(reimbursement)
+        docx_content = generator.generate()
+        
+        response = HttpResponse(
+            docx_content, 
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+        filename = f"Reimbursement_Voucher_{reimbursement.id}.docx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
 
     @action(detail=False, methods=['get'])
     def export_csv(self, request):

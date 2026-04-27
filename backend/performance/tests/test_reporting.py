@@ -68,8 +68,8 @@ class PerformanceReportingTestCase(TenantTestCase):
         assert 'appraisal_summary.csv' in response['Content-Disposition']
         
         content = response.content.decode('utf-8')
-        assert 'Employee Name,Period,Status,Start Date,End Date' in content
-        assert f'Performance Reviewee,Q1 2026,Completed,{self.today}' in content
+        assert 'Employee Name,NIK,Period,Status,Start Date,End Date' in content
+        assert f'Performance Reviewee,P001,Q1 2026,Completed,{self.today}' in content
 
     def test_appraisal_export_csv_filtered(self):
         """Verify filtering by status."""

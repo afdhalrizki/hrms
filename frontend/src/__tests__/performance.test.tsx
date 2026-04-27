@@ -22,6 +22,7 @@ vi.mock('@/lib/api', async (importOriginal) => {
   return {
     ...actual,
     apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
+    apiDownload: vi.fn(() => Promise.resolve()),
   };
 });
 
@@ -174,4 +175,35 @@ describe('PerformancePage (Integrated)', () => {
       expect(screen.getByText('4.5')).toBeInTheDocument();
     }, { timeout: 15000 });
   }, 20000);
+
+  it('calls apiDownload when excel summary button is clicked', async () => {
+    render(<PerformancePage />, { wrapper: AllProviders });
+
+    await waitFor(() => screen.getByText(/Excel Summary/i), { timeout: 15000 });
+    fireEvent.click(screen.getByText(/Excel Summary/i));
+
+    const { apiDownload } = await import('@/lib/api');
+    await waitFor(() => {
+      expect(apiDownload).toHaveBeenCalledWith(
+        expect.stringContaining('/appraisals/export_csv/'),
+        expect.stringContaining('Performance_Recap.csv')
+      );
+    });
+  });
+
+  it('calls apiDownload when download report button is clicked', async () => {
+    render(<PerformancePage />, { wrapper: AllProviders });
+
+    await waitFor(() => screen.getAllByTitle(/Download Report PDF/i), { timeout: 15000 });
+    const downloadBtns = screen.getAllByTitle(/Download Report PDF/i);
+    fireEvent.click(downloadBtns[0]);
+
+    const { apiDownload } = await import('@/lib/api');
+    await waitFor(() => {
+      expect(apiDownload).toHaveBeenCalledWith(
+        expect.stringContaining('/appraisals/'),
+        expect.stringContaining('Appraisal_')
+      );
+    });
+  });
 });

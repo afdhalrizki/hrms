@@ -25,6 +25,7 @@
     "payroll": "Payroll",
     "workflows": "Workflow",
     "analytics": "Analitik",
+    "reports": "Laporan",
     "settings": "Pengaturan",
     "leaves": "Cuti/Izin",
     "reimbursements": "Reimbursement",
@@ -79,8 +80,10 @@
     "payrollSection": "Ringkasan Finansial",
     "attendanceSection": "Kesehatan Kehadiran",
     "headcountSection": "Tren Jumlah Karyawan",
-    "exportAttendance": "Ekspor Kehadiran (CSV)",
-    "exportPerformance": "Ekspor Penilaian (CSV)",
+    "exportAttendance": "Ekspor Kehadiran",
+    "exportPerformance": "Ekspor Penilaian",
+    "exportPayroll": "Ekspor Payroll",
+    "exportExpense": "Ekspor Reimbursement",
     "totalPayroll": "Total Payroll",
     "totalHeadcount": "Total Karyawan",
     "overtimeCost": "Biaya Lembur",
@@ -261,5 +264,10 @@
       "uploading": "Mengunggah..."
     },
     "success": "Profil berhasil diperbarui"
+  },
+  "Reports": {
+    "title": "Pusat Pelaporan",
+    "subtitle": "Akses dan ekspor laporan bisnis yang komprehensif untuk ulasan web atau seluler.",
+    "loading": "Memuat ringkasan laporan..."
   }
 }

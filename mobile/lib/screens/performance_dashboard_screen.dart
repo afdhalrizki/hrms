@@ -186,10 +186,41 @@ class _PerformanceDashboardScreenState extends State<PerformanceDashboardScreen>
                   },
                   child: const Text('Review', style: TextStyle(color: Colors.blueAccent)),
                 ),
+              if (status == 'COMPLETED')
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.picture_as_pdf, size: 18, color: Colors.white60),
+                      onPressed: () => _downloadReport(appraisal['id'], 'pdf'),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.description, size: 18, color: Colors.blueAccent),
+                      onPressed: () => _downloadReport(appraisal['id'], 'docx'),
+                    ),
+                  ],
+                ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _downloadReport(int id, String format) async {
+    try {
+      final endpoint = "/performance/appraisals/$id/download_$format/";
+      await ApiService().downloadAppraisalPDF(id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download $format started...')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download failed: $e')),
+        );
+      }
+    }
   }
 }

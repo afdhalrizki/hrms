@@ -10,13 +10,7 @@ class ConnectionResetMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        print(f"DEBUG: ConnectionResetMiddleware - Start. Connection Schema: {connection.schema_name}")
-        # Reset search_path to include public
-        with connection.cursor() as cursor:
-            cursor.execute('SET search_path TO "public"')
-        
-        # Also reset the connection's internal tenant state to public
+        # Force connection reset to public schema at the start of every request
+        from django.db import connection
         connection.set_schema_to_public()
-        print(f"DEBUG: ConnectionResetMiddleware - Reset complete.")
-        
         return self.get_response(request)

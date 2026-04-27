@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.db import models
 from core.models import Employee
 from core.audit import AuditModel
@@ -49,6 +49,24 @@ class Attendance(AuditModel):
 
     def __str__(self):
         return f"{self.employee.fullname} - {self.date}"
+
+    @property
+    def late_minutes(self):
+        if not self.check_in:
+            return 0
+        # Simple logic: after 08:00 is late
+        from datetime import time
+        if self.check_in > time(8, 0):
+            delta = (datetime.combine(date.min, self.check_in) - datetime.combine(date.min, time(8, 0)))
+            return int(delta.total_seconds() / 60)
+        return 0
+
+    @property
+    def total_hours(self):
+        if not self.check_in or not self.check_out:
+            return 0
+        delta = (datetime.combine(date.min, self.check_out) - datetime.combine(date.min, self.check_in))
+        return round(delta.total_seconds() / 3600, 2)
 
 
 class LeaveRequest(AuditModel):

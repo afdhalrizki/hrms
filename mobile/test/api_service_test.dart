@@ -144,5 +144,57 @@ void main() {
         throwsException,
       );
     });
+
+    group('Reporting Unit Tests', () {
+      test('Reporting: downloadAttendanceRecap calls correct endpoint', () async {
+        await loginForTest();
+        // Since we are in a unit test with integrated helper, this should hit the real dev backend or mock
+        // We verify it doesn't throw and returns bytes
+        final bytes = await apiService.downloadAttendanceRecap('2024-01-01', '2024-12-31', 'csv');
+        expect(bytes, isNotNull);
+        expect(bytes.length, greaterThan(0));
+      });
+
+      test('Reporting: downloadPayrollRecap (XLSX) returns data', () async {
+        await loginForTest();
+        final bytes = await apiService.downloadPayrollRecap(1, 'xlsx');
+        expect(bytes, isNotNull);
+      });
+
+      test('Reporting: downloadPayslip (DOCX) returns data', () async {
+        await loginForTest();
+        final payslips = await apiService.getPayslips();
+        if (payslips.isNotEmpty) {
+          final bytes = await apiService.downloadPayslipDOCX(payslips.first['id']);
+          expect(bytes, isNotNull);
+        }
+      });
+
+      test('Reporting: downloadReimbursementDOCX returns data', () async {
+        await loginForTest();
+        final reimbursements = await apiService.getReimbursements();
+        if (reimbursements.isNotEmpty) {
+          final bytes = await apiService.downloadReimbursementDOCX(reimbursements.first['id']);
+          expect(bytes, isNotNull);
+        }
+      });
+
+      test('Reporting: downloadAppraisalPDF returns data', () async {
+        await loginForTest();
+        final appraisals = await apiService.getAppraisals();
+        if (appraisals.isNotEmpty) {
+          final bytes = await apiService.downloadAppraisalPDF(appraisals.first['id']);
+          expect(bytes, isNotNull);
+        }
+      });
+
+      test('Reporting: downloadFile generic method handles errors', () async {
+        await loginForTest();
+        expect(
+          () => apiService.downloadFile('/non-existent-path/'),
+          throwsException,
+        );
+      });
+    });
   });
 }

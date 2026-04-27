@@ -92,9 +92,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> login(String email, String password, String tenant) async {
-    print('DEBUG MOBILE: Login to ${baseUrl}/auth/login/ with tenant $tenant');
     final headers = _headers(tenant);
-    print('DEBUG MOBILE: Headers: $headers');
     
     debugPrint('HTTP REQUEST: POST $baseUrl/auth/login/');
     debugPrint('HTTP HEADERS: $headers');
@@ -160,25 +158,79 @@ class ApiService {
     await _storage.delete(key: 'jwt_token');
   }
 
-  // Cross-platform PDF downloader (Web & Mobile workaround)
-  Future<void> downloadPdf(String endpoint, String filename) async {
+  // Cross-platform file downloader
+  Future<List<int>> downloadFile(String endpoint, {Map<String, dynamic>? queryParams}) async {
     final tenant = await getTenant();
     final token = await getToken();
     
-    final url = "$baseUrl$endpoint";
+    var url = "$baseUrl$endpoint";
+    if (queryParams != null && queryParams.isNotEmpty) {
+      final queryString = Uri(queryParameters: queryParams.map((k, v) => MapEntry(k, v.toString()))).query;
+      url = "$url?$queryString";
+    }
+    
+    _log('STARTING DOWNLOAD: $url');
+    
     final response = await _client.get(
       Uri.parse(url),
       headers: _headers(tenant, token),
     );
 
     if (response.statusCode == 200) {
-      // In a real mobile app with url_launcher, we'd save it to path_provider and open it.
-      // Since symlinks are blocked on this specific dev environment, we'll just print success 
-      // for the widget tests to pass or implement the web fallback if compiled for web.
-      _log('PDF Downloaded successfully: ${response.bodyBytes.length} bytes');
+      _log('File Downloaded successfully: ${response.bodyBytes.length} bytes');
+      return response.bodyBytes;
     } else {
-      throw Exception('Failed to download PDF');
+      _log('DOWNLOAD FAILED: ${response.statusCode} - ${response.body}');
+      throw Exception('Failed to download file: ${response.statusCode}');
     }
+  }
+
+  Future<List<int>> downloadAttendanceRecap(String startDate, String endDate, String format) async {
+    final endpoint = format == 'pdf' ? '/attendance/download_pdf/' : '/attendance/export_$format/';
+    
+    // Extract month and year from startDate (YYYY-MM-DD)
+    final parts = startDate.split('-');
+    final year = parts[0];
+    final month = parts[1].startsWith('0') ? parts[1].substring(1) : parts[1];
+
+    return await downloadFile(endpoint, queryParams: {
+      'month': month,
+      'year': year,
+    });
+  }
+
+  Future<List<int>> downloadPayrollRecap(int periodId, String format) async {
+    return await downloadFile("/payslips/export_recap_$format/", queryParams: {
+      'period_id': periodId,
+    });
+  }
+
+  Future<List<int>> downloadReimbursementRecap(String format) async {
+    return await downloadFile("/reimbursements/export_$format/");
+  }
+
+  Future<List<int>> downloadPerformanceRecap(String format) async {
+    return await downloadFile("/appraisals/export_$format/");
+  }
+
+  Future<List<int>> downloadPayslipPDF(int payslipId) async {
+    return await downloadFile("/payslips/$payslipId/download_pdf/");
+  }
+
+  Future<List<int>> downloadPayslipDOCX(int payslipId) async {
+    return await downloadFile("/payslips/$payslipId/download_docx/");
+  }
+
+  Future<List<int>> downloadReimbursementPDF(int reimbursementId) async {
+    return await downloadFile("/reimbursements/$reimbursementId/download_pdf/");
+  }
+
+  Future<List<int>> downloadReimbursementDOCX(int reimbursementId) async {
+    return await downloadFile("/reimbursements/$reimbursementId/download_docx/");
+  }
+
+  Future<List<int>> downloadAppraisalPDF(int appraisalId) async {
+    return await downloadFile("/appraisals/$appraisalId/download_pdf/");
   }
 
   Future<http.Response> _authenticatedRequest(
