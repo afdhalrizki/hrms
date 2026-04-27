@@ -295,10 +295,33 @@ export async function killPortProcess(port) {
     } catch (e) {}
   } else {
     try {
-      try { await execAsync(`fuser -k ${port}/tcp`); } catch (e) {
+      // Try SIGINT first (Ctrl+C) - often better for graceful shutdown/data flushing
+      try { await execAsync(`fuser -k -INT ${port}/tcp`); } catch (e) {
         const { stdout } = await execAsync(`lsof -t -i:${port}`);
         const pids = stdout.split('\n').filter((p) => p.trim().length > 0);
-        for (const pid of pids) await execAsync(`kill -9 ${pid}`);
+        for (const pid of pids) await execAsync(`kill -2 ${pid}`);
+      }
+      
+      // Wait a bit for graceful shutdown
+      await new Promise(r => setTimeout(r, 2000));
+      
+      // If still in use, use SIGTERM
+      if (await isPortInUse(port)) {
+        try { await execAsync(`fuser -k -TERM ${port}/tcp`); } catch (e) {
+          const { stdout } = await execAsync(`lsof -t -i:${port}`);
+          const pids = stdout.split('\n').filter((p) => p.trim().length > 0);
+          for (const pid of pids) await execAsync(`kill -15 ${pid}`);
+        }
+        await new Promise(r => setTimeout(r, 2000));
+      }
+      
+      // If still in use, use SIGKILL
+      if (await isPortInUse(port)) {
+        try { await execAsync(`fuser -k -KILL ${port}/tcp`); } catch (e) {
+          const { stdout } = await execAsync(`lsof -t -i:${port}`);
+          const pids = stdout.split('\n').filter((p) => p.trim().length > 0);
+          for (const pid of pids) await execAsync(`kill -9 ${pid}`);
+        }
       }
     } catch (e) {}
   }

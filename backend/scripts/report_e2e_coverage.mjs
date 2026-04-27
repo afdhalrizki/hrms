@@ -44,10 +44,16 @@ async function main() {
       log('❌ ERROR: coverage combine failed.', COLORS.red);
       process.exit(combineCode);
     }
+  } else if (!existsSync(coverageFile)) {
+    log(
+      '⚠️ No coverage data found (.coverage or .coverage.* fragments). Skip report generation.',
+      COLORS.yellow,
+    );
+    process.exit(0);
   } else {
     log(
-      'No parallel coverage files (.coverage.*) found. Using base .coverage file.',
-      COLORS.yellow,
+      'Using existing .coverage file.',
+      COLORS.gray,
     );
   }
 

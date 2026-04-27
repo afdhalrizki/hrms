@@ -29,28 +29,8 @@ async function startBackendRunserver() {
   const backendDir = join(RootDir, 'backend');
 
   if (await isPortInUse(8000)) {
-    // Check if it's healthy
-    const healthy = await new Promise((resolve) => {
-      const req = http.get('http://localhost:8000/api/', (res) =>
-        resolve(res.statusCode < 500),
-      );
-      req.on('error', () => resolve(false));
-      req.setTimeout(2000, () => {
-        req.destroy();
-        resolve(false);
-      });
-    });
-
-    if (healthy) {
-      log(
-        '⚠️ Port 8000 is already listening and /api/ is healthy; reuse existing backend.',
-        COLORS.yellow,
-      );
-      return null;
-    }
-
     log(
-      '⚠️ Port 8000 is listening but backend health check failed; terminating old process(es) and restarting.',
+      '⚠️ Port 8000 is already listening. Terminating existing process(es) to ensure fresh coverage collection.',
       COLORS.yellow,
     );
     await killPortProcess(8000);
@@ -77,8 +57,13 @@ async function stopBackendRunserver() {
   if (BackendServerProcess) {
     log(`[Backend] Stopping backend runserver process...`, COLORS.yellow);
     try {
-      // In Node, we can try to be nice or just kill
+      // First try to kill the wrapper process
       BackendServerProcess.kill('SIGTERM');
+      
+      // Also explicitly kill whatever is on port 8000 (the actual Django server)
+      // our updated killPortProcess uses SIGTERM first!
+      await killPortProcess(8000);
+
       await new Promise((r) => setTimeout(r, 2000));
       if (!BackendServerProcess.killed) BackendServerProcess.kill('SIGKILL');
     } catch (e) {}
