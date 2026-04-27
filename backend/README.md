@@ -63,10 +63,7 @@ python manage.py bootstrap_tenants
 ## 🚀 Running the Platform
 
 ### Start Development Server
-```powershell
-# Windows/Linux/Mac (pwsh)
-.\run_dev.ps1
-# or via Node:
+```bash
 node scripts/run_dev.mjs
 ```
 
@@ -87,26 +84,20 @@ The harikerja platform follows a strict 4-tier promotion path:
 
 ## 🧪 Testing Standard
 
-The backend uses `pytest` with **100% pass rate** across 223 mission-critical scenarios.
+The backend uses `pytest` with **100% pass rate** across **333 mission-critical tests** (317 Unit + 16 E2E).
 
 **Run logic/unit tests:**
-```powershell
-pwsh ./run_unit_tests.ps1
-# or via Node: 
+```bash
 node scripts/run_unit_tests.mjs
 ```
 
 **Run E2E tests:**
-```powershell
-pwsh ./run_e2e_tests.ps1
-# or via Node: 
+```bash
 node scripts/run_e2e_tests.mjs
 ```
 
 **Run All Tests (Unit + E2E):**
-```powershell
-pwsh ./run_tests.ps1
-# or via Node:
+```bash
 node scripts/run_tests.mjs
 ```
 

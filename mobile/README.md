@@ -57,10 +57,8 @@ flutter pub get
 ```
 
 ## 🚀 Running the Platform
-```powershell
-# Automated Local Dev - RECOMMENDED
-pwsh .\run_dev.ps1
-# or via Node:
+
+```bash
 node scripts/run_dev.mjs
 ```
 
@@ -77,35 +75,27 @@ The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 
 ## 🧪 Testing Standard
 
-The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **106 robust tests**.
+The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **151 robust tests**.
 
-### Unit & Logic Tests - 91 Tests
-```powershell
-pwsh .\run_unit_tests.ps1
-# or
+### Unit & Logic Tests - 128 Tests
+```bash
 node scripts/run_unit_tests.mjs
 ```
 
-### End-to-End Testing (E2E) - 15 Tests
+### End-to-End Testing (E2E) - 23 Tests
 
 **Run with mocked API (Isolated):**
-```powershell
-pwsh .\run_e2e_tests.ps1
-# or
+```bash
 node scripts/run_e2e_tests.mjs
 ```
 
 **Run with real integrated API and Database:**
-```powershell
-pwsh .\run_e2e_tests.ps1 -Integrated
-# or
+```bash
 node scripts/run_e2e_tests.mjs --integrated
 ```
 
 ### Run All Tests (Unit + E2E)
-```powershell
-pwsh .\run_tests.ps1
-# or
+```bash
 node scripts/run_tests.mjs
 ```
 

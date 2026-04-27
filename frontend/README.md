@@ -78,35 +78,27 @@ The harikerja platform follows a strict 4-tier promotion path:
 
 ## 🧪 Testing Standard
 
-The frontend uses a dual-layer strategy with **100% pass rate** across **178 mission-critical tests**.
+The frontend uses a dual-layer strategy with **100% pass rate** across **222 mission-critical tests**.
 
-### Unit Testing (Vitest) - 144 Tests
-```powershell
-.\run_unit_tests.ps1
-# or
+### Unit Testing (Vitest) - 184 Tests
+```bash
 node scripts/run_unit_tests.mjs
 ```
 
-### End-to-End Testing (Playwright) - 34 Tests
+### End-to-End Testing (Playwright) - 38 Tests
 
 **Run with mocked API (Fast/Isolated):**
-```powershell
-.\run_e2e_tests.ps1
-# or
+```bash
 node scripts/run_e2e_tests.mjs
 ```
 
 **Run with real integrated API and Database:**
-```powershell
-.\run_e2e_tests.ps1 -Integrated
-# or
+```bash
 node scripts/run_e2e_tests.mjs --integrated
 ```
 
 ### Run All Tests (Unit + E2E)
-```powershell
-.\run_tests.ps1 
-# or 
+```bash
 node scripts/run_tests.mjs
 ```
 

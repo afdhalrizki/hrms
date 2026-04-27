@@ -17,6 +17,7 @@ source =
     D:/hr/hrms/backend
     D:\\hr\\hrms\\backend
 [report]
+ignore_errors = True
 show_missing = True
 precision = 2
 exclude_lines =

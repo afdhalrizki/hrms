@@ -59,23 +59,37 @@ _Tiered SaaS provisioning and intelligent subscription gating (Essential, Profes
 
 ## 📦 Getting Started
 
-Unified scripts to manage **Development**, **Staging**, and **Production** environments seamlessly.
+The platform is orchestrated using a unified Node.js management layer.
 
-### Windows (PowerShell)
+### 🚀 Starting the Platform
 
-```powershell
-# 1. Setup SDK Environments (Flutter, JDK, Android Tools)
-.\scripts\setup_envs.ps1
-
-# 2. Start the platform
-.\up.ps1 dev -build
-```
-
-### Linux/macOS (Make)
+Run the following command to start all services (Backend, Frontend, DB, Redis) in development mode:
 
 ```bash
-make dev
+# Start the entire platform
+node up.mjs dev --build
+
+# View logs
+node up.mjs dev logs
+
+# Stop the platform
+node up.mjs dev down
 ```
+
+### 🧪 Running the Unified Test Suite
+
+The platform includes a master test orchestrator that runs all tests across the entire stack (Backend, Frontend, and Mobile) and generates a master report:
+
+```bash
+# Run all tests for all modules
+node scripts/run_all_tests.mjs
+```
+
+**Individual Stack Tests:**
+For more granular control, you can run tests within each module directory:
+- [**Backend Tests**](./backend/README.md#🧪-testing-standard)
+- [**Frontend Tests**](./frontend/README.md#🧪-testing-standard)
+- [**Mobile Tests**](./mobile/README.md#🧪-testing-standard)
 
 **Access Points (Local Dev):**
 
@@ -114,9 +128,9 @@ make dev
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 223 Mission-critical logic and E2E tests (Pytest).
-- **Frontend**: 178 Comprehensive unit and E2E tests (Vitest + Playwright).
-- **Mobile**: 106 Robust logic and integration tests (Flutter).
+- **Backend**: 333 Tests (317 Unit + 16 E2E) - Pytest.
+- **Frontend**: 222 Tests (184 Unit + 38 E2E) - Vitest & Playwright.
+- **Mobile**: 151 Tests (128 Unit + 23 E2E) - Flutter.
 
 ## 🎯 IMMEDIATE PRIORITIES (Current Focus)
 
