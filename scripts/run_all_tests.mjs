@@ -13,6 +13,7 @@ import {
   isPortInUse,
   killPortProcess,
   getTimestamp,
+  getPythonExec,
   ensureDockerRunning,
   saveDockerLogs,
   moveFailureScreenshots,
@@ -62,7 +63,7 @@ async function startBackendRunserver() {
   );
   BackendServerProcess = spawnBackground(
     'node',
-    [join(backendDir, 'scripts/run_dev.mjs'), '--coverage'],
+    [join(backendDir, 'scripts/run_dev.mjs'), '--coverage', '--skip-migrations'],
     {
       cwd: backendDir,
       logFile: join(LogDir, 'backend_server_bg.log'),
@@ -142,28 +143,26 @@ async function main() {
       log('❌ Docker is required for tests.', COLORS.red);
       process.exit(1);
     }
-
+    log('🔧 Resetting Docker environment...', COLORS.yellow);
     const dockerResult = await spawnStream(
       'node',
-      [
-        join(RootDir, 'backend/scripts/run_unit_tests.mjs'),
-        '--docker-only',
-        '--reset-docker',
-      ],
-      { cwd: join(RootDir, 'backend') },
+      [join(RootDir, 'backend', 'scripts', 'run_unit_tests.mjs'), '--docker-only', '--reset-docker'],
+      { cwd: join(RootDir, 'backend') }
     );
     if (dockerResult !== 0) {
-      log(
-        '⚠️ Initial Docker setup failed; retrying without reset...',
-        COLORS.yellow,
-      );
-      await spawnStream(
-        'node',
-        [join(RootDir, 'backend/scripts/run_unit_tests.mjs'), '--docker-only'],
-        { cwd: join(RootDir, 'backend') },
-      );
+      log('❌ Docker setup failed.', COLORS.red);
+      process.exit(1);
     }
 
+    log("🧪 Initializing Database with 8 worker tenants...", COLORS.yellow);
+    await spawnStream(getPythonExec(join(RootDir, 'backend')), [
+      join(RootDir, 'backend', 'scripts', 'seed_test_db.py'),
+      '--workers', '8',
+      '--preset', 'full'
+    ], { cwd: join(RootDir, 'backend') });
+
+    const onlyBackendSetup = args.includes('--only-backend-setup');
+    
     // 2. Start Backend Server (for E2E)
     if (!skipE2E) {
       log(
@@ -178,6 +177,7 @@ async function main() {
       if (initCode !== 0) {
         log('⚠️ Backend initialization failed. E2E might fail.', COLORS.red);
         allPassed = false;
+        if (onlyBackendSetup) process.exit(1);
       }
 
       await startBackendRunserver();
@@ -194,12 +194,18 @@ async function main() {
             '\n❌ ERROR: Backend server failed to start in time after retries.',
             COLORS.red,
           );
+          if (onlyBackendSetup) process.exit(1);
           log(
             'Backend E2E may still run but could fail; we continue to run all suites.',
             COLORS.yellow,
           );
           allPassed = false;
         }
+      }
+      
+      if (onlyBackendSetup) {
+        log('✅ Backend setup completed successfully.', COLORS.green);
+        process.exit(0);
       }
     }
 
@@ -226,15 +232,32 @@ async function main() {
         continue;
       }
 
-      // Pre-check backend for Backend suite if E2E is relevant
-      if (s.name.includes('Backend') && !skipE2E) {
-        if (!(await isPortInUse(8000))) {
-          log(
-            `\n⚠️ Backend server unexpectedly stopped. Restarting for ${s.name}...`,
-            COLORS.yellow,
-          );
+      // Pre-check backend health
+      if (!(await isPortInUse(8000))) {
+        log(
+          `\n⚠️ Backend server not detected. Starting/Restarting for ${s.name}...`,
+          COLORS.yellow,
+        );
+        await ensureBackendServerReady(2, 240);
+      } else {
+        // If port is in use, verify it's healthy
+        const healthy = await waitForHttp('http://localhost:8000/api/', 5000, 'backend-ping');
+        if (!healthy) {
+          log(`\n⚠️ Backend server unhealthy. Restarting for ${s.name}...`, COLORS.yellow);
           await ensureBackendServerReady(2, 240);
+        } else {
+          log(`✅ Backend server healthy and reused for ${s.name}.`, COLORS.green);
         }
+      }
+
+      // EXPLICIT RE-SEED before Frontend and Mobile stacks to ensure deterministic state
+      if (s.name !== 'Backend Stack') {
+        log(`🧪 Re-seeding database for ${s.name}...`, COLORS.yellow);
+        await spawnStream(getPythonExec(join(RootDir, 'backend')), [
+          join(RootDir, 'backend', 'scripts', 'seed_test_db.py'),
+          '--workers', '8',
+          '--preset', 'full'
+        ], { cwd: join(RootDir, 'backend') });
       }
 
       log(`\n🚀 RUNNING: ${s.name}`, COLORS.yellow);
@@ -249,11 +272,20 @@ async function main() {
       let exitCode = 1;
       let attempt = 0;
       while (attempt <= maxSuiteRetries) {
-        if (attempt > 0)
-          log(
-            `Retry attempt ${attempt} for suite ${s.name} ...`,
-            COLORS.yellow,
-          );
+        if (attempt > 0) {
+          log(`Retry attempt ${attempt} for suite ${s.name} ...`, COLORS.yellow);
+          // Re-seed on retry too!
+          log(`🧪 Re-seeding database for retry...`, COLORS.yellow);
+          await spawnStream(getPythonExec(join(RootDir, 'backend')), [
+            join(RootDir, 'backend', 'scripts', 'seed_test_db.py'),
+            '--workers', '8',
+            '--preset', 'full'
+          ], { cwd: join(RootDir, 'backend') });
+
+          // Mark the log file for parseMetrics to identify the new attempt
+          const { appendFileSync } = await import('node:fs');
+          appendFileSync(suiteLog, `\n\n--- SUITE RETRY ATTEMPT ${attempt} ---\n\n`);
+        }
 
         exitCode = await spawnStream(
           'node',
@@ -261,6 +293,7 @@ async function main() {
           {
             cwd: dirname(join(RootDir, s.path)),
             logFile: suiteLog,
+            env: { ...process.env, NO_RESEED: 'true' },
           },
         );
 
@@ -326,6 +359,7 @@ async function main() {
       log('\n📊 Post-Processing Coverage Data...', COLORS.cyan);
       await spawnStream('node', ['./report_e2e_coverage.mjs'], {
         cwd: join(RootDir, 'backend/scripts'),
+        env: { ...process.env, NO_RESEED: 'true' },
       });
     }
 

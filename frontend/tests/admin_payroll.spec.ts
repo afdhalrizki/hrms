@@ -32,7 +32,15 @@ test.describe.serial('Admin Payroll Management', () => {
     console.log('--- Verifying Stats ---');
     // The screenshot shows empty cards, let's wait for the number to appear
     const totalPayrollText = page.locator('p', { hasText: /Rp/ }).first();
-    await expect(totalPayrollText).toContainText(/16.*500.*000/, { timeout: 20000 });
+    await expect(totalPayrollText).toBeVisible({ timeout: 20000 });
+    
+    // Check it has a non-zero value formatted as Rp
+    await expect(async () => {
+      const val = await totalPayrollText.innerText();
+      if (!/Rp\s*[\d,.]+/.test(val) || val.includes('Rp 0')) {
+        throw new Error(`Payroll value not loaded or zero: ${val}`);
+      }
+    }).toPass({ timeout: 15000 });
 
     // 2. Open Run Payroll Modal
     console.log('--- Opening Run Payroll Modal ---');

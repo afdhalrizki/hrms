@@ -47,10 +47,6 @@ void setupSystemChannelMocks() {
 
   final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
-  // Detect server environment
-  final bool isServer = Platform.environment.containsKey('CI') || 
-                        Platform.environment.containsKey('GITHUB_ACTIONS');
-
   messenger.setMockMethodCallHandler(secureStorageChannel, (call) async {
     if (call.method == 'read') {
       return Future.value(mockSecureStorage[call.arguments['key']]);
@@ -65,25 +61,20 @@ void setupSystemChannelMocks() {
   });
 
   messenger.setMockMethodCallHandler(pathProviderChannel, (call) async {
-    // On server, use system temp to avoid "garbage" files in workspace.
-    // Locally, use '.' so developer can see the files (test.pdf, test.txt).
-    final String baseDir = isServer ? Directory.systemTemp.path : '.';
-    
+    // Always use system temp directory for tests to keep the workspace clean.
+    final String baseDir = Directory.systemTemp.path;
     if (call.method == 'getApplicationDocumentsDirectory') return Future.value(baseDir);
     if (call.method == 'getTemporaryDirectory') return Future.value(baseDir);
     return Future.value(null);
   });
 
-  // Mock open_filex only on server to prevent GUI errors.
-  // Locally, we don't set a mock handler so it attempts to trigger the real OS opener (or fails gracefully).
-  if (isServer) {
-    messenger.setMockMethodCallHandler(openFileChannel, (call) async {
-      if (call.method == 'open') {
-        return Future.value({'message': 'done', 'type': 0});
-      }
-      return Future.value(null);
-    });
-  }
+  // Always mock open_filex during tests to prevent GUI errors or annoying popups.
+  messenger.setMockMethodCallHandler(openFileChannel, (call) async {
+    if (call.method == 'open') {
+      return Future.value({'message': 'done', 'type': 0});
+    }
+    return Future.value(null);
+  });
 
   // Mock platform-specific channels for path_provider
   const List<String> platformChannels = [
@@ -93,7 +84,7 @@ void setupSystemChannelMocks() {
   ];
   for (final channelName in platformChannels) {
     messenger.setMockMethodCallHandler(MethodChannel(channelName), (call) async {
-      final String baseDir = isServer ? Directory.systemTemp.path : '.';
+      final String baseDir = Directory.systemTemp.path;
       if (call.method == 'getApplicationDocumentsDirectory') return Future.value(baseDir);
       if (call.method == 'getTemporaryDirectory') return Future.value(baseDir);
       return Future.value(null);
@@ -138,11 +129,6 @@ Future<void> loginForTest() async {
 
 Future<void> setupIntegratedTest({bool isWidgetTest = false}) async {
   await setupTestEnvironment();
-  // We use a real ApiService but in tests we should have used a mock client.
-  // Since the code uses factory ApiService({http.Client? client}), 
-  // we can inject a mock client.
-  // However, for brevity in this environment, I'll assume the user wants me 
-  // to fix the missing method which likely contained mock setup logic.
 }
 
 Future<void> tearDownIntegratedTest() async {

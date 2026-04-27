@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "start:backend:test": "kill $(lsof -ti:8000) 2>/dev/null || true; node ../backend/scripts/run_dev.mjs --seed --coverage --preset=full --workers=2 > e2e_backend.log 2>&1"
+    "start:backend:test": "node ../backend/scripts/run_dev.mjs --seed --coverage --preset=full --workers=2 > e2e_backend.log 2>&1"
   },
   "dependencies": {
     "clsx": "^2.1.1",

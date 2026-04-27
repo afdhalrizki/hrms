@@ -32,6 +32,10 @@ from seeds.reimbursement import seed_reimbursement_data
 from seeds.performance import seed_performance_data
 
 def main():
+    if os.environ.get('NO_RESEED') == 'true':
+        print("⏭ NO_RESEED is set. Skipping database seeding.")
+        return
+
     import time
     for attempt in range(3):
         try:
@@ -60,6 +64,21 @@ def run_seeding():
     # 1. Nuclear Cleanup (Optional)
     if not args.no_cleanup:
         print("--- Performing Nuclear Cleanup ---")
+        db_name = os.environ.get('DB_NAME', 'hrms')
+        with connection.cursor() as cursor:
+            try:
+                # Kill other connections to prevent lock contention during truncate/drop
+                cursor.execute(f"""
+                    SELECT pg_terminate_backend(pid) 
+                    FROM pg_stat_activity 
+                    WHERE datname = '{db_name}' AND pid <> pg_backend_pid()
+                """)
+            except Exception as e:
+                print(f"      Warning: Failed to terminate other connections: {e}")
+        
+        # Force a fresh connection after killing others
+        connection.close()
+        
         with connection.cursor() as cursor:
             # Drop all tenant schemas except public/shared
             cursor.execute("SELECT schema_name FROM tenants_tenant WHERE schema_name NOT IN ('public', 'shared')")

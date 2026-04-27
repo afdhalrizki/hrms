@@ -20,13 +20,17 @@ void main() {
       final profile = await apiService.getEmployeeProfile();
       final employeeId = profile['employee_id'];
       
+      // Use a date that is unlikely to collide: 2030 + random day
+      final randomDay = (DateTime.now().millisecondsSinceEpoch % 28) + 1;
+      final testDate = '2030-11-${randomDay.toString().padLeft(2, "0")}';
+
       final result = await apiService.submitAttendance(
         employeeId: employeeId,
         latitude: -6.123456,
         longitude: 106.123456,
         checkTime: "08:00:00",
         isClockIn: true,
-        date: '2026-12-31',
+        date: testDate,
       );
 
       expect(result['id'], isNotNull);
@@ -36,7 +40,8 @@ void main() {
       await loginForTest();
       final profile = await apiService.getEmployeeProfile();
       final employeeId = profile['employee_id'];
-      const testDate = '2026-12-30';
+      final randomDay = (DateTime.now().millisecondsSinceEpoch % 28) + 1;
+      final testDate = '2030-10-${randomDay.toString().padLeft(2, "0")}';
 
       // Ensure a clock-in exists first for the same day
       await apiService.submitAttendance(
@@ -64,7 +69,8 @@ void main() {
       await loginForTest();
       final profile = await apiService.getEmployeeProfile();
       final employeeId = profile['employee_id'];
-      final testDate = '2026-05-20';
+      final randomDay = (DateTime.now().millisecondsSinceEpoch % 28) + 1;
+      final testDate = '2030-05-${randomDay.toString().padLeft(2, "0")}';
 
       // First submission
       await apiService.submitAttendance(

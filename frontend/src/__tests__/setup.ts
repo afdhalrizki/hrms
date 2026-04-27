@@ -128,7 +128,7 @@ global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '4', 10);
   const tenant = (!isNaN(workerIdx)) ? `worker_${((workerIdx - 1) % numWorkers + numWorkers) % numWorkers}` : 'company1';
   
-  if (url.includes('localhost:8000')) {
+  if (url.includes('localhost:8000') || url.includes('127.0.0.1:8000')) {
     const newInit = { ...init };
     // CRITICAL: Preserve existing headers from both init and Request object
     const originalHeaders = (input instanceof Request) ? input.headers : (init?.headers || {});
@@ -139,7 +139,8 @@ global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     
     if (process.env.DEBUG_API) {
       const auth = headers.get('Authorization') ? 'Present' : 'Missing';
-      console.log(`[TEST-FETCH] ${url} | Tenant: ${tenant} | Auth: ${auth}`);
+      const xtenant = headers.get('X-Tenant');
+      console.log(`[TEST-FETCH] ${url} | Tenant (Header): ${xtenant} | Auth: ${auth}`);
     }
     
     if (input instanceof Request) {
@@ -162,20 +163,25 @@ export async function loginAs(email: string, password = 'password123') {
   const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '4', 10);
   const tenant = (!isNaN(workerIdx)) ? `worker_${((workerIdx - 1) % numWorkers + numWorkers) % numWorkers}` : 'company1';
 
-  // In parallel tests, we must use the admin of the specific worker tenant
+  // In parallel tests, we must use the users of the specific worker tenant
   // to avoid cross-tenant authentication failures.
-  if (email === 'admin@company1.com' && tenant !== 'company1') {
-    email = `admin@${tenant}.com`;
+  if (email.endsWith('@company1.com') && tenant !== 'company1') {
+    email = email.replace('@company1.com', `@${tenant}.com`);
   }
 
-  const loginUrl = 'http://localhost:8000/api/auth/login/';
+  const baseUrl = 'http://localhost:8000/api';
   try {
     if (process.env.DEBUG_API) {
-      console.log(`[TEST-LOGIN] Attempting login for ${email}...`);
+      console.log(`[TEST-LOGIN] Attempting login for ${email} on tenant ${tenant}...`);
+      console.log(`[TEST-LOGIN] Body: ${JSON.stringify({ email, password })}`);
     }
-    const response = await fetch(loginUrl, {
+
+    const response = await fetch(`${baseUrl}/auth/login/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Tenant': tenant 
+      },
       body: JSON.stringify({ email, password }),
     });
     if (!response.ok) {

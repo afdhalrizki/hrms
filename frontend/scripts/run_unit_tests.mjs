@@ -2,7 +2,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, readdirSync, writeFileSync, appendFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
-import { ensureDir, log, COLORS, spawnStream, spawnBackground, waitForHttp, isPortInUse, parseMetrics } from '../../scripts/lib.mjs';
+import { ensureDir, log, COLORS, spawnStream, spawnBackground, waitForHttp, isPortInUse, parseMetrics, getPythonExec } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FrontendDir = resolve(__dirname, '..');
@@ -44,23 +44,17 @@ async function main() {
       log("ERROR: Backend failed to start. Integrated tests cannot run.", COLORS.red);
       process.exit(1);
     }
-  } else if (!skipBackendRestart) {
-    log("Backend is already running. Restarting and Re-seeding for consistency...", COLORS.gray);
-    const backendLog = join(logDir, `backend_integrated_${timestamp}.log`);
-    log(`Backend logs will be at: ${backendLog}`, COLORS.gray);
-    spawnBackground('node', [join(BackendDir, 'scripts/run_dev.mjs'), '--seed', '--workers', numWorkers.toString(), '--force'], { cwd: BackendDir, logFile: backendLog });
+  } else if (!process.env.NO_RESEED) {
+    log("Backend is already running. Re-seeding for consistency...", COLORS.gray);
+    const python = getPythonExec(BackendDir);
+    const seederScript = join(BackendDir, 'scripts/seed_test_db.py');
     
-    log("Waiting for backend restart to initialize (15s)...", COLORS.gray);
-    await new Promise(r => setTimeout(r, 15000));
-
-    log("Waiting for backend restart (max 300s)...", COLORS.gray);
-    const ready = await waitForHttp('http://localhost:8000/api/', 300000, 'Backend');
-    if (!ready) {
-      log("ERROR: Backend failed to restart. Integrated tests cannot run.", COLORS.red);
-      process.exit(1);
-    }
-  } else {
-    log("Backend is already running and skip-backend-restart is set. Skipping restart.", COLORS.green);
+    // Direct seeding without restarting the server
+    await spawnStream(python, [seederScript, '--workers', numWorkers.toString(), '--preset', 'full'], { 
+      cwd: BackendDir,
+      env: { ...process.env, DB_HOST: '127.0.0.1' }
+    });
+    log("✅ Re-seeding completed.", COLORS.green);
   }
 
   // 2. Dependency Check
@@ -93,7 +87,8 @@ async function main() {
         ...process.env,
         NODE_OPTIONS: '--max-old-space-size=4096',
         NEXT_PUBLIC_API_URL: 'http://localhost:8000/api',
-        TEST_WORKER_COUNT: numWorkers.toString()
+        TEST_WORKER_COUNT: numWorkers.toString(),
+        DEBUG_API: 'true'
       }
     });
 
@@ -179,4 +174,7 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

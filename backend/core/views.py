@@ -133,10 +133,6 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
 
     def get_queryset(self):
         from django.db import connection
-        # with connection.cursor() as cursor:
-        #     cursor.execute("SHOW search_path")
-        #     sp = cursor.fetchone()
-        # print(f"DEBUG VIEW: Path={self.request.path} Schema={connection.schema_name} SP={sp}")
         
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
@@ -230,7 +226,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class DashboardStatsAPIView(views.APIView):
+class DashboardStatsAPIView(TenantIsolationMixin, views.APIView):
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
@@ -263,9 +259,13 @@ class DashboardStatsAPIView(views.APIView):
             ).values('name', 'employee_count')
 
             attendance_stats = Attendance.objects.filter(date=today).values('status').annotate(count=Count('id'))
+            
+            # Use status__in to count PRESENT and LATE
             present_count = Attendance.objects.filter(date=today, status__in=['PRESENT', 'LATE']).count()
-            total_emp = Employee.objects.count()
-            attendance_percent = round((present_count / total_emp * 100) if total_emp > 0 else 0)
+            
+            # If present_count is 0, let's check if there are ANY records for today (maybe they are all ABSENT/LEAVE)
+            # This is helpful for debugging why it shows 0%
+            total_attendance_today = Attendance.objects.filter(date=today).count()
             
             from attendance.models import LeaveRequest
             pending_leaves = LeaveRequest.objects.filter(status='PENDING').count()
@@ -283,11 +283,12 @@ class DashboardStatsAPIView(views.APIView):
                 total_overtime=Sum('overtime_pay')
             )
 
+            # Recalculate percent cleanly
             attendance_percent = (present_count / total_employees * 100) if total_employees > 0 else 0
             
             return Response({
                 'total_employees': total_employees,
-                'attendance_percent': attendance_percent,
+                'attendance_percent': round(attendance_percent, 1),
                 'attendance_today': list(attendance_stats),
                 'pending_leaves': pending_leaves,
                 'new_hires': new_hires,
@@ -299,8 +300,7 @@ class DashboardStatsAPIView(views.APIView):
                 'trends': {
                     'months': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                     'headcount': [total_employees] * 6,
-                },
-                'attendance_percent': round(attendance_percent, 1)
+                }
             })
         except Exception as e:
             logger.error(f"Error in DashboardStatsAPIView: {e}")

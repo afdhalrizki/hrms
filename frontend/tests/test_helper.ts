@@ -130,6 +130,22 @@ export async function login(page: Page, email: string, password = 'password123',
     throw err;
   });
 
+  // 0. Preliminary Backend Reachability Check (Fail Fast)
+  try {
+    const backendUrl = 'http://localhost:8000/api/';
+    const response = await page.request.get(backendUrl, { timeout: 5000 });
+    if (!response.ok() && response.status() >= 500) {
+      throw new Error(`Backend at ${backendUrl} returned status ${response.status()}`);
+    }
+    console.log(`✅ Backend reachability verified: ${backendUrl}`);
+  } catch (e: any) {
+    const errorMsg = `❌ CRITICAL: Backend is UNREACHABLE at http://localhost:8000/api/. Login cannot proceed. Error: ${e.message || e}`;
+    console.error(errorMsg);
+    // Capture screenshot of the state
+    await page.screenshot({ path: `backend-unreachable-${email}.png`, fullPage: true });
+    throw new Error(errorMsg);
+  }
+
   // 1. First, navigate to the base URL to ensure we are in the correct origin context
   await page.goto(BASE_URL).catch(() => {});
   await page.context().clearCookies();

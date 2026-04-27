@@ -191,8 +191,9 @@ async function main() {
   }
 
   // 6. Migrations
-  if (skipSetup) {
-    log('[5/5] Skipping migrations and seeding (SKIP_BACKEND_SETUP=1 detected).', COLORS.green);
+  const skipMigrations = args.includes('--skip-migrations');
+  if (skipSetup || skipMigrations) {
+    log(`[5/5] Skipping migrations and seeding (${skipSetup ? 'SKIP_BACKEND_SETUP=1' : '--skip-migrations'} detected).`, COLORS.green);
   } else {
     log('[5/5] Checking migrations (shared & tenant)...', COLORS.yellow);
     try {

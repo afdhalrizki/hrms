@@ -131,16 +131,24 @@ tools/*.tar.gz
 
 # Test Logs & Artifacts
 *-failure.png
+*-fail-*.png
+*-retry-*.png
+*-snapshot.png
+backend-unreachable-*.png
 **/*.log
 **/logs/
 **/logs/archive/
 unit_test_*.log
 e2e_test_*.log
+docker_compose_logs_*.log
 
 # E2E Reports & Coverage
+**/coverage/
+**/test-results/
+**/playwright-report/
+**/blob-report/
+**/test-snapshots/
+**/.nyc_output/
 **/e2e/coverage/
 **/e2e/test-results/
 **/e2e/report/
-**/playwright-report/
-**/blob-report/
-**/.nyc_output/

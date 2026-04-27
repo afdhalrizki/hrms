@@ -1,6 +1,6 @@
 import { spawn, exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import { createWriteStream } from 'node:fs';
+import { createWriteStream, appendFileSync, readFileSync, existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,7 +37,6 @@ export function spawnStream(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     log(`Executing: ${command} ${args.join(' ')}`, COLORS.gray);
 
-    // In Node.js, we must explicitly check for .cmd on Windows for many binaries
     const actualCommand =
       process.platform === 'win32' && !command.includes('\\')
         ? `${command}.cmd`
@@ -46,7 +45,7 @@ export function spawnStream(command, args, options = {}) {
     const child = spawn(command, args, {
       cwd,
       env,
-      shell: true, // Use shell to handle platform differences correctly
+      shell: true,
       stdio: ['inherit', 'pipe', 'pipe'],
     });
 
@@ -153,8 +152,6 @@ export async function waitForHttp(url, timeoutMs = 60000, label = 'service') {
     try {
       const ok = await new Promise((resolve) => {
         const req = http.get(url, (res) => {
-          // Accept any response that isn't a server error (5xx)
-          // 404 is often acceptable as "the server is up, but this specific route isn't ready"
           resolve(res.statusCode >= 200 && res.statusCode < 500);
         });
         req.on('error', () => resolve(false));
@@ -176,20 +173,16 @@ export async function waitForHttp(url, timeoutMs = 60000, label = 'service') {
 }
 
 export function parseMetrics(logContent, suiteName) {
-  let p = 0,
-    f = 0,
-    e = 0,
-    w = 0;
-  const lines = logContent.split(/\r?\n/);
+  let p = 0, f = 0, e = 0, w = 0;
+  
+  const attempts = logContent.split(/--- SUITE RETRY ATTEMPT \d+ ---/);
+  const finalContent = attempts[attempts.length - 1];
+  const lines = finalContent.split(/\r?\n/);
 
   if (suiteName.includes('Backend')) {
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
-      if (
-        cleanLine.match(
-          /==.* (passed|failed|error|skipped|warning|xfailed|xpassed).* in .*/,
-        )
-      ) {
+      if (cleanLine.match(/==.* (passed|failed|error|skipped|warning|xfailed|xpassed).* in .*/)) {
         const passMatch = cleanLine.match(/(\d+)\s+passed/);
         const failMatch = cleanLine.match(/(\d+)\s+failed/);
         const errMatch = cleanLine.match(/(\d+)\s+error/);
@@ -203,14 +196,12 @@ export function parseMetrics(logContent, suiteName) {
   } else if (suiteName.includes('Frontend')) {
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
-      // Vitest (handles both "X failed | Y passed" and "Y passed")
       const vPass = cleanLine.match(/Tests.*?(\d+)\s+passed/);
       const vFail = cleanLine.match(/Tests.*?(\d+)\s+failed/);
       const vErr = cleanLine.match(/Tests.*?(\d+)\s+error/);
       if (vPass) p = Math.max(p, parseInt(vPass[1], 10));
       if (vFail) f = Math.max(f, parseInt(vFail[1], 10));
       if (vErr) e = Math.max(e, parseInt(vErr[1], 10));
-      // Playwright
       const pPass = cleanLine.match(/^\s*(\d+)\s+passed/);
       const pFail = cleanLine.match(/^\s*(\d+)\s+failed/);
       const pFlaky = cleanLine.match(/^\s*(\d+)\s+flaky/);
@@ -221,7 +212,6 @@ export function parseMetrics(logContent, suiteName) {
   } else if (suiteName.includes('Mobile')) {
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
-      // Case 1: Standard summary log lines (manual or PowerShell wrapper)
       const mPass = cleanLine.match(/TOTAL PASSED:\s+(\d+)/);
       const mFail = cleanLine.match(/TOTAL FAILED:\s+(\d+)/);
       const mErr = cleanLine.match(/TOTAL ERRORS:\s+(\d+)/);
@@ -231,21 +221,10 @@ export function parseMetrics(logContent, suiteName) {
       if (mErr) e += parseInt(mErr[1], 10);
       if (mWarn) w += parseInt(mWarn[1], 10);
 
-      // Case 2: Native Flutter expanded reporter (e.g., 00:15 +67: All tests passed!)
-      // Note: We only take the final count (+XX) to avoid double counting intermittent updates
-      const fPassMatch = cleanLine.match(
-        /\d{2,}:\d{2}\s+\+(\d+): (?:All tests passed|Some tests failed)/,
-      );
-      if (fPassMatch) {
-        p = Math.max(p, parseInt(fPassMatch[1], 10));
-      }
-
-      const fFailMatch = cleanLine.match(
-        /\d{2,}:\d{2}\s+\+\d+\s+-(\d+): Some tests failed/,
-      );
-      if (fFailMatch) {
-        f = Math.max(f, parseInt(fFailMatch[1], 10));
-      }
+      const fPassMatch = cleanLine.match(/\d{2,}:\d{2}\s+\+(\d+): (?:All tests passed|Some tests failed)/);
+      if (fPassMatch) p = Math.max(p, parseInt(fPassMatch[1], 10));
+      const fFailMatch = cleanLine.match(/\d{2,}:\d{2}\s+\+\d+\s+-(\d+): Some tests failed/);
+      if (fFailMatch) f = Math.max(f, parseInt(fFailMatch[1], 10));
     }
   }
   return { p, f, e, w };
@@ -276,38 +255,19 @@ export async function checkDockerDaemon() {
 
 export async function ensureDockerRunning() {
   if (await checkDockerDaemon()) return true;
-
   if (process.platform === 'win32') {
-    log(
-      '⚠️ Docker daemon is not running. Attempting to start Docker Desktop...',
-      COLORS.yellow,
-    );
     const dockerPath = 'C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe';
     try {
-      // Start process without waiting in JS is tricky, we'll use spawn with detached
       const child = spawn(dockerPath, [], { detached: true, stdio: 'ignore' });
       child.unref();
-
-      log('🚀 Starting Docker Desktop... Please wait.', COLORS.gray);
-      let maxWait = 24; // 2 minutes
+      let maxWait = 24;
       while (maxWait > 0) {
         await new Promise((r) => setTimeout(r, 5000));
-        if (await checkDockerDaemon()) {
-          log('\n✅ Docker is now running!', COLORS.green);
-          return true;
-        }
-        process.stdout.write(COLORS.gray + '.' + COLORS.reset);
+        if (await checkDockerDaemon()) return true;
         maxWait--;
       }
-    } catch (e) {
-      log(`❌ ERROR: Failed to start Docker Desktop: ${e.message}`, COLORS.red);
-    }
+    } catch (e) {}
   }
-
-  log(
-    '\n❌ ERROR: Docker daemon is not running and could not be started automatically.',
-    COLORS.red,
-  );
   return false;
 }
 
@@ -315,18 +275,9 @@ export async function isPortInUse(port, host = '127.0.0.1') {
   return new Promise((resolve) => {
     const socket = new net.Socket();
     socket.setTimeout(500);
-    socket.on('connect', () => {
-      socket.destroy();
-      resolve(true);
-    });
-    socket.on('error', () => {
-      socket.destroy();
-      resolve(false);
-    });
-    socket.on('timeout', () => {
-      socket.destroy();
-      resolve(false);
-    });
+    socket.on('connect', () => { socket.destroy(); resolve(true); });
+    socket.on('error', () => { socket.destroy(); resolve(false); });
+    socket.on('timeout', () => { socket.destroy(); resolve(false); });
     socket.connect(port, host);
   });
 }
@@ -334,33 +285,20 @@ export async function isPortInUse(port, host = '127.0.0.1') {
 export async function killPortProcess(port) {
   if (process.platform === 'win32') {
     try {
-      const { stdout } = await execAsync(
-        `netstat -ano | findstr :${port} | findstr LISTENING`,
-      );
+      const { stdout } = await execAsync(`netstat -ano | findstr :${port} | findstr LISTENING`);
       const lines = stdout.split('\n').filter((l) => l.trim().length > 0);
       for (const line of lines) {
         const parts = line.trim().split(/\s+/);
         const pid = parts[parts.length - 1];
-        if (pid && pid !== '0') {
-          log(`Terminating process ${pid} on port ${port}...`, COLORS.yellow);
-          await execAsync(`taskkill /F /PID ${pid}`);
-        }
+        if (pid && pid !== '0') await execAsync(`taskkill /F /PID ${pid}`);
       }
     } catch (e) {}
   } else {
-    // Linux/macOS
     try {
-      log(`Terminating process on port ${port} (Linux/macOS)...`, COLORS.yellow);
-      // Try fuser first
-      try {
-        await execAsync(`fuser -k ${port}/tcp`);
-      } catch (e) {
-        // Fallback to lsof + kill
+      try { await execAsync(`fuser -k ${port}/tcp`); } catch (e) {
         const { stdout } = await execAsync(`lsof -t -i:${port}`);
         const pids = stdout.split('\n').filter((p) => p.trim().length > 0);
-        for (const pid of pids) {
-          await execAsync(`kill -9 ${pid}`);
-        }
+        for (const pid of pids) await execAsync(`kill -9 ${pid}`);
       }
     } catch (e) {}
   }
@@ -369,27 +307,12 @@ export async function killPortProcess(port) {
 export async function saveDockerLogs(suffix, logDir, rootDir) {
   const composeCmd = await getDockerComposeCommand();
   if (!composeCmd) return;
-
-  const timestamp = getTimestamp();
-  const cleanSuffix = suffix.replace(/[^a-z0-9]/gi, '_');
-  const outFile = join(
-    logDir,
-    `docker_compose_logs_${cleanSuffix}_${timestamp}.log`,
-  );
+  const outFile = join(logDir, `docker_compose_logs_${suffix.replace(/[^a-z0-9]/gi, '_')}_${getTimestamp()}.log`);
   const envFile = join(rootDir, 'deploy', 'environments', '.env.local');
-
-  log(`📦 Capturing docker compose logs to ${outFile}`, COLORS.yellow);
   try {
-    const cmd = `${composeCmd} --env-file "${envFile}" logs --no-color --tail 200`;
-    const { stdout, stderr } = await execAsync(cmd, { cwd: rootDir });
-    const { writeFileSync } = await import('node:fs');
+    const { stdout, stderr } = await execAsync(`${composeCmd} --env-file "${envFile}" logs --no-color --tail 200`, { cwd: rootDir });
     writeFileSync(outFile, stdout + stderr);
-  } catch (e) {
-    log(
-      `⚠️ Failed to capture docker compose logs: ${e.message}`,
-      COLORS.yellow,
-    );
-  }
+  } catch (e) {}
 }
 
 export async function moveFailureScreenshots(dir) {
@@ -406,7 +329,11 @@ export async function moveFailureScreenshots(dir) {
       if (entry.isDirectory()) {
         if (filePath === logDir) continue;
         await scan(filePath);
-      } else if (entry.isFile() && entry.name.endsWith('-failure.png')) {
+      } else if (entry.isFile() && (
+        entry.name.endsWith('-failure.png') || 
+        entry.name.includes('-fail-') || 
+        entry.name.includes('backend-unreachable-')
+      )) {
         failureImages.push(filePath);
       }
     }
@@ -418,22 +345,11 @@ export async function moveFailureScreenshots(dir) {
       await rename(file, join(logDir, basename(file)));
     }
     if (failureImages.length > 0) {
-      log(
-        `   📸 Moved ${failureImages.length} failure screenshots to ${logDir}`,
-        COLORS.yellow,
-      );
+      log(`   📸 Moved ${failureImages.length} failure screenshots to ${logDir}`, COLORS.yellow);
     }
-  } catch (e) {
-    // No-op if failed to search/move
-  }
+  } catch (e) {}
 }
 
-/**
- * Returns the path to the python executable within a virtual environment.
- * Handles platform differences (Windows vs POSIX).
- * @param {string} backendDir Path to the backend directory containing the venv.
- * @returns {string} Path to the python executable.
- */
 export function getPythonExec(backendDir) {
   const isWin = process.platform === 'win32';
   return isWin

@@ -79,14 +79,14 @@ describe('ProfilePage (Integrated)', () => {
       expect(screen.getByText(/EMP001/i)).toBeInTheDocument();
     }, { timeout: 15000 });
 
-    expect(screen.getByDisplayValue(/employee1@company1.com/i)).toBeDefined();
+    expect(screen.getByDisplayValue(/employee1@/i)).toBeDefined();
   }, 20000);
 
   it('updates profile fields and saves to real database', async () => {
     render(<ProfilePage />, { wrapper: AllProviders });
 
     // Wait for data to load
-    await screen.findByDisplayValue(/employee1@company1.com/i, {}, { timeout: 30000 });
+    await screen.findByDisplayValue(/employee1@/i, {}, { timeout: 30000 });
 
     const phoneInput = screen.getByPlaceholderText('+62...');
     const addressInput = screen.getByPlaceholderText('Write your home address...');
@@ -150,7 +150,7 @@ describe('ProfilePage (Integrated)', () => {
   it('handles update error', async () => {
     render(<ProfilePage />, { wrapper: AllProviders });
     
-    await waitFor(() => screen.getByDisplayValue(/employee1@company1.com/i), { timeout: 15000 });
+    await waitFor(() => screen.getByDisplayValue(/employee1@/i), { timeout: 15000 });
     
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') {

@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 
 class FileService {
   static Future<void> openBytes(List<int> bytes, String fileName) async {
-    if (kIsWeb) {
-       // Web implementation would use anchor element download, but we focus on mobile hardening
-       print("PDF opening not supported on web in this implementation");
+    // Prevent opening files during tests or on web
+    if (kIsWeb || Platform.environment.containsKey('FLUTTER_TEST')) {
+       debugPrint("PDF opening skipped in test/web environment: $fileName");
        return;
     }
 

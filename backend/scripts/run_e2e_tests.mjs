@@ -186,7 +186,7 @@ async function main() {
   log('✅ Backend server is reachable and healthy.', COLORS.green);
 
   // 3. Seeding
-  if (!noSeed) {
+  if (!noSeed && !process.env.NO_RESEED) {
     log('Seeding test database...', COLORS.yellow);
     const seedResult = await spawnStream(
       pythonPath,

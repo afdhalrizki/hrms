@@ -70,17 +70,5 @@ export default defineConfig({
       stderr: 'pipe',
       timeout: 600 * 1000,
     },
-    {
-      // Backend server (Django)
-      command: 'npm run start:backend:test',
-      url: 'http://localhost:8000/api/schema/',
-      env: {
-        SKIP_BACKEND_SETUP: process.env.SKIP_BACKEND_SETUP || '0',
-      },
-      reuseExistingServer: true,
-      stdout: 'pipe',
-      stderr: 'pipe',
-      timeout: 600 * 1000,
-    },
   ],
 });

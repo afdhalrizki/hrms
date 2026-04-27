@@ -218,8 +218,7 @@ async function main() {
   }
 
   // Port Cleanup
-  log("[3/4] Cleaning up existing ports (8000, 3001) to ensure fresh start...", COLORS.yellow);
-  await cleanupPort(8000);
+  log("[3/4] Cleaning up existing frontend port (3001)...", COLORS.yellow);
   await cleanupPort(3001);
 
   // 3.5. Build Frontend
@@ -277,17 +276,6 @@ async function main() {
     env: testEnv
   });
 
-  // Extra retry for transient failures
-  if (exitCode !== 0) {
-    log("Transient failure detected, retrying Playwright suite once more...", COLORS.yellow);
-    await cleanupPort(3001);
-    await cleanupPort(8000);
-    await new Promise(r => setTimeout(r, 5000));
-    exitCode = await spawnStream('npx', pwArgs, { 
-      cwd: FrontendDir,
-      env: testEnv
-    });
-  }
 
   if (existsSync(FrontendDir)) {
     await moveFailureScreenshots(FrontendDir);
