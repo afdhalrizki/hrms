@@ -28,8 +28,8 @@ The backend is synchronized with the harikerja 4-tier environment hierarchy:
 | Tier | Purpose | Domain | Hosting | Deploy Command |
 | :--- | :--- | :--- | :--- | :--- |
 | **Dev** | Prototyping | `localhost` | Local Docker | `make dev` |
-| **QA** | Functional UAT | `qa.harikerja.web.id` | IDCloudHost VPS | `make qa` |
-| **Staging** | 1M Stress Test | `staging.harikerja.web.id` | AWS Enterprise | `make staging` |
+| **QA** | Functional UAT | `harikerja.web.id` | IDCloudHost VPS | `make qa` |
+| **Staging** | 1M Stress Test | `harikerja.my.id` | AWS Enterprise | `make staging` |
 | **Prod** | Enterprise | `harikerja.com` | AWS Enterprise | `make prod` |
 
 ### Infrastructure Details

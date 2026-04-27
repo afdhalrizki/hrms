@@ -17,7 +17,7 @@ export const getBaseUrl = () => {
     }
 
     if (isProjectDomain) {
-      // For Staging (harikerja.web.id) and Production (harikerja.com), use https
+      // For Staging (harikerja.my.id) and Production (harikerja.com), use https
       // If it's a local test (harikerja.web.id:3000), we might still need http + port
       if (port === '3000' || port === '3001' || port === '8000') {
          return `http://${host}:${apiPort}/api`;

@@ -69,7 +69,7 @@ This is where the magic happens. We will deploy the **Backend** first.
 ## Stage 4: Domain & SSL (Route 53)
 
 1.  In your App Runner service dashboard, go to the **Custom domains** tab.
-2.  Click **Link domain** and enter `staging.harikerja.web.id`.
+2.  Click **Link domain** and enter `harikerja.my.id`.
 3.  App Runner will provide **CNAME records**.
 4.  Go to **Route 53** -> **Hosted Zones** -> Click your domain.
 5.  Add the CNAME records provided. SSL (HTTPS) will be active automatically in ~30 minutes.
@@ -86,7 +86,7 @@ Because we don't have a SSH server, the easiest way for a beginner to run migrat
     ```bash
     export DATABASE_URL=postgres://hrmsuser:password@endpoint:5432/postgres
     python manage.py migrate_schemas --shared
-    python manage.py create_tenant --schema_name=public --name="Staging" --domain-domain=staging.harikerja.web.id --is_primary=True
+    python manage.py create_tenant --schema_name=public --name="Staging" --domain-domain=harikerja.my.id --is_primary=True
     ```
 4.  **REVERT**: Set RDS back to **Public Access: No** immediately after finishing.
 
@@ -96,7 +96,7 @@ Because we don't have a SSH server, the easiest way for a beginner to run migrat
 10-person core team expects this environment to handle sharp traffic spikes.
 
 1.  Use **Locust** or **JMeter** from a separate EC2 instance.
-2.  Target the `staging.harikerja.web.id` endpoint.
+2.  Target the `harikerja.my.id` endpoint.
 3.  Monitor **App Runner Metrics** (CPU/RAM) during the test.
 4.  Validate that the DB handles concurrent connections via **RDS Performance Insights**.
 

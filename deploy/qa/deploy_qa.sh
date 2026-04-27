@@ -10,7 +10,7 @@ set -e # Exit on error
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." &> /dev/null && pwd )"
 
-DOMAIN="qa.harikerja.web.id"
+DOMAIN="harikerja.web.id"
 PROJECT_DIR="/opt/hrms"
 SWAP_SIZE="4G"
 EMAIL="admin@$DOMAIN"

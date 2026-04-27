@@ -13,7 +13,7 @@ The infrastructure is organized by target environment:
 
 ### 2. [QA (Quality Assurance)](./qa/qa.md)
 *   **Path**: `deploy/qa/`
-*   **Purpose**: Functional testing on `qa.harikerja.web.id` (IDCloudHost/Biznet).
+*   **Purpose**: Functional testing on `harikerja.web.id` (IDCloudHost/Biznet).
 *   **Automation**: Includes [deploy_qa.sh](./qa/deploy_qa.sh) for automated server provisioning.
 
 ### 3. [Staging](./staging/staging.md)

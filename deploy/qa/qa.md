@@ -24,7 +24,7 @@ While the Django backend and Next.js frontend are lightweight, the **QA Environm
 
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
-- **QA Domain:** `qa.harikerja.web.id`
+- **QA Domain:** `harikerja.web.id`
 
 ---
 
@@ -125,11 +125,11 @@ Fill in the following key configurations for QA mode:
 # --- CORE API ---
 DEBUG=False
 SECRET_KEY=fill-with-a-very-long-and-random-secret-key
-ALLOWED_HOSTS=.qa.harikerja.web.id,localhost,127.0.0.1
-CSRF_TRUSTED_ORIGINS=https://*.qa.harikerja.web.id
+ALLOWED_HOSTS=.harikerja.web.id,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=https://*.harikerja.web.id
 
 # --- TENANT SETTINGS ---
-TENANT_DOMAIN_SUFFIX=qa.harikerja.web.id
+TENANT_DOMAIN_SUFFIX=harikerja.web.id
 
 # --- DATABASE ---
 POSTGRES_DB=hrms_qa
@@ -139,7 +139,7 @@ POSTGRES_HOST=db
 POSTGRES_PORT=5432
 
 # --- FRONTEND ---
-NEXT_PUBLIC_API_URL=https://qa.harikerja.web.id/api
+NEXT_PUBLIC_API_URL=https://harikerja.web.id/api
 ```
 
 ---
@@ -166,7 +166,7 @@ Once all containers are active, enter the `backend` container and run migrations
 ```bash
 docker compose exec backend bash
 python manage.py migrate_schemas --shared
-python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=qa.harikerja.web.id --is_primary=True
+python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=harikerja.web.id --is_primary=True
 ```
 
 ---
@@ -185,7 +185,7 @@ Insert the following *Reverse Proxy* code:
 ```nginx
 server {
     listen 80;
-    server_name qa.harikerja.web.id *.qa.harikerja.web.id;
+    server_name harikerja.web.id *.harikerja.web.id;
 
     # Bypass static file max payload
     client_max_body_size 100M;
@@ -228,14 +228,14 @@ sudo systemctl reload nginx
 ```
 
 ### 3. Setup Wildcard SSL (*Let's Encrypt*)
-Specifically for *Multi-Tenant* (SaaS) applications, we **must** use a *Wildcard SSL* (`*.qa.harikerja.web.id`). This requires DNS validation.
+Specifically for *Multi-Tenant* (SaaS) applications, we **must** use a *Wildcard SSL* (`*.harikerja.web.id`). This requires DNS validation.
 
 ```bash
-sudo certbot certonly --manual --preferred-challenges=dns --email admin@qa.harikerja.web.id --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d qa.harikerja.web.id -d *.qa.harikerja.web.id
+sudo certbot certonly --manual --preferred-challenges=dns --email admin@harikerja.web.id --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d harikerja.web.id -d *.harikerja.web.id
 ```
 
 > **IMPORTANT**:
-> The command above will provide a *TXT record* (e.g., `_acme-challenge.qa.harikerja.web.id`). You must go to your domain's **DNS Manager Panel**, and add the TXT record before pressing `Enter` in the terminal.
+> The command above will provide a *TXT record* (e.g., `_acme-challenge.harikerja.web.id`). You must go to your domain's **DNS Manager Panel**, and add the TXT record before pressing `Enter` in the terminal.
 
 After the certificate is issued, edit the manual Nginx profile to install the SSL:
 ```bash
@@ -248,8 +248,8 @@ Change the `listen 80;` port to the standard `443 ssl` (refer to the standard Ce
 ## Stage 6: Verification & UAT (*User Acceptance Testing*)
 
 If all steps are successful, validate from your Browser:
-1. Access `https://qa.harikerja.web.id` -> It should display the Next.js *Landing Page / Admin Panel Login*.
-2. Access `https://qa.harikerja.web.id/api/schema/swagger-ui/` -> It should display the Django API documentation tanpa SSL errors.
+1. Access `https://harikerja.web.id` -> It should display the Next.js *Landing Page / Admin Panel Login*.
+2. Access `https://harikerja.web.id/api/schema/swagger-ui/` -> It should display the Django API documentation tanpa SSL errors.
 
 ---
 

@@ -120,8 +120,8 @@ For more granular control, you can run tests within each module directory:
 | Tier           | Domain                     | Hosting Platform              | Purpose                            |
 | :------------- | :------------------------- | :---------------------------- | :--------------------------------- |
 | **Dev**        | `localhost`                | Local Docker                  | Rapid prototyping & local testing. |
-| **QA**         | `qa.harikerja.web.id`      | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
-| **Staging**    | `staging.harikerja.web.id` | **AWS Enterprise**            | 1M User stress test.               |
+| **QA**         | `harikerja.web.id`      | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
+| **Staging**    | `harikerja.my.id` | **AWS Enterprise**            | 1M User stress test.               |
 | **Production** | `harikerja.com`            | **AWS Enterprise**            | Official enterprise workloads.     |
 
 ## 🧪 Testing Standard

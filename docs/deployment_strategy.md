@@ -32,8 +32,8 @@ graph LR
 | Environment | Purpose | Hosting | Domain |
 | :--- | :--- | :--- | :--- |
 | **Development** | Feature coding & debugging. | Local Docker | `localhost` |
-| **QA** | Functional & UAT testing. | Single VPS (Ubuntu) | `qa.harikerja.web.id` |
-| **Staging** | Stress, Load & Scaling tests. | AWS App Runner | `staging.harikerja.web.id` |
+| **QA** | Functional & UAT testing. | Single VPS (Ubuntu) | `harikerja.web.id` |
+| **Staging** | Stress, Load & Scaling tests. | AWS App Runner | `harikerja.my.id` |
 | **Production** | Live enterprise workloads. | AWS App Runner / EKS | `harikerja.com` |
 
 ---
