@@ -1,30 +1,61 @@
-# Harikerja Automation Strategy (MJS & PS1)
+# Harikerja Automation Logic & Strategy
 
-This document explains the synchronization strategy between JavaScript (`.mjs`) and PowerShell (`.ps1`) orchestration scripts within the Harikerja project.
-
-## 1. Orchestration Philosophy
-This project utilizes a dual-script system to ensure full compatibility for all developers:
-- **`*.mjs` (JavaScript/Node.js)**: Serves as the **Source of Truth**. These scripts are designed to run identically on Linux, macOS, and Windows (via Node.js).
-- **`*.ps1` (PowerShell)**: The native version for the Windows platform (also compatible with PowerShell Core on Linux). This version is synchronized to maintain feature parity with the `.mjs` version.
-
-## 2. Why Synchronization is Necessary?
-Prior to the major update (April 2026), the `.ps1` scripts lagged significantly in terms of functionality. Synchronization was performed to achieve:
-- **Feature Parity**: Ensuring parameters such as `--integrated`, `--coverage`, and `--skip-docker` are available on both platforms.
-- **Robustness**: Implementing *Health Checks* (server readiness verification) and *Port Cleanup* logic that was previously only available in the `.mjs` versions.
-- **Identical Expectations**: A Windows developer running `./up.ps1` will receive the same results, logging performance, and safety checks as a Linux developer running `node up.mjs`.
-
-## 3. Key Synchronized Features
-All `.ps1` scripts have been updated with:
-- **Smart Dependency Checking**: Using hashing (`.venv_requirements.hash`) to avoid redundant installations.
-- **Automatic Health Checks**: Waiting for backend servers to be fully reachable (HTTP 200/404) before executing tests.
-- **Automatic Cleanup**: Clearing hanging processes on port 8000 (Backend) and 3000 (Frontend) before starting new services.
-- **Centralized Reporting**: Logs are stored in the `logs/` directory with standardized naming conventions.
-
-## 4. Maintenance Guidelines
-To maintain consistency in the future, please follow these rules:
-1. **Double Update**: If logic changes are made to an `.mjs` file, ensure the equivalent logic is updated in the corresponding `.ps1` file.
-2. **Naming Convention**: Maintain identical filenames (e.g., `run_dev.mjs` paired with `run_dev.ps1`).
-3. **Library Compatibility**: When introducing a new npm library in `.mjs`, consider its equivalent in PowerShell (usually native OS commands or .NET libraries).
+This document provides a comprehensive overview of automation within the harikerja HRMS, covering both DevOps orchestration and core business logic automation.
 
 ---
-*Last Updated: April 14, 2026*
+
+## 1. DevOps & Environment Orchestration
+The project uses a dual-script system to ensure cross-platform compatibility for all developers.
+
+### Orchestration Philosophy
+- **`*.mjs` (JavaScript/Node.js)**: The **Source of Truth**. Designed for Linux, macOS, and Windows.
+- **`*.ps1` (PowerShell)**: Synchronized version for Windows native environments, maintaining feature parity.
+
+### Key Automated Tasks
+- **Smart Dependency Checking**: Uses `.venv_requirements.hash` to skip redundant `pip install` or `npm install`.
+- **Automatic Health Checks**: Scripts wait for the backend/frontend to be reachable (HTTP 200/404) before starting tests.
+- **Automatic Cleanup**: Hanging processes on ports 8000 and 3000 are automatically identified and killed before new sessions start.
+- **Integrated Seeding**: Parallel test workers (`up.mjs --workers=N`) automatically provision isolated tenant databases and seed required test data.
+
+---
+
+## 2. Attendance & Geofencing Automation
+Attendance processing is handled by the `AttendanceService` to ensure consistency across Web and Mobile.
+
+### Automatic Status Calculation
+- **Geofencing**: Uses the Haversine formula to calculate distance between user GPS and branch coordinates. If outside the allowed radius, status is automatically set to `OFF_SITE`.
+- **Shift Mapping**: Compares `check_in_time` against assigned `Schedule` or default `Shift`.
+    - `PRESENT`: Within geofence and on-time.
+    - `LATE`: Within geofence but after shift start time (for non-flexible shifts).
+    - `OFF_SITE`: Outside branch radius.
+- **Leave Conflict Detection**: Automatically blocks clock-in if an `APPROVED` leave request exists for the current date.
+
+---
+
+## 3. Workflow & Approval Engine
+Business requests (Leaves, Reimbursements, Corrections) follow a rule-based automated workflow.
+
+### Stages and Transitions
+1. **Initialization**: When a request is created, `WorkflowService.initialize_workflow` identifies the correct `WorkflowConfig` and sets the `current_stage` to sequence 1.
+2. **Approver Identification**: Approvers are dynamically determined based on the stage configuration:
+    - `SUPERVISOR`: Approver is the direct supervisor of the requesting employee.
+    - `EMPLOYEE`: Approver is a specific employee ID designated for that stage.
+3. **Multi-Stage Processing**: Requests move through sequences (1 → 2 → N) upon `APPROVED` actions.
+4. **Admin Bypass**: If a Tenant Admin (with `manage_settings`) approves a request, subsequent stages are bypassed, and the request is immediately finalized.
+5. **Finalization**: When the last stage is approved, the status moves to `APPROVED`, and secondary automation is triggered (e.g., deducting leave balance or updating attendance logs).
+
+---
+
+## 4. Operational Enforcement
+### Quota & Plan Enforcement
+- **Employee Quotas**: The system automatically counts active employees and blocks `POST /api/employees/` if the plan capacity (Base + Purchased) is exceeded.
+- **Storage Management**: Biometric photos are automatically "skipped" if the tenant's storage capacity is full, allowing clock-in to proceed without attachments.
+- **Platform Policy**: Organizations can enforce a `MOBILE_ONLY` clock-in policy, which automatically rejects web-based attendance requests.
+
+### Data Anonymization
+- **Audit Logs**: Changes are automatically tracked via `AuditModelMixin`, but PII data is masked in logs to ensure compliance with privacy standards.
+
+---
+
+**Last Updated**: April 28, 2026  
+**Related Files**: `backend/attendance/services.py`, `backend/core/services.py`, `up.mjs`
