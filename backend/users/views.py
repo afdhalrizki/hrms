@@ -101,5 +101,10 @@ class LoginAPIView(viewsets.GenericViewSet):
             data['access'] = str(refresh.access_token)
             data['refresh'] = str(refresh)
             return Response(data)
-        
         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+from rest_framework.decorators import api_view, permission_classes
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def health_check(request):
+    return Response({"status": "healthy"}, status=status.HTTP_200_OK)

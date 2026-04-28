@@ -25,9 +25,8 @@ fi
 
 # 2. Safety Backup
 echo "📦 Step 1: Performing pre-deployment backup..."
-# We use the same backup script but it will use DB settings from .env.production_10k if we modify it to be generic
-# For now, let's assume it works or create a specific one
-./deploy/qa/backup_qa.sh
+# Menggunakan backup_10k.sh khusus untuk skala produksi
+./deploy/production-10k/backup_10k.sh
 
 # 3. Code Update
 echo "⬇️ Step 2: Fetching latest stable code..."
@@ -35,12 +34,12 @@ git pull origin main
 
 # 4. Build & Optimize
 echo "🏗️ Step 3: Rebuilding containers with production optimization..."
-# We use docker-compose directly to ensure --env-file is correctly applied
-docker compose --env-file "$ENV_FILE" up -d --build --remove-orphans
+docker compose -f deploy/production-10k/docker-compose.10k.yml --env-file "$ENV_FILE" up -d --build --remove-orphans
 
 # 5. Database Migrations
-echo "⚙️ Step 4: Running schema migrations..."
-docker compose --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas --shared
+echo "⚙️ Step 4: Running schema migrations (Shared & Tenants)..."
+# PENTING: Jangan gunakan --shared saja, agar tabel tenant juga terupdate
+docker compose -f deploy/production-10k/docker-compose.10k.yml --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
 # 6. Maintenance: Cleanup
 echo "🧹 Step 5: Cleaning up unused Docker artifacts..."
@@ -49,7 +48,7 @@ docker image prune -f
 # 7. Health Check
 echo "🔍 Step 6: Verifying service health..."
 sleep 10
-docker compose --env-file "$ENV_FILE" ps
+docker compose -f deploy/production-10k/docker-compose.10k.yml --env-file "$ENV_FILE" ps
 
 echo "🚀 PRODUCTION-10K DEPLOYMENT COMPLETED!"
 echo "Check logs if any service is 'unhealthy': docker compose logs -f"

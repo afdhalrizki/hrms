@@ -38,8 +38,8 @@ echo "🏗️ Step 3: Rebuilding and starting containers..."
 node up.mjs qa build
 
 # 4. Migration Phase
-echo "⚙️ Step 4: Running database migrations..."
-docker compose --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas --shared
+echo "⚙️ Step 4: Running database migrations (Shared & Tenants)..."
+docker compose --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
 # 5. Unit Testing Phase
 echo "🧪 Step 5: Running Backend Unit Tests..."

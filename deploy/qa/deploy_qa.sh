@@ -121,8 +121,8 @@ echo -e "${GREEN}Waiting for containers to be healthy (30s)...${NC}"
 sleep 30
 
 # Run Migrations
-echo -e "${GREEN}Running Migrations...${NC}"
-docker compose exec -T backend python manage.py migrate_schemas --shared
+echo -e "${GREEN}Running Migrations (Shared & Tenants)...${NC}"
+docker compose exec -T backend python manage.py migrate_schemas
 
 # Create Public Tenant (Schema)
 echo -e "${GREEN}Creating Public Tenant...${NC}"
