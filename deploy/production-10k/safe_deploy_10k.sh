@@ -52,16 +52,16 @@ echo "🔍 Step 5: Running Smoke Test (Health Check)..."
 echo "Waiting for services to settle (15s for 10k scale)..."
 sleep 15
 
-# Check API Health (assuming local port 8080 is mapped via Nginx)
+# Check API Health (assuming local port 80 is mapped via Nginx)
 # In production, we check the health endpoint
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/health/ || echo "000")
+API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/api/health/ || echo "000")
 
 if [ "$API_STATUS" -eq 200 ]; then
     echo "✅ Smoke Test Passed! API is healthy (HTTP $API_STATUS)."
 else
     echo "⚠️ Smoke Test Warning: Health endpoint returned HTTP $API_STATUS."
     echo "Verifying root API as fallback..."
-    API_ROOT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/ || echo "000")
+    API_ROOT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/api/ || echo "000")
     if [ "$API_ROOT_STATUS" -eq 200 ] || [ "$API_ROOT_STATUS" -eq 301 ] || [ "$API_ROOT_STATUS" -eq 302 ]; then
         echo "✅ Fallback Smoke Test Passed! API is responding."
     else

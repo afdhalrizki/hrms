@@ -121,8 +121,8 @@ services:
       - static_volume:/app/static:ro
       - media_volume:/app/media:ro
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
       - frontend
