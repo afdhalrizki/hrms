@@ -121,8 +121,8 @@ For more granular control, you can run tests within each module directory:
 | :------------- | :------------------------- | :---------------------------- | :--------------------------------- |
 | **Dev**        | `localhost`                | Local Docker                  | Rapid prototyping & local testing. |
 | **QA**         | `harikerja.web.id`      | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
-| **Staging**    | `harikerja.my.id` | **AWS Enterprise**            | 1M User stress test.               |
-| **Production** | `harikerja.com`            | **AWS Enterprise**            | Official enterprise workloads.     |
+| **Staging**    | `harikerja.my.id` | **Biznet / Bare-Metal**       | 100K User scaling test.            |
+| **Production** | `harikerja.com`            | **Biznet (100K) / AWS (1M)**  | Official enterprise workloads.     |
 
 ## 🧪 Testing Standard
 
@@ -131,37 +131,6 @@ The platform achieves a unified **100% test pass rate** across all layers of the
 - **Backend**: 333 Tests (317 Unit + 16 E2E) - Pytest.
 - **Frontend**: 222 Tests (184 Unit + 38 E2E) - Vitest & Playwright.
 - **Mobile**: 151 Tests (128 Unit + 23 E2E) - Flutter.
-
-## 🎯 IMMEDIATE PRIORITIES (Current Focus)
-
-The platform has achieved **Platform Gold Release v1.3.0** and is now focusing on **Production Readiness** and **Performance Optimization**:
-
-### 🔥 High Priority Tasks (Next 8-12 weeks)
-
-1. **Production Monitoring & Observability**
-   - Prometheus + Grafana for real-time monitoring
-   - ELK Stack for centralized logging
-   - AWS CloudWatch alerting
-
-2. **Security Hardening**
-   - Rate limiting for API endpoints
-   - AWS WAF configuration
-   - Secret management with AWS Secrets Manager
-   - Comprehensive security audit
-
-3. **Database Performance Optimization**
-   - PostgreSQL query optimization and indexing
-   - Database partitioning for large tables
-   - PgBouncer connection pooling optimization
-
-4. **CI/CD Pipeline Enhancement**
-   - GitHub Actions automated pipeline
-   - Canary deployment strategy
-   - Infrastructure as Code with Terraform
-
-### 📋 Detailed Implementation Plan
-
-For complete details on immediate priorities, see: [**Immediate Priorities**](./docs/immediate_priorities.md)
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
 
@@ -187,11 +156,11 @@ Detailed scaling strategy: [**Technical Team Strategy**](./docs/plans/technical_
 
 For in-depth technical details, please refer to the platform-wide internal documentation:
 
-- [**Immediate Priorities**](./docs/immediate_priorities.md) - Current focus areas
-- [**Implementation Plan**](./docs/implementation_plan.md) - Overall architecture blueprint
-- [**Walkthrough & Results**](./docs/walkthrough.md) - Feature stability summaries
-- [**Development Roadmap**](./docs/task.md) - Phase-by-phase completion records
-- [**AWS High Availability Architecture**](./docs/aws_high_availability_architecture.md) - 1M user scaling design
+- [**Implementation Plan**](./docs/project_management/implementation_plan.md) - Overall architecture blueprint
+- [**Walkthrough & Results**](./docs/project_management/walkthrough.md) - Feature stability summaries
+- [**Development Roadmap**](./docs/project_management/task.md) - Phase-by-phase completion records
+- [**AWS High Availability Architecture**](./docs/architecture/aws_high_availability_architecture.md) - 1M user scaling design
+- [**Scalability Architecture Guide**](./docs/architecture/scaling_architecture_guide.md) - 100k to 1M scaling (AWS vs VPS)
 
 ## 🛠 Tech Stack
 

@@ -27,29 +27,24 @@ fi
 # We check if we are in a git repo before pulling
 if [ -d ".git" ]; then
     echo "⬇️ Step 2: Pulling latest code from repository..."
-    git pull
+    git pull || echo "⚠️ Step 2: Git pull failed, maybe local changes exist. Proceeding anyway..."
 else
     echo "⚠️ Step 2: Not a git repository, skipping git pull."
 fi
 
 # 3. Deployment Phase (Build & Up)
 echo "🏗️ Step 3: Rebuilding and starting containers..."
-# Using up.mjs for consistency, which handles env files and docker-compose detection
-node up.mjs qa build
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d --build --remove-orphans
 
 # 4. Migration Phase
 echo "⚙️ Step 4: Running database migrations (Shared & Tenants)..."
-docker compose --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
 # 5. Unit Testing Phase
 echo "🧪 Step 5: Running Backend Unit Tests..."
-if ! docker compose --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
+if ! docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
     echo "❌ Unit Tests Failed! Deployment might be unstable."
     echo "Check test output above."
-    # We don't necessarily want to kill the server if tests fail in QA, 
-    # but we should definitely notify the user.
-    # For now, we continue but with a warning, or exit if you want strictness.
-    # User said "iya boleh" to adding it, so let's be strict for QA.
     exit 1
 fi
 echo "✅ Unit Tests Passed!"
@@ -59,16 +54,20 @@ echo "🔍 Step 6: Running Smoke Test (Health Check)..."
 echo "Waiting for services to settle (10s)..."
 sleep 10
 
-# Check API Health
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/ || echo "000")
+# Check API Health via Nginx on port 80
+API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/api/ || echo "000")
 
 if [ "$API_STATUS" -eq 200 ] || [ "$API_STATUS" -eq 301 ] || [ "$API_STATUS" -eq 302 ]; then
     echo "✅ Smoke Test Passed! API is responding (HTTP $API_STATUS)."
 else
     echo "❌ Smoke Test Failed! API is not responding correctly (HTTP $API_STATUS)."
-    echo "Check logs using: docker compose --env-file $ENV_FILE logs backend"
+    echo "Check logs using: docker compose -f deploy/qa/docker-compose.qa.yml --env-file $ENV_FILE logs backend"
     exit 1
 fi
+
+# 7. Cleanup
+echo "🧹 Step 7: Cleaning up unused Docker artifacts..."
+docker image prune -f
 
 echo "✅ Safe Deployment Finished Successfully!"
 echo "Your app is now up to date and a backup has been saved in the 'backups/' folder."

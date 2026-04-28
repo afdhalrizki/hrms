@@ -79,8 +79,8 @@ The harikerja platform follows a strict 4-tier promotion path:
 | :--- | :--- | :--- | :--- |
 | **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
 | **QA** | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.my.id` | **AWS Enterprise** | 1M User stress test. |
-| **Production** | `harikerja.com` | **AWS Enterprise** | Official enterprise workloads. |
+| **Staging** | `harikerja.my.id` | **Biznet / Bare-Metal** | 100K User scaling test. |
+| **Production** | `harikerja.com` | **Biznet (100K) / AWS (1M)** | Official enterprise workloads. |
 
 ## 🧪 Testing Standard
 
@@ -103,11 +103,11 @@ node scripts/run_tests.mjs
 
 ## 📚 Technical Documentation
 
-For in-depth technical details, please refer to the internal documentation:
-- [**Internal Support Blueprint**](../docs/plans/future_support_ai.md)
-- [**Implementation Plan**](./docs/implementation_plan.md)
-- [**Walkthrough & Results**](./docs/walkthrough.md)
-- [**Development Roadmap**](./docs/task.md)
+For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
+- [**Architecture Guides**](../docs/architecture/)
+- [**Business Strategy**](../docs/business_strategy/)
+- [**Workflows & Features**](../docs/workflows_features/)
+- [**Technical Specifications**](../docs/technical_specs/)
 
 ---
 **Project Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Backend Core Standardized.

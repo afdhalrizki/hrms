@@ -33,8 +33,8 @@ graph LR
 | :--- | :--- | :--- | :--- |
 | **Development** | Feature coding & debugging. | Local Docker | `localhost` |
 | **QA** | Functional & UAT testing. | Single VPS (Ubuntu) | `harikerja.web.id` |
-| **Staging** | Stress, Load & Scaling tests. | AWS App Runner | `harikerja.my.id` |
-| **Production** | Live enterprise workloads. | AWS App Runner / EKS | `harikerja.com` |
+| **Staging** | 100K User Scaling Tests | **Biznet / Bare-Metal** | `harikerja.my.id` |
+| **Production** | Live enterprise workloads. | **Biznet (100K) / AWS (1M)** | `harikerja.com` |
 
 ---
 
@@ -57,15 +57,15 @@ graph LR
 
 ### Stage 3: Staging & Performance (Pre-Prod)
 *   **Trigger**: Tag release (e.g., `v1.4.0-rc1`) or Merge to `release/*`.
-*   **Action**: Deploy to AWS App Runner (Staging).
+*   **Action**: Deploy to Biznet / Bare-Metal (Staging).
 *   **Testing**: 
     1.  End-to-End Tests (Playwright).
-    2.  **1 Million User Load Test** (Locust).
-*   **Goal**: Verify the "Road to 1M Users" architecture.
+    2.  **100K User Load Test** (Locust).
+*   **Goal**: Verify the Horizontal Scaling architecture.
 
 ### Stage 4: Production (Go-Live)
 *   **Trigger**: Merge to `main` branch.
-*   **Action**: Deploy to AWS App Runner (Production).
+*   **Action**: Deploy to Production Cluster (Biznet or AWS).
 *   **Post-Deploy**: 
     1.  Health Check Verification.
     2.  Security Scanning.

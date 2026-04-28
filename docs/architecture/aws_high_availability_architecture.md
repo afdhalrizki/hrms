@@ -24,9 +24,14 @@ flowchart TD
 
         subgraph PrivateSubnets[Private Subnets - Compute]
             subgraph EKS[Amazon EKS Cluster]
-                Django[Django App Pods\nHPA on CPU/RAM]
-                Worker[Celery Workers\nKEDA Scaling on Redis/SQS]
+                subgraph Microservices[Django Microservices]
+                    CoreHR[Core HR Pods]
+                    Att[Attendance Pods]
+                    Pay[Payroll Pods]
+                end
+                Worker[Distributed Workers\nKEDA Scaling on Kafka]
             end
+            Kafka[Amazon MSK\nEvent Streaming]
         end
 
         subgraph IsolatedSubnets[Isolated Subnets - Data Layer]
@@ -56,14 +61,19 @@ flowchart TD
     R53 -->|DNS| CF
     CF --> ALB
     
-    ALB --> Django
-    Django <--> Redis
-    Django --> RDSP
+    ALB --> CoreHR & Att & Pay
+    CoreHR & Att & Pay <--> Redis
+    CoreHR & Att & Pay --> RDSP
+    
+    %% Event Driven Processing
+    Pay -->|Publish Event| Kafka
+    Kafka -->|Consume| Worker
     Worker --> RDSP
+    
     RDSP --> Master
     Master -.-> Replica
     
-    Django --> Sec
+    CoreHR & Att & Pay --> Sec
     Sec --> KMS
     
     %% Monitoring Flows
@@ -112,13 +122,24 @@ At 1M user scale, standard tables will become bottlenecks. We implement **Native
 
 ---
 
-## Scaling Roadmap: Road to 1 Million
+## Scaling Roadmap: Road to 1 Million (Hybrid Approach)
 
-| Phase | Goal | Compute | Database |
+To maximize cost-efficiency, the platform utilizes a **Hybrid Infrastructure Journey**, scaling on local Bare-Metal providers before migrating to the AWS Enterprise architecture described in this document.
+
+| Phase | Goal | Infrastructure | Architecture Paradigm |
 | :--- | :--- | :--- | :--- |
-| **Phase 1: MVP** | 1,000 Users | AWS App Runner | RDS Single-AZ |
-| **Phase 2: Growth** | 50,000 Users | EKS (Managed Node Groups) | Aurora Serverless v2 |
-| **Phase 3: Scale** | 1,000,000 Users | **EKS + KEDA + Fargate** | **Aurora HA + RDS Proxy** |
+| **Phase 1: MVP & Early Growth** | 10,000 Users | **Biznet/Local VPS** (Vertical Scaling) | Monolith, Local PostgreSQL, Simple Celery Queue. |
+| **Phase 2: Scale-Out** | 100,000 Users | **Biznet Bare-Metal** (Horizontal Scaling) | Load Balanced Monolith, DB Primary-Replica, S3 Object Storage. |
+| **Phase 3: Enterprise Cloud** | 1,000,000 Users | **AWS EKS + MSK + Fargate** | Microservices, Database Sharding, Event-Driven (Kafka). |
+
+---
+
+## Evolution to Microservices & Event-Driven Architecture
+
+Reaching 1 million users necessitates breaking down the Django Monolith to prevent localized traffic spikes (e.g., morning attendance) from crashing the entire system.
+
+1. **Microservices Extraction**: The monolith is split into independent pods (Core HR, Attendance, Payroll). Each can scale independently via HPA (Horizontal Pod Autoscaling) based on specific CPU/RAM demands.
+2. **Amazon MSK (Kafka) Integration**: Relying on Redis/SQS for mass payroll processing at 1M users is risky due to memory limits. Amazon MSK (Managed Kafka) acts as the resilient backbone for all asynchronous events (e.g., streaming thousands of clock-in events to the payroll calculation engine without dropping data).
 
 ---
 

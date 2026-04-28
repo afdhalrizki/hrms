@@ -70,8 +70,8 @@ The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 | :--- | :--- | :--- |
 | **Dev** | `http://10.0.2.2:8000/api` | Local Development |
 | **QA** | `https://harikerja.web.id/api` | Biznet / IDCH / Hostinger |
-| **Staging** | `https://harikerja.my.id/api` | AWS Stress Test |
-| **Production** | `https://harikerja.com/api` | AWS Enterprise |
+| **Staging** | `https://harikerja.my.id/api` | Biznet Scaling Test |
+| **Production** | `https://harikerja.com/api` | Biznet/AWS Enterprise |
 
 ## 🧪 Testing Standard
 
@@ -101,11 +101,11 @@ node scripts/run_tests.mjs
 
 ## 📚 Technical Documentation
 
-For in-depth technical details, please refer to the internal documentation:
-- [**Internal Support Blueprint**](../docs/plans/future_support_ai.md)
-- [**Implementation Plan**](./docs/implementation_plan.md)
-- [**Walkthrough & Results**](./docs/walkthrough.md)
-- [**Development Roadmap**](./docs/task.md)
+For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
+- [**Architecture Guides**](../docs/architecture/)
+- [**Business Strategy**](../docs/business_strategy/)
+- [**Workflows & Features**](../docs/workflows_features/)
+- [**Technical Specifications**](../docs/technical_specs/)
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Mobile Experience Standardized.
