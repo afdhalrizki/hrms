@@ -34,12 +34,13 @@ def setup_qa():
     else:
         print(f"ℹ️ Domain mapping for '{domain_name}' already exists.")
 
-    # 3. Ensure localhost domain exists (for smoke tests)
-    Domain.objects.get_or_create(
-        domain='localhost',
-        defaults={'tenant': public_tenant, 'is_primary': False}
-    )
-    print("✅ Ensured 'localhost' is mapped to public tenant.")
+    # 3. Ensure localhost and IP domain exist (for smoke tests and direct IP access)
+    for host in ['localhost', '103.197.190.47']:
+        Domain.objects.get_or_create(
+            domain=host,
+            defaults={'tenant': public_tenant, 'is_primary': False}
+        )
+    print("✅ Ensured 'localhost' and IP are mapped to public tenant.")
 
 if __name__ == "__main__":
     setup_qa()
