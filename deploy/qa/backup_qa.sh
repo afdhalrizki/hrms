@@ -41,10 +41,14 @@ echo "Target: $DB_NAME"
 echo "Container: $DB_CONTAINER"
 echo "Output: $BACKUP_DIR/qa_backup_$TIMESTAMP.sql.gz"
 
-# Run pg_dump inside container and compress output
-docker exec "$DB_CONTAINER" pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$BACKUP_DIR/qa_backup_$TIMESTAMP.sql.gz"
+# Check if container is running
+if [ ! "$(docker ps -q -f name=^/${DB_CONTAINER}$)" ]; then
+    echo "⚠️ Warning: Container $DB_CONTAINER is not running. Skipping backup (likely first deploy)."
+    exit 0
+fi
 
-if [ $? -eq 0 ]; then
+# Run pg_dump inside container and compress output
+if docker exec "$DB_CONTAINER" pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$BACKUP_DIR/qa_backup_$TIMESTAMP.sql.gz"; then
     echo "✅ Backup successful!"
 else
     echo "❌ Backup failed!"

@@ -25,7 +25,23 @@ While the Django backend and Next.js frontend are lightweight, the **QA Environm
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
 - **QA Domain:** `harikerja.web.id`
-- **DNS Setup:** Please refer to **[DNS Setup Guide](../common/dns_setup.md)** before proceeding.
+- **DNS Setup:** Menggunakan **NEO DNS Manager** di dashboard Biznet GIO.
+---
+
+## Stage 0: DNS Configuration (Biznet GIO Dashboard)
+
+Sebelum memulai di server, hubungkan domain Anda ke IP VPS Biznet:
+
+1.  Dapatkan **Public IP** dari panel `Compute > harikerja-qa`.
+2.  Masuk ke menu **Network > NEO DNS**.
+3.  Pilih domain `harikerja.web.id`.
+4.  Tambahkan **A Record** baru:
+    *   **Host/Name:** `@` (atau kosongkan)
+    *   **IP Address:** `[Isi IP VPS Anda]`
+5.  Tambahkan **A Record (Wildcard)**:
+    *   **Host/Name:** `*`
+    *   **IP Address:** `[Isi IP VPS Anda]` (Sama dengan di atas)
+    *   *Fungsi: Agar sub-domain tenant seperti `perusahaan1.harikerja.web.id` otomatis terhubung.*
 
 ---
 
@@ -270,20 +286,20 @@ sudo systemctl reload nginx
 ```
 
 ### 3. Setup Wildcard SSL (*Let's Encrypt*)
-Specifically for *Multi-Tenant* (SaaS) applications, we **must** use a *Wildcard SSL* (`*.harikerja.web.id`). This requires DNS validation.
+Untuk aplikasi *Multi-Tenant* (SaaS), kita wajib menggunakan *Wildcard SSL* (`*.harikerja.web.id`).
 
 ```bash
 sudo certbot certonly --manual --preferred-challenges=dns --email admin@harikerja.web.id --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d harikerja.web.id -d *.harikerja.web.id
 ```
 
-> **IMPORTANT**:
-> The command above will provide a *TXT record* (e.g., `_acme-challenge.harikerja.web.id`). You must go to your domain's **DNS Manager Panel**, and add the TXT record before pressing `Enter` in the terminal.
+> **PENTING (Langkah Biznet DNS)**:
+> Certbot akan memberikan kode *TXT record* (misal: `_acme-challenge.harikerja.web.id`). 
+> 1. Salin kode tersebut.
+> 2. Masuk ke **NEO DNS Manager** di Biznet GIO.
+> 3. Tambahkan record baru: Type **TXT**, Name `_acme-challenge`, Value `[Kode dari Certbot]`.
+> 4. Tunggu 1-2 menit, lalu tekan `Enter` di terminal.
 
-After the certificate is issued, edit the manual Nginx profile to install the SSL:
-```bash
-sudo nano /etc/nginx/sites-available/hrms_qa
-```
-Change the `listen 80;` port to the standard `443 ssl` (refer to the standard Certbot Nginx guide).
+Setelah sertifikat berhasil dibuat, Nginx di dalam Docker akan otomatis membacanya jika file sertifikat di-*mount* ke dalam kontainer (cek `docker-compose.qa.yml`).
 
 ---
 
@@ -300,11 +316,11 @@ If all steps are successful, validate from your Browser:
 Since you are managing this alone, keeping the data safe is a priority. We have provided a backup script to automate this.
 
 ### 1. Database Backup Script
-We have provided a script at `deploy/qa/backup_qa.sh` that automatically:
-- Reads database credentials from `.env.qa`.
-- Creates a compressed `.sql.gz` backup.
-- Stores it in the `backups/` directory at the project root.
-- Deletes backups older than 7 days to save disk space.
+Kita menggunakan script `deploy/qa/backup_qa.sh`. Script ini sudah memiliki fitur **First-Deploy Safety**:
+- Mengecek apakah database sedang berjalan.
+- Jika kontainer belum ada (saat baru pertama kali setup), script akan melewati backup tanpa error sehingga proses deploy tetap lanjut.
+- Jika kontainer aktif, akan dibuat file `.sql.gz` di folder `backups/`.
+- Otomatis menghapus backup yang lebih tua dari 7 hari.
 
 **How to run manually:**
 ```bash
