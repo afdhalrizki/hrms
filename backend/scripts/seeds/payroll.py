@@ -10,12 +10,17 @@ def seed_payroll_data(tenant, employee):
         with connection.cursor() as cursor:
             cursor.execute(f'SET search_path TO "{schema_name}", public')
             
-        period, _ = PayrollPeriod.objects.get_or_create(
-            month=4, year=2026,
-            defaults={'start_date': '2026-04-01', 'end_date': '2026-04-30', 'is_closed': False}
-        )
         from django.utils import timezone
         today = timezone.localdate()
+        
+        period, _ = PayrollPeriod.objects.get_or_create(
+            month=today.month, year=today.year,
+            defaults={
+                'start_date': today.replace(day=1),
+                'end_date': (today.replace(day=28) + timezone.timedelta(days=4)).replace(day=1) - timezone.timedelta(days=1),
+                'is_closed': False
+            }
+        )
         Payslip.objects.update_or_create(
             employee=employee, period=period,
             defaults={
