@@ -95,6 +95,27 @@ services:
           cpus: "${BACKEND_CPU_LIMIT:-8.0}"
           memory: "${BACKEND_MEM_LIMIT:-16G}"
 
+  celery:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: celery -A config worker -l INFO
+    env_file:
+      - ../environments/.env.production_10k
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - hrms_net
+    deploy:
+      resources:
+        limits:
+          cpus: "${CELERY_CPU_LIMIT:-2.0}"
+          memory: "${CELERY_MEM_LIMIT:-2G}"
+
   frontend:
     build:
       context: ../../frontend

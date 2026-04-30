@@ -26,7 +26,7 @@ fi
 DB_NAME=$(grep "^POSTGRES_DB=" "$ENV_FILE" | cut -d'=' -f2)
 DB_USER=$(grep "^POSTGRES_USER=" "$ENV_FILE" | cut -d'=' -f2)
 DB_CONTAINER=$(grep "^DB_CONTAINER=" "$ENV_FILE" | cut -d'=' -f2)
-DB_CONTAINER=${DB_CONTAINER:-hrms-db} # Default to hrms-db if not set
+DB_CONTAINER=${DB_CONTAINER:-hrms-db-qa} # Default to hrms-db-qa if not set
 
 if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ]; then
     echo "Error: Could not find POSTGRES_DB or POSTGRES_USER in $ENV_FILE"

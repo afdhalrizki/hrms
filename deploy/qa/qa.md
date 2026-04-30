@@ -141,6 +141,13 @@ POSTGRES_PORT=5432
 
 # --- FRONTEND ---
 NEXT_PUBLIC_API_URL=https://harikerja.web.id/api
+
+# --- EMAIL & CELERY ---
+ENABLE_EMAIL_NOTIFICATIONS=True
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+DEFAULT_FROM_EMAIL=noreply@harikerja.web.id
+REDIS_URL=redis://redis:6379/1
 ```
 
 ---
@@ -155,6 +162,7 @@ We have provided a script `deploy/qa/safe_deploy_qa.sh` which handles the entire
 - Pulls the latest code (`git pull`).
 - Rebuilds the Docker images.
 - Runs the Database Migrations.
+- **Starts Celery Worker** for background tasks (Email/Notifications).
 
 **Usage:**
 ```bash
@@ -184,11 +192,11 @@ python manage.py create_tenant --schema_name=public --name="harikerja QA Master"
 
 ---
 
-## Stage 5: Nginx Reverse Proxy & SSL Configuration (HTTPS)
+## Stage 5: Nginx Configuration (Containerized)
 
-Our application needs to be accessible via `https://qa.harikerja.web.id` and *wildcard tenants* like `https://<anything>.qa.harikerja.web.id`.
+**PENTING:** Sejak standarisasi terbaru, kita menggunakan **Nginx di dalam Docker** (terintegrasi di `docker-compose.qa.yml`) untuk isolasi maksimal. Anda tidak perlu menginstall Nginx di host server kecuali jika ingin menggunakannya sebagai *Load Balancer* tambahan.
 
-### 1. Create Nginx Server Block
+Jika Anda tetap ingin menggunakan Nginx di host (Legacy Mode), gunakan konfigurasi berikut:
 Create a specific configuration file:
 ```bash
 sudo nano /etc/nginx/sites-available/hrms_qa

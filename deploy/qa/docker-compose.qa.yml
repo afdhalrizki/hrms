@@ -94,6 +94,27 @@ services:
           cpus: "1.5"
           memory: "2G"
 
+  celery:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: celery -A config worker -l INFO
+    env_file:
+      - ../environments/.env.qa
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - hrms_qa_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
   frontend:
     build:
       context: ../../frontend

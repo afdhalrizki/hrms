@@ -40,6 +40,15 @@ Increase workers in the `backend` container:
 **Do NOT serve static files via Django (WhiteNoise).**
 Nginx should serve `static/` and `media/` directly from the host volume for maximum speed.
 
+### 4. Celery Background Processing
+Background tasks (emails, notifications, payroll generation) are handled by the `celery` service.
+- `CELERY_CPU_LIMIT`: Default **2.0** for production.
+- `CELERY_MEM_LIMIT`: Default **2GB**.
+- For high-volume notification bursts, increase the number of workers in the celery command.
+
+### 5. SMTP Email Configuration
+Ensure `.env.production_10k` contains production-ready SMTP credentials. Emails are dispatched asynchronously via Celery to ensure zero lag in user interactions.
+
 ---
 
 ## 🔒 Hardening & Security
