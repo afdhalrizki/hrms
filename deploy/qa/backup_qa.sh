@@ -25,6 +25,7 @@ fi
 # Using grep and sed to avoid sourcing the whole file which might have export-unfriendly lines
 DB_NAME=$(grep "^DB_NAME=" "$ENV_FILE" | cut -d'=' -f2)
 DB_USER=$(grep "^DB_USER=" "$ENV_FILE" | cut -d'=' -f2)
+DB_PASSWORD=$(grep "^DB_PASSWORD=" "$ENV_FILE" | cut -d'=' -f2)
 DB_CONTAINER=$(grep "^DB_CONTAINER=" "$ENV_FILE" | cut -d'=' -f2)
 DB_CONTAINER=${DB_CONTAINER:-hrms-db-qa} # Default to hrms-db-qa if not set
 
@@ -48,7 +49,7 @@ if [ ! "$(docker ps -q -f name=^/${DB_CONTAINER}$)" ]; then
 fi
 
 # Run pg_dump inside container and compress output
-if docker exec "$DB_CONTAINER" pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$BACKUP_DIR/qa_backup_$TIMESTAMP.sql.gz"; then
+if docker exec -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$BACKUP_DIR/qa_backup_$TIMESTAMP.sql.gz"; then
     echo "✅ Backup successful!"
 else
     echo "❌ Backup failed!"
