@@ -29,7 +29,7 @@ DB_CONTAINER=$(grep "^DB_CONTAINER=" "$ENV_FILE" | cut -d'=' -f2)
 DB_CONTAINER=${DB_CONTAINER:-hrms-db-qa} # Default to hrms-db-qa if not set
 
 if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ]; then
-    echo "Error: Could not find POSTGRES_DB or POSTGRES_USER in $ENV_FILE"
+    echo "Error: Could not find DB_NAME or DB_USER in $ENV_FILE"
     exit 1
 fi
 
