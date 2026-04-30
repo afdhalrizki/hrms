@@ -79,15 +79,25 @@ test.describe.serial('Superadmin (Platform) Management', () => {
 
     // 3. Perform Approve Action
     const pendingRow = page.locator('tr').filter({ hasText: 'Pending Corp' });
-    const approveBtn = pendingRow.getByRole('button', { name: /Approve/i });
     
-    await expect(approveBtn).toBeVisible({ timeout: 15000 });
+    // Ensure the row is fully loaded
+    await expect(pendingRow).toBeVisible({ timeout: 10000 });
     
-    // Use a more robust click and wait for state change
-    const approvePromise = page.waitForResponse(resp => resp.url().includes('/internal/registrations/') && resp.status() === 200, { timeout: 120000 });
-    await approveBtn.click();
-    console.log('--- Approve button clicked, waiting for status change ---');
-    await approvePromise;
+    // Check if it's already approved (from a previous Playwright retry)
+    const isAlreadyApproved = await pendingRow.getByText(/APPROVED/i).isVisible();
+    
+    if (!isAlreadyApproved) {
+        const approveBtn = pendingRow.getByRole('button', { name: /Approve/i });
+        await expect(approveBtn).toBeVisible({ timeout: 15000 });
+        
+        // Use a more robust click and wait for state change
+        const approvePromise = page.waitForResponse(resp => resp.url().includes('/internal/registrations/') && resp.status() === 200, { timeout: 120000 });
+        await approveBtn.click();
+        console.log('--- Approve button clicked, waiting for status change ---');
+        await approvePromise;
+    } else {
+        console.log('--- Pending Corp is already APPROVED (likely from a previous retry). Skipping click. ---');
+    }
 
     // Verify success (use toPass to handle potential async updates/schema provisioning)
     await expect(async () => {

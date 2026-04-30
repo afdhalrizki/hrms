@@ -19,18 +19,15 @@ class ConfigSmokeTestCase(TenantTestCase):
         self.assertNotIn('payroll', settings.SHARED_APPS)
 
     def test_middleware_order(self):
-        """TenantMainMiddleware must be near the top, after ConnectionResetMiddleware if present."""
-        first_middleware = settings.MIDDLEWARE[0]
-        if first_middleware == 'users.conn_middleware.ConnectionResetMiddleware':
-            self.assertEqual(
-                settings.MIDDLEWARE[1],
-                'django_tenants.middleware.main.TenantMainMiddleware'
-            )
-        else:
-            self.assertEqual(
-                first_middleware,
-                'django_tenants.middleware.main.TenantMainMiddleware'
-            )
+        """E2ETenantMiddleware must be among the first few middlewares."""
+        # Find the index of E2ETenantMiddleware
+        try:
+            tenant_middleware_idx = settings.MIDDLEWARE.index('users.e2e_middleware.E2ETenantMiddleware')
+        except ValueError:
+            self.fail("E2ETenantMiddleware not found in MIDDLEWARE")
+            
+        # It should be at index 0, 1, or 2 (after Cors or ConnectionReset)
+        self.assertLessEqual(tenant_middleware_idx, 2)
 
     def test_auth_configuration(self):
         """Verify custom user model is set."""

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import IntegrityError
 from rest_framework.test import APIClient
 from tenants.models import Tenant, Domain
+from unittest.mock import patch
 
 class TenantModelTestCase(TestCase):
     def test_tenant_creation(self):
@@ -122,7 +123,8 @@ class RegistrationFlowTestCase(HRMSTestCase):
         response = self.client.get('/api/schema/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_public_signup_creation(self):
+    @patch('tenants.views.send_registration_email_task.delay')
+    def test_public_signup_creation(self, mock_send_email):
         """Verify that any user can submit a registration request."""
         self.client.logout()  # Unauthenticated
         data = {
@@ -137,8 +139,12 @@ class RegistrationFlowTestCase(HRMSTestCase):
         request = RegistrationRequest.objects.first()
         self.assertEqual(request.company_name, 'New Startup')
         self.assertEqual(request.status, 'PENDING')
+        
+        # Verify celery task was called
+        mock_send_email.assert_called_once_with('founder@startup.com')
 
-    def test_admin_approval_process(self):
+    @patch('tenants.views.send_welcome_email_task.delay')
+    def test_admin_approval_process(self, mock_send_welcome):
         """Verify that an admin can approve a request and trigger provisioning."""
         # 1. Create a pending request
         registration = RegistrationRequest.objects.create(
@@ -181,6 +187,9 @@ class RegistrationFlowTestCase(HRMSTestCase):
                 email='admin@approved.com', 
                 nik="ADMIN-001"
             ).exists())
+            
+        # Verify celery task was called
+        mock_send_welcome.assert_called_once_with('admin@approved.com', f'approved.{settings.TENANT_DOMAIN_SUFFIX}')
 
     def test_admin_rejection_process(self):
         """Verify that an admin can reject a request."""

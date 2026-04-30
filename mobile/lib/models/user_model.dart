@@ -9,6 +9,7 @@ class User {
   final String? fullname;
   final String? roleName;
   final String? departmentName;
+  final bool receiveEmailNotifications;
 
   User({
     required this.id,
@@ -21,6 +22,7 @@ class User {
     this.fullname,
     this.roleName,
     this.departmentName,
+    this.receiveEmailNotifications = true,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class User {
       fullname: json['fullname'],
       roleName: json['role_name'] ?? 'Employee',
       departmentName: json['department_name'],
+      receiveEmailNotifications: json['receive_email_notifications'] ?? true,
     );
   }
 
@@ -50,6 +53,7 @@ class User {
       'fullname': fullname,
       'role_name': roleName,
       'department_name': departmentName,
+      'receive_email_notifications': receiveEmailNotifications,
     };
   }
 

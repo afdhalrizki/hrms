@@ -1,6 +1,7 @@
 from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from core.models import Employee, Department, Role, Golongan
+from users.models import User
 from attendance.models import LeaveRequest
 from django.urls import reverse
 from rest_framework import status
@@ -64,9 +65,8 @@ class DeepIsolationTestCase(TenantTestCase):
             
         # 2. API level check: Ensure 404 is returned for cross-tenant IDs
         with schema_context(self.tenant.schema_name):
-            from users.models import User
-            # Create a user for Tenant A
-            user_a = User.objects.create_user(email="user_a@tenant-a.com", password="password123")
+            # Create a user for Tenant A (using the email of the seeded employee)
+            user_a = User.objects.create_user(email="a@test.com", password="password123")
             user_a.tenants.add(self.tenant)
             
             self.client.force_authenticate(user=user_a)

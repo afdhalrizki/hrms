@@ -15,6 +15,7 @@ interface UserProfile {
   fullname: string | null;
   role_name: string | null;
   department_name: string | null;
+  receive_email_notifications: boolean;
 }
 
 interface AuthContextType {

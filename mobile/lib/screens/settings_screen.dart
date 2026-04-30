@@ -1,12 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import 'login_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   const SettingsScreen({super.key, required this.userData});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  late bool _receiveEmail;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _receiveEmail = widget.userData['receive_email_notifications'] ?? true;
+  }
+
+  Future<void> _toggleNotification(bool value) async {
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      final api = ApiService();
+      await api.updateUserPreference(widget.userData['id'], {
+        'receive_email_notifications': value,
+      });
+      
+      setState(() {
+        _receiveEmail = value;
+      });
+      
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.notificationSettingsUpdated)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Settings',
+          AppLocalizations.of(context)!.settings,
           style: AppTheme.plusJakartaSans(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -56,7 +107,14 @@ class SettingsScreen extends StatelessWidget {
             ),
             _buildSettingItem(
               icon: Icons.notifications,
-              title: 'Notifications',
+              title: AppLocalizations.of(context)!.emailNotifications,
+              trailing: _isSaving 
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : Switch(
+                    value: _receiveEmail,
+                    onChanged: _toggleNotification,
+                    activeColor: Colors.blueAccent,
+                  ),
               onTap: () {},
             ),
             const SizedBox(height: 32),
@@ -123,7 +181,7 @@ class SettingsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  userData['fullname'] ?? 'User',
+                  widget.userData['fullname'] ?? 'User',
                   style: AppTheme.plusJakartaSans(
                     color: Colors.white,
                     fontSize: 18,
@@ -132,7 +190,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  userData['email'] ?? '',
+                  widget.userData['email'] ?? '',
                   style: AppTheme.plusJakartaSans(
                     color: Colors.white54,
                     fontSize: 14,
@@ -140,7 +198,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'NIK: ${userData['employee_nik'] ?? 'N/A'}',
+                  'NIK: ${widget.userData['employee_nik'] ?? 'N/A'}',
                   style: AppTheme.plusJakartaSans(
                     color: Colors.blueAccent,
                     fontSize: 12,

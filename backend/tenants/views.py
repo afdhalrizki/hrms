@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status, generics
+from django.conf import settings
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
@@ -7,7 +8,7 @@ from .models import RegistrationRequest, Tenant, Domain
 from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer
 from users.models import User
 from core.models import Department, Role, Golongan, Employee
-
+from .tasks import send_registration_email_task, send_welcome_email_task
 class PublicSignupViewSet(viewsets.GenericViewSet):
     """
     Public-facing signup API for new tenants.
@@ -21,8 +22,9 @@ class PublicSignupViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         registration = serializer.save()
         
-        # Stub: Send email notification to user
-        # send_mail('Registration Received', 'We are reviewing your request.', 'noreply@hrms.com', [registration.admin_email])
+        # Send email notification asynchronously using Celery
+        if getattr(settings, 'ENABLE_EMAIL_NOTIFICATIONS', True):
+            send_registration_email_task.delay(registration.admin_email)
         
         return Response({
             'message': 'Registration request submitted successfully. Our admin will review it shortly.',
@@ -133,8 +135,9 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                 registration.status = 'APPROVED'
                 registration.save()
                 
-                # Stub: Send welcome email to admin_email with login instructions
-                # send_mail('Welcome to HRMS', f'Your schema {domain_name} is ready. Login with {registration.admin_email}.', 'noreply@hrms.com', [registration.admin_email])
+                # Send welcome email asynchronously using Celery
+                if getattr(settings, 'ENABLE_EMAIL_NOTIFICATIONS', True):
+                    send_welcome_email_task.delay(registration.admin_email, domain_name)
 
                 return Response({
                     'message': f'Tenant {registration.company_name} approved and provisioned as Admin-Employee.',

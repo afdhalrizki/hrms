@@ -8,11 +8,12 @@ class TenantIsolationMixin:
     This prevents search_path leakage between parallel requests in threaded environments.
     """
     def dispatch(self, request, *args, **kwargs):
-        tenant_slug = request.headers.get('X-Tenant')
-        if tenant_slug and tenant_slug != 'public':
+        # Use the tenant already resolved by the middleware
+        tenant = getattr(request, 'tenant', None)
+        if tenant and tenant.schema_name != 'public':
             with transaction.atomic():
-                with schema_context(tenant_slug):
-                    # Force set on the connection inside the transaction
-                    connection.set_tenant(request.tenant if hasattr(request, 'tenant') else tenant_slug)
+                with schema_context(tenant.schema_name):
+                    # Ensure connection is in sync with the schema context
+                    connection.set_tenant(tenant)
                     return super().dispatch(request, *args, **kwargs)
         return super().dispatch(request, *args, **kwargs)

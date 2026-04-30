@@ -34,5 +34,7 @@
   "correction": "Correction",
   "performance": "Performance",
   "today": "Today",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "emailNotifications": "Email Notifications",
+  "notificationSettingsUpdated": "Notification settings updated"
 }

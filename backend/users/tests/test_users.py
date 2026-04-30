@@ -109,6 +109,23 @@ class UserModuleTestCase(TenantTestCase):
         self.assertEqual(response.data.get('employee_nik'), 'T01')
         self.assertEqual(response.data['email'], self.tenant_user.email)
 
+    def test_user_email_notification_toggle(self):
+        """Verify that a user can toggle receive_email_notifications via the /api/users/<id>/ endpoint."""
+        # 1. Default should be True
+        self.assertTrue(self.tenant_user.receive_email_notifications)
+        
+        url = reverse('user-detail', kwargs={'pk': self.tenant_user.id})
+        self.client.force_login(self.tenant_user)
+        
+        # 2. Update to False
+        response = self.client.patch(url, {'receive_email_notifications': False}, format='json', SERVER_NAME=str(self.domain))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data['receive_email_notifications'])
+        
+        # 3. Verify in DB
+        self.tenant_user.refresh_from_db()
+        self.assertFalse(self.tenant_user.receive_email_notifications)
+
 class MiddlewareTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()

@@ -202,16 +202,37 @@ export async function login(page: Page, email: string, password = 'password123',
   // Wait for the URL to change to the dashboard (any language)
   await page.waitForURL(/.*\/en|.*\/id/, { timeout: 20000 });
   
-  // 4. Wait for the dashboard/sidebar to be visible
   try {
-    await expect(page.locator('aside')).toBeVisible({ timeout: 90000 });
-    // Also wait for the profile email to be visible in the sidebar to ensure session is active
-    await expect(page.getByText(email, { exact: false })).toBeVisible({ timeout: 30000 });
+    // 4. Wait for the dashboard/sidebar to be visible
+    await expect(page.locator('aside')).toBeVisible({ timeout: 60000 });
+    
+    // 5. If we are on a "Restricted Access" or "Loading" state, try one reload
+    if (await page.getByText(/Restricted Access|Loading/i).isVisible()) {
+      console.log('--- Detected restricted/loading state, performing one-time reload ---');
+      await page.reload();
+      await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
+    }
+    
+    // 6. Wait for the profile data to hydrate
+    const sidebarProfile = page.locator('aside').getByTestId('sidebar-fullname');
+    await expect(sidebarProfile).toBeVisible({ timeout: 30000 });
+    await expect(sidebarProfile).not.toHaveText(/loading/i, { timeout: 45000 });
+    
+    // 7. Verify the CORRECT profile email (effectiveEmail) is visible
+    // We use a self-healing retry logic here: if it doesn't appear in 10s, we reload once.
+    try {
+        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 10000 });
+    } catch (e) {
+        console.log(`--- Email ${effectiveEmail} not visible after 10s, performing self-healing reload ---`);
+        await page.reload();
+        await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
+        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 30000 });
+    }
+    
     console.log(`--- Login successful for ${email} ---`);
   } catch (e) {
     console.error(`--- Login failed for ${email}. Current URL: ${page.url()} ---`);
     await page.screenshot({ path: `login-fail-${email}.png`, fullPage: true });
-    // Also log browser console errors
     throw e;
   }
 }

@@ -29,6 +29,12 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     
+    # User Preferences
+    receive_email_notifications = models.BooleanField(
+        default=True,
+        help_text="Pengguna setuju menerima notifikasi via email"
+    )
+    
     # Mapping user to multiple tenants if necessary (e.g. for multi-tenant support users)
     tenants = models.ManyToManyField(Tenant, blank=True, related_name='users')
     

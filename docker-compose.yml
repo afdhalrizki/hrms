@@ -95,6 +95,29 @@ services:
           cpus: '1.0'
           memory: 1024M
 
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A config worker -l INFO
+    volumes:
+      - ./backend:/app
+    env_file:
+      - ./deploy/environments/.env.local
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - hrms_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
   frontend:
     build:
       context: ./frontend

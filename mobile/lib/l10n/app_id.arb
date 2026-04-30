@@ -34,5 +34,7 @@
   "correction": "Koreksi",
   "performance": "Performa",
   "today": "Hari Ini",
-  "yesterday": "Kemarin"
+  "yesterday": "Kemarin",
+  "emailNotifications": "Notifikasi Email",
+  "notificationSettingsUpdated": "Pengaturan notifikasi diperbarui"
 }

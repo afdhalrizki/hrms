@@ -28,6 +28,7 @@ export default function ProfilePage() {
   const { user } = useAuth();
   
   const [profile, setProfile] = React.useState<any>(null);
+  const [receiveEmail, setReceiveEmail] = React.useState(user?.receive_email_notifications ?? true);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -49,7 +50,10 @@ export default function ProfilePage() {
 
   React.useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+    if (user) {
+      setReceiveEmail(user.receive_email_notifications);
+    }
+  }, [fetchProfile, user]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +71,17 @@ export default function ProfilePage() {
           npwp_number: profile.npwp_number,
         })
       });
+
+      // Update User Preferences if changed
+      if (user && receiveEmail !== user.receive_email_notifications) {
+        await apiFetch(`/users/${user.id}/`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            receive_email_notifications: receiveEmail
+          })
+        });
+      }
+
       toast.success(t('success'));
     } catch (error: any) {
       toast.error(error.message || 'Update failed');
@@ -258,6 +273,44 @@ export default function ProfilePage() {
                     />
                   </div>
                 </div>
+              </div>
+            </motion.div>
+
+            {/* Preferences Section */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="glass-card p-8 rounded-3xl border border-white/10 space-y-6"
+            >
+              <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                <div className="h-8 w-8 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center">
+                  <Shield size={18} />
+                </div>
+                <h3 className="text-lg font-bold text-white">{t('sections.preferences')}</h3>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-white">{t('form.notifications')}</p>
+                  <p className="text-xs text-gray-500">Enable or disable operational email alerts.</p>
+                </div>
+                <button
+                  type="button"
+                  aria-label={t('form.notifications')}
+                  onClick={() => setReceiveEmail(!receiveEmail)}
+                  className={cn(
+                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                    receiveEmail ? "bg-primary" : "bg-white/10"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                      receiveEmail ? "translate-x-6" : "translate-x-1"
+                    )}
+                  />
+                </button>
               </div>
             </motion.div>
 

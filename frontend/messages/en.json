@@ -272,9 +272,11 @@
       "personal": "Personal Information",
       "contact": "Contact Details",
       "documents": "Identity Documents",
-      "employment": "Employment Information"
+      "employment": "Employment Information",
+      "preferences": "User Preferences"
     },
     "form": {
+      "notifications": "Receive Email Notifications",
       "nik": "NIK (Employee ID)",
       "fullname": "Full Name",
       "email": "Work Email",

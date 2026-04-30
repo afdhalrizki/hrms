@@ -461,6 +461,19 @@ class ApiService {
     }
   }
 
+  Future<void> updateUserPreference(int userId, Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.patch(
+      Uri.parse("$baseUrl/users/$userId/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    ));
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update user preference: ${response.body}');
+    }
+  }
+
   Future<void> uploadDocument(int employeeId, String fieldName, List<int> bytes, String fileName) async {
     final tenant = await getTenant();
     final token = await getToken();

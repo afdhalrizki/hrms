@@ -1,7 +1,8 @@
 from .models import SystemNotification
 from django.utils import timezone
+from django.conf import settings
 from users.models import User
-
+from .tasks import send_notification_email_task
 class NotificationService:
     """
     Centralized service for sending notifications.
@@ -26,6 +27,12 @@ class NotificationService:
         Sends a notification to a specific employee/user.
         Category is set to 'OPERATIONAL'.
         """
+        # Trigger async email notification if enabled globally and by the user
+        if getattr(settings, 'ENABLE_EMAIL_NOTIFICATIONS', True):
+            if target_user and getattr(target_user, 'email', None):
+                if getattr(target_user, 'receive_email_notifications', True):
+                    send_notification_email_task.delay(target_user.email, title, message)
+
         return self._create(
             title=title,
             message=message,

@@ -230,4 +230,30 @@ describe('ProfilePage (Integrated)', () => {
       });
     }
   }, 20000);
+
+  it('toggles notification preference and saves to user endpoint', async () => {
+    render(<ProfilePage />, { wrapper: AllProviders });
+    await screen.findByDisplayValue(/employee1@/i, {}, { timeout: 30000 });
+
+    const toggleButton = screen.getByRole('button', { name: /form\.notifications/i });
+    const saveButton = screen.getByRole('button', { name: /save/i });
+
+    // Mock API
+    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (options?.method === 'PATCH') return Promise.resolve({});
+      return realApiFetch.current(endpoint, options);
+    });
+
+    // Toggle the preference
+    fireEvent.click(toggleButton);
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      const calls = (apiFetch as any).mock.calls;
+      // Look for the call to /users/<id>/
+      const userPatchCall = calls.find((c: any) => c[0].includes('/users/') && c[1]?.method === 'PATCH');
+      expect(userPatchCall).toBeDefined();
+      expect(userPatchCall[1].body).toContain('"receive_email_notifications":false');
+    });
+  });
 });

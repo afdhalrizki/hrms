@@ -93,26 +93,32 @@ test.describe('Attendance Management', () => {
 
     console.log('--- Mocking Geolocation in page ---');
     await page.evaluate(() => {
-      const mockGeolocation = {
-        getCurrentPosition: (success: any) => {
-          success({
-            coords: { latitude: -6.2088, longitude: 106.8456, accuracy: 10 },
-            timestamp: Date.now(),
-          });
-        },
-        watchPosition: () => 0,
-        clearWatch: () => {},
-      };
       // @ts-ignore
-      navigator.geolocation = mockGeolocation;
+      navigator.geolocation.getCurrentPosition = (success) => {
+        success({
+          coords: { latitude: -6.2088, longitude: 106.8456, accuracy: 10 },
+          timestamp: Date.now(),
+        });
+      };
     });
 
     console.log('--- Clicking Clock Button ---');
-    await clockBtn.click({ force: true });
+    // Listen for the attendance API call (either POST for check-in or PATCH for check-out)
+    const apiPromise = page.waitForResponse(
+      resp => resp.url().includes('/api/attendance') && (resp.status() === 200 || resp.status() === 201),
+      { timeout: 30000 }
+    );
     
-    console.log('--- Waiting for API response / success toast ---');
-    // Verify success toast from real backend
-    await expect(page.getByText(/Attendance recorded successfully|Clocked out successfully/i)).toBeVisible({ timeout: 30000 });
+    await clockBtn.click();
+    
+    console.log('--- Waiting for API response ---');
+    await apiPromise;
+    
+    console.log('--- Waiting for success toast ---');
+    // Verify success toast from real backend - target the toast container specifically to avoid strict mode violation
+    const toast = page.locator('[data-sonner-toast]');
+    await expect(toast).toBeVisible({ timeout: 15000 });
+    await expect(toast).toContainText(/recorded|successfully|out/i);
   });
 
   test('should allow employee to submit a correction request', async ({ page }) => {

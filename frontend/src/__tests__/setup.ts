@@ -108,11 +108,26 @@ afterEach(() => {
 
 // Force window.location for jsdom so hostname matches localhost for X-Tenant header
 if (typeof window !== 'undefined') {
-  const url = new URL('http://localhost:3000/');
+  const workerId = process.env.VITEST_WORKER_ID || '';
+  const workerIdx = parseInt(workerId, 10);
+  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '4', 10);
+  const tenant = (!isNaN(workerIdx)) ? `worker_${((workerIdx - 1) % numWorkers + numWorkers) % numWorkers}` : 'company1';
+  
+  // ONLY inject test_tenant for worker-based runs (integrated tests)
+  // Pure unit tests like tenant_context.test.tsx will manage their own location
+  const isIntegratedRun = !!process.env.VITEST_WORKER_ID;
+  const url = new URL(isIntegratedRun ? `http://localhost:3000/?test_tenant=${tenant}` : 'http://localhost:3000/');
+  
   Object.defineProperty(window, 'location', {
     value: url,
     writable: true,
   });
+  
+  if (isIntegratedRun) {
+    try {
+      window.sessionStorage.setItem('test_tenant_e2e', tenant);
+    } catch (e) {}
+  }
 }
 
 // Intercept fetch to add X-Tenant header for worker isolation

@@ -248,9 +248,11 @@
       "personal": "Informasi Pribadi",
       "contact": "Detail Kontak",
       "documents": "Dokumen Identitas",
-      "employment": "Informasi Pekerjaan"
+      "employment": "Informasi Pekerjaan",
+      "preferences": "Preferensi Pengguna"
     },
     "form": {
+      "notifications": "Terima Notifikasi Email",
       "nik": "NIK (Karyawan)",
       "fullname": "Nama Lengkap",
       "email": "Email Kerja",

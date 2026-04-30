@@ -5,7 +5,7 @@ import { TenantProvider, useTenant } from '@/context/TenantContext';
 import { apiFetch } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
-  apiFetch: vi.fn(),
+  apiFetch: vi.fn(() => Promise.resolve({})),
 }));
 
 // Helper component to consume context
@@ -22,9 +22,12 @@ const TestConsumer = () => {
 
 describe('TenantContext', () => {
   beforeEach(() => {
-    vi.stubGlobal('location', { hostname: 'localhost' });
+    vi.stubGlobal('location', { hostname: 'localhost', search: '' });
+    if (typeof window !== 'undefined') {
+      sessionStorage.clear();
+      localStorage.clear();
+    }
     process.env.NEXT_PUBLIC_DOMAIN_SUFFIX = 'harikerja.com';
-    vi.resetModules();
   });
 
   it('identifies localhost as public', async () => {

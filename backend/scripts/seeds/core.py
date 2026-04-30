@@ -64,13 +64,6 @@ def setup_tenant(schema_name, company_name):
         defaults={'tenant': tenant, 'is_primary': True}
     )
     
-    # Also add 127.0.0.1 for company1 for convenience
-    if schema_name == 'company1':
-        Domain.objects.update_or_create(
-            domain='127.0.0.1', 
-            defaults={'tenant': tenant, 'is_primary': False}
-        )
-
     # Ensure schema is migrated
     for attempt in range(3):
         try:
@@ -166,7 +159,8 @@ def seed_base_data(tenant, admin_email=None):
 
         # --- USERS & EMPLOYEES ---
         # 1. Admin
-        admin_user, _ = User.objects.get_or_create(email=admin_email, defaults={'is_active': True})
+        admin_user, _ = User.objects.get_or_create(email=admin_email, defaults={'is_active': True, 'is_staff': True})
+        admin_user.is_staff = True # Ensure it is set even if user existed
         admin_user.set_password('password123')
         admin_user.save()
         if not admin_user.tenants.filter(id=tenant.id).exists():

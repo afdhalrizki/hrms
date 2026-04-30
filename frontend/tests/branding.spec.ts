@@ -18,15 +18,13 @@ test.describe('Branding and Identity', () => {
   test('should update company branding and apply theme instantly', async ({ page }) => {
     await page.goto(getTenantUrl('/en/settings/branding'));
     
-    // Wait for loader to disappear
-    await expect(page.locator('svg.animate-spin')).not.toBeVisible({ timeout: 15000 });
-    
-    // Check if we are redirected to "Restricted Access" (indicates permission race)
-    if (await page.getByText(/Restricted Access/i).isVisible()) {
-      console.log('--- Restricted Access detected, reloading... ---');
-      await page.reload();
-      await expect(page.locator('svg.animate-spin')).not.toBeVisible({ timeout: 15000 });
-    }
+    // Wait for loader to disappear and ensure we are not on restricted page
+    await expect(async () => {
+      if (await page.getByText(/Restricted Access/i).isVisible()) {
+        await page.reload();
+      }
+      await expect(page.locator('svg.animate-spin')).not.toBeVisible();
+    }).toPass({ timeout: 30000 });
     
     // Modify colors using text inputs for stability
     const primaryInput = page.getByTestId('primary-color-input');

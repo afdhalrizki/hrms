@@ -54,12 +54,6 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => {
 
 describe('BrandingPage (Integrated)', () => {
   beforeAll(async () => {
-    // Force tenant context for integrated tests
-    const url = new URL('http://localhost:3000/?test_tenant=company1');
-    Object.defineProperty(window, 'location', {
-      value: url,
-      writable: true,
-    });
     await loginAs('admin@company1.com');
   }, 20000);
 

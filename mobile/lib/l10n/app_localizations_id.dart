@@ -115,4 +115,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get yesterday => 'Kemarin';
+
+  @override
+  String get emailNotifications => 'Notifikasi Email';
+
+  @override
+  String get notificationSettingsUpdated => 'Pengaturan notifikasi diperbarui';
 }

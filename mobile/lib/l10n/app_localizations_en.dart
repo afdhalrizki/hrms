@@ -115,4 +115,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yesterday => 'Yesterday';
+
+  @override
+  String get emailNotifications => 'Email Notifications';
+
+  @override
+  String get notificationSettingsUpdated => 'Notification settings updated';
 }

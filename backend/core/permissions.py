@@ -154,7 +154,10 @@ class HasRBACPermission(permissions.BasePermission):
 
         # Check if user is the owner of the record
         is_owner = False
-        if isinstance(obj, Employee):
+        from users.models import User
+        if isinstance(obj, User):
+            is_owner = obj == request.user
+        elif isinstance(obj, Employee):
             is_owner = obj == employee
         elif hasattr(obj, 'employee'):
             is_owner = obj.employee == employee

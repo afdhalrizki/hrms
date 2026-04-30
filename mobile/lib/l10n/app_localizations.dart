@@ -310,6 +310,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yesterday'**
   String get yesterday;
+
+  /// No description provided for @emailNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Notifications'**
+  String get emailNotifications;
+
+  /// No description provided for @notificationSettingsUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings updated'**
+  String get notificationSettingsUpdated;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
