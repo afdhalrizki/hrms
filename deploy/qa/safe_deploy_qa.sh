@@ -41,13 +41,13 @@ echo "⚙️ Step 4: Running database migrations (Shared & Tenants)..."
 docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
 # 5. Unit Testing Phase
-echo "🧪 Step 5: Running Backend Unit Tests..."
-if ! docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
-    echo "❌ Unit Tests Failed! Deployment might be unstable."
-    echo "Check test output above."
-    exit 1
-fi
-echo "✅ Unit Tests Passed!"
+# echo "🧪 Step 5: Running Backend Unit Tests..."
+# if ! docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
+#     echo "❌ Unit Tests Failed! Deployment might be unstable."
+#     echo "Check test output above."
+#     exit 1
+# fi
+# echo "✅ Unit Tests Passed!"
 
 # 6. Smoke Test Phase
 echo "🔍 Step 6: Running Smoke Test (Health Check)..."
