@@ -128,9 +128,9 @@ For more granular control, you can run tests within each module directory:
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 333 Tests (317 Unit + 16 E2E) - Pytest.
-- **Frontend**: 222 Tests (184 Unit + 38 E2E) - Vitest & Playwright.
-- **Mobile**: 151 Tests (128 Unit + 23 E2E) - Flutter.
+- **Backend**: 336 Tests (318 Unit + 18 E2E) - Pytest.
+- **Frontend**: 223 Tests (185 Unit + 38 E2E) - Vitest & Playwright.
+- **Mobile**: 155 Tests (132 Unit + 23 E2E) - Flutter.
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
 
