@@ -55,7 +55,7 @@ echo "Waiting for services to settle (10s)..."
 sleep 10
 
 # Check API Health via Nginx on port 80
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/api/ || echo "000")
+API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Host: harikerja.web.id" http://localhost:80/api/health/ || echo "000")
 
 if [ "$API_STATUS" -eq 200 ] || [ "$API_STATUS" -eq 301 ] || [ "$API_STATUS" -eq 302 ]; then
     echo "✅ Smoke Test Passed! API is responding (HTTP $API_STATUS)."
