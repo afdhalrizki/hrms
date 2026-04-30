@@ -23,8 +23,8 @@ fi
 
 # Load database variables from .env.qa
 # Using grep and sed to avoid sourcing the whole file which might have export-unfriendly lines
-DB_NAME=$(grep "^POSTGRES_DB=" "$ENV_FILE" | cut -d'=' -f2)
-DB_USER=$(grep "^POSTGRES_USER=" "$ENV_FILE" | cut -d'=' -f2)
+DB_NAME=$(grep "^DB_NAME=" "$ENV_FILE" | cut -d'=' -f2)
+DB_USER=$(grep "^DB_USER=" "$ENV_FILE" | cut -d'=' -f2)
 DB_CONTAINER=$(grep "^DB_CONTAINER=" "$ENV_FILE" | cut -d'=' -f2)
 DB_CONTAINER=${DB_CONTAINER:-hrms-db-qa} # Default to hrms-db-qa if not set
 

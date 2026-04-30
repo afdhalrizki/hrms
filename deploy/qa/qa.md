@@ -86,29 +86,33 @@ sudo ufw enable
 
 ## Stage 2: Core Infrastructure Installation (Docker & Nginx)
 
-### 1. Install Docker & Docker Compose Plugin
-```bash
-# Remove old docker installations (if any)
-sudo apt-get remove docker docker-engine docker.io containerd runc
+### 1. Install Docker & Docker Compose (Official Repo)
+Gunakan metode repositori resmi Docker untuk mendapatkan versi terbaru dan paling stabil:
 
-# Install docker repository certificates
-sudo apt-get install -y ca-certificates curl gnupg
+```bash
+# 1. Update list paket & Install dependencies awal
+sudo apt update && sudo apt install -y ca-certificates curl gnupg
+
+# 2. Tambahkan kunci GPG resmi Docker
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-# Add docker repository
+# 3. Tambahkan repository Docker ke Apt sources
 echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Install Docker Engine
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# 4. Install Docker Engine & Compose Plugin
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Grant docker access without "sudo" for the active user (if not root)
-# sudo usermod -aG docker $USER
+# 5. Kelola Docker sebagai user non-root
+# Agar Anda tidak perlu mengetik 'sudo' setiap kali menjalankan perintah docker
+sudo usermod -aG docker $USER
+
+# PENTING: Anda harus LOGOUT dan LOGIN kembali ke SSH agar perubahan grup ini aktif.
 ```
 
 ### 2. Install Nginx & Certbot
