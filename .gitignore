@@ -155,3 +155,4 @@ docker_compose_logs_*.log
 **/e2e/coverage/
 **/e2e/test-results/
 **/e2e/report/
+deploy/qa/certbot/
