@@ -40,6 +40,10 @@ docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d -
 echo "⚙️ Step 4: Running database migrations (Shared & Tenants)..."
 docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
+# 4.1. Tenant Setup Phase
+echo "🏗️ Step 4.1: Initializing Public Tenant and Domains..."
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python scripts/setup_qa_tenant.py
+
 # 5. Unit Testing Phase
 # echo "🧪 Step 5: Running Backend Unit Tests..."
 # if ! docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
