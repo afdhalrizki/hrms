@@ -22,7 +22,7 @@ docker run -it --rm --name certbot \
     -v "$(pwd)/deploy/qa/certbot/conf:/etc/letsencrypt" \
     -v "$(pwd)/deploy/qa/certbot/www:/var/www/certbot" \
     certbot/certbot certonly --webroot -w /var/www/certbot \
-    -d "$DOMAIN" -d "www.$DOMAIN" \
+    -d "$DOMAIN" \
     --email "$EMAIL" --agree-tos --no-eff-email
 
 if [ $? -eq 0 ]; then
