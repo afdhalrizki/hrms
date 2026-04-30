@@ -11,7 +11,7 @@ To ensure the application remains highly responsive, the following "Sweet Spot" 
 | **vCPU** | 4 Cores (Dedicated) | Sufficient for handling Gunicorn workers and Celery background tasks concurrently. |
 | **RAM** | 8 GB | Optimal for PostgreSQL buffer caching and Next.js server-side rendering. |
 | **Storage** | 80 GB NVMe SSD | High IOPS is mandatory to prevent I/O wait during high-frequency database writes. |
-| **Network** | 1 Gbps (Unmetered) | Ensures fast delivery of static assets and media files (attendance photos, etc.). |
+| **Network** | 10 Gbps (Unmetered) | High-speed pipe from Biznet GIO ensures zero bottleneck during peak attendance hours. |
 
 ### Recommended Providers:
 - **Biznet GIO**: **NEO Lite Pro MM.8.4** (4 vCPU AMD EPYC™ 3.1 GHz, 8GB RAM, 80GB NVMe). 
@@ -41,7 +41,7 @@ Configuration tuned in `.env.production_1k`:
 - Tasks: Email dispatch, payroll PDF generation, and push notifications.
 
 ### 4. Reverse Proxy (Nginx)
-- **Gzip Compression**: Level 5 (Balance between CPU usage and transfer speed).
+- **Gzip Compression**: Level 6 (Optimal balance between CPU and bandwidth).
 - **Client Max Body Size**: 50MB (Supports high-resolution attendance uploads).
 
 ---

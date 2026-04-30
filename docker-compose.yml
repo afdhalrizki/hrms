@@ -142,6 +142,19 @@ services:
           cpus: '1.0'
           memory: 2048M
 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '80:80'
+    volumes:
+      - ./deploy/local/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - hrms_net
+
 networks:
   hrms_net:
     driver: bridge

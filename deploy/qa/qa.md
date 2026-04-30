@@ -2,25 +2,38 @@
 
 This document contains a step-by-step (End-to-End) guide to deploy the harikerja HRMS application to the *QA Environment*. We provide recommendations for three major providers: **Biznet GIO**, **IDCloudHost**, and **Hostinger**.
 
-## Recommended Server Specifications
+## Server Specifications & Environment Purpose
 
-Based on the UAT/QA workload analysis, specifically considering **Automated E2E Testing (Playwright)** requirements, the following are the required server specifications:
+The **QA Environment** serves as the primary gateway for functional verification. While a future **Staging Environment** will be used for final load testing and maximum user capacity verification (currently omitted), the QA server is dedicated to **Manual User Acceptance Testing (UAT)** and functional stakeholder verification.
 
-| Tier | vCPU | RAM | Storage | Purpose |
+| Tier | vCPU | RAM | Storage | Primary Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| **Minimum** | 4 Cores | 8 GB | 60 GB SSD | Manual UAT & Basic API Testing |
-| **Ideal (Lancar)** | 8 Cores | 16 GB | 100 GB NVMe | Full Automated E2E & CI/CD Pipelines |
+| **Current (Active)** | 8 Cores | 8 GB | 60 GB SSD | **Temporary Over-provisioned** (NEO Lite MM 8.8) |
+| **Target Ideal** | 4 Cores | 8 GB | 60 GB SSD | **Optimized for Manual UAT & Sanity Checks** |
+
+> [!IMPORTANT]
+> **Current Infrastructure Status:** We are currently utilizing the **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). While providing excellent compute power, we plan to **downgrade to 4 Cores** in the next billing cycle to optimize costs, as 4 Cores is more than sufficient for manual UAT workloads.
+
+### 🧪 QA Environment Usage & Feature Verification
+To ensure all features work correctly before hitting production, the QA environment is used for:
+
+1.  **Manual User Acceptance Testing (UAT):** Real users and stakeholders verify business workflows (Payroll, Attendance, Employee Onboarding).
+2.  **Multi-tenant Isolation Check:** Ensuring that data between different company schemas remains strictly isolated in a cloud-like environment.
+3.  **Sanity & Smoke Testing:** A final manual walkthrough of "Happy Path" scenarios after every deployment.
+4.  **Mobile App Integration:** Final testing of the Flutter mobile app against a public HTTPS API endpoint.
+5.  **Environment Parity Check:** Verifying that configurations (Env Vars, Nginx, SSL) are consistent with the Production-1K setup.
 
 ### Provider Plan Recommendations:
-- **Biznet GIO:** Use **NEO Lite MM 8.4** (Min) or **NEO Lite MM 16.8** (Ideal).
-- **IDCloudHost:** Use **NVMe 5** (Min) or **NVMe 6** (Ideal) for better I/O performance.
-- **Hostinger:** Use **KVM 4** or above to ensure enough RAM for headless browsers.
+- **Biznet GIO:** Use **NEO Lite MM 8.4** (Ideal Target) or **NEO Lite MM 8.8** (Current).
+- **IDCloudHost:** Use **NVMe 5** for high-speed database interactions.
+- **Hostinger:** Use **KVM 4** for stable manual testing performance.
 
-### Technical Rationale for 16GB RAM:
-While the Django backend and Next.js frontend are lightweight, the **QA Environment** has unique resource demands:
-1.  **Headless Browsers (Playwright/Cypress):** Each worker instance of a headless browser (Chrome/Webkit) can consume **500MB - 1GB RAM**. Running 4+ tests in parallel requires significant RAM headroom.
-2.  **CI/CD Overhead:** If the server is used as a GitHub Action runner or for local Docker builds, the Next.js compilation process is very CPU/RAM intensive.
-3.  **Database Seeding:** Frequent resets and seeding of the multi-tenant database snapshots are significantly faster with a larger PostgreSQL shared buffer.
+### Technical Rationale for 8GB RAM:
+Even without automated testing, we maintain **8GB RAM** as the ideal target to support:
+1.  **PostgreSQL Buffer Cache:** High-performance multi-tenant database operations (seeding, resets, and tenant isolation tests).
+2.  **Docker Build Efficiency:** Providing enough memory overhead for the Next.js production build process during deployments.
+3.  **Concurrency Support:** Allowing multiple stakeholders to perform UAT simultaneously without performance degradation.
+4.  **System Stability:** Ensuring enough headroom for the OS, Redis, and Celery background workers to run concurrently with the core app.
 
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS

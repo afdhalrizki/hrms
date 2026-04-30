@@ -1,121 +1,64 @@
-# Staging Deployment Guide - AWS Phase 1 (Solo-Dev Simple)
+# Staging Environment - Performance & Load Testing Guide
 
-This document is designed for a **Solo Developer** to deploy the HRMS application to AWS as simply and cheaply as possible. We use **AWS App Runner**, which handles everything (Servers, SSL, Scaling) automatically.
+The **Staging Environment** is the final performance gateway before production. Its primary purpose is to perform **Load Testing**, **Stress Testing**, and **Maximum User Capacity Verification** (simulating 1,000 to 10,000+ concurrent users).
 
-## Requirements
-- An AWS Account.
-- Domain managed in **Route 53** (Recommended for simplicity).
-- Your code pushed to a Repository.
+> [!NOTE]
+> **Current Status:** This environment is currently **omitted (ditiadakan)** in the initial phase but remains planned as the final hurdle for system scalability.
 
----
+## 🖥️ Recommended Server Specifications (Parity Mode)
 
-## Stage 1: The Database (Amazon RDS)
+To ensure valid test results, the Staging environment should ideally match or exceed the Production-1K specifications.
 
-We will start here because the database needs to be ready before the application.
+| Component | Target Specification | Rationale |
+| :--- | :--- | :--- |
+| **vCPU** | 8 Cores (Dedicated) | Required to simulate high-concurrency Gunicorn workers during load tests. |
+| **RAM** | 16 GB | Necessary for PostgreSQL performance under stress and monitoring tool overhead. |
+| **Storage** | 100 GB NVMe SSD | Ensures storage I/O is not a bottleneck during high-frequency log writes. |
+| **Network** | 10 Gbps (Unmetered) | **Mandatory** to simulate real-world traffic spikes without network throttling. |
 
-1.  **Search for "RDS"** in the AWS Console.
-2.  Click **Create database**.
-3.  Choose **Standard create** -> **PostgreSQL**.
-4.  **Templates:** Choose **Free Tier** (or Dev/Test if Free Tier is unavailable).
-5.  **Settings:**
-    *   DB instance identifier: `hrms-staging-db`.
-    *   Master username: `hrmsuser`.
-    *   Master password: *(Generate a strong one and save it!)*.
-6.  **Connectivity:**
-    *   Public access: **No** (Very important for security).
-    *   VPC Security Group: Create new, name it `rds-sg`.
-7.  Click **Create database**.
+### Deployment Options:
+1.  **Biznet GIO (Recommended for Parity):** Use **NEO Lite Pro MM.16.8** (8 vCPU, 16GB RAM) to maintain parity with the Indonesia-based production environment.
+2.  **AWS (For Global Scalability Testing):** Use **AWS App Runner** + **RDS PostgreSQL** (as detailed in Phase 1) for testing auto-scaling behavior.
 
 ---
 
-## Stage 2: Bridging the Connection (VPC Connector)
+## 🚀 Staging-Specific Testing Goals
 
-Since RDS is private, we need a "bridge" for App Runner to talk to it.
+Unlike QA which focuses on *features*, Staging focuses on *limits*:
 
-1.  **Search for "App Runner"** in the AWS Console.
-2.  In the left menu, click **VPC connectors** -> **Create VPC connector**.
-3.  **Name:** `hrms-staging-connector`.
-4.  **VPC:** Select the same VPC as your RDS (usually the Default VPC).
-5.  **Subnets:** Select at least two subnets (e.g., `us-east-1a` and `us-east-1b`).
-6.  **Security groups:** Select the **default** group or create one that allows outbound traffic.
+### 1. Load Testing (1,000 - 10,000 Users)
+*   **Tools:** Locust or JMeter.
+*   **Goal:** Verify that the system maintains a response time under 2 seconds for 95% of requests during peak traffic simulations.
 
-> **CRITICAL STEP**: Go back to your **RDS Security Group** (`rds-sg`) and add an **Inbound Rule** allowing `PostgreSQL (5432)` from the Security Group you just used in the VPC Connector.
+### 2. Stress Testing (Breaking Point)
+*   **Goal:** Identify the exact number of concurrent users that cause the system to crash or significantly degrade.
+*   **Action:** Tune Gunicorn workers and PostgreSQL connections based on these results.
 
----
+### 3. Database Bottleneck Analysis
+*   **Goal:** Identify slow queries that only appear under high concurrency.
+*   **Tools:** PostgreSQL `pg_stat_statements` and AWS Performance Insights (if using RDS).
 
-## Stage 3: The Application (AWS App Runner)
-
-This is where the magic happens. We will deploy the **Backend** first.
-
-1.  **Click "Create service"** in App Runner.
-2.  **Source:** Choose **Container registry** -> **Amazon ECR**.
-3.  **Container image URI:** Browse and select your `hrms-backend-staging` image.
-4.  **Deployment settings:** Choose **Automatic** (it will redeploy every time you push a new image).
-5.  **Configuration:**
-    *   **Service name:** `hrms-backend-staging`.
-    *   **Port:** `8000`.
-    *   **Environment variables:** Add variables from `environments/.env.staging`.
-        *   `DATABASE_URL`: `postgres://hrmsuser:password@endpoint:5432/postgres` (Get the endpoint from RDS console).
-    *   **Networking:** Choose **Custom VPC** and select the `hrms-staging-connector` we created in Stage 2.
-6.  Click **Create**. Wait ~5 minutes.
-
-**Repeat** the same steps for the **Frontend** using:
-*   **Service name:** `hrms-frontend-staging`.
-*   **Port:** `3000`.
-*   **Environment Variable:** `NEXT_PUBLIC_API_URL` -> Use the URL provided by the Backend App Runner service once it finishes deploying.
+### 4. Background Task Saturation
+*   **Goal:** Test how many concurrent "Payroll PDF Generations" can be handled by Celery workers before the queue becomes unresponsive.
 
 ---
 
-## Stage 4: Domain & SSL (Route 53)
+## 🛠️ Deployment Summary (AWS / Biznet)
 
-1.  In your App Runner service dashboard, go to the **Custom domains** tab.
-2.  Click **Link domain** and enter `harikerja.my.id`.
-3.  App Runner will provide **CNAME records**.
-4.  Go to **Route 53** -> **Hosted Zones** -> Click your domain.
-5.  Add the CNAME records provided. SSL (HTTPS) will be active automatically in ~30 minutes.
+### Option A: AWS App Runner (Simplified Scaling)
+*   **Pros:** Automatic scaling, built-in SSL, easy to tear down after testing.
+*   **Cons:** Higher cost for data egress and RDS instance.
 
----
-
-## Stage 5: Database Migrations (One-Time Setup)
-
-Because we don't have a SSH server, the easiest way for a beginner to run migrations is:
-
-1.  **Temporarily** set your RDS to **Public Access: Yes** in the RDS Console.
-2.  Add your **Local IP** to the RDS Security Group rules.
-3.  From your local machine terminal:
-    ```bash
-    export DATABASE_URL=postgres://hrmsuser:password@endpoint:5432/postgres
-    python manage.py migrate_schemas --shared
-    python manage.py create_tenant --schema_name=public --name="Staging" --domain-domain=harikerja.my.id --is_primary=True
-    ```
-4.  **REVERT**: Set RDS back to **Public Access: No** immediately after finishing.
+### Option B: Biznet GIO (Production Parity)
+*   **Pros:** Identical network latency and CPU architecture to Production-1K. Low cost.
+*   **Cons:** Requires manual server setup and Nginx tuning (follow [production-1k/nginx.conf](file:///home/afdhal/data/hr/hrms/deploy/production-1k/nginx.conf)).
 
 ---
 
-## Stage 6: Load Testing (1M User Simulation)
-10-person core team expects this environment to handle sharp traffic spikes.
+## 🔒 Post-Testing Protocol
+Since Staging is for performance testing, it should not be kept running 24/7 if not in use:
+1.  **Snapshot:** Take a disk snapshot of the tuned environment.
+2.  **Tear Down:** Stop or terminate instances to save costs.
+3.  **Report:** Document the "Maximum Safe Capacity" in the Architecture Decision Records (ADR).
 
-1.  Use **Locust** or **JMeter** from a separate EC2 instance.
-2.  Target the `harikerja.my.id` endpoint.
-3.  Monitor **App Runner Metrics** (CPU/RAM) during the test.
-4.  Validate that the DB handles concurrent connections via **RDS Performance Insights**.
-
----
-
-## Stage 7: Monitoring (AWS CloudWatch)
-
-1.  **Logs**: Centralized in CloudWatch Logs under `/aws/apprunner/hrms-backend-staging`.
-2.  **Metrics**: Set up a CloudWatch Dashboard for:
-    *   `RequestCount`
-    *   `HTTP5xxErrorCount`
-    *   `CPUUtilization` (App Runner)
-    *   `DatabaseConnections` (RDS)
-3.  **Alarms**: Create an alarm that emails you if `CPUUtilization > 80%` for 5 minutes.
-
----
-
-## Summary for Solo-Dev
-- **Logs:** Go to App Runner -> **Logs** tab to see trial/error messages.
-- **Costs:** Monitor the **AWS Billing Dashboard**. App Runner "Provisioned instances" have a small fee even when idle, but it's much cheaper than EKS.
-
-The Staging environment is now LIVE. 🚀
+The Staging environment is the "Proving Ground" where the system's 10K-readiness is officially certified. 🚀
