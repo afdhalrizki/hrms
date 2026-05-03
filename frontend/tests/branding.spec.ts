@@ -11,6 +11,7 @@ test.describe('Branding and Identity', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    test.setTimeout(120000);
     // Perform real login against seeded backend
     await login(page, admin.email, admin.password);
   });

@@ -60,7 +60,7 @@ export default defineConfig({
     {
       // Frontend server
       command: 'next start --port 3001',
-      url: 'http://127.0.0.1:3001/en/',
+      url: 'http://127.0.0.1:3001/en/login/portal-admin',
       env: {
         NODE_ENV: 'test',
         NODE_OPTIONS: '--max-old-space-size=1536'

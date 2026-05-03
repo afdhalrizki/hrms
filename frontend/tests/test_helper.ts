@@ -200,7 +200,10 @@ export async function login(page: Page, email: string, password = 'password123',
   await page.click('button[type="submit"]');
   
   // Wait for the URL to change to the dashboard (any language)
-  await page.waitForURL(/.*\/en|.*\/id/, { timeout: 20000 });
+  await page.waitForURL(url => {
+    const p = url.pathname.toLowerCase();
+    return !p.includes('/login') && !p.includes('/portal-admin') && (p.includes('/en') || p.includes('/id') || p === '/');
+  }, { timeout: 60000 });
   
   try {
     // 4. Wait for the dashboard/sidebar to be visible

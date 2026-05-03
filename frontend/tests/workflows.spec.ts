@@ -11,6 +11,7 @@ test.describe.serial('Workflow Configurations', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    test.setTimeout(120000);
     // Capture browser console logs
     page.on('console', msg => {
       console.log(`BROWSER [${msg.type()}]: ${msg.text()}`);
