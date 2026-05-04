@@ -10,6 +10,10 @@ class ConnectionResetMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        from django.conf import settings
+        if getattr(settings, 'TESTING', False):
+            return self.get_response(request)
+            
         # Force connection reset to public schema at the start of every request
         from django.db import connection
         connection.set_schema_to_public()

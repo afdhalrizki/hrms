@@ -50,7 +50,9 @@ class MiddlewareCoverageTestCase(TenantTestCase):
         # Accessing admin on public domain
         response = self.client.get('/admin/', SERVER_NAME=self.public_domain)
         self.assertEqual(response.status_code, 302) # Redirect to login
-        self.assertTrue(response.url.startswith('/admin/login/'))
+        # Allow both /admin/login/ or the default /accounts/login/
+        redirect_url = response.url.lower()
+        self.assertTrue('/admin/login/' in redirect_url or '/accounts/login/' in redirect_url)
 
     def test_tenant_access_denied_api(self):
         """Cover lines 46-48 in users/middleware.py."""

@@ -49,8 +49,11 @@ class HRMSTestCase(FastTenantTestCase):
     @classmethod
     def setup_tenant(cls, tenant):
         """Ensure tenant has required fields if django-tenants creates it."""
-        tenant.plan_type = 'ENTERPRISE'
-        tenant.subscription_status = 'ACTIVE'
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            tenant.plan_type = 'ENTERPRISE'
+            tenant.subscription_status = 'ACTIVE'
+            tenant.save()
 
     @classmethod
     def setUpClass(cls):
@@ -86,6 +89,15 @@ class HRMSTestCase(FastTenantTestCase):
         super().setUp()
         self.client = APIClient()
         self.worker_id = WORKER_ID
+        
+        # Reset tenant state per test to avoid pollution (e.g. from subscription tests)
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            self.tenant.subscription_status = 'ACTIVE'
+            self.tenant.expiry_date = None
+            self.tenant.employee_count = 0
+            self.tenant.storage_used_bytes = 0
+            self.tenant.save()
 
 class BaseHRTestCase(HRMSTestCase):
     """

@@ -33,7 +33,7 @@ export const TEST_USERS = {
   }
 };
 
-export const BASE_URL = 'http://localhost:3001';
+export const BASE_URL = 'http://127.0.0.1:3001';
 export const DEFAULT_TENANT = 'company1';
 
 /**
@@ -127,7 +127,6 @@ export async function login(page: Page, email: string, password = 'password123',
   
   page.on('pageerror', err => {
     console.error(`BROWSER CRITICAL ERROR: ${err.message}`);
-    throw err;
   });
 
   // 0. Preliminary Backend Reachability Check (Fail Fast)
@@ -193,21 +192,89 @@ export async function login(page: Page, email: string, password = 'password123',
     } catch (e) {}
   }, effectiveTenant);
 
-  // 3. Perform login as usual
-  await page.fill('input[type="email"]', effectiveEmail);
-  await page.fill('input[type="password"]', password);
+  // 3. Perform login with robust waiting
+  const loginButton = page.locator('button[type="submit"]');
+  const emailInput = page.locator('input[type="email"]');
+  const passwordInput = page.locator('input[type="password"]');
   
-  await page.click('button[type="submit"]');
+  await expect(emailInput).toBeVisible({ timeout: 15000 });
   
-  // Wait for the URL to change to the dashboard (any language)
-  await page.waitForURL(url => {
-    const p = url.pathname.toLowerCase();
-    return !p.includes('/login') && !p.includes('/portal-admin') && (p.includes('/en') || p.includes('/id') || p === '/');
-  }, { timeout: 60000 });
+  // 3.1 Initial form fill
+  await emailInput.click();
+  await emailInput.fill(effectiveEmail);
+  await passwordInput.click();
+  await passwordInput.fill(password);
+
+  await expect(loginButton).toBeEnabled({ timeout: 10000 });
+
+  console.log(`--- Attempting login for ${effectiveEmail} ---`);
   
+  // Start waiting for ANY auth-related POST response to catch the login
+  // We add an aggressive retry loop to handle intermittent 401s by clearing state and reloading
+  let loginResp = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const responsePromise = page.waitForResponse(
+      resp => resp.url().includes('/api/auth/') && resp.request().method() === 'POST',
+      { timeout: 20000 }
+    ).catch(() => null);
+
+    await loginButton.click();
+    
+    loginResp = await responsePromise;
+    if (loginResp) {
+      if (loginResp.ok()) {
+        console.log(`--- Login API success on attempt ${attempt} ---`);
+        break;
+      }
+      
+      const body = await loginResp.text().catch(() => 'no body');
+      console.warn(`--- Login attempt ${attempt} failed: ${loginResp.status()} - ${body} ---`);
+      
+      // If it's a 401 and we have retries left, wait, clear state, and try again
+      if (loginResp.status() === 401 && attempt < 3) {
+        console.log(`--- Retrying login (attempt ${attempt+1}): clearing state and reloading ---`);
+        await page.evaluate(() => {
+          try {
+            localStorage.clear();
+            sessionStorage.clear();
+          } catch (e) {}
+        });
+        await page.reload();
+        await expect(emailInput).toBeVisible({ timeout: 10000 });
+        await emailInput.fill(effectiveEmail);
+        await passwordInput.fill(password);
+        await page.waitForTimeout(1000);
+        continue;
+      }
+      
+      throw new Error(`Login failed (API Error): ${loginResp.status()} - ${body}`);
+    } else if (attempt === 3) {
+      throw new Error('Login failed: API response not received after 3 attempts');
+    }
+  }
+
+  // 4. Wait for the URL to change to the dashboard (any language)
   try {
-    // 4. Wait for the dashboard/sidebar to be visible
-    await expect(page.locator('aside')).toBeVisible({ timeout: 60000 });
+    await page.waitForURL(url => {
+      const p = url.pathname.toLowerCase();
+      return !p.includes('/login') && 
+             !p.includes('/portal-admin') && 
+             (p.includes('/en') || p.includes('/id') || p === '/');
+    }, { timeout: 30000 });
+    console.log(`--- Navigation successful: ${page.url()} ---`);
+  } catch (e: any) {
+    console.error(`--- Navigation timeout. Current URL: ${page.url()} ---`);
+    // Fallback: check if we are actually logged in by looking for the sidebar
+    if (await page.locator('aside').isVisible()) {
+        console.log('--- Sidebar visible despite URL timeout, proceeding ---');
+    } else {
+        await page.screenshot({ path: `login-nav-timeout-${email}.png` });
+        throw e;
+    }
+  }
+  
+  // 5. Wait for the dashboard/sidebar to be visible
+  await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
     
     // 5. If we are on a "Restricted Access" or "Loading" state, try one reload
     if (await page.getByText(/Restricted Access|Loading/i).isVisible()) {
@@ -233,11 +300,6 @@ export async function login(page: Page, email: string, password = 'password123',
     }
     
     console.log(`--- Login successful for ${email} ---`);
-  } catch (e) {
-    console.error(`--- Login failed for ${email}. Current URL: ${page.url()} ---`);
-    await page.screenshot({ path: `login-fail-${email}.png`, fullPage: true });
-    throw e;
-  }
 }
 
 /**

@@ -175,17 +175,25 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         Custom create method to handle optional User account provisioning linking.
         Accepts: 'create_user' (bool) and 'is_admin' (bool) in request data.
         """
+        print(f"DEBUG: EmployeeViewSet.create called for {request.path}")
         create_user_flag = str(request.data.get('create_user', 'false')).lower() == 'true'
         is_admin_flag = str(request.data.get('is_admin', 'false')).lower() == 'true'
 
         # Quota Enforcement: Check total employee capacity (Base + Purchased Addons)
-        if hasattr(request, 'tenant') and request.tenant:
-            current_count = request.tenant.employee_count
-            if current_count >= request.tenant.total_employee_capacity:
-                return Response({
-                    'error': f'Employee quota exceeded for your {request.tenant.plan_type} plan (Limit: {request.tenant.total_employee_capacity}).',
-                    'code': 'QUOTA_EXCEEDED'
-                }, status=status.HTTP_403_FORBIDDEN)
+        if hasattr(request, 'tenant') and request.tenant and request.tenant.schema_name != 'public':
+            from tenants.models import Tenant
+            try:
+                # Refresh count from DB to avoid stale data issues
+                t = Tenant.objects.get(schema_name=request.tenant.schema_name)
+                current_count = t.employee_count
+                capacity = t.total_employee_capacity
+                if current_count >= capacity:
+                    return Response({
+                        'error': f'Employee quota exceeded for your {t.plan_type} plan (Limit: {capacity}).',
+                        'code': 'QUOTA_EXCEEDED'
+                    }, status=status.HTTP_403_FORBIDDEN)
+            except Tenant.DoesNotExist:
+                pass
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -224,6 +232,13 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
         except Exception as e:
+            # Catch quota errors regardless of exception type (Django or DRF)
+            err_msg = str(e).lower()
+            if 'quota' in err_msg and 'exceeded' in err_msg:
+                return Response({
+                    'error': str(e),
+                    'code': 'QUOTA_EXCEEDED'
+                }, status=status.HTTP_403_FORBIDDEN)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DashboardStatsAPIView(TenantIsolationMixin, views.APIView):

@@ -1,4 +1,4 @@
-from core.tests.base import HRMSTestCase as TenantTestCase
+from core.tests.base import BaseHRTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from core.models import Employee, Department, Role, Golongan
 from users.models import User
@@ -15,7 +15,6 @@ class DeepIsolationTestCase(TenantTestCase):
         self.client = APIClient()
         # Clear leftovers from other tests in the same worker
         Employee.objects.all().delete()
-        # Tenant A (self.tenant) is already setup by TenantTestCase
         
         # Create a second tenant for isolation testing
         from tenants.models import Tenant, Domain
@@ -23,6 +22,12 @@ class DeepIsolationTestCase(TenantTestCase):
             self.tenant_b = Tenant.objects.create(schema_name='tenant_b', name='Tenant B')
             Domain.objects.create(domain='tenantb.localhost', tenant=self.tenant_b, is_primary=True)
         
+        # Ensure attendance feature is enabled for both tenants to bypass permission checks
+        with schema_context('public'):
+            for t in [self.tenant, self.tenant_b]:
+                t.enabled_modules = ['attendance']
+                t.save()
+
         with schema_context(self.tenant.schema_name):
             # Setup User/Employee in Tenant A
             self.dept_a = Department.objects.create(name="A Dept")
@@ -65,18 +70,15 @@ class DeepIsolationTestCase(TenantTestCase):
             
         # 2. API level check: Ensure 404 is returned for cross-tenant IDs
         with schema_context(self.tenant.schema_name):
-            # Create a user for Tenant A (using the email of the seeded employee)
-            user_a = User.objects.create_user(email="a@test.com", password="password123")
-            user_a.tenants.add(self.tenant)
+            self.client.force_authenticate(user=self.admin_user)
             
-            self.client.force_authenticate(user=user_a)
-            
-            # Try to fetch Tenant B's leave request (ID 1 in B, but 404 in A)
+            # Try to fetch Tenant B's leave request (ID exists in B, but should be 404 in A)
             url = reverse('leaverequest-detail', kwargs={'pk': self.leave_b.id})
             response = self.client.get(url)
             
             # Should be 404 because the ID doesn't exist in Tenant A's schema
-            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND, 
+                             f"Cross-tenant ID should be 404, got {response.status_code}. Body: {response.content}")
 
     def test_schema_isolation_at_database_level(self):
         """
@@ -91,9 +93,13 @@ class DeepIsolationTestCase(TenantTestCase):
             self.assertEqual(Employee.objects.first().fullname, "User B")
             
     def tearDown(self):
-        # Cleanup Tenant B
+        # Cleanup Tenant B safely
         from django_tenants.utils import schema_context
-        with schema_context('public'):
-            if hasattr(self, 'tenant_b'):
-                self.tenant_b.delete()
+        try:
+            with schema_context('public'):
+                from tenants.models import Tenant
+                if hasattr(self, 'tenant_b') and Tenant.objects.filter(id=self.tenant_b.id).exists():
+                    self.tenant_b.delete()
+        except Exception:
+            pass
         super().tearDown()

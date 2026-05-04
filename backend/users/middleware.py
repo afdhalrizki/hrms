@@ -43,6 +43,7 @@ class TenantAccessMiddleware:
             if current_tenant and current_tenant.schema_name != 'public':
                 if not request.user.tenants.filter(id=current_tenant.id).exists():
                     # Unauthorized access attempt
+                    print(f"DEBUG: TenantAccessMiddleware FAILED - User {request.user.email} not in tenant {current_tenant.schema_name}")
                     if request.path.startswith('/api/'):
                         from django.http import JsonResponse
                         return JsonResponse({"detail": f"Akses ditolak. Anda tidak terdaftar di tenant {current_tenant.name}."}, status=403)

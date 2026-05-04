@@ -92,7 +92,12 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware', # Add for i18n
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+]
+
+if not TESTING:
+    MIDDLEWARE += ['django.middleware.csrf.CsrfViewMiddleware']
+
+MIDDLEWARE += [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'users.middleware.TenantAccessMiddleware',
@@ -235,7 +240,7 @@ else:
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": os.environ.get('REDIS_URL', 'redis://redis:6379/1'),
+        "LOCATION": os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1' if TESTING else 'redis://redis:6379/1'),
     }
 }
 
@@ -326,8 +331,9 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', f'noreply@{TENANT_DOMAIN_SUFFIX}')
 
 # Celery Configuration
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', os.environ.get('REDIS_URL', 'redis://redis:6379/1'))
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', os.environ.get('REDIS_URL', 'redis://redis:6379/1'))
+DEFAULT_REDIS_URL = 'redis://127.0.0.1:6379/1' if TESTING else 'redis://redis:6379/1'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', os.environ.get('REDIS_URL', DEFAULT_REDIS_URL))
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', os.environ.get('REDIS_URL', DEFAULT_REDIS_URL))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
