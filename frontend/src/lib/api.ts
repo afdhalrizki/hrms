@@ -24,7 +24,10 @@ export const getBaseUrl = () => {
       }
       return `https://${host}/api`;
     }
-    
+    // Default fallback
+    return `https://${host}/api`;
+  }
+  
   // SERVER-SIDE (SSR)
   // On the server, we MUST use the internal docker network name (http://backend:8000/api)
   // to avoid networking loops or firewall issues with public IPs.
