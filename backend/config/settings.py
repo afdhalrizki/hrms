@@ -45,8 +45,8 @@ if not DEBUG and not TESTING:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    # If the app is behind a proxy that handles SSL (like Nginx), you might need:
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # If the app is behind a proxy that handles SSL (like Nginx), you MUST set:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -257,10 +257,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
+    "https://harikerja.web.id",
+    "https://www.harikerja.web.id",
 ]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://.*\.localhost:300[01]$",
     r"^http://localhost:300[01]$",
+    r"^https://.*\.harikerja\.web\.id$",
+    r"^https://harikerja\.web\.id$",
+    r"^https://.*\.harikerja\.com$",
+    r"^https://harikerja\.com$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 from corsheaders.defaults import default_headers
