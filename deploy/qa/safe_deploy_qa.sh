@@ -34,7 +34,9 @@ fi
 
 # 3. Deployment Phase (Build & Up)
 echo "🏗️ Step 3: Rebuilding and starting containers..."
-docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d --build --remove-orphans
+# Use down first to clear old container IPs and Docker DNS cache
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" down --remove-orphans
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d --build
 
 # 4. Migration Phase
 echo "⚙️ Step 4: Running database migrations (Shared & Tenants)..."
