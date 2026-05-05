@@ -12,6 +12,18 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." &> /dev/null && pwd )"
 ENV_FILE="deploy/environments/.env.qa"
 
+# 0. SSH Stability Phase
+echo "🛡️ Step 0: Ensuring Terminal Stability (SSH KeepAlive)..."
+if grep -q "ClientAliveInterval 0" /etc/ssh/sshd_config; then
+    echo "🔧 Optimizing SSH settings to prevent terminal freeze..."
+    sudo sed -i 's/ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config
+    sudo sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config
+    sudo systemctl restart ssh
+    echo "✅ SSH optimized. Terminal should no longer freeze."
+else
+    echo "✅ SSH stability already configured."
+fi
+
 cd "$PROJECT_ROOT"
 
 echo "🚀 Starting Safe Deployment for HRMS QA..."
@@ -62,6 +74,7 @@ sleep 15
 
 # Check API Health following redirects (-L) and allowing insecure certs (-k)
 # We expect 200 OK after following the HTTPS redirect
+# Note: We use -s to suppress progress bar to keep terminal clean
 API_STATUS=$(curl -skL -o /dev/null -w "%{http_code}" -H "Host: harikerja.web.id" http://localhost:80/api/health/ || echo "000")
 
 if [ "$API_STATUS" -eq 200 ]; then
@@ -69,7 +82,7 @@ if [ "$API_STATUS" -eq 200 ]; then
 else
     echo "❌ Smoke Test Failed! API is not responding correctly (HTTP $API_STATUS)."
     echo "Dumping backend logs for diagnosis:"
-    docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" logs --tail=50 backend
+    docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" logs --tail=100 backend | grep -v "health"
     exit 1
 fi
 
