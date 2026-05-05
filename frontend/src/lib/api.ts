@@ -25,10 +25,10 @@ export const getBaseUrl = () => {
       return `https://${host}/api`;
     }
     
-    // Default fallback
-    return `https://${host}/api`;
-  }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  // SERVER-SIDE (SSR)
+  // On the server, we MUST use the internal docker network name (http://backend:8000/api)
+  // to avoid networking loops or firewall issues with public IPs.
+  return 'http://backend:8000/api';
 };
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
