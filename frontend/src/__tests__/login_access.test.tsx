@@ -32,6 +32,18 @@ vi.mock('next-intl', () => ({
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
 
+vi.mock('@/i18n/routing', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    refresh: mockRefresh,
+  }),
+  usePathname: vi.fn(() => '/login'),
+  Link: ({ children, href }: any) => <a href={href}>{children}</a>,
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
@@ -43,6 +55,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => ({
     get: vi.fn(),
   }),
+  usePathname: vi.fn(() => '/login'),
 }));
 
 describe('LoginPage Access Restrictions', () => {

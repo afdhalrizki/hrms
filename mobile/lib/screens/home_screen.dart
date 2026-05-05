@@ -41,12 +41,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadProfile() async {
     try {
       final api = ApiService();
-      final user = await api.getUserProfile();
+      final results = await Future.wait([
+        api.getUserProfile(),
+        api.getAttendanceRecords(),
+        api.getLeaveRequests(),
+        api.getPayslips(),
+      ]);
 
-      // Fetch data sequentially to avoid connection bottlenecks on runserver
-      final attendance = await api.getAttendanceRecords();
-      final leaves = await api.getLeaveRequests();
-      final payslips = await api.getPayslips();
+      final user = results[0] as User;
+      final attendance = results[1] as List<dynamic>;
+      final leaves = results[2] as List<dynamic>;
+      final payslips = results[3] as List<dynamic>;
 
 
       List<Activity> activities = [];

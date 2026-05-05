@@ -7,30 +7,68 @@ import { SubscriptionBanner } from './SubscriptionBanner';
 import { SuspendedOverlay } from './SuspendedOverlay';
 
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const tenant = useTenant();
   const { user, loading } = useAuth();
   const router = useRouter();
+  
+  // 1. Immediate token check to avoid flickering spinner for unauthenticated users
+  const hasToken = React.useMemo(() => {
+    if (typeof window === 'undefined') return true; // Assume true on server to avoid hydration mismatch
+    return !!localStorage.getItem('access_token');
+  }, []);
+
+  const pathname = usePathname();
+
+  const isPublicRoute = React.useMemo(() => {
+    // List of public routes from docs/technical_specs/auth_classification.md
+    // Note: '/' is only public on the landing page (public tenant)
+    const publicRoutes = ['/about', '/pricelist', '/signup', '/login', '/registration'];
+    if (tenant.isPublic) {
+      publicRoutes.push('/');
+    }
+    
+    // Check if current pathname (without locale) is in publicRoutes
+    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
+    return publicRoutes.includes(pathWithoutLocale);
+  }, [pathname, tenant.isPublic]);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('access_token');
-      // If there is no token and auth has finished loading, redirect to /login
-      if (!loading && !user && !token) {
-        router.push('/login');
-      }
-    }
-  }, [user, loading, router]);
+    // If it's a public route, don't enforce redirect
+    if (isPublicRoute) return;
 
-  if (!user && process.env.NODE_ENV !== 'test') {
-    // Return null if there is no token at all, meaning completely unauthenticated
+    // 1. Immediate redirect if no token is found in localStorage
     if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
-      return null;
+      router.push('/login');
+      return;
     }
+
+    // 2. Redirect only if auth has finished loading AND we are truly unauthenticated
+    // (no user AND no token found in localStorage)
+    if (!loading && !user && typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
+      router.push('/login');
+    }
+  }, [user, loading, router, isPublicRoute]);
+
+  // 3. If it's a protected route and we are still loading,
+  // show a minimal loading state to prevent content flicker.
+  // ONLY show spinner if we have a token (suggesting we are actually authenticating)
+  if (!isPublicRoute && loading && hasToken && process.env.NODE_ENV !== 'test') {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-muted-foreground font-medium animate-pulse">Authenticating...</p>
+      </div>
+    );
   }
 
+  // 4. If it's a protected route and we have NO token, don't render anything
+  // while we wait for the useEffect redirect to trigger.
+  if (!isPublicRoute && !hasToken) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

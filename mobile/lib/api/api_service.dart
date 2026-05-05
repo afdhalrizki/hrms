@@ -141,7 +141,12 @@ class ApiService {
         return true;
       }
     } catch (e) {
+      _log('REFRESH TOKEN EXCEPTION: $e');
     }
+    
+    // If refresh failed, clear tokens to force fresh login
+    await _storage.delete(key: 'jwt_token');
+    await _storage.delete(key: 'refresh_token');
     return false;
   }
 
@@ -156,12 +161,14 @@ class ApiService {
 
   Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');
+    await _storage.delete(key: 'refresh_token');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('tenant_subdomain');
   }
 
   // Cross-platform file downloader
   Future<List<int>> downloadFile(String endpoint, {Map<String, dynamic>? queryParams}) async {
     final tenant = await getTenant();
-    final token = await getToken();
     
     var url = "$baseUrl$endpoint";
     if (queryParams != null && queryParams.isNotEmpty) {
@@ -171,10 +178,10 @@ class ApiService {
     
     _log('STARTING DOWNLOAD: $url');
     
-    final response = await _client.get(
+    final response = await _authenticatedRequest((token) => _client.get(
       Uri.parse(url),
       headers: _headers(tenant, token),
-    );
+    ));
 
     if (response.statusCode == 200) {
       _log('File Downloaded successfully: ${response.bodyBytes.length} bytes');
@@ -261,6 +268,9 @@ class ApiService {
         token = await getToken();
         response = await requestBuilder(token);
         _log('REFRESHED REQUEST RESPONSE: ${response.statusCode}');
+      } else {
+        // Refresh failed, response remains 401
+        _log('TOKEN REFRESH FAILED');
       }
     }
     

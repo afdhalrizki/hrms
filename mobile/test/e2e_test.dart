@@ -105,13 +105,15 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      if (find.textContaining('Welcome', skipOffstage: false).evaluate().isEmpty) {
-        await safeEnterText(tester, find.widgetWithText(TextField, 'e.g. company1', skipOffstage: false), tenant);
-        await safeEnterText(tester, find.widgetWithText(TextField, 'name@company.com', skipOffstage: false), email);
-        await safeEnterText(tester, find.widgetWithText(TextField, '••••••••', skipOffstage: false), password);
+      // Only login if we are actually on the login screen
+      if (find.text('Sign In', skipOffstage: false).evaluate().isNotEmpty) {
+        await safeEnterText(tester, find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == 'e.g. company1'), tenant);
+        await safeEnterText(tester, find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == 'name@company.com'), email);
+        await safeEnterText(tester, find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == '••••••••'), password);
+        
         await safeTap(tester, find.text('Sign In', skipOffstage: false));
         await waitFor(tester, find.textContaining('Welcome', skipOffstage: false), message: 'Dashboard');
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(seconds: 1));
       }
     }
 

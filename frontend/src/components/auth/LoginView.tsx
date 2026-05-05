@@ -6,7 +6,7 @@ import { Mail, Lock, Briefcase, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 
 export interface LoginViewProps {

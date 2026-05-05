@@ -4,7 +4,7 @@ import React from 'react';
 import Home from '@/app/[locale]/page';
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 
 // Mock dependencies
 vi.mock('@/context/AuthContext', () => ({
@@ -15,10 +15,16 @@ vi.mock('@/context/TenantContext', () => ({
   useTenant: vi.fn(),
 }));
 
+vi.mock('@/i18n/routing', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(() => '/'),
+  Link: ({ children, href }: any) => <a href={href}>{children}</a>,
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
-  usePathname: () => '/',
-  useSearchParams: () => new URLSearchParams(),
+  usePathname: vi.fn(() => '/'),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
 }));
 
 vi.mock('@/components/layout/DashboardLayout', () => ({

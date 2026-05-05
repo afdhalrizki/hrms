@@ -88,29 +88,28 @@ def main():
     for schema in schemas:
         setup_tenant(schema, schema.capitalize())
 
-    print(f"--- Seeding Data (Parallel if workers > 0) ---")
-    
-    # Define tasks
-    tasks = [
+    # 1. Seed critical test tenants serially to ensure data integrity
+    print("--- Seeding Critical Tenants (Serial) ---")
+    critical_tasks = [
         ('company1', args.preset),
         ('company2', 'minimal'),
     ]
-    for i in range(args.workers):
-        tasks.append((f'worker_{i}', args.preset))
+    for s, p in critical_tasks:
+        seed_worker_data(s, p)
 
+    # 2. Seed generic workers in parallel if requested
     if args.workers > 0:
-        with ProcessPoolExecutor(max_workers=min(args.workers + 2, 8)) as executor:
-            futures = [executor.submit(seed_worker_data, s, p) for s, p in tasks]
+        print(f"--- Seeding Workers (Parallel: {args.workers}) ---")
+        worker_tasks = [(f'worker_{i}', args.preset) for i in range(args.workers)]
+        
+        with ProcessPoolExecutor(max_workers=min(args.workers, 8)) as executor:
+            futures = [executor.submit(seed_worker_data, s, p) for s, p in worker_tasks]
             for future in as_completed(futures):
                 try:
                     name = future.result()
                     print(f"      ✅ Finished seeding {name}")
                 except Exception as e:
                     print(f"      ❌ Seeding failed: {e}")
-    else:
-        # Serial seeding for 0 workers
-        for s, p in tasks:
-            seed_worker_data(s, p)
 
     print("\n--- Seeding Completed Successfully ---")
 

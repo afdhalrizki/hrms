@@ -94,7 +94,7 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     // Handle Token Refresh (401 Unauthorized)
-    if (response.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/token/refresh')) {
+    if (response.status === 401 && !url.includes('/auth/login')) {
       const refreshToken = localStorage.getItem('refresh_token');
       if (refreshToken && !url.includes('/auth/token/refresh')) {
         try {
@@ -122,8 +122,14 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
             localStorage.removeItem('refresh_token');
           }
         } catch (refreshError) {
-          // Token refresh failed, likely expired or invalid
+          // Token refresh failed, clear anyway to be safe
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
         }
+      } else {
+        // No refresh token available, clear access token as it's clearly invalid
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
       }
     }
 

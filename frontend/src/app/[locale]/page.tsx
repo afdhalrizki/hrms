@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import { 
   Users, 

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 
 // Mock dependencies
 vi.mock('@/context/AuthContext', () => ({
@@ -18,10 +18,16 @@ vi.mock('@/context/TenantContext', () => ({
   })),
 }));
 
+vi.mock('@/i18n/routing', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(() => '/'),
+  Link: ({ children, href }: any) => <a href={href}>{children}</a>,
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
-  usePathname: () => '/',
-  useSearchParams: () => new URLSearchParams(),
+  usePathname: vi.fn(() => '/'),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
 }));
 
 vi.mock('@/components/layout/Sidebar', () => ({
