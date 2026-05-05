@@ -29,6 +29,9 @@ export const getBaseUrl = () => {
   }
   
   // SERVER-SIDE (SSR)
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
   // On the server, we MUST use the internal docker network name (http://backend:8000/api)
   // to avoid networking loops or firewall issues with public IPs.
   return 'http://backend:8000/api';

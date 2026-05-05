@@ -18,7 +18,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const hasToken = React.useMemo(() => {
     if (typeof window === 'undefined') return true; // Assume true on server to avoid hydration mismatch
     return !!localStorage.getItem('access_token');
-  }, []);
+  }, [loading]);
 
   const pathname = usePathname();
 
@@ -31,7 +31,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
     
     // Check if current pathname (without locale) is in publicRoutes
-    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
+    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/').toLowerCase();
     return publicRoutes.includes(pathWithoutLocale);
   }, [pathname, tenant.isPublic]);
 
