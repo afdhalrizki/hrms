@@ -72,10 +72,12 @@ echo "🔍 Step 6: Running Smoke Test (Health Check)..."
 echo "Waiting for services to settle (15s)..."
 sleep 15
 
-# Check API Health following redirects (-L) and allowing insecure certs (-k)
-# We expect 200 OK after following the HTTPS redirect
-# Note: We use -s to suppress progress bar to keep terminal clean
-API_STATUS=$(curl -skL -o /dev/null -w "%{http_code}" -H "Host: harikerja.web.id" http://localhost:80/api/health/ || echo "000")
+# Check API Health telling Nginx/Backend we are already on HTTPS to avoid redirects
+# We hit localhost:80 but pretend we are on the official domain with HTTPS
+API_STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
+  -H "Host: harikerja.web.id" \
+  -H "X-Forwarded-Proto: https" \
+  http://localhost:80/api/health/ || echo "000")
 
 if [ "$API_STATUS" -eq 200 ]; then
     echo "✅ Smoke Test Passed! API is responding (HTTP $API_STATUS)."
