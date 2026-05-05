@@ -55,17 +55,19 @@ docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T
 
 # 6. Smoke Test Phase
 echo "🔍 Step 6: Running Smoke Test (Health Check)..."
-echo "Waiting for services to settle (10s)..."
-sleep 10
+echo "Waiting for services to settle (15s)..."
+sleep 15
 
-# Check API Health via Nginx on port 80
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Host: harikerja.web.id" http://localhost:80/api/health/ || echo "000")
+# Check API Health following redirects (-L) and allowing insecure certs (-k)
+# We expect 200 OK after following the HTTPS redirect
+API_STATUS=$(curl -skL -o /dev/null -w "%{http_code}" -H "Host: harikerja.web.id" http://localhost:80/api/health/ || echo "000")
 
-if [ "$API_STATUS" -eq 200 ] || [ "$API_STATUS" -eq 301 ] || [ "$API_STATUS" -eq 302 ]; then
+if [ "$API_STATUS" -eq 200 ]; then
     echo "✅ Smoke Test Passed! API is responding (HTTP $API_STATUS)."
 else
     echo "❌ Smoke Test Failed! API is not responding correctly (HTTP $API_STATUS)."
-    echo "Check logs using: docker compose -f deploy/qa/docker-compose.qa.yml --env-file $ENV_FILE logs backend"
+    echo "Dumping backend logs for diagnosis:"
+    docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" logs --tail=50 backend
     exit 1
 fi
 
