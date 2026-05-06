@@ -5,11 +5,10 @@ This document provides a comprehensive overview of automation within the hariker
 ---
 
 ## 1. DevOps & Environment Orchestration
-The project uses a dual-script system to ensure cross-platform compatibility for all developers.
+The project uses a unified script system to ensure cross-platform compatibility for all developers.
 
 ### Orchestration Philosophy
-- **`*.mjs` (JavaScript/Node.js)**: The **Source of Truth**. Designed for Linux, macOS, and Windows.
-- **`*.ps1` (PowerShell)**: Synchronized version for Windows native environments, maintaining feature parity.
+- **`*.mjs` (JavaScript/Node.js)**: The **Source of Truth**. A unified script system designed for Linux, macOS, and Windows to ensure consistency across all environments.
 
 ### Key Automated Tasks
 - **Smart Dependency Checking**: Uses `.venv_requirements.hash` to skip redundant `pip install` or `npm install`.

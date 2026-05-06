@@ -5,11 +5,10 @@ Dokumen ini memberikan tinjauan komprehensif tentang otomatisasi dalam harikerja
 ---
 
 ## 1. Orkestrasi DevOps & Lingkungan
-Proyek ini menggunakan sistem skrip ganda untuk memastikan kompatibilitas lintas platform bagi semua pengembang.
+Proyek ini menggunakan sistem skrip terpadu untuk memastikan kompatibilitas lintas platform bagi semua pengembang.
 
 ### Filosofi Orkestrasi
-- **`*.mjs` (JavaScript/Node.js)**: **Sumber Kebenaran** (Source of Truth). Dirancang untuk Linux, macOS, dan Windows.
-- **`*.ps1` (PowerShell)**: Versi yang disinkronkan untuk lingkungan asli Windows, menjaga paritas fitur.
+- **`*.mjs` (JavaScript/Node.js)**: **Sumber Kebenaran** (Source of Truth). Sistem skrip terpadu yang dirancang untuk Linux, macOS, dan Windows untuk memastikan konsistensi di seluruh lingkungan.
 
 ### Tugas Otomatis Utama
 - **Pemeriksaan Dependensi Cerdas**: Menggunakan `.venv_requirements.hash` untuk melewatkan `pip install` atau `npm install` yang redundan.
