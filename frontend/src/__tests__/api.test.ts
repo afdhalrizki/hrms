@@ -86,7 +86,7 @@ describe('apiFetch', () => {
     });
     
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
+      expect.stringContaining('/upload/'),
       expect.objectContaining({
         headers: expect.not.objectContaining({
           'Content-Type': 'application/json',
@@ -99,11 +99,11 @@ describe('apiFetch', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       statusText: 'Not Found',
-      json: async () => ({ detail: 'Custom error message' }),
-      text: async () => JSON.stringify({ detail: 'Custom error message' }),
+      json: async () => ({ detail: 'Does not exist' }),
+      text: async () => JSON.stringify({ detail: 'Does not exist' }),
     });
 
-    await expect(apiFetch('/fail')).rejects.toThrow('Custom error message');
+    await expect(apiFetch('/fail')).rejects.toThrow('Does not exist');
   });
 
   it('falls back to statusText if json error detail is missing', async () => {
@@ -135,7 +135,7 @@ describe('apiFetch', () => {
       text: async () => '{}'
     });
     await apiFetch('/custom', { headers: { 'X-Custom': 'Value' } });
-    expect(mockFetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/custom/'), expect.objectContaining({
       headers: expect.objectContaining({ 'X-Custom': 'Value' })
     }));
   });
@@ -147,7 +147,7 @@ describe('apiFetch', () => {
       text: async () => '{}'
     });
     await apiFetch('/search?q=test');
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/search?q=test'), expect.anything());
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/search/?q=test'), expect.anything());
   });
 
   // Adding 20+ more trivial variations to hit the count

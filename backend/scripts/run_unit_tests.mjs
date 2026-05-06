@@ -24,8 +24,8 @@ async function main() {
   const dockerOnly = args.includes('--docker-only');
   const resetDocker = args.includes('--reset-docker');
   const skipDocker = args.includes('--skip-docker');
-  const pytestArgs = args.filter(
-    (a) => !['--docker-only', '--reset-docker', '--skip-docker'].includes(a),
+  let pytestArgs = args.filter(
+    (a) => !['--docker-only', '--reset-docker', '--skip-docker', '--no-start'].includes(a),
   );
 
   log('--- HRMS Backend Test Environment Setup (Node.js) ---', COLORS.cyan);
@@ -140,6 +140,7 @@ async function main() {
     process.env.DATABASE_URL =
       'postgres://hrms_user:hrms_password@localhost:5433/hrms';
   }
+  process.env.DB_NAME = 'hrms';
 
   const dbPort = parseInt(process.env.DB_PORT) || 5433;
   log(
@@ -151,9 +152,56 @@ async function main() {
     log(`\n❌ ERROR: Database port ${dbPort} did not become ready in time.`, COLORS.red);
     process.exit(1);
   }
-  log(`Database is ready on port ${dbPort}!`, COLORS.green);
+  if (resetDocker) {
+    log('[Docker] Forcefully cleaning up stale test databases...', COLORS.gray);
+    try {
+      const { execSync } = await import('node:child_process');
+      // Kill any lingering python/pytest processes
+      try { execSync('pkill -f python || true'); } catch(e) {}
+      
+      const PGPASS = 'PGPASSWORD=hrms_password';
+      const DB_CMD = `psql -h localhost -p ${dbPort} -U hrms_user -d postgres`;
 
-  // 4. Pytest detection
+      // Kill connections and drop all test databases (main and workers)
+      try {
+        const getDatabasesSql = "SELECT datname FROM pg_database WHERE datname LIKE 'test_hrms%'";
+        const dbsOutput = execSync(`${PGPASS} ${DB_CMD} -t -c "${getDatabasesSql}"`).toString().trim();
+        const dbs = dbsOutput.split(/\r?\n/).map(d => d.trim()).filter(d => d.length > 0);
+        
+        for (const db of dbs) {
+          log(`   🧹 Dropping test database: ${db}`, COLORS.gray);
+          try {
+            execSync(`${PGPASS} ${DB_CMD} -c "REVOKE CONNECT ON DATABASE ${db} FROM public" || true`);
+            execSync(`${PGPASS} ${DB_CMD} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${db}' AND pid <> pg_backend_pid()" || true`);
+            execSync(`${PGPASS} dropdb -h localhost -p ${dbPort} -U hrms_user ${db} || true`);
+          } catch (e) {
+            log(`      ⚠️ Failed to drop ${db}: ${e.message}`, COLORS.gray);
+          }
+        }
+      } catch (e) {
+        log(`   ⚠️ Warning during DB cleanup: ${e.message}`, COLORS.gray);
+      }
+    } catch (e) {}
+  }
+
+  // Restore parallel execution for speed, now that DB infra is stable.
+  const nWorkers = process.env.PYTEST_WORKERS || '4';
+  if (!pytestArgs.some(a => a === '-n' || a.startsWith('-n'))) {
+    log(`Parallel execution enabled with ${nWorkers} workers.`, COLORS.gray);
+    pytestArgs.unshift('-n', nWorkers);
+  }
+ 
+  // Intelligently set --reuse-db
+  // If we just reset docker, we want a fresh creation (no --reuse-db)
+  // Otherwise, we MUST use --reuse-db to avoid "Database already exists" errors
+  if (resetDocker) {
+    pytestArgs = pytestArgs.filter(a => a !== '--reuse-db');
+  } else {
+    if (!pytestArgs.includes('--reuse-db')) {
+      pytestArgs.push('--reuse-db');
+    }
+  }
+  const finalArgs = pytestArgs;
   log('[3/3] Checking pytest and python path...', COLORS.yellow);
   const venvPath = getPythonExec(BackendDir);
   const systemPython = process.platform === 'win32' ? 'python' : 'python3';
@@ -207,11 +255,7 @@ async function main() {
     .replace('T', '_');
   const logFile = join(logDir, `unit_test_${timestamp}.log`);
 
-  // Auto-enable parallel execution if not specified
-  if (!pytestArgs.some(a => a === '-n' || a.startsWith('-n'))) {
-    log('Parallel execution enabled by default (-n auto).', COLORS.gray);
-    pytestArgs.unshift('-n', 'auto');
-  }
+
 
   const exitCode = await spawnStream(
     pythonPath,
@@ -220,7 +264,7 @@ async function main() {
       'pytest',
       '--color=yes',
       '--durations=20',
-      ...pytestArgs,
+      ...finalArgs,
     ],
     {
       cwd: BackendDir,

@@ -3,28 +3,29 @@
 This document provides a comprehensive overview of the available subscription plans within the HRMS platform. Each plan is designed to cater to different business scales and operational requirements, with specific module gating and resource quotas.
 
 ## 1. Plan Overview
-The system offers four distinct tiers to support organizations from startups to large enterprises:
+The system offers five distinct tiers to support organizations from startups to large enterprises:
 
-1.  **ESSENTIAL HR**: Entry-level package for basic digitalization of employee records and attendance.
-2.  **PROFESSIONAL**: Growth-oriented package including automated payroll and reimbursement management.
-3.  **PREMIUM**: Comprehensive package with performance management and KPI tracking features.
-4.  **ENTERPRISE**: Ultimate package providing advanced analytics, multi-shift scheduling, and complete audit trails.
+1.  **FREE**: Entry-level package for micro-SMEs and startups.
+2.  **ESSENTIAL**: Standard package for small businesses needing attendance and leaf management.
+3.  **PROFESSIONAL**: Growth-oriented package including Indonesian Payroll (PPh 21/BPJS) and reimbursements.
+4.  **PREMIUM**: High-growth package with performance management and KPI tracking.
+5.  **ENTERPRISE**: Ultimate package providing full suite access, advanced analytics, and dedicated SLA.
 
 ## 2. Feature & Quota Comparison Matrix
 
-| Feature / Benefit | **ESSENTIAL HR** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
-| :--- | :--- | :--- | :--- | :--- |
-| **Pricing (IDR)** | **Rp 250.000 /mo** | **Rp 750.000 /mo** | **Rp 1.500.000 /mo** | **Contact Us** |
-| **Billing Cycle** | Annual Only | Monthly/Annual | Monthly/Annual | Custom |
-| **Employee Limit** | 50 | 500 | 2,000 | 10,000+ |
-| **Storage Limit** | **100 MB** | **2 GB** | **5 GB** | **20 GB** |
-| **Employee Data (Core)** | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
-| **Attendance** | ✅ Basic (Check-in/out) | ✅ Geofencing & Photo | ✅ Attendance Correction | ✅ Advanced (Shift & Roster) |
-| **Leave & Permits** | ✅ Single-stage | ✅ Multi-stage | ✅ Multi-stage | ✅ Multi-stage |
-| **Payroll** | ❌ Not Available | ✅ PPh 21 & BPJS | ✅ Bonus & Loans | ✅ Payroll Analytics |
-| **Reimbursement** | ❌ Not Available | ✅ Standard | ✅ Approval Workflow | ✅ Advanced Tracking |
-| **Performance** | ❌ Not Available | ❌ Not Available | ✅ KPI & Review | ✅ Analytics & Coaching |
-| **Security & Auditing** | ❌ Not Available | ❌ Not Available | ✅ Role-based Access | ✅ Audit Trail & Syslog |
+| Feature / Benefit | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Pricing (IDR)** | **Rp 0** | **Rp 250,000 /mo** | **Rp 750,000 /mo** | **Rp 1,500,000 /mo** | **Contact Us** |
+| **Billing Cycle** | N/A | Annual Only | Monthly/Annual | Monthly/Annual | Custom |
+| **Employee Limit** | 10 | 50 | 100 | 500 | 2,000+ |
+| **Storage Limit** | **50 MB** | **250 MB** | **1 GB** | **5 GB** | **20 GB+** |
+| **Employee Data (Core)** | ✅ Basic | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
+| **Attendance** | ✅ Basic | ✅ Geofencing | ✅ Geofencing & Photo | ✅ Correction | ✅ Advanced (Shift) |
+| **Leave & Permits** | ❌ Not Available | ✅ Standard | ✅ Multi-stage | ✅ Multi-stage | ✅ Multi-stage |
+| **Payroll** | ❌ Not Available | ❌ Not Available | ✅ PPh 21 & BPJS | ✅ Bonus & Loans | ✅ Payroll Analytics |
+| **Reimbursement** | ❌ Not Available | ❌ Not Available | ✅ Standard | ✅ Approval Workflow | ✅ Advanced Tracking |
+| **Performance** | ❌ Not Available | ❌ Not Available | ❌ Not Available | ✅ KPI & Review | ✅ Analytics & Coaching |
+| **Security & Auditing** | ❌ Not Available | ❌ Not Available | ❌ Not Available | ✅ Advanced RBAC | ✅ Audit Trail |
 
 ---
 
@@ -32,9 +33,10 @@ The system offers four distinct tiers to support organizations from startups to 
 
 Feature access is enforced through the system's modular gating engine. Enabling a plan automatically provisions the following module sets:
 
-*   **ESSENTIAL:** `['core', 'attendance']`
-*   **PROFESSIONAL:** `['core', 'attendance', 'payroll', 'reimbursement']`
-*   **PREMIUM:** `['core', 'attendance', 'payroll', 'reimbursement', 'performance']`
+*   **FREE:** `['core', 'attendance_basic']`
+*   **ESSENTIAL:** `['core', 'attendance', 'leaves']`
+*   **PROFESSIONAL:** `['core', 'attendance', 'leaves', 'payroll', 'reimbursement']`
+*   **PREMIUM:** `['core', 'attendance', 'leaves', 'payroll', 'reimbursement', 'performance', 'rbac']`
 *   **ENTERPRISE:** Access to all core modules, including `analytics` and `audit`.
 
 ## 4. Storage & Data Isolation

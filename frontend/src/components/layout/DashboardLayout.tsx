@@ -16,9 +16,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   
   // 1. Immediate token check to avoid flickering spinner for unauthenticated users
   const hasToken = React.useMemo(() => {
-    if (typeof window === 'undefined') return true; // Assume true on server to avoid hydration mismatch
+    if (typeof window === 'undefined') return true; 
     return !!localStorage.getItem('access_token');
-  }, [loading]);
+  }, []); // Remove loading dependency to stabilize
 
   const pathname = usePathname();
 
@@ -30,9 +30,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       publicRoutes.push('/');
     }
     
-    // Check if current pathname (without locale) is in publicRoutes
-    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/').toLowerCase();
-    return publicRoutes.includes(pathWithoutLocale);
+    // Normalize pathname: remove locale prefix, trailing slash, and lowercase
+    // usePathname() from next-intl already removes locale, but we handle it just in case
+    const pathWithoutLocale = pathname
+      .replace(/^\/(en|id)(\/|$)/, '/')
+      .replace(/\/$/, '') || '/';
+    
+    const normalizedPath = pathWithoutLocale.toLowerCase();
+    
+    return publicRoutes.includes(normalizedPath) || normalizedPath === '/login';
   }, [pathname, tenant.isPublic]);
 
   React.useEffect(() => {
@@ -46,7 +52,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
 
     // 2. Redirect only if auth has finished loading AND we are truly unauthenticated
-    // (no user AND no token found in localStorage)
     if (!loading && !user && typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
       router.push('/login');
     }
@@ -54,7 +59,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   // 3. If it's a protected route and we are still loading,
   // show a minimal loading state to prevent content flicker.
-  // ONLY show spinner if we have a token (suggesting we are actually authenticating)
+  // CRITICAL: NEVER show spinner on public routes like /login
   if (!isPublicRoute && loading && hasToken && process.env.NODE_ENV !== 'test') {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">

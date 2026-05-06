@@ -40,9 +40,9 @@ export const getBaseUrl = () => {
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const baseUrl = getBaseUrl();
   // Ensure trailing slash for Django compatibility (if no query string)
-  const normalizedEndpoint = endpoint.includes('?') 
-    ? endpoint 
-    : (endpoint.endsWith('/') ? endpoint : `${endpoint}/`);
+  const [pathPart, queryPart] = endpoint.split('?');
+  const normalizedPath = pathPart.endsWith('/') ? pathPart : `${pathPart}/`;
+  const normalizedEndpoint = queryPart ? `${normalizedPath}?${queryPart}` : normalizedPath;
   const url = `${baseUrl}${normalizedEndpoint.startsWith('/') ? '' : '/'}${normalizedEndpoint}`;
   
   const isFormData = options.body instanceof FormData;
@@ -77,8 +77,9 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     const hostname = window.location.hostname;
     const searchParams = new URLSearchParams(window.location.search);
     const urlTenant = searchParams.get('test_tenant');
-    const storageTenant = sessionStorage.getItem('test_tenant_e2e');
-    const testTenant = urlTenant || storageTenant;
+    const storageTenant = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('test_tenant_e2e') : null;
+    const cookieTenant = getCookie('test_tenant_e2e');
+    const testTenant = urlTenant || storageTenant || cookieTenant;
     
     const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || 
                     hostname.endsWith('.localhost') || hostname.endsWith('.127.0.0.1');
@@ -92,94 +93,105 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     }
   }
 
-  try {
-    let response = await fetch(url, { 
-      ...options, 
-      headers,
-      credentials: options.credentials || 'include'
-    });
+  let response: Response | undefined;
+  let retryCount = 0;
+  const maxRetries = (process.env.NEXT_PUBLIC_E2E_LOGGING === 'true' || typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 3 : 0;
 
-    // Handle Token Refresh (401 Unauthorized)
-    if (response.status === 401 && !url.includes('/auth/login')) {
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (refreshToken && !url.includes('/auth/token/refresh')) {
-        try {
-          const refreshUrl = `${baseUrl}/auth/token/refresh/`;
-          const refreshResponse = await fetch(refreshUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh: refreshToken }),
-          });
+  while (retryCount <= maxRetries) {
+    try {
+      response = await fetch(url, { 
+        ...options, 
+        headers,
+        credentials: options.credentials || 'include'
+      });
 
-          if (refreshResponse.ok) {
-            const refreshData = await refreshResponse.json();
-            localStorage.setItem('access_token', refreshData.access);
-            
-            // Retry original request with new token
-            headers['Authorization'] = `Bearer ${refreshData.access}`;
-            response = await fetch(url, { 
-              ...options, 
-              headers,
-              credentials: options.credentials || 'include'
+      // Handle Token Refresh (401 Unauthorized)
+      if (response.status === 401 && !url.includes('/auth/login')) {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken && !url.includes('/auth/token/refresh')) {
+          try {
+            const refreshUrl = `${baseUrl}/auth/token/refresh/`;
+            const refreshResponse = await fetch(refreshUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refresh: refreshToken }),
             });
-          } else {
-            // Refresh failed, clear tokens
+
+            if (refreshResponse.ok) {
+              const refreshData = await refreshResponse.json();
+              localStorage.setItem('access_token', refreshData.access);
+              
+              // Retry original request with new token
+              headers['Authorization'] = `Bearer ${refreshData.access}`;
+              response = await fetch(url, { 
+                ...options, 
+                headers,
+                credentials: options.credentials || 'include'
+              });
+            } else {
+              localStorage.removeItem('access_token');
+              localStorage.removeItem('refresh_token');
+            }
+          } catch (e) {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
           }
-        } catch (refreshError) {
-          // Token refresh failed, clear anyway to be safe
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
         }
-      } else {
-        // No refresh token available, clear access token as it's clearly invalid
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
       }
-    }
 
-    if (!response.ok) {
-      const text = await response.text().catch(() => '');
-      let detail = `API Error: ${response.statusText}`;
-      try {
-        if (text) {
-          const json = JSON.parse(text);
-          if (json.detail) {
-            detail = json.detail;
-          } else {
-            // DRF Validation error dict
-            detail = Object.entries(json)
-              .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
-              .join(' | ');
-          }
+      // Retry on 404 (Tenant resolution race) or 502 (Backend restart/overload)
+      if (maxRetries > 0 && (response.status === 404 || response.status === 502) && retryCount < maxRetries) {
+        console.warn(`[API] Received ${response.status} for ${url}. Retrying (${retryCount + 1}/${maxRetries})...`);
+        retryCount++;
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+        continue;
+      }
+      break;
+    } catch (err: any) {
+      if (maxRetries > 0 && retryCount < maxRetries && err.name !== 'AbortError') {
+        console.warn(`[API] Fetch error for ${url}: ${err.message}. Retrying (${retryCount + 1}/${maxRetries})...`);
+        retryCount++;
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  if (!response || !response.ok) {
+    const text = response ? await response.text().catch(() => '') : '';
+    let detail = response ? `API Error: ${response.statusText}` : 'API Fetch Failed (No Response)';
+    try {
+      if (text) {
+        const json = JSON.parse(text);
+        if (json.detail) {
+          detail = json.detail;
+        } else {
+          detail = Object.entries(json)
+            .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+            .join(' | ');
         }
-      } catch (e) {}
-      if (process.env.NODE_ENV === 'test') {
-        console.log(`[API] Error from ${url}: ${response.status} - Body: ${text}`);
       }
-      throw new Error(detail);
+    } catch (e) {}
+    if (process.env.NEXT_PUBLIC_E2E_LOGGING === 'true') {
+       console.error(`[API ERROR] ${options.method || 'GET'} ${url} - Status: ${response?.status} - Detail: ${detail}`);
     }
+    throw new Error(detail);
+  }
 
-    if (response.status === 204) {
-      return null as any;
-    }
-
-    const text = await response.text();
-    if (!response.ok && process.env.NODE_ENV === 'test') {
-       console.log(`[API] Error from ${url}: ${response.status} - Body: ${text}`);
-    }
-    if (!text) {
-      return null as any;
-    }
+  if (response.status === 204) return null;
+  const text = await response.text();
+  if (!text) return null;
+  
+  try {
     const data = JSON.parse(text);
     if (process.env.NODE_ENV === 'test') {
-       const display = Array.isArray(data) ? (data.length === 1 ? JSON.stringify(data[0]) : data.length + ' items') : 'Object';
-       console.log(`[API] Response from ${url}: ${display}`);
+       const display = Array.isArray(data) ? `${data.length} items` : 'Object';
+       console.log(`[API] Success from ${url}: ${display}`);
     }
     return data;
-  } catch (error) {
-    throw error;
+  } catch (e) {
+    return text;
   }
 };
 

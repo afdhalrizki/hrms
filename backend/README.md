@@ -14,12 +14,12 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
 - [x] **ESS Profile Management**: Restricted self-service API allowing employees to update personal contact info and upload KTP/NPWP documents without compromising HR master data.
 - [x] **SaaS Tiering & Gating**: Model-level logic for plan-based feature enabling (Essential, Professional, Premium, Enterprise).
   
-  | Feature | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
-  | :--- | :---: | :---: | :---: | :---: |
-  | **Quota** | 50 Emp | 500 Emp | 2,000 Emp | 10,000+ |
-  | **Payroll** | ❌ | ✅ | ✅ | ✅ |
-  | **Performance**| ❌ | ❌ | ✅ | ✅ |
-  | **Analytics** | ❌ | ❌ | ❌ | ✅ |
+  | Feature | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
+  | :--- | :---: | :---: | :---: | :---: | :---: |
+  | **Quota** | 10 Emp | 50 Emp | 100 Emp | 500 Emp | 2,000+ |
+  | **Payroll** | ❌ | ❌ | ✅ | ✅ | ✅ |
+  | **Performance**| ❌ | ❌ | ❌ | ✅ | ✅ |
+  | **Analytics** | ❌ | ❌ | ❌ | ❌ | ✅ |
 - [x] **Cloud-Native Storage**: Ready for Amazon S3 or AWS-compatible storage via `django-storages` for multi-node scalability.
 
 ## 📁 Core Modules

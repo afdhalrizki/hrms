@@ -26,7 +26,7 @@ function getFileHash(path) {
 }
 
 async function ensureBackendStarted(noStart) {
-  if (await waitForHttp('http://localhost:8000/api/', 5000, 'backend')) {
+  if (await waitForHttp('http://localhost:8000/api/', 60000, 'backend')) {
     return true;
   }
 

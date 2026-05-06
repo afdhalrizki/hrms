@@ -37,13 +37,20 @@ from seeds.performance import seed_performance_data
 
 def clean_slate():
     """Nuclear cleanup using TRUNCATE CASCADE."""
-    from django.db import connection
+    from django.db import connection, transaction
     with connection.cursor() as cursor:
         print("   🧹 Cleaning up existing tenants and users...")
         cursor.execute("TRUNCATE TABLE tenants_tenant CASCADE;")
         cursor.execute("TRUNCATE TABLE tenants_registrationrequest CASCADE;")
         cursor.execute("TRUNCATE TABLE users_user CASCADE;")
-        cursor.execute("ALTER SEQUENCE users_user_id_seq RESTART WITH 1;")
+        
+        # Reset sequences to ensure deterministic IDs for many-to-many and FKs
+        cursor.execute("ALTER SEQUENCE IF EXISTS tenants_tenant_id_seq RESTART WITH 1;")
+        cursor.execute("ALTER SEQUENCE IF EXISTS users_user_id_seq RESTART WITH 1;")
+        
+        if not connection.get_autocommit():
+            transaction.commit()
+            
         print("   ✅ Cleanup finished.")
 
 def seed_worker_data(schema_name, preset):

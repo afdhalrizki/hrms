@@ -132,7 +132,7 @@ export async function login(page: Page, email: string, password = 'password123',
   // 0. Preliminary Backend Reachability Check (Fail Fast)
   try {
     const backendUrl = 'http://localhost:8000/api/';
-    const response = await page.request.get(backendUrl, { timeout: 5000 });
+    const response = await page.request.get(backendUrl, { timeout: 15000 });
     if (!response.ok() && response.status() >= 500) {
       throw new Error(`Backend at ${backendUrl} returned status ${response.status()}`);
     }

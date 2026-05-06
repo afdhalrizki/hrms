@@ -49,16 +49,19 @@ export default function WorkflowsPage() {
   };
 
   const fetchSupportData = async () => {
+    // Fetch roles and employees separately so one failure doesn't block the other
     try {
-      const [rData, eData] = await Promise.all([
-        apiFetch('/access-roles'),
-        apiFetch('/employees?lite=true')
-      ]);
+      const rData = await apiFetch('/access-roles');
       setRoles(rData);
+    } catch (err) {
+      console.error('Failed to fetch roles:', err);
+    }
+
+    try {
+      const eData = await apiFetch('/employees?lite=true');
       setEmployees(eData);
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to fetch support data for workflows');
+      console.error('Failed to fetch employees:', err);
     }
   };
 

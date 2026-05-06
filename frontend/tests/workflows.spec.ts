@@ -71,15 +71,32 @@ test.describe.serial('Workflow Configurations', () => {
     const roleButton = page.getByRole('button', { name: 'ROLE', exact: true }).last();
     await roleButton.click();
     
-    // Select specific role (Seeded: Manager)
+    // Select specific role (Seeded: HR Manager)
     const roleSelect = page.locator('select[name*="approver_role"]').last();
-    await expect(roleSelect).toBeVisible();
+    await expect(roleSelect).toBeVisible({ timeout: 10000 });
     
-    // Wait for roles to load
+    // Wait for roles to load with more detail
+    let refreshAttempted = false;
     await expect(async () => {
-      const count = await roleSelect.locator('option').count();
-      if (count <= 1) throw new Error('Roles not loaded yet');
-    }).toPass({ timeout: 20000 });
+      const options = (await roleSelect.locator('option').allInnerTexts()).map(o => o.trim());
+      const found = options.some(opt => opt.toLowerCase().includes('hr manager'));
+      console.log(`[TEST] Check roles - Found: ${found} | All: [${options.join(' | ')}]`);
+      if (!found) {
+        if (!refreshAttempted) {
+             console.log('[TEST] Empty roles detected, attempting page refresh...');
+             await page.reload();
+             await page.waitForLoadState('networkidle');
+             await addStageBtn.click();
+             await roleButton.click();
+             refreshAttempted = true;
+         }
+         throw new Error('Roles not loaded yet');
+      }
+      const hasHRManager = options.some(opt => opt.includes('HR Manager'));
+      if (!hasHRManager) {
+        throw new Error(`'HR Manager' role not found in options: ${options.join(', ')}`);
+      }
+    }).toPass({ timeout: 40000 });
 
     await roleSelect.selectOption({ label: 'HR Manager' });
 

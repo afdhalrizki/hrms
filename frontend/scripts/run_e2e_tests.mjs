@@ -128,7 +128,7 @@ function printE2ESummary(jsonPath) {
 async function main() {
   const args = process.argv.slice(2);
   const skipInstall = args.includes('--skip-install');
-  const skipSeed = args.includes('--skip-seed');
+  const skipSeed = args.includes('--skip-seed') || process.env.NO_RESEED === 'true';
   const live = args.includes('--live');
   const workersArg = args.find(a => a.startsWith('--workers='));
   const numWorkers = workersArg ? parseInt(workersArg.split('=')[1]) : 2;
@@ -230,6 +230,10 @@ async function main() {
     // OR if we want to be more sophisticated, we can check file modification times.
     // For now, let's just allow the user to use --skip-build or we can automate it.
     log("[3.5/4] Building Frontend Production Bundle...", COLORS.yellow);
+    try {
+      const { execSync } = await import('node:child_process');
+      execSync('rm -rf .next', { cwd: FrontendDir });
+    } catch (e) {}
     const buildEnv = { 
       ...process.env, 
       NEXT_DISABLE_SWC: "1", 

@@ -195,7 +195,7 @@ async function main() {
     }
 
     const suites = [
-      { name: 'Backend Stack', path: 'backend/scripts/run_tests.mjs' },
+      { name: 'Backend Stack', path: 'backend/scripts/run_tests.mjs', args: ['--no-start'] },
       { name: 'Frontend Stack', path: 'frontend/scripts/run_tests.mjs' },
       { name: 'Mobile Stack', path: 'mobile/scripts/run_tests.mjs' },
     ];
@@ -238,11 +238,19 @@ async function main() {
       // EXPLICIT RE-SEED before Frontend and Mobile stacks to ensure deterministic state
       if (s.name !== 'Backend Stack') {
         log(`🧪 Re-seeding database for ${s.name}...`, COLORS.yellow);
+        
+        // Stop server to avoid DB locks or inconsistent states during seeding
+        await stopBackendRunserver();
+        
         await spawnStream(getPythonExec(join(RootDir, 'backend')), [
           join(RootDir, 'backend', 'scripts', 'seed_test_db.py'),
           '--workers', '8',
           '--preset', 'full'
         ], { cwd: join(RootDir, 'backend') });
+
+        // Restart and ensure ready
+        await startBackendRunserver();
+        await ensureBackendServerReady(2, 120);
       }
 
       log(`\n🚀 RUNNING: ${s.name}`, COLORS.yellow);
@@ -261,11 +269,23 @@ async function main() {
           log(`Retry attempt ${attempt} for suite ${s.name} ...`, COLORS.yellow);
           // Re-seed on retry too!
           log(`🧪 Re-seeding database for retry...`, COLORS.yellow);
+          
+          // If it's a backend or integration stack, we MUST stop the server
+          const needsServer = !skipE2E && (s.name === 'Backend Stack' || s.name === 'Frontend Stack' || s.name === 'Mobile Stack');
+          if (needsServer) {
+            await stopBackendRunserver();
+          }
+
           await spawnStream(getPythonExec(join(RootDir, 'backend')), [
             join(RootDir, 'backend', 'scripts', 'seed_test_db.py'),
             '--workers', '8',
             '--preset', 'full'
           ], { cwd: join(RootDir, 'backend') });
+
+          if (needsServer) {
+            await startBackendRunserver();
+            await ensureBackendServerReady(2, 120);
+          }
 
           // Mark the log file for parseMetrics to identify the new attempt
           const { appendFileSync } = await import('node:fs');
@@ -274,7 +294,7 @@ async function main() {
 
         exitCode = await spawnStream(
           'node',
-          [join(RootDir, s.path), ...(skipE2E ? ['--skip-e2e'] : [])],
+          [join(RootDir, s.path), ...(s.args || []), ...(skipE2E ? ['--skip-e2e'] : [])],
           {
             cwd: dirname(join(RootDir, s.path)),
             logFile: suiteLog,

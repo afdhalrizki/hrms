@@ -42,39 +42,70 @@ class E2ETenantMiddleware:
             return self.get_response(request)
 
         # 3. Handle E2E/Production Mode (with Overrides and Retries)
-        # Check for explicit override (from test_helper.ts or specific E2E clients)
         tenant_slug = (
             request.headers.get('X-Tenant') or 
+            request.headers.get('X-Tenant-Domain') or 
             request.GET.get('test_tenant') or 
             request.COOKIES.get('test_tenant_e2e')
         )
+        if tenant_slug and (tenant_slug.endswith('.localhost') or tenant_slug.endswith('.127.0.0.1')):
+            tenant_slug = tenant_slug.split('.')[0]
         
-        if tenant_slug:
-            tenant = Tenant.objects.filter(schema_name=tenant_slug).first()
+        from django_tenants.utils import schema_context
+        
+        for attempt in range(15):
+            try:
+                # Force a fresh connection to the database
+                connection.close()
+                
+                with schema_context('public'):
+                    # Debug: Log total tenants available
+                    total_tenants = Tenant.objects.count()
+                    all_schemas = list(Tenant.objects.values_list('schema_name', flat=True))
+                    print(f"[E2E DEBUG] Attempt {attempt+1}: {total_tenants} tenants in DB. Schemas: {all_schemas}")
+
+                    if tenant_slug:
+                        tenant = Tenant.objects.filter(schema_name=tenant_slug).first()
+                        if tenant:
+                            print(f"[E2E DEBUG] Resolved tenant '{tenant_slug}' from header/query")
+                            break
+                        else:
+                            print(f"[E2E DEBUG] Tenant slug '{tenant_slug}' NOT FOUND in DB. Path: {request.path}")
+                    
+                    # Fallback to hostname resolution
+                    try:
+                        domain = Domain.objects.select_related('tenant').get(domain=hostname)
+                        tenant = domain.tenant
+                        print(f"[E2E DEBUG] Resolved tenant '{tenant.schema_name}' from hostname '{hostname}'")
+                        break
+                    except Domain.DoesNotExist:
+                        # Localhost/Loopback fallback
+                        if hostname in ['127.0.0.1', 'localhost', '0.0.0.0']:
+                            tenant = Tenant.objects.filter(schema_name='public').first() or \
+                                     Tenant.objects.all().first()
+                            if tenant:
+                                print(f"[E2E DEBUG] Fallback to tenant '{tenant.schema_name}' for hostname '{hostname}'")
+                                break
+                            else:
+                                print(f"[E2E DEBUG] NO TENANTS FOUND IN DB for fallback! Hostname: {hostname}")
+                
+                if attempt < 14:
+                    import time
+                    print(f"[E2E DEBUG] Retrying tenant resolution in 1s (Attempt {attempt+1}/15)...")
+                    time.sleep(1)
+                    continue
+                
+            except Exception as e:
+                print(f"[E2E DEBUG] Error during tenant resolution (Attempt {attempt+1}/15): {e}")
+                if attempt < 14:
+                    import time
+                    time.sleep(1)
+                    continue
 
         if not tenant:
-            for attempt in range(2):
-                try:
-                    connection.set_schema_to_public()
-                    domain = Domain.objects.select_related('tenant').get(domain=hostname)
-                    tenant = domain.tenant
-                    break
-                except (Domain.DoesNotExist, Exception):
-                    # Localhost/Loopback fallback for local dev/mobile
-                    if hostname in ['127.0.0.1', 'localhost', '0.0.0.0']:
-                        tenant = Tenant.objects.filter(schema_name='public').first() or \
-                                 Tenant.objects.all().first()
-                        if tenant:
-                            break
-                    
-                    if attempt == 0:
-                        import time
-                        connection.close() 
-                        time.sleep(1)
-                        continue
-                    
-                    from django.http import Http404
-                    raise Http404(f"Tenant not found for hostname: {hostname}")
+            from django.http import Http404
+            print(f"[E2E CRITICAL] Tenant NOT FOUND! Host: {hostname}, Slug: {tenant_slug}, Path: {request.path}")
+            raise Http404(f"Tenant not found for hostname: {hostname} (Slug: {tenant_slug})")
 
         # 4. Apply Context
         request.tenant = tenant

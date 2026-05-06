@@ -48,14 +48,14 @@ _Tiered SaaS provisioning and intelligent subscription gating (Essential, Profes
 
 ### 📊 Commercial Plans
 
-| Feature | **ESSENTIAL HR** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
-| :--- | :--- | :--- | :--- | :--- |
-| **Employee Limit** | 50 | 500 | 2,000 | 10,000+ |
-| **Core HR** | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
-| **Attendance** | ✅ Clock-in/out | ✅ Geofencing | ✅ Correction | ✅ Shift/Roster |
-| **Payroll** | ❌ | ✅ PPh 21/BPJS | ✅ Advanced | ✅ Analytics |
-| **Performance** | ❌ | ❌ | ✅ KPI/Appraisal | ✅ Team Coaching |
-| **Analytics** | ❌ | ❌ | ❌ | ✅ Audit/Insight |
+| Feature | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Employee Limit** | 10 | 50 | 100 | 500 | 2,000+ |
+| **Core HR** | ✅ Basic | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
+| **Attendance** | ✅ Basic | ✅ Geofencing | ✅ Geo + Photo | ✅ Correction | ✅ Shift/Roster |
+| **Payroll** | ❌ | ❌ | ✅ PPh 21/BPJS | ✅ Advanced | ✅ Analytics |
+| **Performance** | ❌ | ❌ | ❌ | ✅ KPI/Appraisal | ✅ Team Coaching |
+| **Analytics** | ❌ | ❌ | ❌ | ❌ | ✅ Audit/Insight |
 
 ## 📦 Getting Started
 
@@ -129,7 +129,7 @@ For more granular control, you can run tests within each module directory:
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
 - **Backend**: 336 Tests (318 Unit + 18 E2E) - Pytest.
-- **Frontend**: 226 Tests (187 Unit + 39 E2E) - Vitest & Playwright.
+- **Frontend**: 227 Tests (187 Unit + 40 E2E) - Vitest & Playwright.
 - **Mobile**: 155 Tests (132 Unit + 23 E2E) - Flutter.
 
 ## 📈 Scalability Strategy: Road to 1 Million Users

@@ -123,6 +123,8 @@ describe('lib/api', () => {
     expect(result).toEqual({ data: 'success' });
     expect(localStorage.getItem('access_token')).toBe('new-token');
     expect(fetchMock).toHaveBeenCalledTimes(3);
+    // Verify that the second call (original retry) uses the trailing slash
+    expect(fetchMock).toHaveBeenLastCalledWith(expect.stringContaining('/test/'), expect.anything());
   });
 
   it('apiFetch throws an error when response is not ok', async () => {

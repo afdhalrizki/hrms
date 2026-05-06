@@ -151,11 +151,14 @@ async function ensureBackendStarted(isIntegrated) {
         env: integratedEnv,
       });
 
-      log('🔗 Running seed_test_db.py...', COLORS.gray);
-      await execAsync(`${pythonExec} scripts/seed_test_db.py --preset mobile`, {
-        cwd: backendDir,
-        env: integratedEnv,
-      });
+      const skipSeed = process.env.NO_RESEED === 'true';
+      if (!skipSeed) {
+        log('🔗 Running seed_test_db.py...', COLORS.gray);
+        await execAsync(`${pythonExec} scripts/seed_test_db.py --preset mobile`, {
+          cwd: backendDir,
+          env: integratedEnv,
+        });
+      }
 
       // Smoke test: Login check
       log('💨 Running pre-flight smoke test (Login check)...', COLORS.yellow);

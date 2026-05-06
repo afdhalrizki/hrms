@@ -33,12 +33,12 @@ class TenantQuotaAndPlansTestCase(TenantTestCase):
         self.role = Role.objects.create(name='Staff-QUOTA', department=self.dept)
 
     def test_tenant_default_plans_and_quotas(self):
-        """Test how tenants assign default modules and quotas on creation, overriding default 1000 limit."""
+        """Test how tenants assign default modules and quotas on creation, applying plan defaults."""
         from django_tenants.utils import schema_context, get_public_schema_name
         
         with schema_context(get_public_schema_name()):
             # Essential Plan
-            t_essential = Tenant(schema_name='essential_tenant', name='Essential', plan_type='ESSENTIAL', max_employees=1000)
+            t_essential = Tenant(schema_name='essential_tenant', name='Essential', plan_type='ESSENTIAL', max_employees=None)
             t_essential.save()
             self.assertEqual(t_essential.max_employees, 50)
             self.assertIn('attendance', t_essential.enabled_modules)
@@ -47,24 +47,24 @@ class TenantQuotaAndPlansTestCase(TenantTestCase):
             self.assertTrue(t_essential.is_module_enabled('attendance'))
             
             # Professional Plan
-            t_prof = Tenant(schema_name='prof_tenant', name='Prof', plan_type='PROFESSIONAL', max_employees=1000)
+            t_prof = Tenant(schema_name='prof_tenant', name='Prof', plan_type='PROFESSIONAL', max_employees=None)
             t_prof.save()
-            self.assertEqual(t_prof.max_employees, 500)
+            self.assertEqual(t_prof.max_employees, 100) # Strategy v2.0
             self.assertIn('payroll', t_prof.enabled_modules)
-            self.assertNotIn('performance', t_prof.enabled_modules)
+            self.assertIn('leaves', t_prof.enabled_modules)
             self.assertTrue(t_prof.is_module_enabled('payroll'))
             
             # Premium Plan
-            t_prem = Tenant(schema_name='prem_tenant', name='Prem', plan_type='PREMIUM', max_employees=1000)
+            t_prem = Tenant(schema_name='prem_tenant', name='Prem', plan_type='PREMIUM', max_employees=None)
             t_prem.save()
-            self.assertEqual(t_prem.max_employees, 2000)
+            self.assertEqual(t_prem.max_employees, 500) # Strategy v2.0
             self.assertTrue(t_prem.is_module_enabled('performance'))
-            self.assertNotIn('analytics', t_prem.enabled_modules)
+            self.assertIn('rbac', t_prem.enabled_modules)
 
             # Enterprise Plan
-            t_ent = Tenant(schema_name='ent_tenant', name='Ent', plan_type='ENTERPRISE', max_employees=1000)
+            t_ent = Tenant(schema_name='ent_tenant', name='Ent', plan_type='ENTERPRISE', max_employees=None)
             t_ent.save()
-            self.assertEqual(t_ent.max_employees, 10000) # Re-assigned by defaults
+            self.assertEqual(t_ent.max_employees, 2000) # Strategy v2.0
             self.assertTrue(t_ent.is_module_enabled('super_unknown_module')) # Enterprise has everything true
 
     def test_subscription_status_properties(self):

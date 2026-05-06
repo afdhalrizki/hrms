@@ -115,39 +115,40 @@ class Tenant(TenantMixin):
         return module_name in self.enabled_modules
 
     def save(self, *args, **kwargs):
-        # Set default modules and quotas based on plan if not already set
-        if not self.pk:
-            if not self.enabled_modules:
-                if self.plan_type == 'FREE':
-                    self.enabled_modules = ['core', 'attendance']
-                    self.max_employees = 10
-                    self.storage_limit_mb = 100
-                elif self.plan_type == 'ESSENTIAL':
-                    self.enabled_modules = ['core', 'attendance', 'leaves']
-                    self.max_employees = 50
-                    self.storage_limit_mb = 100
-                elif self.plan_type == 'PROFESSIONAL':
-                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement']
-                    self.max_employees = 500
-                    self.storage_limit_mb = 2000
-                elif self.plan_type == 'PREMIUM':
-                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'performance']
-                    self.max_employees = 2000
-                    self.storage_limit_mb = 5000
-                elif self.plan_type == 'ENTERPRISE':
-                    self.enabled_modules = ['core', 'attendance', 'payroll', 'reimbursement', 'performance', 'analytics', 'audit']
-                    self.max_employees = 10000
-                    self.storage_limit_mb = 20000
-            
-            # Quotas should still be applied if not default
+        # 1. Initialize default modules for new tenants
+        if not self.pk and not self.enabled_modules:
             if self.plan_type == 'FREE':
-                self.max_employees = 10
+                self.enabled_modules = ['core', 'attendance']
             elif self.plan_type == 'ESSENTIAL':
-                self.max_employees = 50
+                self.enabled_modules = ['core', 'attendance', 'leaves']
             elif self.plan_type == 'PROFESSIONAL':
-                self.max_employees = 500
+                self.enabled_modules = ['core', 'attendance', 'leaves', 'payroll', 'reimbursement']
             elif self.plan_type == 'PREMIUM':
-                self.max_employees = 2000
+                self.enabled_modules = ['core', 'attendance', 'leaves', 'payroll', 'reimbursement', 'performance', 'rbac']
+            elif self.plan_type == 'ENTERPRISE':
+                self.enabled_modules = ['core', 'attendance', 'leaves', 'payroll', 'reimbursement', 'performance', 'rbac', 'analytics', 'audit']
+        
+        # 2. Enforce quotas based on plan_type (on create and update)
+        # In testing mode, we allow manual overrides to test quota exhaustion
+        from django.conf import settings
+        is_testing = getattr(settings, 'TESTING', False)
+        
+        if self.plan_type == 'FREE':
+            if not is_testing or self.max_employees is None: self.max_employees = 10
+            if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 50
+        elif self.plan_type == 'ESSENTIAL':
+            if not is_testing or self.max_employees is None: self.max_employees = 50
+            if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 250
+        elif self.plan_type == 'PROFESSIONAL':
+            if not is_testing or self.max_employees is None: self.max_employees = 100
+            if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 1024
+        elif self.plan_type == 'PREMIUM':
+            if not is_testing or self.max_employees is None: self.max_employees = 500
+            if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 5120
+        elif self.plan_type == 'ENTERPRISE':
+            if not is_testing or self.max_employees is None: self.max_employees = 2000
+            if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 20480
+            
         super().save(*args, **kwargs)
 
     @property

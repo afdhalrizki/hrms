@@ -48,6 +48,9 @@ if not DEBUG and not TESTING:
     # If the app is behind a proxy that handles SSL (like Nginx), you MUST set:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# CSRF and Session settings for cross-subdomain support
+APPEND_SLASH = False  # Disable automatic slash appending to prevent redirect loops in API
+
 
 # Application definition
 
