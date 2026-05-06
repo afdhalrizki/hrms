@@ -27,7 +27,7 @@ async def async_client():
 def get_auth_headers(domain, token=None):
     headers = {
         "X-Tenant-Domain": domain,
-        "Host": f"{domain}:8000", # Compatibility with django-tenants
+        "Host": "localhost:8000", # Always use a valid host to satisfy ALLOWED_HOSTS
         "Content-Type": "application/json",
     }
     if token:

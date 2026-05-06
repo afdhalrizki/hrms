@@ -39,8 +39,8 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
-        with schema_context('public'):
-            return RegistrationRequest.objects.all()
+        # Always return registrations from the public schema
+        return RegistrationRequest.objects.all()
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
@@ -55,9 +55,13 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                 # Convert prefix to a valid schema name (snake_case)
                 schema_name = registration.subdomain_prefix.replace('-', '_').lower()
                 
+                from datetime import date, timedelta
+                expiry_date = date.today() + timedelta(days=14)
+
                 tenant = Tenant.objects.create(
                     schema_name=schema_name,
-                    name=registration.company_name
+                    name=registration.company_name,
+                    expiry_date=expiry_date
                 )
                 
                 # 2. Create Domain

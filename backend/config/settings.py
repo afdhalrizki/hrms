@@ -73,10 +73,6 @@ SHARED_APPS = [
 ]
 
 TENANT_APPS = [
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.messages',
-    'django.contrib.admin',
     'core',  # Per-tenant: HR Master Data
     'attendance',  # Per-tenant: Attendance
     'payroll',  # Per-tenant: Payroll
