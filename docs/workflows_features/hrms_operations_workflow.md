@@ -6,7 +6,7 @@ This document explains the integrated operational workflow between the Attendanc
 
 ## Process Overview
 
-![Integrated HRMS Process Flow](assets/hrms_integrated_workflow.png)
+![Integrated HRMS Process Flow](../assets/hrms_integrated_workflow.png)
 
 ---
 
@@ -50,7 +50,7 @@ Attendance data flows directly into the payroll module as the basis for calculat
 
 ### Payroll Flowchart
 
-![Payroll Flowchart Diagram](assets/payroll_flowchart.png)
+![Payroll Flowchart Diagram](../assets/payroll_flowchart.png)
 
 ```mermaid
 graph TD

@@ -6,7 +6,7 @@ Dokumen ini menjelaskan alur kerja operasional yang terintegrasi antara sistem K
 
 ## Tinjauan Proses
 
-![Alur Proses HRMS Terintegrasi](assets/hrms_integrated_workflow.png)
+![Alur Proses HRMS Terintegrasi](../assets/hrms_integrated_workflow.png)
 
 ---
 
@@ -50,7 +50,7 @@ Data kehadiran mengalir langsung ke modul penggajian sebagai dasar untuk menghit
 
 ### Diagram Alir Penggajian
 
-![Diagram Alir Penggajian](assets/payroll_flowchart.png)
+![Diagram Alir Penggajian](../assets/payroll_flowchart.png)
 
 ```mermaid
 graph TD

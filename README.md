@@ -156,9 +156,7 @@ Detailed scaling strategy: [**Technical Team Strategy**](./docs/plans/technical_
 
 For in-depth technical details, please refer to the platform-wide internal documentation:
 
-- [**Implementation Plan**](./docs/project_management/implementation_plan.md) - Overall architecture blueprint
-- [**Walkthrough & Results**](./docs/project_management/walkthrough.md) - Feature stability summaries
-- [**Development Roadmap**](./docs/project_management/task.md) - Phase-by-phase completion records
+- [**Feature Checklist & Roadmap**](./docs/project_management/feature_roadmap_checklist.md) - Complete list of existing features and future plans
 - [**AWS High Availability Architecture**](./docs/architecture/aws_high_availability_architecture.md) - 1M user scaling design
 - [**Scalability Architecture Guide**](./docs/architecture/scaling_architecture_guide.md) - 100k to 1M scaling (AWS vs VPS)
 

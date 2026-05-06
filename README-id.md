@@ -156,9 +156,7 @@ Strategi penskalaan mendalam: [**Strategi Tim Teknis**](./docs/plans/technical_t
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi internal di seluruh platform:
 
-- [**Rencana Implementasi**](./docs/project_management/implementation_plan-id.md) - Cetak biru arsitektur keseluruhan
-- [**Walkthrough & Hasil**](./docs/project_management/walkthrough-id.md) - Ringkasan stabilitas fitur
-- [**Peta Jalan Pengembangan**](./docs/project_management/task-id.md) - Catatan penyelesaian fase demi fase
+- [**Checklist Fitur & Peta Jalan**](./docs/project_management/feature_roadmap_checklist-id.md) - Daftar lengkap fitur yang ada dan rencana masa depan
 - [**Arsitektur High Availability AWS**](./docs/architecture/aws_high_availability_architecture-id.md) - Desain penskalaan 1 juta pengguna
 - [**Panduan Arsitektur Skalabilitas**](./docs/architecture/scaling_architecture_guide-id.md) - Penskalaan 100 ribu ke 1 juta (AWS vs VPS)
 
