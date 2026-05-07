@@ -2,21 +2,29 @@ import { test, expect } from './fixtures';
 import { getTenantUrl } from './test_helper';
 
 test.describe('DashboardLayout Authentication Redirection', () => {
-  test('should redirect unauthenticated users accessing /attendance to /login', async ({ page }) => {
-    // Go to the protected attendance page directly
-    const url = getTenantUrl('/en/attendance');
-    await page.goto(url);
+  const protectedRoutes = [
+    '/en/profile',
+    '/en/attendance',
+    '/en/leaves',
+    '/en/payroll',
+    '/en/reimbursements',
+    '/en/employees',
+    '/en/branches',
+    '/en/analytics',
+    '/en/settings',
+    '/en/settings/branding',
+    '/en/settings/billing',
+  ];
 
-    // Should immediately detect no session and redirect to /login
-    await expect(page).toHaveURL(/.*\/login/);
-  });
+  for (const route of protectedRoutes) {
+    test(`should redirect unauthenticated users accessing ${route} to /login`, async ({ page }) => {
+      // Go to the protected page directly
+      const url = getTenantUrl(route);
+      await page.goto(url);
 
-  test('should redirect unauthenticated users accessing /profile to /login', async ({ page }) => {
-    // Go to the protected profile page directly
-    const url = getTenantUrl('/en/profile');
-    await page.goto(url);
-
-    // Should immediately detect no session and redirect to /login
-    await expect(page).toHaveURL(/.*\/login/);
-  });
+      // Should immediately detect no session and redirect to /login
+      // The redirection target usually includes the locale and login path
+      await expect(page).toHaveURL(/.*\/login/, { timeout: 15000 });
+    });
+  }
 });
