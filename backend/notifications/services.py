@@ -136,6 +136,28 @@ class NotificationService:
         
         return self.send_employee_notification(target_user, title, message, level='SUCCESS')
 
+    def notify_employee_onboarding(self, employee, domain_name):
+        """
+        Triggers the onboarding email for a newly created employee.
+        """
+        if not employee or not employee.email:
+            return None
+            
+        # Create in-app notification
+        title = "Selamat Datang!"
+        message = f"Selamat bergabung di perusahaan. Akun Anda telah aktif di {domain_name}."
+        
+        # Trigger actual email task
+        from .tasks import send_employee_onboarding_email_task
+        send_employee_onboarding_email_task.delay(employee.email, employee.fullname, domain_name)
+        
+        try:
+            target_user = User.objects.get(email=employee.email)
+            return self.send_employee_notification(target_user, title, message, level='SUCCESS')
+        except User.DoesNotExist:
+            # If user record isn't created yet, we just send the email
+            return None
+
     def _create(self, title, message, level, category, target_user=None, expires_at=None):
         """Internal helper to create SystemNotification records."""
         return SystemNotification.objects.create(

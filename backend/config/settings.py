@@ -333,7 +333,7 @@ EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', f'noreply@{TENANT_DOMAIN_SUFFIX}')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', f'HariKerja HRMS <noreply@{TENANT_DOMAIN_SUFFIX}>')
 
 # Celery Configuration
 DEFAULT_REDIS_URL = 'redis://127.0.0.1:6379/1' if TESTING else 'redis://redis:6379/1'

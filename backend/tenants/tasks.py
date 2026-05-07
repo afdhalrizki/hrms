@@ -10,7 +10,7 @@ def send_registration_email_task(admin_email):
     try:
         send_mail(
             subject='Registration Received',
-            message='We have received your registration request and our admin will review it shortly.',
+            message='Pendaftaran Anda telah kami terima dan akan segera kami tinjau.\n\nTerima kasih,\nHariKerja HRMS',
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[admin_email],
             fail_silently=False,
@@ -28,7 +28,7 @@ def send_welcome_email_task(admin_email, domain_name):
     try:
         send_mail(
             subject='Welcome to HRMS',
-            message=f'Your workspace {domain_name} is ready.\n\nYou can now log in using your email: {admin_email}\nPassword: change-me-123\n\nPlease change your password immediately after logging in.',
+            message=f'Workspace Anda {domain_name} sudah siap.\n\nSekarang Anda dapat login menggunakan email: {admin_email}\nPassword: change-me-123\n\nMohon segera ubah password Anda setelah login.\n\nTerima kasih,\nHariKerja HRMS',
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[admin_email],
             fail_silently=False,

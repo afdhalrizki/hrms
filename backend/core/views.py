@@ -228,6 +228,19 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                     if hasattr(request, 'tenant') and request.tenant:
                         user.tenants.add(request.tenant)
 
+                    # 4. Trigger Onboarding Notification (NEW)
+                    from notifications.services import NotificationService
+                    service = NotificationService()
+                    
+                    # Determine domain name for the login link
+                    domain_name = "app.harikerja.com"
+                    if hasattr(request, 'tenant') and request.tenant:
+                        domain = request.tenant.domains.first()
+                        if domain:
+                            domain_name = domain.domain
+                    
+                    service.notify_employee_onboarding(employee, domain_name)
+
                 headers = self.get_success_headers(serializer.data)
                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
