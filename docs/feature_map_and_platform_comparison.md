@@ -16,27 +16,27 @@ The HRMS platform is divided into several core modules:
 
 ## 2. Platform Comparison Matrix
 
-| Module | Feature | Web (Admin/Staff) | Web (Employee) | Mobile (Employee) |
-| :--- | :--- | :---: | :---: | :---: |
-| **Auth** | Login / Logout | ✅ | ✅ | ✅ |
-| | Registration (SaaS) | ✅ | ❌ | ❌ |
-| | Profile Update | ✅ | ✅ | ✅ |
-| **HR** | Employee Management (CRUD) | ✅ | ❌ | ❌ |
-| | Document Management | ✅ | ✅ | ✅ (Upload) |
-| | Org Chart / Branches | ✅ | ✅ | ❌ |
-| **Attendance** | Clock In/Out (GPS) | ✅ | ✅ | ✅ (Primary) |
-| | Leave Application | ✅ | ✅ | ✅ |
-| | Leave Approval | ✅ | ❌ | ❌ |
-| | Overtime Requests | ✅ | ✅ | ✅ |
-| | Attendance Corrections | ✅ | ✅ | ✅ |
-| **Payroll** | Process Payroll | ✅ | ❌ | ❌ |
-| | View/Download Payslips | ✅ | ✅ | ✅ |
-| **Performance** | Setup KPIs | ✅ | ❌ | ❌ |
-| | Self-Appraisal | ✅ | ✅ | ✅ |
-| | Manager Review | ✅ | ❌ | ❌ |
-| **Analytics** | Dashboard Summary | ✅ | ✅ | ✅ |
-| | Detailed Export (XLSX/PDF) | ✅ | ✅ | ✅ (Limited) |
-| | System Audit Logs | ✅ | ❌ | ❌ |
+| Module | Feature | Web (Admin/Staff) | Web (Employee) | Mobile (Employee) | Min. Plan |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **Auth** | Login / Logout | ✅ | ✅ | ✅ | FREE |
+| | Registration (SaaS) | ✅ | ❌ | ❌ | FREE |
+| | Profile Update | ✅ | ✅ | ✅ | FREE |
+| **HR** | Employee Management (CRUD) | ✅ | ❌ | ❌ | FREE |
+| | Document Management | ✅ | ✅ | ✅ (Upload) | FREE |
+| | Org Chart / Branches | ✅ | ✅ | ❌ | ESSENTIAL |
+| **Attendance** | Clock In/Out (GPS) | ✅ | ✅ | ✅ (Primary) | FREE |
+| | Leave Application | ✅ | ✅ | ✅ | ESSENTIAL |
+| | Leave Approval | ✅ | ❌ | ❌ | ESSENTIAL |
+| | Overtime Requests | ✅ | ✅ | ✅ | ESSENTIAL |
+| | Attendance Corrections | ✅ | ✅ | ✅ | PREMIUM |
+| **Payroll** | Process Payroll | ✅ | ❌ | ❌ | PROFESSIONAL |
+| | View/Download Payslips | ✅ | ✅ | ✅ | PROFESSIONAL |
+| **Performance** | Setup KPIs | ✅ | ❌ | ❌ | PREMIUM |
+| | Self-Appraisal | ✅ | ✅ | ✅ | PREMIUM |
+| | Manager Review | ✅ | ❌ | ❌ | PREMIUM |
+| **Analytics** | Dashboard Summary | ✅ | ✅ | ✅ | FREE |
+| | Detailed Export (XLSX/PDF) | ✅ | ✅ | ✅ (Limited) | ESSENTIAL |
+| | System Audit Logs | ✅ | ❌ | ❌ | ENTERPRISE |
 
 ---
 
@@ -88,12 +88,26 @@ All protected endpoints require the `Authorization: Bearer <token>` header and `
 | `/leave-requests/{id}/`| `PATCH` | Web | `manage_leaves` | ✅ |
 | `/payslips/` | `GET` | All | `IsAuthenticated` (Self) | ✅ |
 | `/payslips/{id}/pdf/` | `GET` | All | `IsAuthenticated` (Self) | ✅ |
-| `/core/dashboard-stats/`| `GET` | All | `view_analytics` | ✅ |
-| `/tenant/settings/` | `PATCH` | Web | `manage_tenant_settings` | ✅ |
+| `/core/dashboard-stats/`| `GET` | All | `view_analytics` | ✅ | PROFESSIONAL |
+| `/tenant/settings/` | `PATCH` | Web | `manage_tenant_settings` | ✅ | ESSENTIAL |
 
 ---
 
-## 5. Summary of Platform Restrictions
+## 5. Subscription Gating & Module Access
+
+The system enforces access to features based on the tenant's active subscription plan.
+
+| Plan | Included Modules | Target Audience |
+| :--- | :--- | :--- |
+| **FREE** | Core, Basic Attendance | Startups & Micro-SMEs |
+| **ESSENTIAL** | Core, Attendance (Geo), Leaves | Small Businesses |
+| **PROFESSIONAL** | + Payroll (PPh 21/BPJS), Reimbursement | Growing SMBs |
+| **PREMIUM** | + Performance (KPI), Advanced RBAC | High-Growth Companies |
+| **ENTERPRISE** | + Analytics, Audit Trail, Custom SLA | Large Corporations |
+
+---
+
+## 6. Summary of Platform Restrictions
 
 1.  **Mobile is for Employees**: The mobile app is streamlined for daily operational tasks. It does not include management features (approving others' leaves, processing payroll, or system configuration).
 2.  **Web is for Admin & Self-Service**: The web portal is the full-featured interface. It serves both the administrators (HR Managers, Owners) and employees who prefer a desktop view.

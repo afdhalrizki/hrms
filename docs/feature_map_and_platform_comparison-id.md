@@ -16,27 +16,27 @@ Platform HRMS dibagi menjadi beberapa modul inti:
 
 ## 2. Matriks Perbandingan Platform
 
-| Modul | Fitur | Web (Admin/Staff) | Web (Karyawan) | Mobile (Karyawan) |
-| :--- | :--- | :---: | :---: | :---: |
-| **Auth** | Login / Logout | ✅ | ✅ | ✅ |
-| | Registrasi (SaaS) | ✅ | ❌ | ❌ |
-| | Update Profil | ✅ | ✅ | ✅ |
-| **HR** | Manajemen Karyawan (CRUD) | ✅ | ❌ | ❌ |
-| | Manajemen Dokumen | ✅ | ✅ | ✅ (Upload) |
-| | Struktur Org / Cabang | ✅ | ✅ | ❌ |
-| **Attendance** | Absensi (GPS) | ✅ | ✅ | ✅ (Utama) |
-| | Pengajuan Cuti | ✅ | ✅ | ✅ |
-| | Persetujuan Cuti | ✅ | ❌ | ❌ |
-| | Pengajuan Lembur | ✅ | ✅ | ✅ |
-| | Koreksi Absensi | ✅ | ✅ | ✅ |
-| **Payroll** | Proses Payroll | ✅ | ❌ | ❌ |
-| | Lihat/Unduh Slip Gaji | ✅ | ✅ | ✅ |
-| **Performance** | Setup KPI | ✅ | ❌ | ❌ |
-| | Penilaian Mandiri | ✅ | ✅ | ✅ |
-| | Review Manajer | ✅ | ❌ | ❌ |
-| **Analytics** | Ringkasan Dashboard | ✅ | ✅ | ✅ |
-| | Ekspor Detail (XLSX/PDF) | ✅ | ✅ | ✅ (Terbatas) |
-| | Audit Log Sistem | ✅ | ❌ | ❌ |
+| Modul | Fitur | Web (Admin/Staff) | Web (Karyawan) | Mobile (Karyawan) | Plan Min. |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **Auth** | Login / Logout | ✅ | ✅ | ✅ | FREE |
+| | Registrasi (SaaS) | ✅ | ❌ | ❌ | FREE |
+| | Update Profil | ✅ | ✅ | ✅ | FREE |
+| **HR** | Manajemen Karyawan (CRUD) | ✅ | ❌ | ❌ | FREE |
+| | Manajemen Dokumen | ✅ | ✅ | ✅ (Upload) | FREE |
+| | Struktur Org / Cabang | ✅ | ✅ | ❌ | ESSENTIAL |
+| **Attendance** | Absensi (GPS) | ✅ | ✅ | ✅ (Utama) | FREE |
+| | Pengajuan Cuti | ✅ | ✅ | ✅ | ESSENTIAL |
+| | Persetujuan Cuti | ✅ | ❌ | ❌ | ESSENTIAL |
+| | Pengajuan Lembur | ✅ | ✅ | ✅ | ESSENTIAL |
+| | Koreksi Absensi | ✅ | ✅ | ✅ | PREMIUM |
+| **Payroll** | Proses Payroll | ✅ | ❌ | ❌ | PROFESSIONAL |
+| | Lihat/Unduh Slip Gaji | ✅ | ✅ | ✅ | PROFESSIONAL |
+| **Performance** | Setup KPI | ✅ | ❌ | ❌ | PREMIUM |
+| | Penilaian Mandiri | ✅ | ✅ | ✅ | PREMIUM |
+| | Review Manajer | ✅ | ❌ | ❌ | PREMIUM |
+| **Analytics** | Ringkasan Dashboard | ✅ | ✅ | ✅ | FREE |
+| | Ekspor Detail (XLSX/PDF) | ✅ | ✅ | ✅ (Terbatas) | ESSENTIAL |
+| | Audit Log Sistem | ✅ | ❌ | ❌ | ENTERPRISE |
 
 ---
 
@@ -88,12 +88,26 @@ Semua endpoint yang terproteksi memerlukan header `Authorization: Bearer <token>
 | `/leave-requests/{id}/`| `PATCH` | Web | `manage_leaves` | ✅ |
 | `/payslips/` | `GET` | Semua | `IsAuthenticated` (Diri sendiri) | ✅ |
 | `/payslips/{id}/pdf/` | `GET` | Semua | `IsAuthenticated` (Diri sendiri) | ✅ |
-| `/core/dashboard-stats/`| `GET` | Semua | `view_analytics` | ✅ |
-| `/tenant/settings/` | `PATCH` | Web | `manage_tenant_settings` | ✅ |
+| `/core/dashboard-stats/`| `GET` | Semua | `view_analytics` | ✅ | PROFESSIONAL |
+| `/tenant/settings/` | `PATCH` | Web | `manage_tenant_settings` | ✅ | ESSENTIAL |
 
 ---
 
-## 5. Ringkasan Batasan Platform
+## 5. Pembatasan Berdasarkan Paket Langganan
+
+Sistem memberlakukan akses ke fitur berdasarkan paket langganan aktif milik tenant.
+
+| Paket | Modul yang Termasuk | Target Pengguna |
+| :--- | :--- | :--- |
+| **FREE** | Core, Absensi Dasar | Startup & UMKM Mikro |
+| **ESSENTIAL** | Core, Absensi (Geo), Cuti | Bisnis Kecil |
+| **PROFESSIONAL** | + Payroll (PPh 21/BPJS), Reimbursement | Bisnis Berkembang |
+| **PREMIUM** | + Performance (KPI), RBAC Lanjutan | Perusahaan High-Growth |
+| **ENTERPRISE** | + Analytics, Audit Trail, Custom SLA | Perusahaan Besar/Enterprise |
+
+---
+
+## 6. Ringkasan Batasan Platform
 
 1.  **Mobile untuk Karyawan**: Aplikasi mobile dirancang ramping untuk tugas operasional harian. Ini tidak mencakup fitur manajemen (menyetujui cuti orang lain, memproses payroll, atau konfigurasi sistem).
 2.  **Web untuk Admin & Mandiri**: Portal web adalah antarmuka fitur lengkap. Ini melayani administrator (Manajer HR, Pemilik) dan karyawan yang lebih memilih tampilan desktop.
