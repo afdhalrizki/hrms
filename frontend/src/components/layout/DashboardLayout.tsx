@@ -52,7 +52,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
 
     // 2. Redirect only if auth has finished loading AND we are truly unauthenticated
-    if (!loading && !user && typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
+    if (!loading && !user && typeof window !== 'undefined') {
+      if (localStorage.getItem('access_token')) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+      }
       router.push('/login');
     }
   }, [user, loading, router, isPublicRoute]);
