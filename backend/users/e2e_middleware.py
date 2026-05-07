@@ -53,48 +53,59 @@ class E2ETenantMiddleware:
                 tenant_slug = tenant_slug.split('.')[0]
             # Convert to schema format (dashes to underscores)
             tenant_slug = tenant_slug.replace('-', '_').lower()
-        
+
         from django_tenants.utils import schema_context
         
-        for attempt in range(15):
+        # Only retry if specifically enabled for E2E synchronization
+        # OR if we are in a development/test environment and have a specific slug
+        is_e2e_sync_needed = (
+            request.headers.get('X-E2E-Retry') == 'true' or 
+            getattr(settings, 'E2E_RETRY_ENABLED', False) or
+            (tenant_slug and (getattr(settings, 'DEBUG', False) or getattr(settings, 'TESTING', False)))
+        )
+        
+        # Increase retries for E2E to 30s as some slow environments need more time for seeding
+        max_retries = 30 if is_e2e_sync_needed else 1
+
+        for attempt in range(max_retries):
             try:
-                # Force a fresh connection to the database
-                connection.close()
+                # Force a fresh connection to the database if we are in retry mode
+                if max_retries > 1:
+                    connection.close()
                 
                 with schema_context('public'):
                     if tenant_slug:
+                        # If a specific slug is requested, ONLY try to resolve that slug
                         tenant = Tenant.objects.filter(schema_name=tenant_slug).first()
-                        if tenant:
-                            print(f"[E2E DEBUG] Resolved tenant '{tenant_slug}' from header/query")
-                            break
-                        else:
-                            print(f"[E2E DEBUG] Tenant slug '{tenant_slug}' NOT FOUND in DB. Attempt {attempt+1}/15")
-                    
-                    if not tenant:
-                        # Fallback to hostname resolution
+                    else:
+                        # Fallback to hostname resolution ONLY if no slug is provided
                         try:
                             domain = Domain.objects.select_related('tenant').get(domain=hostname)
                             tenant = domain.tenant
-                            print(f"[E2E DEBUG] Resolved tenant '{tenant.schema_name}' from hostname '{hostname}'")
-                            break
                         except Domain.DoesNotExist:
                             # Localhost/Loopback fallback
                             if hostname in ['127.0.0.1', 'localhost', '0.0.0.0']:
                                 tenant = Tenant.objects.filter(schema_name='public').first() or \
                                          Tenant.objects.all().first()
-                                if tenant:
-                                    print(f"[E2E DEBUG] Fallback to tenant '{tenant.schema_name}' for hostname '{hostname}'")
-                                    break
+                
+                if tenant:
+                    break
 
-                # If no tenant found yet, wait and retry
-                import time
-                print(f"[E2E DEBUG] Retrying tenant resolution in 1s (Attempt {attempt+1}/15)...")
-                time.sleep(1)
+                if max_retries > 1:
+                    # If no tenant found yet, wait and retry
+                    import time
+                    if attempt % 5 == 0:
+                        print(f"[E2E DEBUG] Still waiting for tenant '{tenant_slug or hostname}' (Attempt {attempt+1}/{max_retries})...")
+                    time.sleep(1)
+                else:
+                    break
                 
             except Exception as e:
-                print(f"[E2E DEBUG] Error during tenant resolution (Attempt {attempt+1}/15): {e}")
-                import time
-                time.sleep(1)
+                if max_retries > 1:
+                    import time
+                    time.sleep(1)
+                else:
+                    break
 
         if not tenant:
             from django.http import Http404
