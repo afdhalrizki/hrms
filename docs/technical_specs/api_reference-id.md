@@ -159,7 +159,7 @@ Authorization: Bearer <access_token>
 - `404` - Tidak Ditemukan
 - `429` - Terlalu Banyak Permintaan (batas tarif terlampaui)
 
-### Contoh Kesalahan Kuota
+### Contoh Kesalahan Kuota & Langganan
 ```json
 {
   "error": "Kuota karyawan terlampaui untuk paket FREE Anda (Batas: 10).",
@@ -167,8 +167,22 @@ Authorization: Bearer <access_token>
 }
 ```
 
+```json
+{
+  "error": "Langganan Anda telah kedaluwarsa. Silakan perbarui untuk memulihkan akses penuh.",
+  "code": "SUBSCRIPTION_EXPIRED_READ_ONLY"
+}
+```
+
+```json
+{
+  "error": "Langganan Anda ditangguhkan karena belum melakukan pembayaran.",
+  "code": "SUBSCRIPTION_SUSPENDED"
+}
+```
+
 ---
 
-**Terakhir Diperbarui**: 28 April 2026  
-**Versi API**: v1.4.0  
-**Base URL**: https://api.harikerja.com
+**Terakhir Diperbarui**: 7 Mei 2026  
+**Versi API**: v1.5.0  
+**URL Dasar**: https://api.harikerja.com

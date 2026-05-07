@@ -169,5 +169,5 @@ Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi internal di s
 
 ---
 
-**Status**: 🚀 **Platform Gold Release v1.3.0 (31 Maret 2026)**. Siap untuk Fase Kesiapan Produksi.
+**Status**: 🚀 **Rilis Platform Gold v1.5.0 (7 Mei 2026)**. Siap untuk Fase Kesiapan Produksi.
 **Fokus Saat Ini**: Optimasi Kinerja Prioritas Tinggi & Penguatan Keamanan (Fase P5).

@@ -5,6 +5,8 @@
 - **Rasional isolasi berbasis skema**: Skema PostgreSQL memberikan isolasi data yang kuat dengan overhead performa minimal.
 - **Pemisahan aplikasi Bersama vs Tenant**: Pemisahan yang jelas untuk fungsionalitas global vs spesifik tenant.
 - **Manajemen koneksi database**: Connection pooling dengan PgBouncer untuk skalabilitas.
+- **Provisi Otomatis**: Pembuatan skema waktu nyata dan seeding database setelah persetujuan tenant.
+- **Siklus Hidup Langganan**: Uji coba 14 hari otomatis untuk tenant baru dengan fase ACTIVE, EXPIRED (Read-Only), dan SUSPENDED (Blocked).
 
 ### Prinsip Desain API
 - **Konvensi API RESTful**: Desain berorientasi sumber daya dengan kata kerja HTTP yang tepat.
@@ -30,7 +32,8 @@
 - **Struktur tabel spesifik tenant**: Semua data tenant dalam skema terpisah.
 - **Strategi pengindeksan**: Indeks B-tree untuk kunci asing, indeks GIN untuk bidang JSON.
 - **Kendala kunci asing**: Integritas referensial dengan ON DELETE CASCADE/SET NULL.
-- **Manajemen migrasi**: Migrasi bersama dan tenant terpisah dengan kontrol versi.
+- **Manajemen migrasi**: Migrasi Django bawaan untuk aplikasi publik dan spesifik tenant.
+- **Kepatuhan Pajak Indonesia (TER 2024)**: Dukungan bawaan untuk regulasi PPh 21 "Tarif Efektif Rata-rata".
 
 ### Optimasi Performa
 - **Optimasi kueri**: Optimasi Django ORM dengan select_related/prefetch_related.
@@ -72,7 +75,8 @@
 - **Kebijakan auto-scaling**: Auto-scaling pod horizontal berdasarkan CPU/memori.
 
 ### Pipeline CI/CD
-- **Strategi pengujian**: Pengujian unit, integrasi, dan E2E dengan cakupan 100%.
+- **Strategi pengujian**: Pengujian unit, integrasi, dan E2E dengan tingkat kelulusan 100%.
+- **Metrik Pengujian**: Backend (340 tes), Frontend (235 tes), Mobile (158 tes).
 - **Otomatisasi penyebaran**: GitOps dengan ArgoCD untuk Kubernetes.
 - **Prosedur rollback**: Rollback otomatis pada kegagalan penyebaran.
 - **Promosi lingkungan**: Alur kerja Dev → QA → Staging → Produksi.
@@ -155,7 +159,9 @@
 
 ---
 
-**Terakhir Diperbarui**: 31 Maret 2026  
+---
+
+**Terakhir Diperbarui**: 7 Mei 2026  
 **Pemilik Dokumen**: Tim Arsitektur Backend  
 **Siklus Peninjauan**: Triwulanan  
 **Status**: Aktif

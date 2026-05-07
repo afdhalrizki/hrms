@@ -10,6 +10,7 @@ This document provides a comprehensive overview of the currently implemented fea
 - [x] **Dynamic Subdomain Routing**: Tenant identification via URL hostnames (e.g., `client.harikerja.com`).
 - [x] **Tiered Resource Gating**: Feature masking and resource quotas (Employee count, Storage) based on plans.
 - [x] **Global Admin Portal**: Centralized management for tenant registrations, billing, and system health.
+- [x] **Automated Subscription Lifecycle**: 14-day trial gating with ACTIVE, EXPIRED (Read-Only), and SUSPENDED states.
 
 ### 👤 2. HR Master Data & User Identity
 - [x] **Employee Profiles**: Comprehensive PII management (Personal, Banking, Family, Education).

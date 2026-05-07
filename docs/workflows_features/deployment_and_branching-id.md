@@ -166,7 +166,7 @@ Untuk memastikan bahwa fitur yang berfungsi di **Lokal** juga berfungsi di **Pro
 
 ### 1. Sinkronisasi Migrasi Database
 *   **Jangan pernah** mengubah skema database secara manual di server mana pun.
-*   **Selalu** gunakan file migrasi (Alembic untuk Python/Backend).
+*   **Selalu** gunakan file migrasi (Migrasi Django untuk Python/Backend).
 *   Migrasi harus menjadi bagian dari PR dan dijalankan secara otomatis selama penyebaran ke QA/Staging/Prod.
 
 ### 2. Sinkronisasi Konfigurasi (`.env`)

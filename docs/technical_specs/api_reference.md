@@ -159,7 +159,7 @@ Authorization: Bearer <access_token>
 - `404` - Not Found
 - `429` - Too Many Requests (rate limit exceeded)
 
-### Quota Error Example
+### Quota & Subscription Error Examples
 ```json
 {
   "error": "Employee quota exceeded for your FREE plan (Limit: 10).",
@@ -167,8 +167,24 @@ Authorization: Bearer <access_token>
 }
 ```
 
+```json
+{
+  "error": "Your subscription has expired. Please renew to restore full access.",
+  "code": "SUBSCRIPTION_EXPIRED_READ_ONLY"
+}
+```
+
+```json
+{
+  "error": "Your subscription is suspended due to non-payment.",
+  "code": "SUBSCRIPTION_SUSPENDED"
+}
+```
+
 ---
 
-**Last Updated**: April 28, 2026  
-**API Version**: v1.4.0  
+---
+
+**Last Updated**: May 7, 2026  
+**API Version**: v1.5.0  
 **Base URL**: https://api.harikerja.com  

@@ -1,10 +1,12 @@
-﻿# Technical Specifications & Architecture Decisions
+# Technical Specifications & Architecture Decisions
 
 ## 🏗 System Architecture
 ### Multi-Tenant Design Patterns
 - **Schema-based isolation rationale**: PostgreSQL schemas provide strong data isolation with minimal performance overhead
 - **Shared vs Tenant app separation**: Clear separation for global vs tenant-specific functionality
 - **Database connection management**: Connection pooling with PgBouncer for scalability
+- **Automated Provisioning**: Real-time schema creation and database seeding upon tenant approval
+- **Subscription Lifecycle**: Automated 14-day trial for new tenants with ACTIVE, EXPIRED (Read-Only), and SUSPENDED (Blocked) phases
 
 ### API Design Principles
 - **RESTful API conventions**: Resource-oriented design with proper HTTP verbs
@@ -30,7 +32,8 @@
 - **Tenant-specific table structures**: All tenant data in separate schemas
 - **Indexing strategy**: B-tree indexes for foreign keys, GIN indexes for JSON fields
 - **Foreign key constraints**: Referential integrity with ON DELETE CASCADE/SET NULL
-- **Migration management**: Separate shared and tenant migrations with version control
+- **Migration management**: Native Django migrations for both public and tenant-specific apps
+- **Indonesian Tax Compliance (TER 2024)**: Native support for "Tarif Efektif Rata-rata" PPh 21 regulations
 
 ### Performance Optimization
 - **Query optimization**: Django ORM optimization with select_related/prefetch_related
@@ -72,7 +75,8 @@
 - **Auto-scaling policies**: Horizontal pod autoscaling based on CPU/memory
 
 ### CI/CD Pipeline
-- **Testing strategy**: Unit, integration, and E2E tests with 100% coverage
+- **Testing strategy**: Unit, integration, and E2E tests with 100% pass rate
+- **Test Metrics**: Backend (340 tests), Frontend (235 tests), Mobile (158 tests)
 - **Deployment automation**: GitOps with ArgoCD for Kubernetes
 - **Rollback procedures**: Automated rollback on deployment failure
 - **Environment promotion**: Dev → QA → Staging → Production workflow
@@ -155,7 +159,7 @@
 
 ---
 
-**Last Updated**: March 31, 2026  
+**Last Updated**: May 7, 2026  
 **Document Owner**: Backend Architecture Team  
 **Review Cycle**: Quarterly  
 **Status**: Active

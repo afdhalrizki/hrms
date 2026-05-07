@@ -166,7 +166,7 @@ To ensure that a feature working on **Local** also works on **Production**, we f
 
 ### 1. Database Migrations Sync
 *   **Never** change the database schema manually on any server.
-*   **Always** use migration files (Alembic for Python/Backend).
+*   **Always** use migration files (Django Migrations for Python/Backend).
 *   Migrations must be part of the PR and are executed automatically during deployment to QA/Staging/Prod.
 
 ### 2. Configuration Sync (`.env`)
