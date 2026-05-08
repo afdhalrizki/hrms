@@ -14,11 +14,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   
-  // 1. Immediate token check to avoid flickering spinner for unauthenticated users
+  // 1. Immediate token check to avoid flickering spinner for unauthenticated users.
+  // We check this directly to ensure it responds to localStorage changes.
   const hasToken = React.useMemo(() => {
     if (typeof window === 'undefined') return true; 
     return !!localStorage.getItem('access_token');
-  }, []); // Remove loading dependency to stabilize
+  }, [loading, user]); // Depend on loading/user to re-evaluate when auth state changes
 
   const pathname = usePathname();
 
@@ -36,6 +37,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     // Check if it's a known public route or any variant of the login page
     const isPublic = publicRoutes.some(route => normalizedPath === route || normalizedPath.startsWith(route)) || 
                      normalizedPath.includes('/login') || 
+                     pathname.includes('/login') ||
                      (tenant.isPublic && normalizedPath === '/');
                      
     return isPublic;

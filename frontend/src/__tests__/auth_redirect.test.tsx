@@ -49,7 +49,7 @@ describe('Home Page Redirection', () => {
     });
   });
 
-  it('redirects unauthenticated users to /signup on public domain', async () => {
+  it('shows landing page instead of redirecting unauthenticated users on public domain', async () => {
     (useAuth as any).mockReturnValue({
       user: null,
       loading: false,
@@ -58,12 +58,18 @@ describe('Home Page Redirection', () => {
       isPublic: true,
       subdomain: null,
     });
+    process.env.NEXT_PUBLIC_E2E_TESTING = 'true';
 
-    render(<Home />);
+    const { getByText } = render(<Home />);
 
+    // Should NOT redirect to /signup
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(mockPush).not.toHaveReturnedWith('/signup');
+    
+    // Should render landing page content
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/signup');
-    });
+      expect(getByText(/harikerja HRMS/i)).toBeDefined();
+    }, { timeout: 2000 });
   });
 
   it('does not redirect on tenant subdomain', async () => {

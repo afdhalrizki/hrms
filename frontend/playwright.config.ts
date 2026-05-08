@@ -63,6 +63,7 @@ export default defineConfig({
       url: 'http://127.0.0.1:3001/en/login/portal-admin',
       env: {
         NODE_ENV: 'test',
+        NEXT_PUBLIC_E2E_TESTING: 'true',
         NODE_OPTIONS: '--max-old-space-size=1536'
       },
       reuseExistingServer: true,

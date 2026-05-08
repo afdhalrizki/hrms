@@ -42,8 +42,14 @@ export default function Home() {
   const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user && isPublic) {
-      router.push('/signup');
+    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const isTest = process.env.NEXT_PUBLIC_E2E_TESTING === 'true';
+    const isPublicDomain = isPublic || isLocal || isTest;
+
+    // Only redirect to login if we are on a private tenant (subdomain) 
+    // where the root page is NOT public.
+    if (!authLoading && !user && !isPublicDomain) {
+      router.push('/login');
     }
   }, [user, authLoading, isPublic, router]);
 
@@ -71,7 +77,7 @@ export default function Home() {
     return () => controller.abort();
   }, [user]);
 
-  if (authLoading || statsLoading) {
+  if (authLoading || (user && statsLoading)) {
     return (
       <DashboardLayout>
         <div className="space-y-10">
@@ -125,9 +131,45 @@ export default function Home() {
       color: 'bg-purple-500/10 text-purple-500'
     },
   ];
+  
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
-  // If not logged in and on public, we'll be redirecting, so show nothing
-  if (!user && isPublic) return null;
+  // If not logged in and on public domain, show the Landing Page
+  const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const isTest = process.env.NEXT_PUBLIC_E2E_TESTING === 'true';
+  const isPublicDomain = isPublic || isLocal || isTest;
+  
+  if (!user && isPublicDomain) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10 text-center space-y-8">
+        <div className="space-y-4">
+          <h1 className="text-6xl font-black tracking-tighter animate-in fade-in slide-in-from-bottom-4 duration-1000">harikerja HRMS</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+            Next-generation Human Resource Management System. 
+            Automate your HR, Payroll, and Attendance with ease.
+          </p>
+        </div>
+        <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+          <a href="/login" className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
+            Login to Portal
+          </a>
+          <a href="/signup" className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-bold hover:bg-white/10 transition-all">
+            Get Started
+          </a>
+        </div>
+        <div className="flex gap-8 text-sm font-medium text-muted-foreground pt-20 animate-in fade-in duration-1000 delay-500">
+          <a href="/about" className="hover:text-primary transition-colors">About Us</a>
+          <a href="/pricelist" className="hover:text-primary transition-colors">Price List</a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout>

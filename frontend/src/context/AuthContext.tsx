@@ -48,8 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return data;
     } catch (err: any) {
       // Don't set error on 401/403 as it's expected if not logged in
-      if (!err.message?.includes('401') && !err.message?.includes('403')) {
+      const isAuthError = err.message?.includes('401') || err.message?.includes('403');
+      if (!isAuthError) {
         setError(err.message || 'Failed to load user profile');
+      } else {
+        // Clear tokens if we get an auth error to prevent redirect loops or stuck loading states
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        }
       }
       setUser(null);
       return null;
