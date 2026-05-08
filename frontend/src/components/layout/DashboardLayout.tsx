@@ -24,21 +24,21 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const isPublicRoute = React.useMemo(() => {
     // List of public routes from docs/technical_specs/auth_classification.md
-    // Note: '/' is only public on the landing page (public tenant)
     const publicRoutes = ['/about', '/pricelist', '/signup', '/login', '/registration'];
-    if (tenant.isPublic) {
-      publicRoutes.push('/');
-    }
     
     // Normalize pathname: remove locale prefix, trailing slash, and lowercase
-    // usePathname() from next-intl already removes locale, but we handle it just in case
     const pathWithoutLocale = pathname
       .replace(/^\/(en|id)(\/|$)/, '/')
       .replace(/\/$/, '') || '/';
     
     const normalizedPath = pathWithoutLocale.toLowerCase();
     
-    return publicRoutes.includes(normalizedPath) || normalizedPath === '/login';
+    // Check if it's a known public route or any variant of the login page
+    const isPublic = publicRoutes.some(route => normalizedPath === route || normalizedPath.startsWith(route)) || 
+                     normalizedPath.includes('/login') || 
+                     (tenant.isPublic && normalizedPath === '/');
+                     
+    return isPublic;
   }, [pathname, tenant.isPublic]);
 
   React.useEffect(() => {

@@ -31,7 +31,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !!localStorage.getItem('access_token');
+    }
+    return true;
+  });
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async (): Promise<UserProfile | null> => {
@@ -80,7 +85,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    fetchProfile();
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('access_token');
+    if (hasToken) {
+      fetchProfile();
+    } else {
+      setLoading(false);
+    }
   }, [fetchProfile]);
 
   const logout = () => {

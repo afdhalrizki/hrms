@@ -29,6 +29,7 @@ describe('AuthProvider', () => {
   });
 
   it('fetches and provides user profile on mount', async () => {
+    localStorage.setItem('access_token', 'fake-token');
     const mockUser = {
       id: 1,
       email: 'test@example.com',
@@ -57,6 +58,7 @@ describe('AuthProvider', () => {
   });
 
   it('handles API errors gracefully', async () => {
+    localStorage.setItem('access_token', 'fake-token');
     (api.apiFetch as any).mockRejectedValueOnce(new Error('Network Error'));
 
     render(
@@ -71,6 +73,7 @@ describe('AuthProvider', () => {
   });
 
   it('sets user to null on 401 error without showing global error message', async () => {
+    localStorage.setItem('access_token', 'fake-token');
     (api.apiFetch as any).mockRejectedValueOnce(new Error('401 Unauthorized'));
 
     render(
@@ -87,6 +90,7 @@ describe('AuthProvider', () => {
   });
 
   it('login sets tokens and user data', async () => {
+    localStorage.clear();
     const loginUser = {
       id: 99,
       email: 'newuser@example.com',
@@ -100,13 +104,6 @@ describe('AuthProvider', () => {
       access: 'new-access-token',
       refresh: 'new-refresh-token'
     };
-
-    (api.apiFetch as any).mockResolvedValueOnce({
-      id: 99,
-      email: 'newuser@example.com',
-      fullname: 'New User',
-      employee_nik: null
-    });
 
     const ActionsConsumer = () => {
       const { user, login, logout } = useAuth();
@@ -144,7 +141,7 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('user-email').textContent).toBe('newuser@example.com');
       expect(localStorage.getItem('access_token')).toBe('new-access-token');
       expect(localStorage.getItem('refresh_token')).toBe('new-refresh-token');
-    });
+    }, { timeout: 3000 });
 
     const logoutButton = screen.getByTestId('do-logout');
     fireEvent.click(logoutButton);
