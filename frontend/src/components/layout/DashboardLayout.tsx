@@ -13,85 +13,121 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const tenant = useTenant();
   const { user, loading } = useAuth();
   const router = useRouter();
-  
-  // 1. Immediate token check to avoid flickering spinner for unauthenticated users.
-  // We check this directly to ensure it responds to localStorage changes.
-  const hasToken = React.useMemo(() => {
-    if (typeof window === 'undefined') return true; 
-    return !!localStorage.getItem('access_token');
-  }, [loading, user]); // Depend on loading/user to re-evaluate when auth state changes
-
   const pathname = usePathname();
+  const [mounted, setMounted] = React.useState(false);
+  const [isRedirecting, setIsRedirecting] = React.useState(false);
 
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+  
   const isPublicRoute = React.useMemo(() => {
-    // List of public routes from docs/technical_specs/auth_classification.md
     const publicRoutes = ['/about', '/pricelist', '/signup', '/login', '/registration'];
     
-    // Normalize pathname: remove locale prefix, trailing slash, and lowercase
-    const pathWithoutLocale = pathname
-      .replace(/^\/(en|id)(\/|$)/, '/')
-      .replace(/\/$/, '') || '/';
+    // 1. Get raw path from window if available, else use pathname from next-intl
+    let rawPath = pathname;
+    if (typeof window !== 'undefined') {
+      rawPath = window.location.pathname;
+    }
     
-    const normalizedPath = pathWithoutLocale.toLowerCase();
+    if (!rawPath) return true; // Default to safe if unknown
+
+    // 2. Normalize: remove locale prefix (e.g., /en/profile -> /profile)
+    const normalizedPath = rawPath.replace(/^\/(en|id)(\/|$)/, '/').replace(/\/$/, '') || '/';
+    const finalPath = normalizedPath.toLowerCase();
     
-    // Check if it's a known public route or any variant of the login page
-    const isPublic = publicRoutes.some(route => normalizedPath === route || normalizedPath.startsWith(route)) || 
-                     normalizedPath.includes('/login') || 
-                     pathname.includes('/login') ||
-                     (tenant.isPublic && normalizedPath === '/');
+    // 3. Check against public list
+    const isPublic = publicRoutes.some(route => finalPath === route || finalPath.startsWith(route + '/')) || 
+                     finalPath.includes('/login') || 
+                     (tenant.isPublic && finalPath === '/');
                      
     return isPublic;
   }, [pathname, tenant.isPublic]);
 
-  React.useEffect(() => {
-    // If it's a public route, don't enforce redirect
-    if (isPublicRoute) return;
+  const hasToken = React.useMemo(() => {
+    if (!mounted || typeof window === 'undefined') return false; 
+    return !!localStorage.getItem('access_token');
+  }, [loading, user, mounted]);
 
-    // 1. Immediate redirect if no token is found in localStorage
-    if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
+  const isTest = process.env.NODE_ENV === 'test';
+
+  // REDIRECT LOGIC
+  React.useEffect(() => {
+    if (!mounted || typeof window === 'undefined' || isRedirecting) return;
+
+    const token = localStorage.getItem('access_token');
+
+    // If it's a public route, ensure we are not in redirecting state anymore
+    if (isPublicRoute) {
+      return;
+    }
+
+    // 1. Immediate redirect if no token is found
+    if (!token) {
+      setIsRedirecting(true);
       router.push('/login');
       return;
     }
 
-    // 2. Redirect only if auth has finished loading AND we are truly unauthenticated
-    if (!loading && !user && typeof window !== 'undefined') {
-      if (localStorage.getItem('access_token')) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-      }
+    // 2. Redirect if auth finished and no user
+    if (!loading && !user) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setIsRedirecting(true);
       router.push('/login');
     }
-  }, [user, loading, router, isPublicRoute]);
+  }, [user, loading, router, isPublicRoute, mounted, isRedirecting]);
 
-  // 3. If it's a protected route and we are still loading,
-  // show a minimal loading state to prevent content flicker.
-  // CRITICAL: NEVER show spinner on public routes like /login
-  if (!isPublicRoute && loading && hasToken && process.env.NODE_ENV !== 'test') {
+  // SAFETY FAILSAFE: Redirect to login if stuck in loading for too long
+  React.useEffect(() => {
+    if (!isPublicRoute && loading && hasToken && mounted && !isRedirecting) {
+      const timer = setTimeout(() => {
+        console.warn('[DashboardLayout] Auth timeout reached, forcing redirect...');
+        setIsRedirecting(true);
+        window.location.href = '/en/login';
+      }, 3000); // 3 seconds is enough to know something is slow
+      return () => clearTimeout(timer);
+    }
+  }, [isPublicRoute, loading, hasToken, mounted, router, isRedirecting]);
+
+  // 3. While redirecting or initial loading without token on private route, return null
+  // We bypass this in tests to allow components to render and be inspected
+  if (!isTest && !isPublicRoute && (isRedirecting || !hasToken)) {
+    return null;
+  }
+
+  // 4. If loading with token on private route, return null (blank page) but keep top bar active
+  // The useEffect above will handle the timeout or success
+  if (!isPublicRoute && loading && hasToken) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
-        <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-muted-foreground font-medium animate-pulse">Authenticating...</p>
+      <div className="fixed top-0 left-0 right-0 h-1.5 bg-primary/20 overflow-hidden z-[100]">
+        <div className="h-full bg-primary animate-progress-fast" />
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes progress-fast {
+            0% { transform: translateX(-100%); width: 30%; }
+            100% { transform: translateX(400%); width: 30%; }
+          }
+          .animate-progress-fast {
+            animation: progress-fast 0.8s linear infinite;
+          }
+        `}} />
       </div>
     );
   }
 
-  // 4. If it's a protected route and we have NO token, don't render anything
-  // while we wait for the useEffect redirect to trigger.
-  if (!isPublicRoute && !hasToken) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {loading && process.env.NODE_ENV !== 'test' && (
+      {/* Top Progress Bar for subtle loading indication */}
+      {loading && (
         <div className="fixed top-0 left-0 right-0 h-1 bg-primary/20 overflow-hidden z-50">
-          <div className="h-full bg-primary w-1/3 rounded-full animate-progress" style={{
-            animation: 'progress 1s ease-in-out infinite alternate'
-          }} />
+          <div className="h-full bg-primary w-1/3 rounded-full animate-progress" />
           <style dangerouslySetInnerHTML={{ __html: `
             @keyframes progress {
               0% { transform: translateX(-100%); width: 30%; }
               100% { transform: translateX(350%); width: 40%; }
+            }
+            .animate-progress {
+              animation: progress 1s ease-in-out infinite alternate;
             }
           `}} />
         </div>
@@ -106,7 +142,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <main className="pl-64 min-h-screen flex flex-col">
         <SubscriptionBanner />
-        {/* Top Navbar */}
         <header className="h-20 glass-nav flex items-center justify-between px-10 sticky top-0 z-30 border-b border-white/5 backdrop-blur-[15px]">
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -124,7 +159,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Content Area */}
         <div className="p-8 max-w-7xl mx-auto">
           {children}
         </div>

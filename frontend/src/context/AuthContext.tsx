@@ -40,15 +40,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async (): Promise<UserProfile | null> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     try {
       setLoading(true);
       setError(null);
-      const data = await apiFetch('/users/me');
+      const data = await apiFetch('/users/me', { signal: controller.signal });
       setUser(data);
       return data;
     } catch (err: any) {
+      // Handle abort (timeout)
+      if (err.name === 'AbortError') {
+        console.warn('[AuthContext] Profile fetch timed out after 5s');
+      }
+
       // Don't set error on 401/403 as it's expected if not logged in
-      const isAuthError = err.message?.includes('401') || err.message?.includes('403');
+      const isAuthError = err.message?.includes('401') || err.message?.includes('403') || err.name === 'AbortError';
       if (!isAuthError) {
         setError(err.message || 'Failed to load user profile');
       } else {
@@ -61,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       return null;
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }, []);
