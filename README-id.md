@@ -110,7 +110,7 @@ Untuk kontrol yang lebih spesifik, Anda dapat menjalankan tes di dalam setiap di
 
 - **Pondasi Multi-Tenant**: Isolasi data lengkap menggunakan skema PostgreSQL per pelanggan.
 - **Keamanan Biometrik**: Face ID bertenaga AI dengan pemeriksaan keaslian (liveness check) menggunakan Google ML Kit.
-- **Kepatuhan Penggajian Indonesia**: Mesin penggajian yang sepenuhnya mematuhi **TER 2024 PPh 21** dan BPJS.
+- **Kepatuhan Penggajian Indonesia**: Mesin penggajian yang sepenuhnya mematuhi **TER 2024 PPh 21** dan BPJS dengan pemetaan gaji berbasis Grade.
 - **Kinerja Strategis**: Pelacakan KPI, siklus Penilaian (Appraisal), dan alur kerja persetujuan multi-tahap.
 - **Manajemen Profil ESS**: Portal mandiri bagi karyawan untuk memperbarui info pribadi dan mengunggah dokumen.
 - **Auto-Onboarding**: Pendaftaran mandiri siap komersial dan penyediaan skema otomatis.
@@ -128,9 +128,9 @@ Untuk kontrol yang lebih spesifik, Anda dapat menjalankan tes di dalam setiap di
 
 Platform ini mencapai tingkat kelulusan tes **100% terpadu** di semua lapisan stack.
 
-- **Backend**: 348 Tes (329 Unit + 19 E2E) - Pytest.
-- **Frontend**: 245 Tes (187 Unit + 58 E2E) - Vitest & Playwright.
-- **Mobile**: 158 Tes (135 Unit + 23 E2E) - Flutter.
+- **Backend**: 348 Tes (329 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 11 Mei 2026)
+- **Frontend**: 245 Tes (187 Unit + 58 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 11 Mei 2026)
+- **Mobile**: 158 Tes (135 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 11 Mei 2026)
 
 ## 📈 Strategi Skalabilitas: Jalan Menuju 1 Juta Pengguna
 
@@ -169,5 +169,5 @@ Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi internal di s
 
 ---
 
-**Status**: 🚀 **Rilis Platform Gold v1.5.0 (7 Mei 2026)**. Siap untuk Fase Kesiapan Produksi.
+**Status**: 🚀 **Rilis Platform Gold v1.5.1 (11 Mei 2026)**. Siap untuk Fase Kesiapan Produksi.
 **Fokus Saat Ini**: Optimasi Kinerja Prioritas Tinggi & Penguatan Keamanan (Fase P5).

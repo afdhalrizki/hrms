@@ -80,7 +80,7 @@ from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from tenants.models import RegistrationRequest, Tenant, Domain
-from core.models import Department, Role, Golongan, Employee
+from core.models import Department, Role, Grade, Employee
 from core.tests.base import HRMSTestCase
 
 User = get_user_model()
@@ -180,7 +180,7 @@ class RegistrationFlowTestCase(HRMSTestCase):
         with schema_context(tenant.schema_name):
             self.assertTrue(Department.objects.filter(name="Management").exists())
             self.assertTrue(Role.objects.filter(name="Company Admin").exists())
-            self.assertTrue(Golongan.objects.filter(name="G1").exists())
+            self.assertTrue(Grade.objects.filter(name="G1").exists())
             
             # - Admin linked as Employee
             self.assertTrue(Employee.objects.filter(

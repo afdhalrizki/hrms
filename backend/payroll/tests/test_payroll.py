@@ -2,7 +2,7 @@ from decimal import Decimal
 from django_tenants.utils import schema_context
 from django.urls import reverse
 from rest_framework import status
-from core.models import Employee, Department, Role, Golongan
+from core.models import Employee, Department, Role, Grade
 from payroll.models import PayrollPeriod, Payslip, SalaryComponent, PayslipDetail
 from payroll.services import PayrollCalculator, BPJSManager, TaxEngine
 from core.tests.base import HRMSTestCase as TenantTestCase
@@ -18,7 +18,7 @@ class PayrollExtendedTestCase(TenantTestCase):
 
         cls.dept = Department.objects.create(name="Engineering")
         cls.role = Role.objects.create(name="Backend DEV", department=cls.dept)
-        cls.gol = Golongan.objects.create(
+        cls.gol = Grade.objects.create(
             name="G3",
             base_salary=Decimal('15000000'),
             meal_allowance=Decimal('500000'),
@@ -30,7 +30,7 @@ class PayrollExtendedTestCase(TenantTestCase):
             email="afdhal@comp.com",
             department=cls.dept,
             role=cls.role,
-            golongan=cls.gol,
+            grade=cls.gol,
             join_date="2024-01-01",
             ktp_number="123456789",
             ptkp_status='K/1' # Category B
@@ -43,7 +43,7 @@ class PayrollExtendedTestCase(TenantTestCase):
         # Public User
         cls.user = Employee.objects.create(
             nik="ADMIN", fullname="Admin", email="admin@tenant.com",
-            department=cls.dept, role=cls.role, golongan=cls.gol,
+            department=cls.dept, role=cls.role, grade=cls.gol,
             join_date="2024-01-01", ktp_number="000"
         )
         # Note: In real setup, User model is separate, but for smoke tests on payroll logic 
@@ -129,7 +129,7 @@ class PayrollExtendedTestCase(TenantTestCase):
         self.assertEqual(response['Content-Type'], 'application/pdf')
 
     def test_overtime_precedence_logic(self):
-        """Verify precedence: Golongan Rate > Tenant Rate > Divisor."""
+        """Verify precedence: Grade Rate > Tenant Rate > Divisor."""
         from attendance.models import Overtime
         Overtime.objects.create(
             employee=self.employee, date="2026-03-05", hours=10, status='APPROVED'
@@ -154,7 +154,7 @@ class PayrollExtendedTestCase(TenantTestCase):
         self.assertEqual(payslip.overtime_pay, Decimal('1000000'))
         payslip.delete()
         
-        # 3. Golongan Rate (200,000 * 10 = 2,000,000)
+        # 3. Grade Rate (200,000 * 10 = 2,000,000)
         self.gol.overtime_rate = 200000
         self.gol.save()
         self.employee.refresh_from_db()
@@ -205,7 +205,7 @@ class PayrollExtendedTestCase(TenantTestCase):
         # Create another employee and their payslip
         emp2 = Employee.objects.create(
             nik="EMP002", fullname="User Two", email="user2@comp.com",
-            department=self.dept, role=self.role, golongan=self.gol, join_date="2024-01-01"
+            department=self.dept, role=self.role, grade=self.gol, join_date="2024-01-01"
         )
         calc = PayrollCalculator(emp2, self.period)
         calc.run()

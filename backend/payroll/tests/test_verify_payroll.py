@@ -2,7 +2,7 @@ from decimal import Decimal
 from django_tenants.utils import schema_context
 from django.urls import reverse
 from rest_framework import status
-from core.models import Employee, Department, Role, Golongan
+from core.models import Employee, Department, Role, Grade
 from payroll.models import PayrollPeriod, Payslip
 from payroll.services import PayrollCalculator
 from core.tests.base import BaseHRTestCase
@@ -29,7 +29,7 @@ class PayrollVerificationTestCase(BaseHRTestCase):
             # 1. Reuse Master Data from BaseHRTestCase or create unique
             dept = self.dept
             role = self.role
-            golongan = self.gol
+            grade = self.gol
             
             # 2. Ensure an employee exists
             employee = Employee.objects.create(
@@ -38,7 +38,7 @@ class PayrollVerificationTestCase(BaseHRTestCase):
                 email="john_verify@test.com",
                 department=dept,
                 role=role,
-                golongan=golongan,
+                grade=grade,
                 join_date="2024-01-01",
                 ktp_number="1234567890-VER",
                 ptkp_status='TK/0'
@@ -55,13 +55,13 @@ class PayrollVerificationTestCase(BaseHRTestCase):
             payslip = calc.run()
 
             # Verify
-            assert payslip.basic_salary == golongan.base_salary
+            assert payslip.basic_salary == grade.base_salary
             assert payslip.net_pay > 0
 
     def test_payroll_calculator_edge_cases(self):
         """Test PayrollCalculator with missing data and zero boundaries."""
         with schema_context(self.tenant.schema_name):
-            # 1. Missing Golongan (should fallback to 0 basic)
+            # 1. Missing Grade (should fallback to 0 basic)
             emp_no_grade = Employee.objects.create(nik="NOGRADE-V", fullname="No Grade", email="no_v@test.com", join_date="2024-01-01", ktp_number="000-V")
             period = PayrollPeriod.objects.get_or_create(month=3, year=2026, defaults={'start_date': '2026-03-01', 'end_date': '2026-03-31'})[0]
             
@@ -75,8 +75,8 @@ class PayrollVerificationTestCase(BaseHRTestCase):
             self.tenant.save()
             
             # Use employee with grade but no overtime_rate to trigger divisor usage
-            gol, _ = Golongan.objects.get_or_create(name="G_DIV_V", defaults={'base_salary': Decimal('1730000')})
-            emp_div = Employee.objects.create(nik="DIVTEST-V", fullname="Div Test", email="div_v@test.com", join_date="2024-01-01", ktp_number="001-V", golongan=gol)
+            gol, _ = Grade.objects.get_or_create(name="G_DIV_V", defaults={'base_salary': Decimal('1730000')})
+            emp_div = Employee.objects.create(nik="DIVTEST-V", fullname="Div Test", email="div_v@test.com", join_date="2024-01-01", ktp_number="001-V", grade=gol)
             
             # Mock an approved overtime (1 hour) -> Should be 1,730,000 / 173 = 10,000
             from attendance.models import Overtime
@@ -89,8 +89,8 @@ class PayrollVerificationTestCase(BaseHRTestCase):
     def test_payroll_calculator_large_ot(self):
         """Precision: Decimal OT hours and large scale math."""
         with schema_context(self.tenant.schema_name):
-            gol, _ = Golongan.objects.get_or_create(name="LARGE_V", defaults={'base_salary': Decimal('50000000')})
-            emp = Employee.objects.create(nik="LARGE_OT_V", fullname="Large", email="large_v@test.com", join_date="2024-01-01", ktp_number="LARGE_V", golongan=gol)
+            gol, _ = Grade.objects.get_or_create(name="LARGE_V", defaults={'base_salary': Decimal('50000000')})
+            emp = Employee.objects.create(nik="LARGE_OT_V", fullname="Large", email="large_v@test.com", join_date="2024-01-01", ktp_number="LARGE_V", grade=gol)
             period = PayrollPeriod.objects.get_or_create(month=4, year=2026, defaults={'start_date': '2026-04-01', 'end_date': '2026-04-30'})[0]
             
             # 1.55 hours OT (Scale 2)
@@ -104,8 +104,8 @@ class PayrollVerificationTestCase(BaseHRTestCase):
     def test_payroll_atomic_rollback_on_failure(self):
         """Failure Handling: Ensure NO payslip is created if details fail (atomic)."""
         with schema_context(self.tenant.schema_name):
-            gol, _ = Golongan.objects.get_or_create(name="G_ROLL_V", defaults={'base_salary': Decimal('5000000')})
-            emp = Employee.objects.create(nik="ROLLBACK_V", fullname="Roll", email="roll_v@test.com", join_date="2024-01-01", ktp_number="ROLL_V", golongan=gol)
+            gol, _ = Grade.objects.get_or_create(name="G_ROLL_V", defaults={'base_salary': Decimal('5000000')})
+            emp = Employee.objects.create(nik="ROLLBACK_V", fullname="Roll", email="roll_v@test.com", join_date="2024-01-01", ktp_number="ROLL_V", grade=gol)
             period = PayrollPeriod.objects.get_or_create(month=5, year=2026, defaults={'start_date': '2026-05-01', 'end_date': '2026-05-31'})[0]
             
             from unittest.mock import patch

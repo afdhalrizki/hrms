@@ -43,7 +43,7 @@ class PayslipPDFGenerator:
             ["Name", f": {emp.fullname}", "Period", f": {self.payslip.period.get_month_display()} {self.payslip.period.year}"],
             ["NIK", f": {emp.nik}", "Payment Date", f": {self.payslip.payment_date or '-'}"],
             ["Department", f": {emp.department.name}", "PTKP Status", f": {emp.ptkp_status}"],
-            ["Role", f": {emp.role.name}", "Golongan", f": {emp.golongan.name}"],
+            ["Role", f": {emp.role.name}", "Grade", f": {emp.grade.name}"],
         ]
         
         t = Table(header_data, colWidths=[1*inch, 2.5*inch, 1*inch, 1.5*inch])

@@ -78,6 +78,6 @@ class TieringAccessTestCase(HRMSTestCase):
             data = response.json()
             if isinstance(data, list) and len(data) > 0:
                 emp = data[0]
-                # 'fullname' exists, but complex fields like 'golongan_name' should not be in Lite
+                # 'fullname' exists, but complex fields like 'grade_name' should not be in Lite
                 self.assertIn('fullname', emp)
-                self.assertNotIn('golongan_name', emp)
+                self.assertNotIn('grade_name', emp)

@@ -2,7 +2,7 @@ from datetime import date
 from django.urls import reverse
 from django_tenants.utils import schema_context
 from rest_framework import status
-from core.models import Department, Role, Golongan, Employee, Branch, AccessRole, APIKey, AuditLog
+from core.models import Department, Role, Grade, Employee, Branch, AccessRole, APIKey, AuditLog
 from users.models import User
 from core.tests.base import HRMSTestCase, BaseHRTestCase
 
@@ -11,8 +11,8 @@ class CoreModuleTestCase(BaseHRTestCase):
         super().setUp()
         self.user = self.admin_user
         self.employee = self.admin_employee
-        # BaseHRTestCase uses self.gol, test_core uses self.golongan
-        self.golongan = self.gol
+        # BaseHRTestCase uses self.gol, test_core uses self.grade
+        self.grade = self.gol
 
     def test_department_api(self):
         """Test Department CRUD via API."""
@@ -44,10 +44,10 @@ class CoreModuleTestCase(BaseHRTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Role.objects.get(name='Senior Developer').department, self.dept)
 
-    def test_golongan_api(self):
-        """Test Golongan salary fields."""
+    def test_grade_api(self):
+        """Test Grade salary fields."""
         self.client.force_login(self.user)
-        url = reverse('golongan-list')
+        url = reverse('grade-list')
         
         payload = {
             'name': 'IVB',
@@ -58,7 +58,7 @@ class CoreModuleTestCase(BaseHRTestCase):
         response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
-        gol = Golongan.objects.get(name='IVB')
+        gol = Grade.objects.get(name='IVB')
         self.assertEqual(float(gol.base_salary), 7500000.0)
 
     def test_employee_api(self):
@@ -74,7 +74,7 @@ class CoreModuleTestCase(BaseHRTestCase):
             'address': 'Jl. Keadilan No. 70',
             'department': self.dept.id,
             'role': self.role.id,
-            'golongan': self.golongan.id,
+            'grade': self.grade.id,
             'join_date': str(date.today()),
             'ktp_number': '0000000000000000',
             'npwp_number': 'NPWP002',
@@ -98,7 +98,7 @@ class CoreModuleTestCase(BaseHRTestCase):
             'email': 'provisioned@company.com',
             'department': self.dept.id,
             'role': self.role.id,
-            'golongan': self.golongan.id,
+            'grade': self.grade.id,
             'join_date': str(date.today()),
             'ktp_number': '1111111111111111',
             'ptkp_status': 'K/0',
@@ -249,9 +249,9 @@ class AuditIntegrationTestCase(HRMSTestCase):
 
     def test_audit_log_generation(self):
         """Verify that AuditModelMixin correctly generates logs for Master Data changes."""
-        from core.models import AuditLog, Golongan
+        from core.models import AuditLog, Grade
         self.client.force_login(self.user)
-        url = reverse('golongan-list')
+        url = reverse('grade-list')
         
         # 1. CREATE should trigger log
         payload = {'name': 'AuditGrade', 'base_salary': '1000.00'}
@@ -259,10 +259,10 @@ class AuditIntegrationTestCase(HRMSTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
         gol_id = response.data['id']
-        self.assertTrue(AuditLog.objects.filter(model_name='Golongan', action_type='CREATE', object_id=str(gol_id)).exists())
+        self.assertTrue(AuditLog.objects.filter(model_name='Grade', action_type='CREATE', object_id=str(gol_id)).exists())
         
         # 2. UPDATE should trigger log with diff
-        url_detail = reverse('golongan-detail', kwargs={'pk': gol_id})
+        url_detail = reverse('grade-detail', kwargs={'pk': gol_id})
         # Note: DecimalField might be stringified in the payload. 
         # AuditLogger compares model_to_dict values.
         payload_update = {'name': 'AuditGradeUpdated', 'base_salary': '2000.00'}
@@ -270,7 +270,7 @@ class AuditIntegrationTestCase(HRMSTestCase):
         self.assertEqual(response_patch.status_code, status.HTTP_200_OK)
         
         # Check AuditLog
-        update_log = AuditLog.objects.filter(model_name='Golongan', action_type='UPDATE', object_id=str(gol_id)).first()
+        update_log = AuditLog.objects.filter(model_name='Grade', action_type='UPDATE', object_id=str(gol_id)).first()
         self.assertIsNotNone(update_log, "AuditLog for UPDATE should exist")
         self.assertIn('name', update_log.changed_fields)
         self.assertEqual(update_log.changed_fields['name']['new'], 'AuditGradeUpdated')
@@ -297,14 +297,14 @@ class AuditIntegrationTestCase(HRMSTestCase):
 class DataConstraintTestCase(HRMSTestCase):
     def test_employee_ptkp_validation(self):
         """Verify PTKP status choices in Employee model."""
-        from core.models import Employee, Department, Role, Golongan
+        from core.models import Employee, Department, Role, Grade
         dept = Department.objects.create(name="D1")
         role = Role.objects.create(name="R1", department=dept)
-        gol, _ = Golongan.objects.get_or_create(name="G1_VAL", defaults={"base_salary": 1000})
+        gol, _ = Grade.objects.get_or_create(name="G1_VAL", defaults={"base_salary": 1000})
         
         emp = Employee.objects.create(
             nik="VAL-PTKP-UNIQUE", fullname="Val Test", email="val_ptkp@test.com",
-            department=dept, role=role, golongan=gol,
+            department=dept, role=role, grade=gol,
             join_date=date.today(), ktp_number="VALKTP-UNIQUE",
             ptkp_status="K/2" # Valid Choice
         )

@@ -3,7 +3,7 @@ from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from payroll.services import BPJSManager, TaxEngine, PayrollCalculator
 from payroll.models import PayrollPeriod, SalaryComponent
-from core.models import Employee, Department, Golongan
+from core.models import Employee, Department, Grade
 from datetime import date
 
 class PayrollServicesCoverageTestCase(TenantTestCase):
@@ -36,12 +36,12 @@ class PayrollServicesCoverageTestCase(TenantTestCase):
         rate = TaxEngine.get_ter_rate('INVALID', Decimal('5000000'))
         self.assertEqual(rate, Decimal('0'))
 
-    def test_payroll_calculator_no_golongan(self):
+    def test_payroll_calculator_no_grade(self):
         """Cover line 116 in payroll/services.py."""
         with schema_context(self.tenant.schema_name):
             dept = Department.objects.create(name='IT')
             emp = Employee.objects.create(
-                fullname='No Golongan', email='no@test.com', nik='N001',
+                fullname='No Grade', email='no@test.com', nik='N001',
                 join_date=date.today(), ktp_number='1', department=dept
             )
             period = PayrollPeriod.objects.create(month=1, year=2026, start_date=date(2026,1,1), end_date=date(2026,1,31))

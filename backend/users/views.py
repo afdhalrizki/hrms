@@ -48,7 +48,7 @@ class UserViewSet(TenantIsolationMixin, viewsets.ModelViewSet):
         is_public = not current_tenant or current_tenant.schema_name == 'public'
         
         if not is_public:
-            employee = Employee.objects.filter(email=user.email).select_related('role', 'department', 'role__department', 'golongan', 'access_role', 'supervisor').first()
+            employee = Employee.objects.filter(email=user.email).select_related('role', 'department', 'role__department', 'grade', 'access_role', 'supervisor').first()
             if employee:
                 data['employee_id'] = employee.id
                 data['employee_nik'] = employee.nik

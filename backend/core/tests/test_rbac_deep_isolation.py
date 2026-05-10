@@ -1,6 +1,6 @@
 from core.tests.base import BaseHRTestCase as TenantTestCase
 from django_tenants.utils import schema_context
-from core.models import Employee, Department, Role, Golongan
+from core.models import Employee, Department, Role, Grade
 from users.models import User
 from attendance.models import LeaveRequest
 from django.urls import reverse
@@ -32,10 +32,10 @@ class DeepIsolationTestCase(TenantTestCase):
             # Setup User/Employee in Tenant A
             self.dept_a = Department.objects.create(name="A Dept")
             self.role_a = Role.objects.create(name="A Role", department=self.dept_a)
-            self.gol_a = Golongan.objects.create(name="G_A", base_salary=1000)
+            self.gol_a = Grade.objects.create(name="G_A", base_salary=1000)
             self.emp_a = Employee.objects.create(
                 nik="EMP-A", fullname="User A", email="a@test.com", 
-                department=self.dept_a, role=self.role_a, golongan=self.gol_a,
+                department=self.dept_a, role=self.role_a, grade=self.gol_a,
                 join_date=date.today(), ktp_number="KTP-A"
             )
 
@@ -43,10 +43,10 @@ class DeepIsolationTestCase(TenantTestCase):
             # Setup User/Employee in Tenant B
             self.dept_b = Department.objects.create(name="B Dept")
             self.role_b = Role.objects.create(name="B Role", department=self.dept_b)
-            self.gol_b = Golongan.objects.create(name="G_B", base_salary=2000)
+            self.gol_b = Grade.objects.create(name="G_B", base_salary=2000)
             self.emp_b = Employee.objects.create(
                 nik="EMP-B", fullname="User B", email="b@test.com", 
-                department=self.dept_b, role=self.role_b, golongan=self.gol_b,
+                department=self.dept_b, role=self.role_b, grade=self.gol_b,
                 join_date=date.today(), ktp_number="KTP-B"
             )
             

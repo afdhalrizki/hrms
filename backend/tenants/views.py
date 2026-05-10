@@ -7,7 +7,7 @@ from django_tenants.utils import schema_context
 from .models import RegistrationRequest, Tenant, Domain
 from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer
 from users.models import User
-from core.models import Department, Role, Golongan, Employee
+from core.models import Department, Role, Grade, Employee
 from .tasks import send_registration_email_task, send_welcome_email_task
 class PublicSignupViewSet(viewsets.GenericViewSet):
     """
@@ -111,8 +111,8 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                             defaults={'description': "Top-level administrative role"}
                         )
                         
-                        # Create Default Golongan (for payroll stub)
-                        gol, _ = Golongan.objects.get_or_create(
+                        # Create Default Grade (for payroll stub)
+                        grade_obj, _ = Grade.objects.get_or_create(
                             name="G1",
                             defaults={
                                 'base_salary': 10000000,
@@ -134,7 +134,7 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
                                 'fullname': registration.company_name + " Admin",
                                 'department': dept,
                                 'role': role,
-                                'golongan': gol,
+                                'grade': grade_obj,
                                 'access_role': admin_role,
                                 'status': 'PERMANENT',
                                 'join_date': date.today(),

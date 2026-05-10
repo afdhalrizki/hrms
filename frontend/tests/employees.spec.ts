@@ -61,7 +61,7 @@ test.describe.serial('Employee Management', () => {
     // Select options from seeded backend
     await page.locator('select[name="department"]').selectOption({ label: 'Engineering' });
     await page.locator('select[name="role"]').selectOption({ label: 'Software Engineer' });
-    await page.locator('select[name="golongan"]').selectOption({ label: '3A' });
+    await page.locator('select[name="grade"]').selectOption({ label: '3A' });
     await page.locator('select[name="access_role"]').selectOption({ label: 'Finance Staff' });
     
     // Submit

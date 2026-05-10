@@ -17,7 +17,7 @@ Aplikasi employee self-service (ESS) untuk ekosistem **harikerja HRMS**. Aplikas
 - **Pengaturan Akun**: Personalisasi aplikasi, preferensi bahasa, dan manajemen logout yang aman.
 
 ### 📊 Status & Kematangan Fitur
-Untuk audit mendalam tentang fitur yang diimplementasikan vs fitur tiruan (mocked), lihat [**Audit Fitur & Analisis Kesenjangan**](./docs/feature_audit.md).
+Untuk audit mendalam tentang fitur yang diimplementasikan vs fitur tiruan (mocked), lihat [**Audit Fitur & Analisis Kesenjangan**](../docs/project_management/mobile_feature_audit-id.md) ([**English Version**](../docs/project_management/mobile_feature_audit.md)).
 
 | Modul | Status | Dinamis? |
 | :--- | :--- | :--- |

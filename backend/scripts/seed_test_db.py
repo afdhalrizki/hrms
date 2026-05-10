@@ -36,17 +36,29 @@ from seeds.reimbursement import seed_reimbursement_data
 from seeds.performance import seed_performance_data
 
 def clean_slate():
-    """Nuclear cleanup using TRUNCATE CASCADE."""
+    """Nuclear cleanup: Truncate tables and DROP all non-public schemas."""
     from django.db import connection, transaction
     with connection.cursor() as cursor:
         print("   🧹 Cleaning up existing tenants and users...")
+        
+        # 1. Truncate shared tables
         cursor.execute("TRUNCATE TABLE tenants_tenant CASCADE;")
         cursor.execute("TRUNCATE TABLE tenants_registrationrequest CASCADE;")
         cursor.execute("TRUNCATE TABLE users_user CASCADE;")
         
-        # Reset sequences to ensure deterministic IDs for many-to-many and FKs
+        # 2. Reset sequences
         cursor.execute("ALTER SEQUENCE IF EXISTS tenants_tenant_id_seq RESTART WITH 1;")
         cursor.execute("ALTER SEQUENCE IF EXISTS users_user_id_seq RESTART WITH 1;")
+        
+        # 3. Drop all schemas except protected ones
+        cursor.execute("SELECT schema_name FROM information_schema.schemata;")
+        schemas = [row[0] for row in cursor.fetchall()]
+        protected_schemas = ['public', 'information_schema', 'pg_catalog', 'pg_toast']
+        
+        for schema in schemas:
+            if schema not in protected_schemas and not schema.startswith('pg_'):
+                print(f"      🗑️ Dropping stale schema: {schema}")
+                cursor.execute(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE;')
         
         if not connection.get_autocommit():
             transaction.commit()

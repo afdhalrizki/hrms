@@ -2,7 +2,7 @@ from decimal import Decimal
 from django_tenants.utils import schema_context
 from django.urls import reverse
 from rest_framework import status
-from core.models import Employee, Department, Golongan
+from core.models import Employee, Department, Grade
 from payroll.models import PayrollPeriod, Payslip
 from users.models import User
 from core.tests.base import BaseHRTestCase
@@ -19,7 +19,7 @@ class PayrollSubscriptionEnforcementTestCase(BaseHRTestCase):
             # Using unique data to avoid conflicts with other tests
             self.sub_employee = Employee.objects.create(
                 nik="EMP-SUB-ENFORCE", fullname="Afdhal Sub", email="afdhal_sub@test.com",
-                department=self.dept, golongan=self.gol, join_date="2024-01-01", ktp_number="123-SUB"
+                department=self.dept, grade=self.gol, join_date="2024-01-01", ktp_number="123-SUB"
             )
             self.period = PayrollPeriod.objects.create(
                 month=3, year=2026, start_date="2026-03-01", end_date="2026-03-31"

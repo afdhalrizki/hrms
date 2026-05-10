@@ -17,7 +17,7 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Account Settings**: App personalization, language preferences, and secure logout management.
 
 ### 📊 Feature Status & Maturity
-For a detailed audit of implemented vs. mocked features, see [**Feature Audit & Gap Analysis**](./docs/feature_audit.md).
+For a detailed audit of implemented vs. mocked features, see [**Feature Audit & Gap Analysis**](../docs/project_management/mobile_feature_audit.md) ([**Versi Indonesia**](../docs/project_management/mobile_feature_audit-id.md)).
 
 | Module | Status | Dynamic? |
 | :--- | :--- | :--- |
@@ -108,6 +108,6 @@ For in-depth technical details, please refer to the platform-wide documentation 
 - [**Technical Specifications**](../docs/technical_specs/)
 
 ---
-**Status**: 🏆 **Platform Gold Release v1.3.0 (March 31, 2026)**. Scalability Blueprint & Mobile Experience Standardized.
+**Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Mobile Experience Standardized.
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
 

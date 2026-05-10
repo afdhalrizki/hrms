@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    Department, Role, Golongan, Employee, AccessRole, 
+    Department, Role, Grade, Employee, AccessRole, 
     Branch, WorkflowConfig, WorkflowStage, WorkflowAction,
     APIKey, AuditLog
 )
@@ -82,9 +82,9 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = '__all__'
 
-class GolonganSerializer(serializers.ModelSerializer):
+class GradeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Golongan
+        model = Grade
         fields = '__all__'
 
 class AccessRoleSerializer(serializers.ModelSerializer):
@@ -95,7 +95,7 @@ class AccessRoleSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.ReadOnlyField(source='department.name')
     role_name = serializers.ReadOnlyField(source='role.name')
-    golongan_name = serializers.ReadOnlyField(source='golongan.name')
+    grade_name = serializers.ReadOnlyField(source='grade.name')
     access_role_name = serializers.ReadOnlyField(source='access_role.name')
     supervisor_name = serializers.ReadOnlyField(source='supervisor.fullname')
     
@@ -118,20 +118,20 @@ class EmployeeProfileSerializer(serializers.ModelSerializer):
     """Specialized serializer for self-service profile updates (Phase 70)."""
     department_name = serializers.ReadOnlyField(source='department.name')
     role_name = serializers.ReadOnlyField(source='role.name')
-    golongan_name = serializers.ReadOnlyField(source='golongan.name')
+    grade_name = serializers.ReadOnlyField(source='grade.name')
     supervisor_name = serializers.ReadOnlyField(source='supervisor.fullname')
     
     class Meta:
         model = Employee
         fields = [
             'id', 'fullname', 'nik', 'email', 'phone', 'address',
-            'department_name', 'role_name', 'golongan_name', 'supervisor_name',
+            'department_name', 'role_name', 'grade_name', 'supervisor_name',
             'ktp_number', 'npwp_number', 'ptkp_status', 'ktp_image', 'npwp_image',
             'face_reference', 'join_date', 'status'
         ]
         read_only_fields = [
             'id', 'fullname', 'nik', 'email', 'department_name', 
-            'role_name', 'golongan_name', 'supervisor_name', 
+            'role_name', 'grade_name', 'supervisor_name', 
             'join_date', 'status'
         ]
         extra_kwargs = {

@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 from users.models import User
 from users.middleware import TenantAccessMiddleware
 from tenants.models import Tenant, Domain
-from core.models import Department, Role, Golongan, Employee
+from core.models import Department, Role, Grade, Employee
 from core.tests.base import HRMSTestCase as TenantTestCase
 
 class UserModuleTestCase(TenantTestCase):
@@ -48,13 +48,13 @@ class UserModuleTestCase(TenantTestCase):
         # 1. Setup HR data for this user in self.tenant
         dept = Department.objects.create(name="Engineering")
         role = Role.objects.create(name="Developer", department=dept)
-        gol = Golongan.objects.create(name="G2", base_salary=15000000)
+        gol = Grade.objects.create(name="G2", base_salary=15000000)
         
         employee = Employee.objects.get(email=self.tenant_user.email)
         employee.nik = "DEV-001"
         employee.department = dept
         employee.role = role
-        employee.golongan = gol
+        employee.grade = gol
         employee.join_date = "2024-01-01"
         employee.ktp_number = "123456789"
         employee.save()

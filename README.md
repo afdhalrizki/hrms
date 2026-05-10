@@ -110,7 +110,7 @@ For more granular control, you can run tests within each module directory:
 
 - **Multi-Tenant Foundation**: Complete data isolation using PostgreSQL schemas per customer.
 - **Biometric Security**: AI-powered Face ID with liveness check using Google ML Kit.
-- **Indonesian Payroll Compliance**: Fully compliant **TER 2024 PPh 21** and BPJS engine.
+- **Indonesian Payroll Compliance**: Fully compliant **TER 2024 PPh 21** and BPJS engine with Grade-based salary mapping.
 - **Strategic Performance**: KPI tracking, Appraisal lifecycle, and multi-stage approval workflows.
 - **ESS Profile Management**: Self-service portal for employees to update personal info and upload documents.
 - **Auto-Onboarding**: Commercial-ready self-service registration and schema provisioning.
@@ -128,9 +128,9 @@ For more granular control, you can run tests within each module directory:
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 348 Tests (329 Unit + 19 E2E) - Pytest.
-- **Frontend**: 245 Tests (187 Unit + 58 E2E) - Vitest & Playwright.
-- **Mobile**: 158 Tests (135 Unit + 23 E2E) - Flutter.
+- **Backend**: 348 Tests (329 Unit + 19 E2E) - Pytest. (Verified 100% Passed - May 11, 2026)
+- **Frontend**: 245 Tests (187 Unit + 58 E2E) - Vitest & Playwright. (Verified 100% Passed - May 11, 2026)
+- **Mobile**: 158 Tests (135 Unit + 23 E2E) - Flutter. (Verified 100% Passed - May 11, 2026)
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
 
@@ -150,15 +150,15 @@ To guarantee stability, we have defined a **10-person core team** structure:
 2.  **Next Phase**: 1,000 - 10,000 User Scaling with enhanced monitoring
 3.  **Future Phase**: 100,000+ User scaling with full 10-person team deployment
 
-Detailed scaling strategy: [**Technical Team Strategy**](./docs/plans/technical_team_strategy.md)
+Detailed scaling strategy: [**Technical Team Strategy**](./docs/business_strategy/organization_structure_strategy.md) ([**Versi Indonesia**](./docs/business_strategy/organization_structure_strategy-id.md))
 
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide internal documentation:
 
-- [**Feature Checklist & Roadmap**](./docs/project_management/feature_roadmap_checklist.md) - Complete list of existing features and future plans
-- [**AWS High Availability Architecture**](./docs/architecture/aws_high_availability_architecture.md) - 1M user scaling design
-- [**Scalability Architecture Guide**](./docs/architecture/scaling_architecture_guide.md) - 100k to 1M scaling (AWS vs VPS)
+- [**Feature Checklist & Roadmap**](./docs/project_management/feature_roadmap_checklist.md) ([**Versi Indonesia**](./docs/project_management/feature_roadmap_checklist-id.md)) - Complete list of existing features and future plans
+- [**AWS High Availability Architecture**](./docs/architecture/aws_high_availability_architecture.md) ([**Versi Indonesia**](./docs/architecture/aws_high_availability_architecture-id.md)) - 1M user scaling design
+- [**Scalability Architecture Guide**](./docs/architecture/scaling_architecture_guide.md) ([**Versi Indonesia**](./docs/architecture/scaling_architecture_guide-id.md)) - 100k to 1M scaling (AWS vs VPS)
 
 ## 🛠 Tech Stack
 
@@ -169,5 +169,5 @@ For in-depth technical details, please refer to the platform-wide internal docum
 
 ---
 
-**Status**: 🚀 **Platform Gold Release v1.5.0 (May 7, 2026)**. Ready for Production Readiness Phase.
+**Status**: 🚀 **Platform Gold Release v1.5.1 (May 11, 2026)**. Ready for Production Readiness Phase.
 **Current Focus**: High Priority Performance Optimization & Security Hardening (Phase P5).

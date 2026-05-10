@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 # Import ViewSets
 from users.views import UserViewSet, LoginAPIView, health_check
 from core.views import (
-    DepartmentViewSet, RoleViewSet, GolonganViewSet, EmployeeViewSet, 
+    DepartmentViewSet, RoleViewSet, GradeViewSet, EmployeeViewSet, 
     AccessRoleViewSet, BranchViewSet, WorkflowConfigViewSet, 
     WorkflowStageViewSet, WorkflowActionViewSet, APIKeyViewSet, AuditLogViewSet,
     DashboardStatsAPIView
@@ -27,7 +27,7 @@ router.register(r'users', UserViewSet)
 router.register(r'auth', LoginAPIView, basename='auth')
 router.register(r'departments', DepartmentViewSet)
 router.register(r'roles', RoleViewSet)
-router.register(r'golongan', GolonganViewSet)
+router.register(r'grades', GradeViewSet)
 router.register(r'access-roles', AccessRoleViewSet)
 router.register(r'employees', EmployeeViewSet)
 router.register(r'attendance', AttendanceViewSet)

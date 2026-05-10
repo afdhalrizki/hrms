@@ -24,7 +24,7 @@ Sistem mengikuti alur kerja **B2B SaaS** terpusat untuk memastikan setiap perusa
     1.  **Pembuatan Skema**: Database PostgreSQL membuat skema terisolasi baru untuk perusahaan (misal, `pt_maju_bersama`).
     2.  **Pemetaan Domain**: Subdomain (misal, `maju.harikerja.com`) didaftarkan.
     3.  **Penyediaan Pengguna**: Akun pengguna Admin dibuat di skema `public` dan ditautkan ke tenant.
-    4.  **Inisialisasi Dasar HR**: Sistem secara otomatis menghasilkan data master dasar (Departemen Manajemen, Peran Admin, Golongan Gaji Dasar) di dalam skema tenant agar sistem siap digunakan segera.
+    4.  **Inisialisasi Dasar HR**: Sistem secara otomatis menghasilkan data master dasar (Departemen Manajemen, Peran Admin, Grade Gaji Dasar) di dalam skema tenant agar sistem siap digunakan segera.
 
 ### Tahap 4: Onboarding
 *   **Tindakan**: Admin perusahaan menerima kredensial login.

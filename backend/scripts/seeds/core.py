@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from tenants.models import Tenant, Domain
-from core.models import Employee, Department, Role, Golongan, AccessRole, Branch, APIKey, WorkflowConfig, WorkflowStage
+from core.models import Employee, Department, Role, Grade, AccessRole, Branch, APIKey, WorkflowConfig, WorkflowStage
 from django_tenants.utils import schema_context
 from django.core.management import call_command
 import time
@@ -90,7 +90,7 @@ def seed_base_data(tenant, admin_email=None):
         dept_eng, _ = Department.objects.get_or_create(name='Engineering')
         role_mgr, _ = Role.objects.get_or_create(name='Manager', department=dept_eng)
         role_se, _ = Role.objects.get_or_create(name='Software Engineer', department=dept_eng)
-        gol_3a, _ = Golongan.objects.update_or_create(
+        gol_3a, _ = Grade.objects.update_or_create(
             name='3A', 
             defaults={'base_salary': 15000000, 'meal_allowance': 50000, 'transport_allowance': 30000}
         )
@@ -174,7 +174,7 @@ def seed_base_data(tenant, admin_email=None):
                 'ktp_number': f'12345678901234{schema_name[-1] if schema_name[-1].isdigit() else "0"}0',
                 'department': dept_eng,
                 'role': role_se,
-                'golongan': gol_3a,
+                'grade': gol_3a,
                 'access_role': ar_admin,
                 'branch': branch_jkt,
                 'join_date': '2023-01-01'
@@ -196,7 +196,7 @@ def seed_base_data(tenant, admin_email=None):
                 'ktp_number': f'12345678901234{schema_name[-1] if schema_name[-1].isdigit() else "0"}1',
                 'department': dept_eng,
                 'role': role_mgr,
-                'golongan': gol_3a,
+                'grade': gol_3a,
                 'supervisor': admin_emp,
                 'access_role': ar_mgr,
                 'branch': branch_jkt,
@@ -222,7 +222,7 @@ def seed_base_data(tenant, admin_email=None):
                     'ktp_number': f'12345678901234{schema_name[-1] if schema_name[-1].isdigit() else "0"}{i+1}',
                     'department': dept_eng,
                     'role': role_se,
-                    'golongan': gol_3a,
+                    'grade': gol_3a,
                     'supervisor': mgr_emp,
                     'branch': branch_jkt,
                     'join_date': '2023-01-01'

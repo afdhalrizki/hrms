@@ -1,7 +1,7 @@
 from django_tenants.test.cases import FastTenantTestCase
 from rest_framework.test import APIClient
 from users.models import User
-from core.models import Department, Role, Golongan, Employee, AccessRole, Branch
+from core.models import Department, Role, Grade, Employee, AccessRole, Branch
 from decimal import Decimal
 import os
 
@@ -101,7 +101,7 @@ class HRMSTestCase(FastTenantTestCase):
 
 class BaseHRTestCase(HRMSTestCase):
     """
-    Extends HRMSTestCase with common HR master data (Department, Role, Golongan).
+    Extends HRMSTestCase with common HR master data (Department, Role, Grade).
     """
     def setUp(self):
         super().setUp()
@@ -121,7 +121,7 @@ class BaseHRTestCase(HRMSTestCase):
         
         self.dept, _ = Department.objects.get_or_create(name="Default Dept")
         self.role, _ = Role.objects.get_or_create(name="Default Role", department=self.dept)
-        self.gol, _ = Golongan.objects.get_or_create(
+        self.gol, _ = Grade.objects.get_or_create(
             name="G1", 
             defaults={'base_salary': Decimal('10000000')}
         )
@@ -133,7 +133,7 @@ class BaseHRTestCase(HRMSTestCase):
                 'fullname': 'Admin Base',
                 'department': self.dept,
                 'role': self.role,
-                'golongan': self.gol,
+                'grade': self.gol,
                 'join_date': '2024-01-01',
                 'ktp_number': 'KTP-BASE'
             }

@@ -4,7 +4,7 @@ from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
 from rest_framework import status
 from rest_framework.test import APIClient
-from core.models import Department, Role, Golongan, Employee
+from core.models import Department, Role, Grade, Employee
 from users.models import User
 
 class EmployeeProfileSelfServiceTest(TenantTestCase):
@@ -16,7 +16,7 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
             # 1. Setup Master Data
             self.dept = Department.objects.create(name='Technology')
             self.role = Role.objects.create(name='Developer', department=self.dept)
-            self.gol = Golongan.objects.create(name='IIIA', base_salary=5000000)
+            self.gol = Grade.objects.create(name='IIIA', base_salary=5000000)
             
             # 2. Setup Employee User (Standard)
             self.user = User.objects.create_user(email='emp@test.com', password='password')
@@ -28,7 +28,7 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
                 email='emp@test.com',
                 department=self.dept,
                 role=self.role,
-                golongan=self.gol,
+                grade=self.gol,
                 join_date=date.today(),
                 ktp_number='KTPS70001',
                 ptkp_status='TK/0'
@@ -43,7 +43,7 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
                 email='other@test.com',
                 department=self.dept,
                 role=self.role,
-                golongan=self.gol,
+                grade=self.gol,
                 join_date=date.today(),
                 ktp_number='KTPS70002'
             )

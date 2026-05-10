@@ -226,10 +226,14 @@ export function parseMetrics(logContent, suiteName) {
           if (currentSection === 'unit') up += count;
           else if (currentSection === 'e2e') ep += count;
       }
+      if (flakyMatch) {
+          const count = parseInt(flakyMatch[1], 10);
+          p += count;
+          if (currentSection === 'e2e') ep += count;
+      }
       if (failMatch) f += parseInt(failMatch[1], 10);
       if (errMatch) e += parseInt(errMatch[1], 10);
       if (skipMatch) w += parseInt(skipMatch[1], 10);
-      if (flakyMatch) w += parseInt(flakyMatch[1], 10);
       
       // Also match the custom summary lines if they are present
       const customMatch = cleanLine.match(/^\s*Tests\s*:\s*(\d+)\s*\/\s*(\d+)/);

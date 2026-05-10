@@ -112,8 +112,8 @@ class PayrollCalculator:
     from django.db import transaction
     @transaction.atomic
     def run(self) -> Payslip:
-        # 1. Base Salary from Golongan (with Pro-rata for joiners/leavers)
-        raw_basic = self.employee.golongan.base_salary if self.employee.golongan else Decimal('0')
+        # 1. Base Salary from Grade (with Pro-rata for joiners/leavers)
+        raw_basic = self.employee.grade.base_salary if self.employee.grade else Decimal('0')
         
         # Ensure dates are date objects (handle potential string inputs from tests/mocks)
         from datetime import date
@@ -154,7 +154,7 @@ class PayrollCalculator:
             'is_deduction': False
         })
 
-        # 2. Daily Allowances (Meal & Transport) from Golongan
+        # 2. Daily Allowances (Meal & Transport) from Grade
         from attendance.models import Attendance
         attendances = Attendance.objects.filter(
             employee=self.employee,
@@ -169,9 +169,9 @@ class PayrollCalculator:
         from django_tenants.utils import get_tenant_model
         tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
 
-        if self.employee.golongan:
-            meal_allowance = self.employee.golongan.meal_allowance * days_worked
-            transport_allowance = self.employee.golongan.transport_allowance * days_worked
+        if self.employee.grade:
+            meal_allowance = self.employee.grade.meal_allowance * days_worked
+            transport_allowance = self.employee.grade.transport_allowance * days_worked
             
             if meal_allowance > 0:
                 self.gross_pay += meal_allowance
@@ -243,8 +243,8 @@ class PayrollCalculator:
             from django.db import connection
             tenant = connection.tenant
             
-            if self.employee.golongan and self.employee.golongan.overtime_rate > 0:
-                hourly_rate = Decimal(str(self.employee.golongan.overtime_rate))
+            if self.employee.grade and self.employee.grade.overtime_rate > 0:
+                hourly_rate = Decimal(str(self.employee.grade.overtime_rate))
             elif getattr(tenant, 'overtime_rate', 0) > 0:
                 hourly_rate = Decimal(str(tenant.overtime_rate))
             else:

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Department, Role, Golongan, Employee, Branch, 
+    Department, Role, Grade, Employee, Branch, 
     WorkflowConfig, WorkflowStage, WorkflowAction,
     APIKey, AuditLog
 )
@@ -45,12 +45,12 @@ class DepartmentAdmin(admin.ModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('name', 'department')
 
-@admin.register(Golongan)
-class GolonganAdmin(admin.ModelAdmin):
+@admin.register(Grade)
+class GradeAdmin(admin.ModelAdmin):
     list_display = ('name', 'base_salary', 'meal_allowance', 'transport_allowance')
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('nik', 'fullname', 'email', 'branch', 'department', 'role', 'golongan', 'status')
+    list_display = ('nik', 'fullname', 'email', 'branch', 'department', 'role', 'grade', 'status')
     search_fields = ('nik', 'fullname', 'email')
-    list_filter = ('status', 'branch', 'department', 'golongan')
+    list_filter = ('status', 'branch', 'department', 'grade')

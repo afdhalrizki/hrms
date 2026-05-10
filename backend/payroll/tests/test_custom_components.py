@@ -1,7 +1,7 @@
 from decimal import Decimal
 from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
-from core.models import Employee, Golongan
+from core.models import Employee, Grade
 from payroll.models import PayrollPeriod, SalaryComponent, EmployeeSalaryComponent, Payslip, PayslipDetail
 from payroll.services import PayrollCalculator
 
@@ -9,7 +9,7 @@ class CustomComponentIntegrationTestCase(TenantTestCase):
     def setUp(self):
         super().setUp()
         with schema_context(self.tenant.schema_name):
-            self.gol = Golongan.objects.create(
+            self.gol = Grade.objects.create(
                 name="G_CUSTOM",
                 base_salary=Decimal('8000000'),
             )
@@ -17,7 +17,7 @@ class CustomComponentIntegrationTestCase(TenantTestCase):
                 nik="CUSTOM001",
                 fullname="Custom User",
                 email="custom@test.com",
-                golongan=self.gol,
+                grade=self.gol,
                 join_date="2024-01-01",
                 ktp_number="CUSTOM-1",
                 ptkp_status='TK/0'

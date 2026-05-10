@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
-from core.models import Employee, Department, AccessRole, Branch, Role, Golongan
+from core.models import Employee, Department, AccessRole, Branch, Role, Grade
 from attendance.models import Attendance, LeaveRequest
 from payroll.models import Payslip, PayrollPeriod
 from users.models import User
@@ -55,7 +55,7 @@ class DashboardStatsTestCase(HRMSTestCase):
             longitude=Decimal("106.816666")
         )
         self.role = Role.objects.create(name="Manager", department=self.dept_it)
-        self.gol = Golongan.objects.create(name="G1", base_salary=10000000)
+        self.gol = Grade.objects.create(name="G1", base_salary=10000000)
 
         # 4. Create Employees
         self.emp_admin = Employee.objects.create(
@@ -64,7 +64,7 @@ class DashboardStatsTestCase(HRMSTestCase):
             email=self.user_admin.email,
             department=self.dept_hr,
             role=self.role,
-            golongan=self.gol,
+            grade=self.gol,
             access_role=self.admin_role,
             join_date=timezone.localdate(),
             ktp_number="1234567890123456"
@@ -76,7 +76,7 @@ class DashboardStatsTestCase(HRMSTestCase):
             email=self.user_staff.email,
             department=self.dept_it,
             role=self.role,
-            golongan=self.gol,
+            grade=self.gol,
             access_role=self.staff_role,
             join_date=timezone.localdate() - timezone.timedelta(days=40),
             ktp_number="9876543210987654"

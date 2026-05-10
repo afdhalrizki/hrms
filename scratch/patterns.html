@@ -1,0 +1,2757 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Page not found at /api/nonexistent/</title>
+  <meta name="robots" content="NONE,NOARCHIVE">
+  <style>
+    html * { padding:0; margin:0; }
+    body * { padding:10px 20px; }
+    body * * { padding:0; }
+    body { font-family: sans-serif; background:#eee; color:#000; }
+    body > :where(header, main, footer) { border-bottom:1px solid #ddd; }
+    h1 { font-weight:normal; margin-bottom:.4em; }
+    h1 small { font-size:60%; color:#666; font-weight:normal; }
+    table { border:none; border-collapse: collapse; width:100%; }
+    td, th { vertical-align:top; padding:2px 3px; }
+    th { width:12em; text-align:right; color:#666; padding-right:.5em; }
+    #info { background:#f6f6f6; }
+    #info ol { margin: 0.5em 4em; }
+    #info ol li { font-family: monospace; }
+    #summary { background: #ffc; }
+    #explanation { background:#eee; border-bottom: 0px none; }
+    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
+  </style>
+</head>
+<body>
+  <header id="summary">
+    <h1>Page not found <small>(404)</small></h1>
+    
+    <table class="meta">
+      <tr>
+        <th scope="row">Request Method:</th>
+        <td>GET</td>
+      </tr>
+      <tr>
+        <th scope="row">Request URL:</th>
+        <td>http://localhost:8000/api/nonexistent/</td>
+      </tr>
+      
+    </table>
+  </header>
+
+  <main id="info">
+    
+      <p>
+      Using the URLconf defined in <code>config.urls</code>,
+      Django tried these URL patterns, in this order:
+      </p>
+      <ol>
+        
+          <li>
+            
+              <code>
+                admin/
+                
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/health/
+                [name='health_check']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^users/$
+                [name='user-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^users\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='user-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^users/me/$
+                [name='user-me']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^users/me\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='user-me']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^users/(?P&lt;pk&gt;[^/.]+)/$
+                [name='user-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^users/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='user-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^auth/login/$
+                [name='auth-login']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^auth/login\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='auth-login']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^departments/$
+                [name='department-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^departments\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='department-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^departments/(?P&lt;pk&gt;[^/.]+)/$
+                [name='department-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^departments/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='department-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^roles/$
+                [name='role-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^roles\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='role-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^roles/(?P&lt;pk&gt;[^/.]+)/$
+                [name='role-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^roles/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='role-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^grades/$
+                [name='grade-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^grades\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='grade-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^grades/(?P&lt;pk&gt;[^/.]+)/$
+                [name='grade-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^grades/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='grade-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^access-roles/$
+                [name='accessrole-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^access-roles\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='accessrole-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^access-roles/(?P&lt;pk&gt;[^/.]+)/$
+                [name='accessrole-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^access-roles/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='accessrole-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employees/$
+                [name='employee-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employees\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='employee-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employees/(?P&lt;pk&gt;[^/.]+)/$
+                [name='employee-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employees/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='employee-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/$
+                [name='attendance-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendance-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/download_pdf/$
+                [name='attendance-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/download_pdf\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendance-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/export_csv/$
+                [name='attendance-export-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/export_csv\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendance-export-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/export_summary_pdf/$
+                [name='attendance-export-summary-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/export_summary_pdf\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendance-export-summary-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/export_xlsx/$
+                [name='attendance-export-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/export_xlsx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendance-export-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/(?P&lt;pk&gt;[^/.]+)/$
+                [name='attendance-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendance-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance-corrections/$
+                [name='attendancecorrectionrequest-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance-corrections\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendancecorrectionrequest-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance-corrections/(?P&lt;pk&gt;[^/.]+)/$
+                [name='attendancecorrectionrequest-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^attendance-corrections/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='attendancecorrectionrequest-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-requests/$
+                [name='leaverequest-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-requests\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='leaverequest-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-requests/(?P&lt;pk&gt;[^/.]+)/$
+                [name='leaverequest-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-requests/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='leaverequest-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^overtime/$
+                [name='overtime-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^overtime\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='overtime-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^overtime/(?P&lt;pk&gt;[^/.]+)/$
+                [name='overtime-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^overtime/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='overtime-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^shifts/$
+                [name='shift-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^shifts\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='shift-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^shifts/(?P&lt;pk&gt;[^/.]+)/$
+                [name='shift-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^shifts/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='shift-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^schedules/$
+                [name='schedule-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^schedules\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='schedule-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^schedules/(?P&lt;pk&gt;[^/.]+)/$
+                [name='schedule-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^schedules/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='schedule-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-balances/$
+                [name='leavebalance-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-balances\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='leavebalance-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-balances/(?P&lt;pk&gt;[^/.]+)/$
+                [name='leavebalance-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^leave-balances/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='leavebalance-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^salary-components/$
+                [name='salarycomponent-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^salary-components\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='salarycomponent-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^salary-components/(?P&lt;pk&gt;[^/.]+)/$
+                [name='salarycomponent-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^salary-components/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='salarycomponent-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employee-salary-components/$
+                [name='employeesalarycomponent-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employee-salary-components\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='employeesalarycomponent-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employee-salary-components/(?P&lt;pk&gt;[^/.]+)/$
+                [name='employeesalarycomponent-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^employee-salary-components/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='employeesalarycomponent-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payroll-periods/$
+                [name='payrollperiod-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payroll-periods\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payrollperiod-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payroll-periods/(?P&lt;pk&gt;[^/.]+)/$
+                [name='payrollperiod-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payroll-periods/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payrollperiod-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/$
+                [name='payslip-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/export_recap_csv/$
+                [name='payslip-export-recap-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/export_recap_csv\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-export-recap-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/export_recap_xlsx/$
+                [name='payslip-export-recap-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/export_recap_xlsx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-export-recap-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/generate/$
+                [name='payslip-generate']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/generate\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-generate']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/(?P&lt;pk&gt;[^/.]+)/$
+                [name='payslip-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/(?P&lt;pk&gt;[^/.]+)/download_docx/$
+                [name='payslip-download-docx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/(?P&lt;pk&gt;[^/.]+)/download_docx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-download-docx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/(?P&lt;pk&gt;[^/.]+)/download_pdf/$
+                [name='payslip-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslips/(?P&lt;pk&gt;[^/.]+)/download_pdf\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslip-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslip-details/$
+                [name='payslipdetail-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslip-details\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslipdetail-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslip-details/(?P&lt;pk&gt;[^/.]+)/$
+                [name='payslipdetail-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^payslip-details/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='payslipdetail-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursement-categories/$
+                [name='reimbursementcategory-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursement-categories\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursementcategory-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursement-categories/(?P&lt;pk&gt;[^/.]+)/$
+                [name='reimbursementcategory-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursement-categories/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursementcategory-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/$
+                [name='reimbursement-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/export_csv/$
+                [name='reimbursement-export-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/export_csv\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-export-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/export_xlsx/$
+                [name='reimbursement-export-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/export_xlsx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-export-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/$
+                [name='reimbursement-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/approve_finance/$
+                [name='reimbursement-approve-finance']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/approve_finance\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-approve-finance']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/approve_supervisor/$
+                [name='reimbursement-approve-supervisor']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/approve_supervisor\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-approve-supervisor']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/download_docx/$
+                [name='reimbursement-download-docx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/download_docx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-download-docx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/download_pdf/$
+                [name='reimbursement-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/download_pdf\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/process_action/$
+                [name='reimbursement-process-action']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/process_action\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-process-action']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/reject/$
+                [name='reimbursement-reject']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^reimbursements/(?P&lt;pk&gt;[^/.]+)/reject\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='reimbursement-reject']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^branches/$
+                [name='branch-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^branches\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='branch-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^branches/(?P&lt;pk&gt;[^/.]+)/$
+                [name='branch-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^branches/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='branch-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-configs/$
+                [name='workflowconfig-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-configs\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='workflowconfig-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-configs/(?P&lt;pk&gt;[^/.]+)/$
+                [name='workflowconfig-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-configs/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='workflowconfig-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-stages/$
+                [name='workflowstage-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-stages\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='workflowstage-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-stages/(?P&lt;pk&gt;[^/.]+)/$
+                [name='workflowstage-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-stages/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='workflowstage-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-actions/$
+                [name='workflowaction-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-actions\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='workflowaction-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-actions/(?P&lt;pk&gt;[^/.]+)/$
+                [name='workflowaction-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^workflow-actions/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='workflowaction-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^api-keys/$
+                [name='apikey-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^api-keys\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='apikey-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^api-keys/(?P&lt;pk&gt;[^/.]+)/$
+                [name='apikey-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^api-keys/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='apikey-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^audit-logs/$
+                [name='auditlog-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^audit-logs\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='auditlog-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^audit-logs/(?P&lt;pk&gt;[^/.]+)/$
+                [name='auditlog-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^audit-logs/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='auditlog-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpis/$
+                [name='kpi-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpis\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='kpi-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpis/(?P&lt;pk&gt;[^/.]+)/$
+                [name='kpi-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpis/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='kpi-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpi-targets/$
+                [name='kpitarget-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpi-targets\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='kpitarget-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpi-targets/(?P&lt;pk&gt;[^/.]+)/$
+                [name='kpitarget-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^kpi-targets/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='kpitarget-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/$
+                [name='appraisal-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisal-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/export_csv/$
+                [name='appraisal-export-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/export_csv\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisal-export-csv']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/export_xlsx/$
+                [name='appraisal-export-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/export_xlsx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisal-export-xlsx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/(?P&lt;pk&gt;[^/.]+)/$
+                [name='appraisal-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisal-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/(?P&lt;pk&gt;[^/.]+)/download_docx/$
+                [name='appraisal-download-docx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/(?P&lt;pk&gt;[^/.]+)/download_docx\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisal-download-docx']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/(?P&lt;pk&gt;[^/.]+)/download_pdf/$
+                [name='appraisal-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisals/(?P&lt;pk&gt;[^/.]+)/download_pdf\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisal-download-pdf']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisal-reviews/$
+                [name='appraisalreview-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisal-reviews\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisalreview-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisal-reviews/(?P&lt;pk&gt;[^/.]+)/$
+                [name='appraisalreview-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^appraisal-reviews/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='appraisalreview-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^public/signup/$
+                [name='public-signup-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^public/signup\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='public-signup-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/$
+                [name='internal-registration-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='internal-registration-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/(?P&lt;pk&gt;[^/.]+)/$
+                [name='internal-registration-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='internal-registration-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/(?P&lt;pk&gt;[^/.]+)/approve/$
+                [name='internal-registration-approve']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/(?P&lt;pk&gt;[^/.]+)/approve\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='internal-registration-approve']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/(?P&lt;pk&gt;[^/.]+)/reject/$
+                [name='internal-registration-reject']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^internal/registrations/(?P&lt;pk&gt;[^/.]+)/reject\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='internal-registration-reject']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^quota-reduction/$
+                [name='quota-reduction-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^quota-reduction\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='quota-reduction-list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^quota-reduction/(?P&lt;pk&gt;[^/.]+)/$
+                [name='quota-reduction-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <co100 60959  100 60959    0     0   276k      0 --:--:-- --:--:-- --:--:--  275k
+de>
+                ^quota-reduction/(?P&lt;pk&gt;[^/.]+)\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='quota-reduction-detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^billing/checkout/$
+                [name='billing-checkout']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^billing/checkout\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='billing-checkout']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^billing/webhook/$
+                [name='billing-webhook']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                ^billing/webhook\.(?P&lt;format&gt;[a-z0-9]+)/?$
+                [name='billing-webhook']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                
+                [name='api-root']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/
+                
+              </code>
+            
+              <code>
+                &lt;drf_format_suffix:format&gt;
+                [name='api-root']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/tenant/settings/
+                [name='tenant-settings']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/core/dashboard-stats/
+                [name='dashboard-stats']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/schema/
+                [name='schema']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/schema/swagger-ui/
+                [name='swagger-ui']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/schema/redoc/
+                [name='redoc']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                api/auth/token/refresh/
+                [name='token_refresh']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                ^media/(?P&lt;path&gt;.*)$
+                
+              </code>
+            
+          </li>
+        
+      </ol>
+      <p>
+        
+          The current path, <code>api/nonexistent/</code>,
+        
+        didn’t match any of these.
+      </p>
+    
+  </main>
+
+  <footer id="explanation">
+    <p>
+      You’re seeing this error because you have <code>DEBUG = True</code> in
+      your Django settings file. Change that to <code>False</code>, and Django
+      will display a standard 404 page.
+    </p>
+  </footer>
+</body>
+</html>

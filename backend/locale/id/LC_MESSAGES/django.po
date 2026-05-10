@@ -75,8 +75,8 @@ msgstr "tarif lembur"
 msgid "Tarif lembur per jam (0 = gunakan formula standar)"
 msgstr "Tarif lembur per jam (0 = gunakan formula standar)"
 
-msgid "golongan"
-msgstr "golongan"
+msgid "grade"
+msgstr "grade"
 
 msgid "TK/0: Single, No dependents"
 msgstr "TK/0: Tidak Kawin, Tanpa Tanggungan"

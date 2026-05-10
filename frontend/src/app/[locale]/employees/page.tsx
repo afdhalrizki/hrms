@@ -32,7 +32,7 @@ interface Employee {
   department_name: string;
   role_name: string;
   access_role_name: string;
-  golongan_name: string;
+  grade_name: string;
   join_date: string;
 }
 
@@ -54,7 +54,7 @@ export default function EmployeesPage() {
   const [departments, setDepartments] = useState<DropdownItem[]>([]);
   const [roles, setRoles] = useState<DropdownItem[]>([]);
   const [accessRoles, setAccessRoles] = useState<DropdownItem[]>([]);
-  const [golongans, setGolongans] = useState<DropdownItem[]>([]);
+  const [grades, setGrades] = useState<DropdownItem[]>([]);
   const { user, loading: authLoading } = useAuth();
 
   // Form State
@@ -65,7 +65,7 @@ export default function EmployeesPage() {
     phone: '',
     department: '',
     role: '',
-    golongan: '',
+    grade: '',
     access_role: '',
     status: 'PERMANENT',
     join_date: new Date().toISOString().split('T')[0],
@@ -99,8 +99,8 @@ export default function EmployeesPage() {
       setDepartments(depts);
       const rls = await apiFetch('roles');
       setRoles(rls);
-      const gols = await apiFetch('golongan');
-      setGolongans(gols);
+      const grads = await apiFetch('grades');
+      setGrades(grads);
       const accRoles = await apiFetch('access-roles');
       setAccessRoles(accRoles);
     } catch (error) {
@@ -337,10 +337,10 @@ export default function EmployeesPage() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Grade (Golongan)</label>
-                    <select required name="golongan" value={formData.golongan} onChange={handleInputChange} className="w-full px-4 py-2 border bg-white/5 rounded-xl text-sm appearance-none">
+                    <label className="text-sm font-medium">Salary Grade</label>
+                    <select required name="grade" value={formData.grade} onChange={handleInputChange} className="w-full px-4 py-2 border bg-white/5 rounded-xl text-sm appearance-none">
                       <option value="" className="bg-background text-foreground">Select Grade</option>
-                      {golongans.map(g => <option key={g.id} value={g.id} className="bg-background text-foreground">{g.name}</option>)}
+                      {grades.map(g => <option key={g.id} value={g.id} className="bg-background text-foreground">{g.name}</option>)}
                     </select>
                   </div>
                 </div>

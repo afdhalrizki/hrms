@@ -1,6 +1,6 @@
 from core.tests.base import HRMSTestCase as TenantTestCase
 from django_tenants.utils import schema_context
-from core.models import Employee, Department, Role, Golongan
+from core.models import Employee, Department, Role, Grade
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 from datetime import date
@@ -12,7 +12,7 @@ class QuotaEnforcementTestCase(TenantTestCase):
         with schema_context(self.tenant.schema_name):
             self.dept = Department.objects.create(name="Dept")
             self.role = Role.objects.create(name="Role", department=self.dept)
-            self.gol = Golongan.objects.create(name="G1", base_salary=1000)
+            self.gol = Grade.objects.create(name="G1", base_salary=1000)
 
     def test_employee_quota_enforcement(self):
         """Verify that creating more employees than allowed raises ValidationError."""
@@ -28,7 +28,7 @@ class QuotaEnforcementTestCase(TenantTestCase):
             # 1. Create first employee - should succeed
             Employee.objects.create(
                 nik="E1", fullname="Emp 1", email="e1@test.com", 
-                department=self.dept, role=self.role, golongan=self.gol,
+                department=self.dept, role=self.role, grade=self.gol,
                 join_date=date.today(), ktp_number="KTP-1"
             )
             
@@ -40,7 +40,7 @@ class QuotaEnforcementTestCase(TenantTestCase):
             with self.assertRaisesMessage(ValidationError, "Employee quota exceeded"):
                 Employee.objects.create(
                     nik="E2", fullname="Emp 2", email="e2@test.com", 
-                    department=self.dept, role=self.role, golongan=self.gol,
+                    department=self.dept, role=self.role, grade=self.gol,
                     join_date=date.today(), ktp_number="KTP-2"
                 )
 

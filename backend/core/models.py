@@ -57,7 +57,7 @@ class Role(AuditModel):
         return f"{self.name} - {self.department.name}"
 
 
-class Golongan(AuditModel):
+class Grade(AuditModel):
     name = models.CharField(_("name"), max_length=50, unique=True)
     base_salary = models.DecimalField(_("base salary"), max_digits=12, decimal_places=2, help_text=_("Gaji Pokok"))
     meal_allowance = models.DecimalField(_("meal allowance"), max_digits=10, decimal_places=2, default=0, help_text=_("Tunjangan Makan Harian"))
@@ -65,8 +65,8 @@ class Golongan(AuditModel):
     overtime_rate = models.DecimalField(_("overtime rate"), max_digits=12, decimal_places=2, default=0, help_text=_("Tarif lembur per jam (0 = gunakan formula standar)"))
 
     class Meta:
-        verbose_name = _("golongan")
-        verbose_name_plural = _("golongan")
+        verbose_name = _("grade")
+        verbose_name_plural = _("grades")
 
     def __str__(self):
         return self.name
@@ -119,7 +119,7 @@ class Employee(AuditModel):
 
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("department"))
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("role"))
-    golongan = models.ForeignKey(Golongan, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("golongan"))
+    grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True, related_name='employees', verbose_name=_("grade"))
     
     # RBAC mapping
     access_role = models.ForeignKey(AccessRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees', verbose_name=_("access role"))

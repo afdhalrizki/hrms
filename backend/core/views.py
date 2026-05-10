@@ -8,12 +8,12 @@ from django.utils import timezone
 from core.audit import AuditModelMixin
 from core.permissions import HasRBACPermission
 from .models import (
-    Department, Role, Golongan, Employee, AccessRole,
+    Department, Role, Grade, Employee, AccessRole,
     Branch, WorkflowConfig, WorkflowStage, WorkflowAction,
     APIKey, AuditLog
 )
 from .serializers import (
-    DepartmentSerializer, RoleSerializer, GolonganSerializer, 
+    DepartmentSerializer, RoleSerializer, GradeSerializer, 
     EmployeeSerializer, AccessRoleSerializer,
     BranchSerializer, WorkflowConfigSerializer, 
     WorkflowStageSerializer, WorkflowActionSerializer,
@@ -110,9 +110,9 @@ class RoleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     required_rbac_permission = 'manage_hr'
 
 
-class GolonganViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
-    queryset = Golongan.objects.all()
-    serializer_class = GolonganSerializer
+class GradeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
     permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
     required_rbac_permission = 'manage_hr'
 
@@ -140,7 +140,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         # Managers/HR see everyone
         if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_hr')):
             queryset = Employee.objects.all().select_related(
-                'department', 'role', 'role__department', 'golongan', 'branch', 'access_role', 'supervisor'
+                'department', 'role', 'role__department', 'grade', 'branch', 'access_role', 'supervisor'
             )
             dept_id = self.request.query_params.get('department')
             if dept_id:
@@ -150,7 +150,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         # Employees can only see themselves
         if employee:
             return Employee.objects.filter(id=employee.id).select_related(
-                'department', 'role', 'role__department', 'golongan', 'branch', 'access_role', 'supervisor'
+                'department', 'role', 'role__department', 'grade', 'branch', 'access_role', 'supervisor'
             )
             
         return Employee.objects.none()

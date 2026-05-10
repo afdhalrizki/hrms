@@ -2,7 +2,7 @@ from core.tests.base import HRMSTestCase as TenantTestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from core.models import APIKey, AuditLog, WorkflowConfig, AccessRole, Employee, Department, Role, Golongan, Branch
+from core.models import APIKey, AuditLog, WorkflowConfig, AccessRole, Employee, Department, Role, Grade, Branch
 from users.models import User
 from decimal import Decimal
 from django.utils import timezone
@@ -42,17 +42,17 @@ class AdminConfigsTestCase(TenantTestCase):
             longitude=Decimal("106.8")
         )
         self.role = Role.objects.create(name="Mgr", department=self.dept)
-        self.gol = Golongan.objects.create(name="G1", base_salary=1000)
+        self.gol = Grade.objects.create(name="G1", base_salary=1000)
 
         Employee.objects.create(
             nik="ADM-01", fullname="Admin", email=self.user_admin.email,
-            department=self.dept, role=self.role, golongan=self.gol,
+            department=self.dept, role=self.role, grade=self.gol,
             access_role=self.admin_role, join_date="2024-01-01",
             ktp_number="ADM123"
         )
         Employee.objects.create(
             nik="STF-01", fullname="Staff", email=self.user_staff.email,
-            department=self.dept, role=self.role, golongan=self.gol,
+            department=self.dept, role=self.role, grade=self.gol,
             access_role=self.staff_role, join_date="2024-01-01",
             ktp_number="STF123"
         )

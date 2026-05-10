@@ -37,9 +37,9 @@ class PayrollProrataTestCase(TenantTestCase):
         if joining on the 16th of a 30-day month (April 2026).
         """
         with schema_context(self.tenant.schema_name):
-            from core.models import Golongan
-            golongan = Golongan.objects.create(name='Grade A', base_salary=Decimal('10000000'))
-            self.employee.golongan = golongan
+            from core.models import Grade
+            grade = Grade.objects.create(name='Grade A', base_salary=Decimal('10000000'))
+            self.employee.grade = grade
             self.employee.save()
 
             calculator = PayrollCalculator(self.employee, self.period)
@@ -54,11 +54,11 @@ class PayrollProrataTestCase(TenantTestCase):
         [DEEP TEST] Verify that if deductions exceed salary, the net pay is 0 (not negative).
         """
         with schema_context(self.tenant.schema_name):
-            from core.models import Golongan
+            from core.models import Grade
             from payroll.models import SalaryComponent, EmployeeSalaryComponent
             
-            golongan = Golongan.objects.create(name='Grade A', base_salary=Decimal('1000000'))
-            self.employee.golongan = golongan
+            grade = Grade.objects.create(name='Grade A', base_salary=Decimal('1000000'))
+            self.employee.grade = grade
             self.employee.save()
             
             # Add a massive deduction component (e.g. Loan repayment 2M)

@@ -44,7 +44,7 @@ Kunci-kunci berikut adalah "sumber kebenaran" (source of truth) bagi sistem. Pen
 | Kunci Izin | Deskripsi |
 | :--- | :--- |
 | `manage_attendance` | Mengelola shift, jadwal, dan melihat catatan kehadiran global. |
-| `manage_payroll` | Menghitung gaji, membuat slip gaji, dan mengelola golongan gaji. |
+| `manage_payroll` | Menghitung gaji, membuat slip gaji, dan mengelola grade (golongan) gaji. |
 | `manage_reimbursement` | Mengonfigurasi kategori reimbursement dan batas global. |
 | `manage_performance` | Membuat templat penilaian, KPI, dan Mengelola siklus peninjauan. |
 

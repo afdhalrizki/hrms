@@ -75,7 +75,7 @@ Sistem menggunakan parameter yang dapat dikonfigurasi oleh Admin Tenant di menu 
 ## 3. Komponen Perhitungan (Aturan Bisnis)
 
 ### Konfigurasi Gaji
-*   **Gaji Pokok**: Diambil berdasarkan **Golongan (Grade)** karyawan.
+*   **Gaji Pokok**: Diambil berdasarkan **Grade (Golongan)** karyawan.
 *   **Komponen Kustom**: Tunjangan tetap, bonus, atau potongan pinjaman yang dikonfigurasi per individu melalui `EmployeeSalaryComponent`.
 
 ### Kepatuhan Pajak & BPJS
