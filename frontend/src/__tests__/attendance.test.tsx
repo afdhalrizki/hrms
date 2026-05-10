@@ -41,6 +41,19 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { 
+      id: 1, 
+      fullname: 'Employee One', 
+      is_staff: false,
+      permissions: { manage_hr: true } 
+    }, 
+    loading: false 
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <NextIntlClientProvider locale="en" messages={{}}>
@@ -65,7 +78,7 @@ describe('AttendancePage (Integrated)', () => {
     
     await waitFor(() => {
       expect(screen.getAllByText(/Employee 1/i).length).toBeGreaterThanOrEqual(1);
-    }, { timeout: 15000 });
+    }, { timeout: 30000 });
   });
 
   it('calls apiDownload when individual PDF button is clicked', async () => {

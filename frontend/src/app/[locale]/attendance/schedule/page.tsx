@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { format, startOfWeek, addDays, startOfMonth, addMonths, subMonths, isSameMonth } from 'date-fns';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface Employee {
   id: number;
@@ -50,6 +51,7 @@ export default function SchedulePage() {
   
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{employeeId: number, date: string} | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startOfCurrentWeek, i));
@@ -73,8 +75,10 @@ export default function SchedulePage() {
   }, [currentDate]);
 
   React.useEffect(() => {
-    fetchData();
-  }, [currentDate, fetchData]);
+    if (!authLoading && user) {
+      fetchData();
+    }
+  }, [currentDate, fetchData, authLoading, user]);
 
   const getShiftForEmployeeAndDate = (employeeId: number, date: string) => {
     const sch = schedules.find(s => s.employee === employeeId && s.date === date);

@@ -36,6 +36,19 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { 
+      id: 1, 
+      fullname: 'Employee One', 
+      is_staff: false,
+      permissions: { manage_hr: false } 
+    }, 
+    loading: false 
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
 const { mockToast } = vi.hoisted(() => ({
   mockToast: {
     success: vi.fn(),
@@ -99,7 +112,7 @@ describe('LeavesPage (Integrated)', () => {
     
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalledWith('Failed to load leave data');
-    });
+    }, { timeout: 15000 });
   });
 
   it('opens and submits leave request modal to real API', async () => {

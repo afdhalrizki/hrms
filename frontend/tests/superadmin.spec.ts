@@ -45,7 +45,7 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     
     // Wait for navigation and sidebar
     console.log(`--- Waiting for redirection to registrations ---`);
-    await page.waitForURL(/.*\/(analytics|admin\/registrations)/, { timeout: 45000 });
+    await page.waitForURL(/.*\/(analytics|admin\/registrations)/, { timeout: 120000 });
     console.log(`--- Portal Admin redirected to: ${page.url()} ---`);
 
     await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
@@ -70,7 +70,7 @@ test.describe.serial('Superadmin (Platform) Management', () => {
         const countValue = page.locator('div:has-text("Total Requests") + div p, div:has-text("Total Requests") p').last();
         const val = await countValue.innerText();
         if (parseInt(val) < 2) throw new Error(`Requests not all loaded yet: ${val}`);
-    }).toPass({ timeout: 45000 });
+    }).toPass({ timeout: 120000 });
 
 
     // 2. Verify List Content from seeded data

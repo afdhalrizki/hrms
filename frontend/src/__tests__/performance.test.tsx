@@ -30,6 +30,14 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { id: 1, fullname: 'Employee One', is_staff: false, permissions: { manage_hr: false } }, 
+    loading: false 
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,

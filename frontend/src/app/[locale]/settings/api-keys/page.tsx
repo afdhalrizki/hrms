@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CreateApiKeyModal } from '@/components/settings/CreateApiKeyModal';
@@ -37,6 +38,7 @@ export default function ApiKeysPage() {
   const [keys, setKeys] = React.useState<APIKey[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   const fetchData = React.useCallback(async () => {
     try {
@@ -51,8 +53,10 @@ export default function ApiKeysPage() {
   }, []);
 
   React.useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!authLoading && user) {
+      fetchData();
+    }
+  }, [fetchData, authLoading, user]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;

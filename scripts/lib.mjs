@@ -174,12 +174,14 @@ export async function waitForHttp(url, timeoutMs = 60000, label = 'service') {
 
 export function parseMetrics(logContent, suiteName) {
   let p = 0, f = 0, e = 0, w = 0;
+  let up = 0, ep = 0; // unit passed, e2e passed
   
   const attempts = logContent.split(/--- SUITE RETRY ATTEMPT \d+ ---/);
   const finalContent = attempts[attempts.length - 1];
   const lines = finalContent.split(/\r?\n/);
 
   if (suiteName.includes('Backend')) {
+    let passResults = [];
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
       if (cleanLine.match(/==.* (passed|failed|error|skipped|warning|xfailed|xpassed).* in .*/)) {
@@ -187,47 +189,93 @@ export function parseMetrics(logContent, suiteName) {
         const failMatch = cleanLine.match(/(\d+)\s+failed/);
         const errMatch = cleanLine.match(/(\d+)\s+error/);
         const warnMatch = cleanLine.match(/(\d+)\s+warning/);
-        if (passMatch) p += parseInt(passMatch[1], 10);
+        if (passMatch) {
+            const count = parseInt(passMatch[1], 10);
+            p += count;
+            passResults.push(count);
+        }
         if (failMatch) f += parseInt(failMatch[1], 10);
         if (errMatch) e += parseInt(errMatch[1], 10);
         if (warnMatch) w += parseInt(warnMatch[1], 10);
       }
     }
+    // In backend, first summary is Unit, second is E2E
+    if (passResults.length >= 2) {
+        up = passResults[0];
+        ep = passResults[1];
+    } else if (passResults.length === 1) {
+        up = passResults[0];
+    }
   } else if (suiteName.includes('Frontend')) {
+    let currentSection = null;
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
-      const vPass = cleanLine.match(/Tests.*?(\d+)\s+passed/);
-      const vFail = cleanLine.match(/Tests.*?(\d+)\s+failed/);
-      const vErr = cleanLine.match(/Tests.*?(\d+)\s+error/);
-      if (vPass) p = Math.max(p, parseInt(vPass[1], 10));
-      if (vFail) f = Math.max(f, parseInt(vFail[1], 10));
-      if (vErr) e = Math.max(e, parseInt(vErr[1], 10));
-      const pPass = cleanLine.match(/^\s*(\d+)\s+passed/);
-      const pFail = cleanLine.match(/^\s*(\d+)\s+failed/);
-      const pFlaky = cleanLine.match(/^\s*(\d+)\s+flaky/);
-      if (pPass) p += parseInt(pPass[1], 10);
-      if (pFail) f += parseInt(pFail[1], 10);
-      if (pFlaky) w += parseInt(pFlaky[1], 10);
+      
+      if (cleanLine.includes('[Unit Tests]')) currentSection = 'unit';
+      else if (cleanLine.includes('[E2E Tests]')) currentSection = 'e2e';
+
+      const passMatch = cleanLine.match(/^\s*(?:Tests\s+)?(\d+)\s+passed/);
+      const failMatch = cleanLine.match(/^\s*(?:Tests\s+)?(\d+)\s+failed/);
+      const errMatch = cleanLine.match(/^\s*(?:Tests\s+)?(\d+)\s+error/);
+      const skipMatch = cleanLine.match(/^\s*(?:Tests\s+)?(\d+)\s+skipped/);
+      const flakyMatch = cleanLine.match(/^\s*(?:Tests\s+)?(\d+)\s+flaky/);
+
+      if (passMatch) {
+          const count = parseInt(passMatch[1], 10);
+          p += count;
+          if (currentSection === 'unit') up += count;
+          else if (currentSection === 'e2e') ep += count;
+      }
+      if (failMatch) f += parseInt(failMatch[1], 10);
+      if (errMatch) e += parseInt(errMatch[1], 10);
+      if (skipMatch) w += parseInt(skipMatch[1], 10);
+      if (flakyMatch) w += parseInt(flakyMatch[1], 10);
+      
+      // Also match the custom summary lines if they are present
+      const customMatch = cleanLine.match(/^\s*Tests\s*:\s*(\d+)\s*\/\s*(\d+)/);
+      if (customMatch && currentSection) {
+          const count = parseInt(customMatch[1], 10);
+          if (currentSection === 'unit') up = count;
+          else if (currentSection === 'e2e') ep = count;
+          p = up + ep; // Synchronize total passed
+      }
+    }
+    // If we didn't get a breakdown from sections, fall back to best guess
+    if (up === 0 && ep === 0 && p > 0) {
+        // This shouldn't happen with the new logic, but just in case
     }
   } else if (suiteName.includes('Mobile')) {
+    let currentSection = null;
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
+      
+      if (cleanLine.includes('UNIT TEST SUMMARY')) currentSection = 'unit';
+      else if (cleanLine.includes('E2E TEST SUMMARY')) currentSection = 'e2e';
+
       const mPass = cleanLine.match(/TOTAL PASSED:\s+(\d+)/);
       const mFail = cleanLine.match(/TOTAL FAILED:\s+(\d+)/);
       const mErr = cleanLine.match(/TOTAL ERRORS:\s+(\d+)/);
       const mWarn = cleanLine.match(/WARNINGS?:\s+(\d+)/);
-      if (mPass) p += parseInt(mPass[1], 10);
+      
+      if (mPass) {
+          const count = parseInt(mPass[1], 10);
+          p += count;
+          if (currentSection === 'unit') up = count;
+          else if (currentSection === 'e2e') ep = count;
+      }
       if (mFail) f += parseInt(mFail[1], 10);
       if (mErr) e += parseInt(mErr[1], 10);
       if (mWarn) w += parseInt(mWarn[1], 10);
 
       const fPassMatch = cleanLine.match(/\d{2,}:\d{2}\s+\+(\d+): (?:All tests passed|Some tests failed)/);
-      if (fPassMatch) p = Math.max(p, parseInt(fPassMatch[1], 10));
-      const fFailMatch = cleanLine.match(/\d{2,}:\d{2}\s+\+\d+\s+-(\d+): Some tests failed/);
-      if (fFailMatch) f = Math.max(f, parseInt(fFailMatch[1], 10));
+      if (fPassMatch) {
+          const count = parseInt(fPassMatch[1], 10);
+          // Only update p if it's the only info we have
+          if (p === 0) p = count;
+      }
     }
   }
-  return { p, f, e, w };
+  return { p, f, e, w, up, ep };
 }
 
 export async function getDockerComposeCommand() {

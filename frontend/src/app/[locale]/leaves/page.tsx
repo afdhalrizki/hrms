@@ -17,6 +17,7 @@ import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useAuth } from '@/context/AuthContext';
 
 interface LeaveBalance {
   year: number;
@@ -43,6 +44,7 @@ export default function LeavesPage() {
   const [requests, setRequests] = React.useState<LeaveRequest[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = React.useState({
     leave_type: 'CUTI',
@@ -52,6 +54,7 @@ export default function LeavesPage() {
   });
 
   const fetchData = React.useCallback(async () => {
+    if (!user) return;
     try {
       setIsLoading(true);
       const [balanceData, requestData] = await Promise.all([
@@ -65,11 +68,17 @@ export default function LeavesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   React.useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!authLoading) {
+      if (user) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [fetchData, user, authLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

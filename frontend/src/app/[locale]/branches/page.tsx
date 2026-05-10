@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 export default function BranchesPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -25,10 +26,13 @@ export default function BranchesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    fetchBranches();
-  }, []);
+    if (!authLoading && user) {
+      fetchBranches();
+    }
+  }, [authLoading, user]);
 
   const fetchBranches = async () => {
     try {

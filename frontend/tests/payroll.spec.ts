@@ -24,7 +24,7 @@ test.describe.serial('Payroll Management (Employee View)', () => {
     await expect(table).toBeVisible({ timeout: 20000 });
     
     // Check formatted amount
-    await expect(table.getByText(/16,500,000/)).toBeVisible({ timeout: 15000 });
+    await expect(table.getByText(/16[.,]500[.,]000/)).toBeVisible({ timeout: 30000 });
     
     // 2. View Details (if there's a view button)
     // The button name might be something like view-payslip-X
@@ -35,7 +35,7 @@ test.describe.serial('Payroll Management (Employee View)', () => {
     const modal = page.getByRole('dialog');
     await expect(modal.getByText(/Payslip Details|Payslip Breakdown/i)).toBeVisible({ timeout: 10000 });
     await expect(modal.getByText(/Basic Salary/i)).toBeVisible();
-    await expect(modal.getByText(/15,000,000/)).toBeVisible();
+    await expect(modal.getByText(/15[.,]000[.,]000/)).toBeVisible();
   });
 
   test('should support downloading payslip as PDF', async ({ page }) => {

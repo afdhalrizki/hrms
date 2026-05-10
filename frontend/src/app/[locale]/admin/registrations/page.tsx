@@ -18,6 +18,7 @@ import { apiFetch } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface RegistrationRequest {
   id: number;
@@ -32,6 +33,7 @@ export default function RegistrationsPage() {
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   const fetchRequests = async (signal?: AbortSignal) => {
     try {
@@ -46,10 +48,12 @@ export default function RegistrationsPage() {
   };
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetchRequests(controller.signal);
-    return () => controller.abort();
-  }, []);
+    if (!authLoading && user) {
+      const controller = new AbortController();
+      fetchRequests(controller.signal);
+      return () => controller.abort();
+    }
+  }, [authLoading, user]);
 
   const handleAction = async (id: number, action: 'approve' | 'reject') => {
     setActionLoading(id);

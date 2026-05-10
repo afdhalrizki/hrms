@@ -19,6 +19,7 @@ import { apiFetch, getBaseUrl } from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useAuth } from '@/context/AuthContext';
 
 interface ReimbursementCategory {
   id: number;
@@ -49,6 +50,7 @@ export default function ReimbursementsPage() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const isFetching = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = React.useState({
     category: '',
@@ -86,8 +88,10 @@ export default function ReimbursementsPage() {
   }, []);
 
   React.useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!authLoading && user) {
+      fetchData();
+    }
+  }, [fetchData, authLoading, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

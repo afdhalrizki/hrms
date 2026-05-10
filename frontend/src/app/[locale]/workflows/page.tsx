@@ -17,6 +17,7 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -25,15 +26,18 @@ export default function WorkflowsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedConfig, setSelectedConfig] = useState<WorkflowConfig | null>(null);
   const [saving, setSaving] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   // For Form:
   const [roles, setRoles] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
 
   useEffect(() => {
-    fetchConfigs();
-    fetchSupportData();
-  }, []);
+    if (!authLoading && user) {
+      fetchConfigs();
+      fetchSupportData();
+    }
+  }, [authLoading, user]);
 
   const fetchConfigs = async () => {
     try {

@@ -52,7 +52,15 @@ if (typeof window !== 'undefined') {
     }
   });
   window.addEventListener('unhandledrejection', (event) => {
-    if (event.reason?.message?.includes('getContext') || event.reason?.message?.includes('snap-popup')) {
+    const msg = event.reason?.message || '';
+    const name = event.reason?.name || '';
+    if (
+      msg.includes('getContext') || 
+      msg.includes('snap-popup') || 
+      msg.includes('The operation was aborted') ||
+      msg.includes('aborted') ||
+      name === 'AbortError'
+    ) {
       event.preventDefault();
       event.stopPropagation();
     }
@@ -191,6 +199,9 @@ export async function loginAs(email: string, password = 'password123') {
       console.log(`[TEST-LOGIN] Body: ${JSON.stringify({ email, password })}`);
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     const response = await fetch(`${baseUrl}/auth/login/`, {
       method: 'POST',
       headers: { 
@@ -198,7 +209,9 @@ export async function loginAs(email: string, password = 'password123') {
         'X-Tenant': tenant 
       },
       body: JSON.stringify({ email, password }),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     if (!response.ok) {
       const body = await response.text().catch(() => 'no body');
       throw new Error(`Login failed for ${email}: ${response.status} ${response.statusText} - ${body}`);

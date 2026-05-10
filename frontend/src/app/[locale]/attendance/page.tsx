@@ -20,6 +20,7 @@ import { useTranslations } from 'next-intl';
 import { CorrectionRequestModal } from '@/components/attendance/CorrectionRequestModal';
 import { Attendance } from '@/types/core';
 import { useTenant } from '@/context/TenantContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface AttendanceLog {
   id: number;
@@ -43,9 +44,11 @@ export default function AttendancePage() {
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const { attendancePlatformPolicy } = useTenant();
+  const { user, loading: authLoading } = useAuth();
   const isWebRestricted = attendancePlatformPolicy === 'MOBILE';
 
   const fetchLogs = React.useCallback(async () => {
+    if (!user) return;
     try {
       setIsLoading(true);
       const data = await apiFetch('/attendance');
@@ -60,7 +63,7 @@ export default function AttendancePage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const handleClockAction = async () => {
     if (isWebRestricted) {
@@ -178,8 +181,14 @@ export default function AttendancePage() {
   };
 
   React.useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
+    if (!authLoading) {
+      if (user) {
+        fetchLogs();
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [fetchLogs, user, authLoading]);
 
   return (
     <DashboardLayout>
@@ -391,7 +400,10 @@ export default function AttendancePage() {
                           setSelectedAttendance(log as unknown as Attendance);
                           setIsCorrectionModalOpen(true);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-gray-400 hover:bg-white/10 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-gray-400 hover:bg-white/10 hover:text-white transition-all",
+                          process.env.NEXT_PUBLIC_E2E === 'true' ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        )}
                       >
                         Request Correction
                       </button>

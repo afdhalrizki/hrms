@@ -47,6 +47,7 @@ async function startBackendRunserver() {
     {
       cwd: backendDir,
       logFile: join(LogDir, 'backend_server_bg.log'),
+      env: { ...process.env, ENABLE_EMAIL_NOTIFICATIONS: 'False' }
     },
   );
 
@@ -157,7 +158,10 @@ async function main() {
       const initCode = await spawnStream(
         'node',
         [join(RootDir, 'backend/scripts/run_dev.mjs'), '--no-server'],
-        { cwd: join(RootDir, 'backend') },
+        { 
+          cwd: join(RootDir, 'backend'),
+          env: { ...process.env, NO_RESEED: '1' }
+        },
       );
       if (initCode !== 0) {
         log('⚠️ Backend initialization failed. E2E might fail.', COLORS.red);
@@ -337,6 +341,8 @@ async function main() {
         Suite: r.name,
         Status: r.status,
         Passed: r.p,
+        'Unit Passed': r.up || '-',
+        'E2E Passed': r.ep || '-',
         Failed: r.f,
         Errors: r.e,
         Warn: r.w,

@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -39,6 +40,7 @@ export default function AuditLogsPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [expandedId, setExpandedId] = React.useState<number | null>(null);
   const [isMounted, setIsMounted] = React.useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   const fetchData = React.useCallback(async (isSilent = false) => {
     try {
@@ -57,15 +59,21 @@ export default function AuditLogsPage() {
 
   React.useEffect(() => {
     setIsMounted(true);
-    fetchData();
-    
-    // Implement silent polling for "Live Tracking"
-    const interval = setInterval(() => {
-      fetchData(true);
-    }, 10000); // 10 seconds
-    
-    return () => clearInterval(interval);
-  }, [fetchData]);
+    if (!authLoading) {
+      if (user) {
+        fetchData();
+        
+        // Implement silent polling for "Live Tracking"
+        const interval = setInterval(() => {
+          fetchData(true);
+        }, 10000); // 10 seconds
+        
+        return () => clearInterval(interval);
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [fetchData, authLoading, user]);
 
   // Helper for safe date formatting
   const formatDateSafe = (dateStr: string, formatStr: string) => {

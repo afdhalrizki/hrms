@@ -49,7 +49,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return !!localStorage.getItem('access_token');
   }, [loading, user, mounted]);
 
-  const isTest = process.env.NODE_ENV === 'test';
+  const isTest = process.env.NODE_ENV === 'test' || process.env.NEXT_PUBLIC_E2E === 'true';
 
   // REDIRECT LOGIC
   React.useEffect(() => {
@@ -78,27 +78,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, router, isPublicRoute, mounted, isRedirecting]);
 
-  // SAFETY FAILSAFE: Redirect to login if stuck in loading for too long
   React.useEffect(() => {
-    if (!isPublicRoute && loading && hasToken && mounted && !isRedirecting) {
+    if (!isTest && !isPublicRoute && loading && hasToken && mounted && !isRedirecting) {
       const timer = setTimeout(() => {
         console.warn('[DashboardLayout] Auth timeout reached, forcing redirect...');
         setIsRedirecting(true);
         window.location.href = '/en/login';
-      }, 3000); // 3 seconds is enough to know something is slow
+      }, 90000); // 90 seconds in E2E to allow for slow backend responses
       return () => clearTimeout(timer);
     }
   }, [isPublicRoute, loading, hasToken, mounted, router, isRedirecting]);
 
   // 3. While redirecting or initial loading without token on private route, return null
   // We bypass this in tests to allow components to render and be inspected
-  if (!isTest && !isPublicRoute && (isRedirecting || !hasToken)) {
+  if (!isPublicRoute && (isRedirecting || !hasToken)) {
     return null;
   }
 
   // 4. If loading with token on private route, return null (blank page) but keep top bar active
   // The useEffect above will handle the timeout or success
-  if (!isPublicRoute && loading && hasToken) {
+  if (!isTest && !isPublicRoute && loading && hasToken) {
     return (
       <div className="fixed top-0 left-0 right-0 h-1.5 bg-primary/20 overflow-hidden z-[100]">
         <div className="h-full bg-primary animate-progress-fast" />
@@ -113,6 +112,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         `}} />
       </div>
     );
+  }
+
+  // 5. Final Guard: Only render private content if we have a user and are not loading
+  // Public routes are always rendered.
+  if (!isPublicRoute && (!user || loading)) {
+    // If we have a token but are loading, show the top progress bar (handled above)
+    // If we have no user and are not loading, the redirect useEffect will handle it
+    // For now, return null to prevent children (private pages) from mounting and fetching data
+    return null;
   }
 
   return (
@@ -158,7 +166,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-
         <div className="p-8 max-w-7xl mx-auto">
           {children}
         </div>

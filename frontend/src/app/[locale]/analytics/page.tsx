@@ -15,6 +15,7 @@ import {
 import { apiFetch, getBaseUrl } from '@/lib/api';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useAuth } from '@/context/AuthContext';
 
 interface DashboardStats {
   total_employees: number;
@@ -36,6 +37,7 @@ export default function AnalyticsPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isFetching = useRef(false);
+  const { user, loading: authLoading } = useAuth();
 
   const fetchData = useCallback(async () => {
     if (isFetching.current) return;
@@ -62,8 +64,14 @@ export default function AnalyticsPage() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!authLoading) {
+      if (user) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [fetchData, authLoading, user]);
 
   const handleExport = async (type: 'attendance' | 'performance' | 'payroll' | 'reimbursement') => {
     const { apiDownload } = await import('@/lib/api');

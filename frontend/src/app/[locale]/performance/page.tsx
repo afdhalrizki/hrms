@@ -24,6 +24,7 @@ import { FeatureGuard } from '@/components/shared/FeatureGuard';
 import { Skeleton } from '@/components/shared/Skeleton';
 import { toast } from 'sonner';
 import { AppraisalReviewModal } from '@/components/performance/AppraisalReviewModal';
+import { useAuth } from '@/context/AuthContext';
 
 interface KPITarget {
   id: number;
@@ -62,6 +63,7 @@ export default function PerformancePage() {
   const [appraisals, setAppraisals] = useState<Appraisal[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAppraisalId, setSelectedAppraisalId] = useState<number | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   const fetchPerformanceData = useCallback(async () => {
     try {
@@ -81,8 +83,10 @@ export default function PerformancePage() {
   }, []);
 
   useEffect(() => {
-    fetchPerformanceData();
-  }, [fetchPerformanceData]);
+    if (!authLoading && user) {
+      fetchPerformanceData();
+    }
+  }, [fetchPerformanceData, authLoading, user]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

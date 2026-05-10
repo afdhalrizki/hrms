@@ -306,7 +306,7 @@ async function main() {
       } else {
         await spawnStream(
           pythonPath,
-          ['manage.py', 'runserver', '0.0.0.0:8000'],
+          ['manage.py', 'runserver', '0.0.0.0:8000', '--noreload'],
           { cwd: BackendDir },
         );
       }

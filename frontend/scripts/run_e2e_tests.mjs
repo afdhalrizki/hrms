@@ -225,10 +225,12 @@ async function main() {
   const buildTimestampFile = join(logDir, 'last_build_timestamp');
   let shouldSkipBuild = args.includes('--skip-build');
   
+  if (!shouldSkipBuild && existsSync(join(FrontendDir, '.next'))) {
+    log("[3.5/4] Skipping Frontend Build (Found existing .next folder)...", COLORS.green);
+    shouldSkipBuild = true;
+  }
+
   if (!shouldSkipBuild) {
-    // Simple cache: if .next exists and is newer than the last build timestamp we recorded
-    // OR if we want to be more sophisticated, we can check file modification times.
-    // For now, let's just allow the user to use --skip-build or we can automate it.
     log("[3.5/4] Building Frontend Production Bundle...", COLORS.yellow);
     try {
       const { execSync } = await import('node:child_process');
@@ -262,7 +264,9 @@ async function main() {
     NODE_OPTIONS: "--max-old-space-size=1536", // Limit memory per worker
     PLAYWRIGHT_JSON_OUTPUT_NAME: "logs/e2e_results.json",
     NEXT_PUBLIC_API_URL: (live ? 'https://qa.harikerja.web.id/api' : 'http://127.0.0.1:8000/api'),
-    NEXT_PUBLIC_E2E_LOGGING: 'true'
+    NEXT_PUBLIC_E2E_LOGGING: 'true',
+    NEXT_PUBLIC_E2E: 'true',
+    ENABLE_EMAIL_NOTIFICATIONS: 'False'
   };
 
   const pwArgs = [
@@ -270,7 +274,7 @@ async function main() {
     '--grep-invert', '"diagnostic|Instrumentation"',
     `--workers=${numWorkers}`,
     '--retries=2', // Allow two retries for transient network/concurrency issues
-    '--timeout=120000',
+    '--timeout=180000',
     '--reporter=list,json'
   ];
 

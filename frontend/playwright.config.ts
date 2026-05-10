@@ -14,9 +14,12 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 2, 
   /* Opt out of parallel tests. */
-  workers: 1, 
+  workers: 2, 
   /* Timeout for each test in milliseconds. */
-  timeout: 300000,
+  timeout: 180000,
+  expect: {
+    timeout: 30000,
+  },
   reporter: ([
     ['list'],
     ['html', { open: 'never', outputFolder: './e2e/report' }],
@@ -42,6 +45,8 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    locale: 'en-US',
+    timezoneId: 'UTC',
   },
 
   /* Configure projects for major browsers */
@@ -63,7 +68,9 @@ export default defineConfig({
       url: 'http://127.0.0.1:3001/en/login/portal-admin',
       env: {
         NODE_ENV: 'test',
+        NEXT_PUBLIC_E2E: 'true',
         NEXT_PUBLIC_E2E_TESTING: 'true',
+        NEXT_PUBLIC_E2E_LOGGING: 'true',
         NODE_OPTIONS: '--max-old-space-size=1536'
       },
       reuseExistingServer: true,

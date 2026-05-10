@@ -13,6 +13,13 @@ vi.mock('next-intl', () => ({
   useTranslations: vi.fn(() => (key: string) => key),
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { id: 1, fullname: 'Admin', is_staff: true }, 
+    loading: false 
+  }),
+}));
+
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));

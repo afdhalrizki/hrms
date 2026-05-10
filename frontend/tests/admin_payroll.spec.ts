@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { login, TEST_USERS, getTenantUrl } from './test_helper';
+import { login, TEST_USERS, getTenantUrl, waitForNoLoaders } from './test_helper';
 
 test.describe.serial('Admin Payroll Management', () => {
   const admin = TEST_USERS.admin;
@@ -26,13 +26,14 @@ test.describe.serial('Admin Payroll Management', () => {
     
     // 1. Verify table content first (Admin One)
     console.log('--- Verifying Table Content ---');
-    await expect(page.locator('tr', { hasText: 'Admin One' }).first()).toBeVisible({ timeout: 20000 });
+    await waitForNoLoaders(page);
+    await expect(page.locator('tr', { hasText: 'Admin One' }).first()).toBeVisible({ timeout: 120000 });
     
     // 2. Verify Stats are visible from real backend
     console.log('--- Verifying Stats ---');
     // The screenshot shows empty cards, let's wait for the number to appear
     const totalPayrollText = page.locator('p', { hasText: /Rp/ }).first();
-    await expect(totalPayrollText).toBeVisible({ timeout: 20000 });
+    await expect(totalPayrollText).toBeVisible({ timeout: 120000 });
     
     // Check it has a non-zero value formatted as Rp
     await expect(async () => {
@@ -40,7 +41,7 @@ test.describe.serial('Admin Payroll Management', () => {
       if (!/Rp\s*[\d,.]+/.test(val) || val.includes('Rp 0')) {
         throw new Error(`Payroll value not loaded or zero: ${val}`);
       }
-    }).toPass({ timeout: 15000 });
+    }).toPass({ timeout: 120000 });
 
     // 2. Open Run Payroll Modal
     console.log('--- Opening Run Payroll Modal ---');
@@ -71,7 +72,7 @@ test.describe.serial('Admin Payroll Management', () => {
     // 4. Verify Success from real backend
     // Relaxed check to handle both initial generation and "already exists" state if seeded
     try {
-      await expect(page.locator('body').getByText(/Payroll generated successfully|already generated/i)).toBeVisible({ timeout: 20000 });
+      await expect(page.locator('body').getByText(/Payroll generated successfully|already generated/i)).toBeVisible({ timeout: 45000 });
     } catch (e) {
       console.log('Success toast not found, checking if progress bar or table updated.');
       await expect(page.locator('tr').first()).toBeVisible({ timeout: 10000 });

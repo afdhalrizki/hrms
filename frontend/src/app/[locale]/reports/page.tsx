@@ -18,6 +18,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { apiFetch, apiDownload } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface ReportStats {
   attendance: { total: number; present: number; late: number; rate: number };
@@ -30,6 +31,7 @@ export default function ReportsPage() {
   const t = useTranslations('Reports');
   const [stats, setStats] = useState<ReportStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     async function loadStats() {
@@ -67,8 +69,10 @@ export default function ReportsPage() {
         setIsLoading(false);
       }
     }
-    loadStats();
-  }, []);
+    if (!authLoading && user) {
+      loadStats();
+    }
+  }, [authLoading, user]);
 
   const reportCards = [
     {

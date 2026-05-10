@@ -51,6 +51,19 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { 
+      id: 1, 
+      fullname: 'Admin One', 
+      is_staff: true,
+      permissions: { manage_hr: true, manage_payroll: true } 
+    }, 
+    loading: false 
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <NextIntlClientProvider locale="en" messages={{}}>
@@ -78,7 +91,7 @@ describe('Integrated Payroll Tests', () => {
       
       await waitFor(() => {
         expect(screen.getByText('Admin One')).toBeInTheDocument();
-      }, { timeout: 15000 });
+      }, { timeout: 30000 });
     });
 
     it('opens detail modal on view button click', async () => {
@@ -150,7 +163,7 @@ describe('Integrated Payroll Tests', () => {
       const { toast } = await import('sonner');
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalled();
-      });
+      }, { timeout: 15000 });
     });
   });
 
@@ -179,7 +192,7 @@ describe('Integrated Payroll Tests', () => {
       const { toast } = await import('sonner');
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalled();
-      });
+      }, { timeout: 15000 });
     });
   });
 });

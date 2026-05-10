@@ -15,7 +15,7 @@ async function main() {
   const skipBackendRestart = args.includes('--skip-backend-restart');
   const coverage = args.includes('--coverage');
   const quick = args.includes('--quick');
-  const numWorkers = 4;
+  const numWorkers = 2;
 
   log("--- HRMS Frontend Integrated Unit Test Automation ---", COLORS.cyan);
 

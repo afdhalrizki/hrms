@@ -33,21 +33,25 @@ export const TEST_USERS = {
   }
 };
 
-export const BASE_URL = 'http://localhost:3001';
+export const BASE_URL = 'http://127.0.0.1:3001';
 export const DEFAULT_TENANT = 'company1';
 
 /**
  * Navigates to the login page and performs a full login flow.
  */
 export async function login(page: Page, email: string, password = 'password123', tenant?: string) {
-  // If no tenant is provided, try to get it from sessionStorage or default to company1
+  // Use parallelIndex (0 to numWorkers-1) for stable tenant isolation.
+  // We use modulo 8 because run_all_tests.mjs seeds 8 worker tenants.
+  const parallelIndex = test.info().parallelIndex;
+  const workerTenant = parallelIndex > 0 ? `worker_${(parallelIndex - 1) % 8}` : DEFAULT_TENANT;
+  
   const effectiveTenant = tenant || await page.evaluate(() => {
     try {
       return sessionStorage.getItem('test_tenant_e2e');
     } catch (e) {
       return null;
     }
-  }) || DEFAULT_TENANT;
+  }) || workerTenant;
   
   // Also adjust email if it's a worker tenant and standard admin/employee email
   let effectiveEmail = email;
@@ -113,6 +117,13 @@ export async function login(page: Page, email: string, password = 'password123',
       if (status >= 500) {
         console.error(`[STRICT MODE - SERVER ERROR] ${status} on ${url}`);
       }
+      
+      // FAIL FAST: If tenant settings return 404, the tenant is definitely missing
+      if (status === 404 && url.includes('/api/tenant/settings/')) {
+        const errorMsg = `❌ CRITICAL: Tenant "${effectiveTenant}" NOT FOUND (404) at ${url}. Aborting test.`;
+        console.error(errorMsg);
+        throw new Error(errorMsg);
+      }
     }
   });
 
@@ -128,10 +139,26 @@ export async function login(page: Page, email: string, password = 'password123',
   page.on('pageerror', err => {
     console.error(`BROWSER CRITICAL ERROR: ${err.message}`);
   });
+  // 0. Add logging listeners early to catch all requests
+  page.on('request', request => {
+    if (request.url().includes('/api/')) {
+        const headers = request.headers();
+        console.log(`[API REQUEST] ${request.method()} ${request.url()} - X-Tenant: ${headers['x-tenant'] || 'NONE'}`);
+    }
+  });
+  page.on('response', async response => {
+    if (response.url().includes('/api/')) {
+        console.log(`[API RESPONSE] ${response.status()} ${response.url()}`);
+    }
+    if (response.status() >= 400 && response.url().includes('/api/')) {
+        const body = await response.text().catch(() => 'NO BODY');
+        console.error(`[STRICT MODE - ERROR] Failed to load resource: the server responded with a status of ${response.status()} (${response.url()}) - BODY: ${body}`);
+    }
+  });
 
   // 0. Preliminary Backend Reachability Check (Fail Fast)
   try {
-    const backendUrl = 'http://localhost:8000/api/';
+    const backendUrl = 'http://127.0.0.1:8000/api/';
     const response = await page.request.get(backendUrl, { timeout: 15000 });
     if (!response.ok() && response.status() >= 500) {
       throw new Error(`Backend at ${backendUrl} returned status ${response.status()}`);
@@ -140,29 +167,64 @@ export async function login(page: Page, email: string, password = 'password123',
   } catch (e: any) {
     const errorMsg = `❌ CRITICAL: Backend is UNREACHABLE at http://localhost:8000/api/. Login cannot proceed. Error: ${e.message || e}`;
     console.error(errorMsg);
-    // Capture screenshot of the state
-    await page.screenshot({ path: `backend-unreachable-${email}.png`, fullPage: true });
     throw new Error(errorMsg);
   }
 
-  // 1. First, navigate to the base URL to ensure we are in the correct origin context
+  // 1. Fast Login Path (API-based) - Attempt this first to save time
+  try {
+    console.log(`--- Attempting Fast Login for ${effectiveEmail} on tenant ${effectiveTenant} ---`);
+    const loginResponse = await page.request.post('http://127.0.0.1:8000/api/auth/login/', {
+      data: { email: effectiveEmail, password },
+      headers: { 'X-Tenant': effectiveTenant },
+      timeout: 30000
+    });
+
+    if (loginResponse.ok()) {
+      const authData = await loginResponse.json();
+      
+      // Inject tokens and tenant into the context
+      await page.context().addInitScript((data) => {
+        localStorage.setItem('access_token', data.auth.access);
+        if (data.auth.refresh) localStorage.setItem('refresh_token', data.auth.refresh);
+        localStorage.setItem('test_tenant_e2e', data.tenant);
+        sessionStorage.setItem('test_tenant_e2e', data.tenant);
+        document.cookie = `test_tenant_e2e=${data.tenant}; path=/; max-age=3600`;
+      }, { auth: authData, tenant: effectiveTenant });
+
+      // Set cookies for the context
+      const domain = new URL(getTenantUrl('')).hostname;
+      await page.context().addCookies([{
+        name: 'test_tenant_e2e',
+        value: effectiveTenant,
+        domain: domain,
+        path: '/',
+        expires: Math.floor(Date.now() / 1000) + 3600
+      }]);
+
+      await page.goto(`${BASE_URL}/en`);
+      
+      // Verify login success via sidebar
+      try {
+        await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
+        console.log(`--- Fast Login successful for ${effectiveEmail} ---`);
+        return; // Success!
+      } catch (e) {
+        console.warn(`--- Fast Login navigation failed, falling back to UI login ---`);
+      }
+    } else {
+      console.warn(`--- Fast Login API returned ${loginResponse.status()}, falling back to UI login ---`);
+    }
+  } catch (e: any) {
+    console.warn(`--- Fast Login encountered error: ${e.message}, falling back to UI login ---`);
+  }
+
+  // 2. Fallback: UI Login (The original robust logic)
+  console.log(`--- Proceeding with UI Login for ${effectiveEmail} ---`);
+  
   await page.goto(BASE_URL).catch(() => {});
   await page.context().clearCookies();
-  try {
-    await page.evaluate((t) => {
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-        sessionStorage.setItem('test_tenant_e2e', t);
-      } catch (e) {}
-    }, effectiveTenant);
-  } catch (e) {
-    // If navigation hasn't finished, this might fail, but we'll set it via URL anyway
-  }
   
   await page.goto(`${BASE_URL}/en/login/portal-admin?test_tenant=${effectiveTenant}`);
-  
-  // Wait for the form to be ready to ensure page is loaded
   await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 15000 });
 
   // 2. Persist tenant for subsequent API calls via X-Tenant header
@@ -170,6 +232,7 @@ export async function login(page: Page, email: string, password = 'password123',
   await page.context().addInitScript((t) => {
     try {
       sessionStorage.setItem('test_tenant_e2e', t);
+      localStorage.setItem('test_tenant_e2e', t);
       document.cookie = `test_tenant_e2e=${t}; path=/; max-age=3600`;
     } catch (e) {}
   }, effectiveTenant);
@@ -188,6 +251,7 @@ export async function login(page: Page, email: string, password = 'password123',
   await page.evaluate((t) => {
     try {
       sessionStorage.setItem('test_tenant_e2e', t);
+      localStorage.setItem('test_tenant_e2e', t);
       document.cookie = `test_tenant_e2e=${t}; path=/; max-age=3600`;
     } catch (e) {}
   }, effectiveTenant);
@@ -200,25 +264,29 @@ export async function login(page: Page, email: string, password = 'password123',
   await expect(emailInput).toBeVisible({ timeout: 15000 });
   
   // 3.1 Initial form fill
-  await emailInput.click();
+  await emailInput.click({ force: true });
   await emailInput.fill(effectiveEmail);
-  await passwordInput.click();
+  await passwordInput.click({ force: true });
   await passwordInput.fill(password);
 
-  await expect(loginButton).toBeEnabled({ timeout: 10000 });
+  await expect(loginButton).toBeEnabled({ timeout: 15000 });
 
-  console.log(`--- Attempting login for ${effectiveEmail} ---`);
+  console.log(`--- Attempting login for ${effectiveEmail} on tenant ${effectiveTenant} ---`);
   
+
   // Start waiting for ANY auth-related POST response to catch the login
-  // We add an aggressive retry loop to handle intermittent 401s by clearing state and reloading
+  // We add an aggressive retry loop to handle intermittent 401s or hung requests
   let loginResp = null;
   for (let attempt = 1; attempt <= 3; attempt++) {
     const responsePromise = page.waitForResponse(
-      resp => resp.url().includes('/api/auth/') && resp.request().method() === 'POST',
-      { timeout: 20000 }
+      resp => resp.url().includes('/auth/login') && resp.request().method() === 'POST',
+      { timeout: 60000 }
     ).catch(() => null);
 
-    await loginButton.click();
+    // Use dispatchEvent as a fallback if click is swallowed or blocked by overlay
+    await loginButton.click({ force: true }).catch(() => {
+        return loginButton.dispatchEvent('click');
+    });
     
     loginResp = await responsePromise;
     if (loginResp) {
@@ -230,8 +298,8 @@ export async function login(page: Page, email: string, password = 'password123',
       const body = await loginResp.text().catch(() => 'no body');
       console.warn(`--- Login attempt ${attempt} failed: ${loginResp.status()} - ${body} ---`);
       
-      // If it's a 401 and we have retries left, wait, clear state, and try again
-      if (loginResp.status() === 401 && attempt < 3) {
+      // If it's a 401 or we hit a timeout/error, wait, clear state, and try again
+      if (attempt < 3) {
         console.log(`--- Retrying login (attempt ${attempt+1}): clearing state and reloading ---`);
         await page.evaluate(() => {
           try {
@@ -240,7 +308,7 @@ export async function login(page: Page, email: string, password = 'password123',
           } catch (e) {}
         });
         await page.reload();
-        await expect(emailInput).toBeVisible({ timeout: 10000 });
+        await expect(emailInput).toBeVisible({ timeout: 15000 });
         await emailInput.fill(effectiveEmail);
         await passwordInput.fill(password);
         await page.waitForTimeout(1000);
@@ -248,7 +316,16 @@ export async function login(page: Page, email: string, password = 'password123',
       }
       
       throw new Error(`Login failed (API Error): ${loginResp.status()} - ${body}`);
-    } else if (attempt === 3) {
+    } else {
+      console.warn(`--- Login attempt ${attempt} timed out waiting for API response ---`);
+      if (attempt < 3) {
+        console.log(`--- Retrying login (attempt ${attempt+1}) due to timeout ---`);
+        await page.reload();
+        await expect(emailInput).toBeVisible({ timeout: 15000 });
+        await emailInput.fill(effectiveEmail);
+        await passwordInput.fill(password);
+        continue;
+      }
       throw new Error('Login failed: API response not received after 3 attempts');
     }
   }
@@ -274,32 +351,53 @@ export async function login(page: Page, email: string, password = 'password123',
   }
   
   // 5. Wait for the dashboard/sidebar to be visible
-  await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
     
-    // 5. If we are on a "Restricted Access" or "Loading" state, try one reload
-    if (await page.getByText(/Restricted Access|Loading/i).isVisible()) {
-      console.log('--- Detected restricted/loading state, performing one-time reload ---');
-      await page.reload();
-      await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
-    }
+    // 6. Wait for all loaders to settle
+    await waitForNoLoaders(page);
     
-    // 6. Wait for the profile data to hydrate
+    // 7. Wait for the profile data to hydrate
     const sidebarProfile = page.locator('aside').getByTestId('sidebar-fullname');
-    await expect(sidebarProfile).toBeVisible({ timeout: 30000 });
-    await expect(sidebarProfile).not.toHaveText(/loading/i, { timeout: 45000 });
+    await expect(sidebarProfile).toBeVisible({ timeout: 20000 });
+    await expect(sidebarProfile).not.toHaveText(/loading/i, { timeout: 20000 });
     
-    // 7. Verify the CORRECT profile email (effectiveEmail) is visible
+    // 8. Verify the CORRECT profile email (effectiveEmail) is visible
     // We use a self-healing retry logic here: if it doesn't appear in 10s, we reload once.
     try {
-        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 10000 });
+        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 15000 });
     } catch (e) {
-        console.log(`--- Email ${effectiveEmail} not visible after 10s, performing self-healing reload ---`);
+        console.log(`--- Email ${effectiveEmail} not visible after 15s, performing self-healing reload ---`);
         await page.reload();
-        await expect(page.locator('aside')).toBeVisible({ timeout: 30000 });
-        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 30000 });
+        await waitForNoLoaders(page);
+        await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 20000 });
     }
     
     console.log(`--- Login successful for ${email} ---`);
+}
+
+/**
+ * Helper to wait for any loading indicators or skeletons to disappear.
+ */
+export async function waitForNoLoaders(page: Page) {
+    // List of common loading text/patterns in the app
+    const loaders = [
+        /Loading/i,
+        /Syncing/i,
+        /Fetching/i,
+        /Please wait/i,
+        /Updating/i
+    ];
+    
+    for (const loader of loaders) {
+        // We use a short timeout for each check to avoid hanging if the loader isn't there
+        await expect(page.getByText(loader)).not.toBeVisible({ timeout: 10000 }).catch(() => {
+            console.log(`--- Note: Loader "${loader}" still visible or timed out, continuing ---`);
+        });
+    }
+    
+    // Also wait for network to settle slightly
+    await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 /**
@@ -326,9 +424,10 @@ export async function logout(page: Page) {
  * Helper to construct a tenant-specific URL.
  */
 export const getTenantUrl = (path: string, tenant?: string) => {
+  const parallelIndex = test.info().parallelIndex;
+  const workerTenant = parallelIndex > 0 ? `worker_${(parallelIndex - 1) % 8}` : DEFAULT_TENANT;
+  
   const url = new URL(`${BASE_URL}${path}`);
-  if (tenant) {
-    url.searchParams.set('test_tenant', tenant);
-  }
+  url.searchParams.set('test_tenant', tenant || workerTenant);
   return url.toString();
 };

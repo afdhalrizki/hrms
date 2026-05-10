@@ -67,7 +67,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       // Special override for E2E testing on localhost
       if (testTenant && isLocal) {
         if (testTenant === 'public') {
-          sessionStorage.removeItem('test_tenant_e2e');
+          sessionStorage.setItem('test_tenant_e2e', 'public');
           setTenant({
             tenantName: 'Public',
             subdomain: '',

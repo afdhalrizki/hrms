@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface Shift {
   id?: number;
@@ -43,6 +44,7 @@ export default function ShiftsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState<Shift>({
     name: '',
@@ -64,8 +66,10 @@ export default function ShiftsPage() {
   }, []);
 
   React.useEffect(() => {
-    fetchShifts();
-  }, [fetchShifts]);
+    if (!authLoading && user) {
+      fetchShifts();
+    }
+  }, [fetchShifts, authLoading, user]);
 
   const handleSaveShift = async (e: React.FormEvent) => {
     e.preventDefault();

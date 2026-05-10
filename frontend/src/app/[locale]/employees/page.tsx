@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface Employee {
   id: number;
@@ -54,6 +55,7 @@ export default function EmployeesPage() {
   const [roles, setRoles] = useState<DropdownItem[]>([]);
   const [accessRoles, setAccessRoles] = useState<DropdownItem[]>([]);
   const [golongans, setGolongans] = useState<DropdownItem[]>([]);
+  const { user, loading: authLoading } = useAuth();
 
   // Form State
   const [formData, setFormData] = useState({
@@ -74,9 +76,11 @@ export default function EmployeesPage() {
   });
 
   useEffect(() => {
-    fetchEmployees();
-    fetchDropdownData();
-  }, []);
+    if (!authLoading && user) {
+      fetchEmployees();
+      fetchDropdownData();
+    }
+  }, [authLoading, user]);
 
   const fetchEmployees = async () => {
     try {

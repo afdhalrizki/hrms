@@ -50,13 +50,14 @@ export default function PayrollPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedPayslip, setSelectedPayslip] = React.useState<Payslip | null>(null);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
-  const { loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
   const canManage = hasPermission('manage_payroll');
   const canViewAll = hasPermission('view_all_payslips');
   const isManagerMode = canManage || canViewAll;
 
   const fetchData = React.useCallback(async () => {
+    if (!user) return;
     try {
       setIsLoading(true);
       const payslipData = await apiFetch('/payslips');
@@ -66,11 +67,17 @@ export default function PayrollPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   React.useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!authLoading) {
+      if (user) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [fetchData, user, authLoading]);
 
   const totalPayroll = payslips.reduce((sum, p) => sum + parseFloat(p.net_pay || '0'), 0);
   const totalTax = payslips.reduce((sum, p) => sum + parseFloat(p.pph21_tax || '0'), 0);
@@ -239,7 +246,10 @@ export default function PayrollPage() {
                           </span>
                         </td>
                         <td className="px-8 py-6 text-right">
-                          <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className={cn(
+                            "flex justify-end gap-3 transition-opacity",
+                            process.env.NEXT_PUBLIC_E2E === 'true' ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                          )}>
                             <button 
                               onClick={() => setSelectedPayslip(row)}
                               aria-label={`view-payslip-${row.id}`}

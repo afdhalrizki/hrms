@@ -19,7 +19,7 @@ test.describe.serial('Leaves Management', () => {
     await page.goto(getTenantUrl('/en/leaves'));
     
     // 1. Check remaining days from real seeded backend (12 days total, 0 used)
-    await expect(page.getByTestId('remaining-days-value')).toContainText('12', { timeout: 15000 });
+    await expect(page.getByTestId('remaining-days-value')).toContainText('12', { timeout: 30000 });
     
     // 2. Check history table (should be empty or show "No data")
     const table = page.locator('table');
@@ -33,7 +33,7 @@ test.describe.serial('Leaves Management', () => {
     await page.goto(getTenantUrl('/en/leaves'));
     
     // 1. Verify balances are loaded
-    await expect(page.getByTestId('remaining-days-value')).toContainText('12', { timeout: 10000 });
+    await expect(page.getByTestId('remaining-days-value')).toContainText('12', { timeout: 30000 });
     
     // 2. Open Request Leave Modal
     const requestBtn = page.getByRole('button', { name: /Request Leave/i });

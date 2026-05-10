@@ -15,7 +15,7 @@ import { CorrectionRequestList } from '@/components/attendance/CorrectionRequest
 import { useAuth } from '@/context/AuthContext';
 
 export default function AttendanceCorrectionsPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [requests, setRequests] = React.useState<AttendanceCorrectionRequest[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -33,8 +33,10 @@ export default function AttendanceCorrectionsPage() {
   }, []);
 
   React.useEffect(() => {
-    fetchRequests();
-  }, [fetchRequests]);
+    if (!authLoading && user) {
+      fetchRequests();
+    }
+  }, [fetchRequests, authLoading, user]);
 
   const filteredRequests = requests.filter(r => 
     r.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||

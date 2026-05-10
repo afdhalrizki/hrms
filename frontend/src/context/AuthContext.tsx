@@ -40,8 +40,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async (): Promise<UserProfile | null> => {
+    const isE2E = process.env.NEXT_PUBLIC_E2E === 'true' || process.env.NODE_ENV === 'test';
+    const timeoutMs = isE2E ? 60000 : 15000;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       setLoading(true);
@@ -52,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err: any) {
       // Handle abort (timeout)
       if (err.name === 'AbortError') {
-        console.warn('[AuthContext] Profile fetch timed out after 5s');
+        console.warn(`[AuthContext] Profile fetch timed out after ${timeoutMs/1000}s`);
       }
 
       // Don't set error on 401/403 as it's expected if not logged in

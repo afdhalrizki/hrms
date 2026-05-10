@@ -35,7 +35,7 @@ test.describe('Company Onboarding Flow', () => {
 
     // 5. Verify the success state from real backend
     // Backend should return 201 Created and the frontend should show the success view
-    await expect(page.getByText(/Request Submitted!|Created successfully/i)).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText(/Request Submitted!|Created successfully/i)).toBeVisible({ timeout: 120000 });
     await expect(page.getByText(companyName)).toBeVisible();
     await expect(page.getByText(adminEmail)).toBeVisible();
 

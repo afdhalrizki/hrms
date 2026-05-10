@@ -29,6 +29,14 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { id: 1, fullname: 'Admin', is_staff: true, permissions: { manage_hr: true } }, 
+    loading: false 
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <NextIntlClientProvider locale="en" messages={{}}>
@@ -56,6 +64,8 @@ describe('AuditLogsPage (Integrated)', () => {
     expect(header).toBeInTheDocument();
     
     // Verify API was called
-    expect(apiFetch).toHaveBeenCalledWith('/audit-logs');
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith('/audit-logs');
+    }, { timeout: 15000 });
   }, 40000);
 });

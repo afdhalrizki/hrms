@@ -95,15 +95,33 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
 
   let response: Response | undefined;
   let retryCount = 0;
-  const maxRetries = (process.env.NEXT_PUBLIC_E2E_LOGGING === 'true' || typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 3 : 0;
+  const maxRetries = (process.env.NEXT_PUBLIC_E2E_TESTING === 'true' || process.env.NEXT_PUBLIC_E2E_LOGGING === 'true') ? 3 : 0;
 
   while (retryCount <= maxRetries) {
     try {
-      response = await fetch(url, { 
-        ...options, 
-        headers,
-        credentials: options.credentials || 'include'
-      });
+      const abortController = new AbortController();
+      let globalTimeout: NodeJS.Timeout | undefined;
+      
+      // In E2E tests, add a safety timeout to prevent infinite hangs
+      if (process.env.NEXT_PUBLIC_E2E_TESTING === 'true' || process.env.NEXT_PUBLIC_E2E_LOGGING === 'true' || process.env.NODE_ENV === 'test') {
+        globalTimeout = setTimeout(() => {
+          console.warn(`[API] Global timeout (90s) hit for ${url}`);
+          abortController.abort();
+        }, 90000); // 90s global safety
+      }
+      
+      const combinedSignal = options.signal || abortController.signal;
+
+      try {
+        response = await fetch(url, { 
+          ...options, 
+          headers,
+          credentials: options.credentials || 'include',
+          signal: combinedSignal
+        });
+      } finally {
+        if (globalTimeout) clearTimeout(globalTimeout);
+      }
 
       // Handle Token Refresh (401 Unauthorized)
       if (response.status === 401 && !url.includes('/auth/login')) {
@@ -126,7 +144,8 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
               response = await fetch(url, { 
                 ...options, 
                 headers,
-                credentials: options.credentials || 'include'
+                credentials: options.credentials || 'include',
+                signal: combinedSignal
               });
             } else {
               localStorage.removeItem('access_token');

@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/context/AuthContext';
 
 interface AttendanceLog {
   id: number;
@@ -32,6 +33,7 @@ export default function AttendanceAuditPage() {
   const t = useTranslations('Attendance');
   const [logs, setLogs] = React.useState<AttendanceLog[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const { user, loading: authLoading } = useAuth();
 
   const fetchAuditLogs = React.useCallback(async () => {
     try {
@@ -47,8 +49,10 @@ export default function AttendanceAuditPage() {
   }, []);
 
   React.useEffect(() => {
-    fetchAuditLogs();
-  }, [fetchAuditLogs]);
+    if (!authLoading && user) {
+      fetchAuditLogs();
+    }
+  }, [fetchAuditLogs, authLoading, user]);
 
   return (
     <DashboardLayout>

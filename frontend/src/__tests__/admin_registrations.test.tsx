@@ -14,6 +14,14 @@ vi.mock('@/lib/api', () => ({
   getBaseUrl: vi.fn(),
 }));
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ 
+    user: { id: 1, fullname: 'Admin', is_staff: true }, 
+    loading: false 
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -90,19 +98,16 @@ describe('RegistrationsPage Component', () => {
   });
 
   it('updates status in UI after Approve click and refresh', async () => {
-    let callCount = 0;
+    let registrationsResponse = mockRequests;
     vi.mocked(api.apiFetch).mockImplementation(async (endpoint: string, opts?: any) => {
       if (endpoint === '/internal/registrations') {
-        callCount += 1;
-        if (callCount === 1) {
-          return mockRequests;
-        }
-        return [
+        return registrationsResponse;
+      }
+      if (endpoint === '/internal/registrations/1/approve') {
+        registrationsResponse = [
           { ...mockRequests[0], status: 'APPROVED' },
           mockRequests[1],
         ];
-      }
-      if (endpoint === '/internal/registrations/1/approve') {
         return {};
       }
       return [];
@@ -112,7 +117,8 @@ describe('RegistrationsPage Component', () => {
 
     await waitFor(() => screen.getByText('Pending Corp'));
 
-    fireEvent.click(screen.getAllByText('Approve')[0]);
+    const approveBtn = await screen.findByText('Approve');
+    fireEvent.click(approveBtn);
 
     await waitFor(() => {
       expect(api.apiFetch).toHaveBeenCalledWith('/internal/registrations/1/approve', { method: 'POST' });

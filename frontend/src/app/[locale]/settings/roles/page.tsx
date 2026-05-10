@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 interface AccessRole {
   id: number;
@@ -36,6 +37,7 @@ const PERMISSION_KEYS = [
 export default function RolesPage() {
   const [roles, setRoles] = useState<AccessRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
   const [isEditing, setIsEditing] = useState<number | 'new' | null>(null);
   const [editForm, setEditForm] = useState<Partial<AccessRole>>({
     name: '',
@@ -44,8 +46,10 @@ export default function RolesPage() {
   });
 
   useEffect(() => {
-    fetchRoles();
-  }, []);
+    if (!authLoading && user) {
+      fetchRoles();
+    }
+  }, [authLoading, user]);
 
   const fetchRoles = async () => {
     try {
