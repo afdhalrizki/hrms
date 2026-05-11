@@ -270,7 +270,7 @@ export default function PerformancePage() {
                                 {(appraisal.reviews || []).map((r, i) => (
                                   <div 
                                     key={r.id} 
-                                    className="h-8 w-8 rounded-full border-2 border-[#0f172a] bg-indigo-500 flex items-center justify-center text-[8px] font-black text-white ring-2 ring-primary/20"
+                                    className="h-8 w-8 rounded-full border-2 border-[#0f172a] bg-primary flex items-center justify-center text-[8px] font-black text-white ring-2 ring-primary/20"
                                     title={r.reviewer_name}
                                   >
                                     {r.reviewer_type === 'SELF' ? 'S' : 'M'}

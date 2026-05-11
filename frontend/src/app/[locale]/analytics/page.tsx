@@ -96,7 +96,7 @@ export default function AnalyticsPage() {
     { key: 'totalHeadcount', label: t('totalHeadcount'), value: `${stats?.total_employees || 0}`, icon: Users, color: '#10B981' },
     { key: 'attendanceRate', label: 'Attendance Rate', value: `${stats?.attendance_percent || 0}%`, icon: UserCheck, color: '#10B981' },
     { key: 'overtimeCost', label: t('overtimeCost'), value: fmt(stats?.payroll_summary.total_overtime || 0), icon: Clock, color: '#F59E0B' },
-    { key: 'costPerEmployee', label: t('costPerEmployee'), value: fmt((stats?.payroll_summary.total_net_pay || 0) / (stats?.total_employees || 1)), icon: TrendingUp, color: '#8B5CF6' },
+    { key: 'costPerEmployee', label: t('costPerEmployee'), value: fmt((stats?.payroll_summary.total_net_pay || 0) / (stats?.total_employees || 1)), icon: TrendingUp, color: '#a3b18a' },
   ];
 
   return (

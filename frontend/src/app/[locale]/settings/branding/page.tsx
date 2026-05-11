@@ -27,8 +27,8 @@ export default function BrandingPage() {
   
   const [logo, setLogo] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(tenant.logo || null);
-  const [primaryColor, setPrimaryColor] = React.useState(tenant.themePrimaryColor || '#6366f1');
-  const [secondaryColor, setSecondaryColor] = React.useState(tenant.themeSecondaryColor || '#4f46e5');
+  const [primaryColor, setPrimaryColor] = React.useState(tenant.themePrimaryColor || '#588157');
+  const [secondaryColor, setSecondaryColor] = React.useState(tenant.themeSecondaryColor || '#4a5d23');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { user, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
@@ -177,7 +177,7 @@ export default function BrandingPage() {
                 </div>
                 <div className="space-y-4">
                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-indigo-500" />
+                    <div className="h-2 w-2 rounded-full bg-primary" />
                     {t('secondaryColor')}
                   </label>
                   <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">

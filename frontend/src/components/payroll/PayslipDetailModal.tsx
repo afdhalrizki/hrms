@@ -108,7 +108,7 @@ export function PayslipDetailModal({ payslip, onClose }: Props) {
           </div>
 
           {/* Final Summary Card */}
-          <div className="mt-8 p-6 rounded-[24px] bg-gradient-to-br from-primary/20 to-indigo-500/5 border border-primary/20 relative overflow-hidden group">
+          <div className="mt-8 p-6 rounded-[24px] bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
               <Wallet size={80} />
             </div>

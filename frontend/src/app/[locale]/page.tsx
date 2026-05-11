@@ -183,7 +183,7 @@ export default function Home() {
                   desc: "Alur kerja persetujuan cuti bertingkat yang transparan dan mudah dipantau oleh admin." 
                 },
                 { 
-                  icon: <ArrowUpRight className="text-purple-500" />, 
+                  icon: <ArrowUpRight className="text-accent" />, 
                   title: "Reimbursement", 
                   desc: "Pengajuan klaim biaya operasional dengan upload kuitansi langsung dari aplikasi mobile." 
                 },
@@ -321,7 +321,7 @@ export default function Home() {
       change: '+0', 
       trend: 'up' as const, 
       icon: UserPlus,
-      color: 'bg-purple-500/10 text-purple-500'
+      color: 'bg-accent/10 text-accent'
     },
   ];
 
@@ -330,7 +330,7 @@ export default function Home() {
       <div className="space-y-10 relative">
         {/* Abstract Background Elements */}
         <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] opacity-40 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -z-10 w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[100px] opacity-30 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -z-10 w-[300px] h-[300px] bg-accent/5 rounded-full blur-[100px] opacity-30 pointer-events-none" />
 
         {/* Header Section */}
         <div className="flex flex-col gap-3">

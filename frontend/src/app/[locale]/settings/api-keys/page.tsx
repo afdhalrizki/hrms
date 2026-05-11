@@ -92,8 +92,8 @@ export default function ApiKeysPage() {
         </div>
 
         {/* Info Banner */}
-        <div className="p-6 rounded-[24px] bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-white/5 flex items-start gap-4">
-          <div className="h-10 w-10 shrink-0 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+        <div className="p-6 rounded-[24px] bg-gradient-to-r from-primary/10 to-accent/10 border border-white/5 flex items-start gap-4">
+          <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
             <ShieldCheck size={24} />
           </div>
           <div>

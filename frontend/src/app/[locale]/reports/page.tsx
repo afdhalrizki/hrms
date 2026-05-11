@@ -111,7 +111,7 @@ export default function ReportsPage() {
     {
       title: 'Performance Analysis',
       icon: TrendingUp,
-      color: 'purple',
+      color: 'accent',
       stats: stats ? `${stats.performance.avg_score}/5.0 Avg Score` : 'Loading...',
       desc: 'Appraisal completion rates and KPI performance recaps.',
       exports: [
@@ -131,7 +131,7 @@ export default function ReportsPage() {
           </h1>
           <p className="text-gray-400 font-medium">Access and export comprehensive business reports for web or mobile review.</p>
         </header>
-
+[diff_block_start]
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {reportCards.map((card, idx) => (
             <motion.div
@@ -142,7 +142,12 @@ export default function ReportsPage() {
               className="glass-card p-8 rounded-[2.5rem] border border-white/10 bg-white/5 hover:bg-white/[0.08] transition-all group"
             >
               <div className="flex justify-between items-start mb-6">
-                <div className={`p-4 rounded-2xl bg-${card.color}-500/10 text-${card.color}-500 border border-${card.color}-500/20`}>
+                <div className={cn(
+                  "p-4 rounded-2xl border",
+                  card.color === 'primary' || card.color === 'accent' || card.color === 'blue' || card.color === 'emerald' || card.color === 'amber'
+                    ? `bg-${card.color}/10 text-${card.color} border-${card.color}/20`
+                    : `bg-${card.color}-500/10 text-${card.color}-500 border-${card.color}-500/20`
+                )}>
                   <card.icon size={24} />
                 </div>
                 <div className="text-right">

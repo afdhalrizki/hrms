@@ -98,7 +98,7 @@ export default function QuotaUsageCard() {
       {/* Dynamic Mesh Background */}
       <div className="absolute inset-0 z-0 opacity-30">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-primary/20 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-purple-500/20 rounded-full blur-[100px] animate-pulse delay-700" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-accent/20 rounded-full blur-[100px] animate-pulse delay-700" />
       </div>
 
       <div className="flex items-center justify-between relative z-10" style={{ transform: "translateZ(40px)" }}>

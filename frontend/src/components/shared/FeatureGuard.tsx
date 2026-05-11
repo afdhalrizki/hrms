@@ -37,7 +37,7 @@ export function FeatureGuard({
   if (showInUpgradePrompt) {
     return (
       <div className="glass-card p-12 rounded-[40px] border border-white/10 bg-white/[0.02] flex flex-col items-center text-center space-y-6">
-        <div className="h-20 w-20 rounded-3xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+        <div className="h-20 w-20 rounded-3xl bg-primary/20 flex items-center justify-center text-primary">
           <ShieldAlert size={40} />
         </div>
         <div className="space-y-2">
@@ -46,7 +46,7 @@ export function FeatureGuard({
             {t('upgradeNeeded', { module })}
           </p>
         </div>
-        <button className="px-8 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all flex items-center gap-2">
+        <button className="px-8 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all flex items-center gap-2">
           <Rocket size={18} />
           {t('upgradeBtn')}
         </button>

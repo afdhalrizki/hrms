@@ -51,7 +51,7 @@ const PLANS = [
     price: 1500000,
     features: ['500 Employees', '5GB Storage', 'Performance Management', 'Advanced Analytics'],
     icon: ShieldCheck,
-    color: 'bg-purple-500/10 text-purple-500'
+    color: 'bg-accent/10 text-accent'
   }
 ];
 

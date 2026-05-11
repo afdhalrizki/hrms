@@ -31,8 +31,8 @@ export default function AttendanceChart({ data = defaultData }: { data?: any[] }
         >
           <defs>
             <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
-              <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+              <stop offset="5%" stopColor="#588157" stopOpacity={0.4}/>
+              <stop offset="95%" stopColor="#588157" stopOpacity={0}/>
             </linearGradient>
             <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="6" result="blur" />
@@ -53,7 +53,7 @@ export default function AttendanceChart({ data = defaultData }: { data?: any[] }
             tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
           />
           <Tooltip 
-            cursor={{ stroke: 'rgba(99, 102, 241, 0.2)', strokeWidth: 2 }}
+            cursor={{ stroke: 'rgba(88, 129, 87, 0.2)', strokeWidth: 2 }}
             contentStyle={{ 
               backgroundColor: 'rgba(15, 23, 42, 0.8)', 
               backdropFilter: 'blur(16px)',
@@ -65,12 +65,12 @@ export default function AttendanceChart({ data = defaultData }: { data?: any[] }
               padding: '12px 16px',
               textTransform: 'uppercase'
             }}
-            itemStyle={{ color: '#818cf8', padding: 0 }}
+            itemStyle={{ color: '#a3b18a', padding: 0 }}
           />
           <Area 
             type="monotone" 
             dataKey="attendance" 
-            stroke="#6366f1" 
+            stroke="#588157" 
             strokeWidth={4}
             fillOpacity={1} 
             fill="url(#colorAttendance)" 

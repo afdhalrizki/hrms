@@ -116,7 +116,7 @@ export function AppraisalReviewModal({ appraisalId, onClose, onSuccess }: Props)
               onClick={() => setReviewerType('MANAGER')}
               className={cn(
                 "flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
-                reviewerType === 'MANAGER' ? "bg-indigo-500 text-white shadow-lg" : "text-gray-500 hover:text-white"
+                reviewerType === 'MANAGER' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:text-white"
               )}
             >
               {t('managerReview')}

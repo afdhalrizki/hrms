@@ -221,7 +221,7 @@ export default function PayrollPage() {
                       >
                         <td className="px-8 py-6">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 p-[2px]">
+                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent p-[2px]">
                               <div className="h-full w-full rounded-full bg-[#0f172a] flex items-center justify-center text-xs font-bold text-white">
                                 {row.employee_name.split(' ').map(n => n[0]).join('')}
                               </div>
