@@ -19,6 +19,7 @@ import { useTranslations } from 'next-intl';
 import { apiFetch, apiDownload } from '@/lib/api';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { cn } from '@/lib/utils';
 
 interface ReportStats {
   attendance: { total: number; present: number; late: number; rate: number };
