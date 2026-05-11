@@ -5,8 +5,8 @@ test.describe('Public Routes Accessibility', () => {
   // Test accessibility of new and existing public routes
   const publicRoutes = [
     { path: '/en', expectedTitle: /harikerja/i },
-    { path: '/en/about', expectedTitle: /About/i },
-    { path: '/en/pricelist', expectedTitle: /Price/i },
+    { path: '/en/about', expectedTitle: /Tentang|About/i },
+    { path: '/en/pricelist', expectedTitle: /Pilih Paket|Price|Pricelist/i },
     { path: '/en/login', expectedTitle: /Sign In|Masuk|Login/i },
     { path: '/en/signup', expectedTitle: /Start|Daftar|Get Started|Account|Scale/i },
   ];

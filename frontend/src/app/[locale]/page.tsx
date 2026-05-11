@@ -12,7 +12,8 @@ import {
   Clock, 
   TrendingUp,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  ArrowRight
 } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -24,6 +25,8 @@ import { apiFetch } from '@/lib/api';
 
 import StatCard from '@/components/dashboard/StatCard';
 import QuotaUsageCard from '@/components/dashboard/QuotaUsageCard';
+import { PublicNav } from '@/components/layout/PublicNav';
+import { PublicFooter } from '@/components/layout/PublicFooter';
 
 const AttendanceChart = dynamic(() => import('@/components/dashboard/AttendanceChart'), {
   loading: () => <Skeleton className="w-full h-64" />,
@@ -82,29 +85,177 @@ export default function Home() {
   const isPublicDomain = isPublic || isLocal || isTest;
 
   // 1. If we are on a public domain and NOT logged in, show Landing Page immediately
-  // even if auth is still loading (to avoid flicker)
   if (!user && isPublicDomain) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10 text-center space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-6xl font-black tracking-tighter animate-in fade-in slide-in-from-bottom-4 duration-1000">harikerja HRMS</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
-            Next-generation Human Resource Management System. 
-            Automate your HR, Payroll, and Attendance with ease.
-          </p>
-        </div>
-        <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-          <a href="/login" className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
-            Login to Portal
-          </a>
-          <a href="/signup" className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-bold hover:bg-white/10 transition-all">
-            Get Started
-          </a>
-        </div>
-        <div className="flex gap-8 text-sm font-medium text-muted-foreground pt-20 animate-in fade-in duration-1000 delay-500">
-          <a href="/about" className="hover:text-primary transition-colors">About Us</a>
-          <a href="/pricelist" className="hover:text-primary transition-colors">Price List</a>
-        </div>
+      <div className="flex flex-col min-h-screen">
+        <PublicNav />
+        
+        {/* Hero Section */}
+        <section className="relative pt-32 pb-20 overflow-hidden">
+          <div className="absolute top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-50" />
+          <div className="absolute bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] opacity-40" />
+          
+          <div className="max-w-7xl mx-auto px-6 text-center space-y-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                Sesuai TER 2024 & BPJS
+              </div>
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1]">
+                Kelola SDM Jadi Lebih <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Simpel & Akurat</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-medium">
+                Sistem HRMS all-in-one untuk bisnis Indonesia. Dari absensi geolokasi hingga 
+                otomatisasi penggajian yang patuh pajak.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <a href="/signup" className="w-full sm:w-auto px-10 py-5 bg-primary text-white rounded-2xl font-bold text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-2">
+                Mulai Sekarang (Gratis) <ArrowRight size={20} />
+              </a>
+              <a href="/pricelist" className="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center">
+                Lihat Paket Harga
+              </a>
+            </motion.div>
+
+            {/* Dashboard Mockup Placeholder */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.4 }}
+              className="relative mt-20 p-4 bg-white/5 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
+              <img 
+                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop" 
+                alt="Dashboard Preview" 
+                className="rounded-[2rem] w-full shadow-2xl grayscale-[0.5] hover:grayscale-0 transition-all duration-700"
+              />
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="py-32 bg-white/5">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-20 space-y-4">
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter">Fitur Utama HariKerja</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Solusi lengkap yang dirancang khusus untuk memenuhi kebutuhan operasional dan kepatuhan bisnis di Indonesia.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                { 
+                  icon: <Clock className="text-primary" />, 
+                  title: "Absensi & Kehadiran", 
+                  desc: "Pelacakan waktu nyata dengan geofencing GPS dan verifikasi foto untuk mencegah kecurangan." 
+                },
+                { 
+                  icon: <Users className="text-accent" />, 
+                  title: "Manajemen Karyawan", 
+                  desc: "Database pusat untuk semua data karyawan, dokumen (KTP/NPWP), dan struktur organisasi." 
+                },
+                { 
+                  icon: <TrendingUp className="text-emerald-500" />, 
+                  title: "Otomatisasi Payroll", 
+                  desc: "Perhitungan gaji otomatis yang sudah terintegrasi dengan PPh 21 (TER 2024) dan iuran BPJS." 
+                },
+                { 
+                  icon: <UserCheck className="text-orange-500" />, 
+                  title: "Cuti & Perizinan", 
+                  desc: "Alur kerja persetujuan cuti bertingkat yang transparan dan mudah dipantau oleh admin." 
+                },
+                { 
+                  icon: <ArrowUpRight className="text-purple-500" />, 
+                  title: "Reimbursement", 
+                  desc: "Pengajuan klaim biaya operasional dengan upload kuitansi langsung dari aplikasi mobile." 
+                },
+                { 
+                  icon: <TrendingUp className="text-blue-500" />, 
+                  title: "Manajemen Kinerja", 
+                  desc: "Pantau produktivitas tim dengan pelacakan KPI dan sistem penilaian mandiri (Self-Appraisal)." 
+                }
+              ].map((feature, i) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ y: -10 }}
+                  className="p-10 rounded-[2.5rem] bg-background border border-glass-border hover:border-primary/50 transition-all group"
+                >
+                  <div className="h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.desc}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="py-32">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { label: "Pengguna Aktif", value: "10,000+" },
+                { label: "Perusahaan", value: "500+" },
+                { label: "Akurasi Payroll", value: "99.9%" },
+                { label: "Dukungan", value: "24/7" }
+              ].map((stat, i) => (
+                <div key={i} className="text-center space-y-2">
+                  <div className="text-4xl md:text-5xl font-black text-primary tracking-tighter">{stat.value}</div>
+                  <div className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="relative p-12 md:p-20 rounded-[3rem] bg-gradient-to-br from-primary to-accent overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -ml-20 -mb-20" />
+              
+              <div className="relative z-10 text-center text-white space-y-8">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Siap Modernisasi HR Anda?</h2>
+                <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
+                  Bergabunglah dengan ratusan perusahaan lainnya yang telah menyederhanakan proses HR mereka.
+                </p>
+                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <a href="/signup" className="w-full sm:w-auto px-10 py-5 bg-white text-primary rounded-2xl font-bold text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                    Daftar Sekarang
+                  </a>
+                  <a href="/about" className="w-full sm:w-auto px-10 py-5 bg-transparent border border-white/30 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all">
+                    Pelajari Lebih Lanjut
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <PublicFooter />
       </div>
     );
   }

@@ -68,7 +68,7 @@ describe('Home Page Redirection', () => {
     
     // Should render landing page content
     await waitFor(() => {
-      expect(getByText(/harikerja HRMS/i)).toBeDefined();
+      expect(getByText(/Kelola SDM Jadi Lebih/i)).toBeDefined();
     }, { timeout: 2000 });
   });
 
