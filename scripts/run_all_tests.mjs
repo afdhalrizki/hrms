@@ -198,11 +198,19 @@ async function main() {
       }
     }
 
+    const onlyStack = args.find(a => a.startsWith('--stack='))?.split('=')[1] || 
+                     args[args.indexOf('--stack') + 1];
+
     const suites = [
       { name: 'Backend Stack', path: 'backend/scripts/run_tests.mjs', args: ['--no-start'] },
       { name: 'Frontend Stack', path: 'frontend/scripts/run_tests.mjs' },
       { name: 'Mobile Stack', path: 'mobile/scripts/run_tests.mjs' },
-    ];
+    ].filter(s => !onlyStack || s.name.toLowerCase().includes(onlyStack.toLowerCase()));
+
+    if (suites.length === 0) {
+      log(`❌ ERROR: No stack found matching '${onlyStack}'`, COLORS.red);
+      process.exit(1);
+    }
 
     const results = [];
     for (const s of suites) {
@@ -246,11 +254,24 @@ async function main() {
         // Stop server to avoid DB locks or inconsistent states during seeding
         await stopBackendRunserver();
         
+        process.env.TEST_WORKER_COUNT = "8";
+        const seedEnv = { 
+          ...process.env, 
+          DB_HOST: '127.0.0.1', 
+          DB_PORT: '5433',
+          DATABASE_URL: 'postgres://hrms_user:hrms_password@127.0.0.1:5433/hrms'
+        };
+
         await spawnStream(getPythonExec(join(RootDir, 'backend')), [
           join(RootDir, 'backend', 'scripts', 'seed_test_db.py'),
-          '--workers', '8',
-          '--preset', 'full'
-        ], { cwd: join(RootDir, 'backend') });
+          '--workers',
+          '8',
+          '--preset',
+          'full',
+        ], {
+          env: seedEnv,
+          cwd: join(RootDir, 'backend')
+        });
 
         // Restart and ensure ready
         await startBackendRunserver();

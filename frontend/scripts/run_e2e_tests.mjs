@@ -97,7 +97,7 @@ function printE2ESummary(jsonPath) {
     
     warningCount += countWarnings(data.suites);
 
-    const passed = stats.expected || 0;
+    const passed = (stats.expected || 0) + (stats.flaky || 0);
     const failed = stats.unexpected || 0;
     const flaky = stats.flaky || 0;
     const errored = errors.length;

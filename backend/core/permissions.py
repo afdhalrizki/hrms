@@ -37,8 +37,16 @@ class HasRBACPermission(permissions.BasePermission):
 
         current_tenant = getattr(request, 'tenant', None)
         if not current_tenant or current_tenant.schema_name == 'public':
-            is_global = getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
-            return is_global
+            # On public schema, allow IsStaff or GlobalAdmin for everything
+            if getattr(request.user, 'is_global_admin', False) or request.user.is_superuser or request.user.is_staff:
+                return True
+            
+            # Allow regular users for self-service actions ONLY
+            if getattr(view, 'allow_self_service', False):
+                action = getattr(view, 'action', None)
+                if action in ['retrieve', 'me']:
+                    return True
+            return False
             
         if request.user.is_staff:
             return True

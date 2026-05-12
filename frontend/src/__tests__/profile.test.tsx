@@ -4,7 +4,6 @@ import ProfilePage from '../app/[locale]/profile/page';
 import { loginAs } from './setup';
 import { AuthProvider } from '@/context/AuthContext';
 import { NextIntlClientProvider } from 'next-intl';
-import { apiFetch } from '@/lib/api';
 
 // Mock next-intl but include the provider using the factory argument
 vi.mock('next-intl', async (importOriginal) => {
@@ -15,18 +14,10 @@ vi.mock('next-intl', async (importOriginal) => {
   };
 });
 
-const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
-
-// Mock apiFetch to allow both real requests and mocked responses
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  realApiFetch.current = actual.apiFetch;
-  return {
-    ...actual,
-    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
-    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-  };
-});
+// Spy on apiFetch while letting it call the real backend
+import * as api from '@/lib/api';
+const originalApiFetch = api.apiFetch;
+vi.spyOn(api, 'apiFetch');
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -96,15 +87,15 @@ describe('ProfilePage (Integrated)', () => {
     fireEvent.change(addressInput, { target: { value: 'Integrated Test Address Updated' } });
 
     // Mock API just to prevent continuous DB mutations during tests, but verify integration calling pattern
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+    vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') return Promise.resolve({});
-      return realApiFetch.current(endpoint, options);
+      return originalApiFetch(endpoint, options);
     });
 
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      const calls = (apiFetch as any).mock.calls;
+      const calls = (api.apiFetch as any).mock.calls;
       const patchCall = calls.find((c: any) => c[1]?.method === 'PATCH');
       expect(patchCall).toBeDefined();
       expect(patchCall[1].body).toContain('081122334455');
@@ -119,15 +110,15 @@ describe('ProfilePage (Integrated)', () => {
     const file = new File(['hello'], 'ktp.png', { type: 'image/png' });
     const ktpInput = container.querySelector('#ktp-upload') as HTMLInputElement;
     
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+    vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') return Promise.resolve({});
-      return realApiFetch.current(endpoint, options);
+      return originalApiFetch(endpoint, options);
     });
 
     fireEvent.change(ktpInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      const formDataCall = (apiFetch as any).mock.calls.find((call: any) => call[1] && call[1].body instanceof FormData);
+      const formDataCall = (api.apiFetch as any).mock.calls.find((call: any) => call[1] && call[1].body instanceof FormData);
       expect(formDataCall).toBeDefined();
       expect(formDataCall[1].body.get('ktp_image')).toBeDefined();
     });
@@ -135,9 +126,9 @@ describe('ProfilePage (Integrated)', () => {
 
   it('handles profile fetch error', async () => {
     // We mock users/me to return user, then mock employees/id to fail
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+    vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (endpoint.includes('/employees/')) return Promise.reject(new Error('Fetch failed'));
-      return realApiFetch.current(endpoint, options);
+      return originalApiFetch(endpoint, options);
     });
     
     render(<ProfilePage />, { wrapper: AllProviders });
@@ -152,11 +143,11 @@ describe('ProfilePage (Integrated)', () => {
     
     await waitFor(() => screen.getByDisplayValue(/employee1@/i), { timeout: 15000 });
     
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+    vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') {
         return Promise.reject(new Error('Update failed'));
       }
-      return realApiFetch.current(endpoint, options);
+      return originalApiFetch(endpoint, options);
     });
     
     const saveButton = screen.getByRole('button', { name: /save/i });
@@ -174,15 +165,15 @@ describe('ProfilePage (Integrated)', () => {
     const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
     const avatarInput = container.querySelector('#avatar-upload') as HTMLInputElement;
     
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+    vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') return Promise.resolve({});
-      return realApiFetch.current(endpoint, options);
+      return originalApiFetch(endpoint, options);
     });
 
     fireEvent.change(avatarInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      const formDataCall = (apiFetch as any).mock.calls.find((call: any) => 
+      const formDataCall = (api.apiFetch as any).mock.calls.find((call: any) => 
         call[1] && call[1].body instanceof FormData && call[1].body.has('face_reference')
       );
       expect(formDataCall).toBeDefined();
@@ -212,16 +203,16 @@ describe('ProfilePage (Integrated)', () => {
       fireEvent.change(npwpInputRef, { target: { value: 'NPWP99999' } });
       fireEvent.change(ptkpSelect, { target: { value: 'K/1' } });
 
-      (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
         if (options?.method === 'PATCH') return Promise.resolve({});
-        return realApiFetch.current(endpoint, options);
+        return originalApiFetch(endpoint, options);
       });
 
       const saveButton = screen.getByRole('button', { name: /save/i });
       fireEvent.click(saveButton);
 
       await waitFor(() => {
-        const calls = (apiFetch as any).mock.calls;
+        const calls = (api.apiFetch as any).mock.calls;
         const patchCall = calls.find((c: any) => c[1]?.method === 'PATCH');
         expect(patchCall).toBeDefined();
         expect(patchCall[1].body).toContain('9999999999');
@@ -239,9 +230,9 @@ describe('ProfilePage (Integrated)', () => {
     const saveButton = screen.getByRole('button', { name: /save/i });
 
     // Mock API
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+    vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') return Promise.resolve({});
-      return realApiFetch.current(endpoint, options);
+      return originalApiFetch(endpoint, options);
     });
 
     // Toggle the preference
@@ -249,7 +240,7 @@ describe('ProfilePage (Integrated)', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      const calls = (apiFetch as any).mock.calls;
+      const calls = (api.apiFetch as any).mock.calls;
       // Look for the call to /users/<id>/
       const userPatchCall = calls.find((c: any) => c[0].includes('/users/') && c[1]?.method === 'PATCH');
       expect(userPatchCall).toBeDefined();

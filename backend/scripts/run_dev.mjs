@@ -101,42 +101,45 @@ async function main() {
   // 3. Env Vars & DB Health
   log('[2/5] Checking environment variables...', COLORS.yellow);
   // Overrides for local native run (ensure we talk to host ports, not container names)
-  if (process.env.DB_HOST === 'localhost' || process.env.DB_HOST === 'db') {
-    process.env.DB_HOST = 'localhost';
-  }
-  if (!process.env.DB_HOST) process.env.DB_HOST = 'localhost';
+  process.env.DB_HOST = '127.0.0.1';
 
   if (process.env.REDIS_URL?.includes('://redis:')) {
     process.env.REDIS_URL = process.env.REDIS_URL.replace(
       '://redis:',
-      '://localhost:',
+      '://127.0.0.1:',
     );
   }
-  if (!process.env.REDIS_URL)
-    process.env.REDIS_URL = 'redis://localhost:6379/1';
+  if (!process.env.REDIS_URL || process.env.REDIS_URL.includes(':6379'))
+    process.env.REDIS_URL = 'redis://127.0.0.1:6380/1';
 
   if (process.env.DATABASE_URL?.includes('@pgbouncer:')) {
     process.env.DATABASE_URL = process.env.DATABASE_URL.replace(
       '@pgbouncer:',
-      '@localhost:',
+      '@127.0.0.1:',
     );
   }
   if (process.env.DATABASE_URL?.includes('@db:')) {
     process.env.DATABASE_URL = process.env.DATABASE_URL.replace(
       '@db:',
-      '@localhost:',
+      '@127.0.0.1:',
     );
   }
   if (!process.env.DATABASE_URL) {
     process.env.DATABASE_URL =
-      'postgres://hrms_user:hrms_password@localhost:6432/hrms';
+      'postgres://hrms_user:hrms_password@127.0.0.1:5433/hrms';
   }
 
-  const dbPort = process.env.DATABASE_URL?.includes(':6432/') ? 6432 : 5432;
+  // HARD OVERRIDE: Port 5432 is often used by local postgres, we MUST use 5433
+  const dbPort = 5433;
   process.env.DB_PORT = dbPort.toString();
+  
+  // Also update DATABASE_URL if it has the wrong port
+  if (process.env.DATABASE_URL.includes(':5432/')) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL.replace(':5432/', ':5433/');
+  }
 
   log(
-    `Waiting for database to be ready on ${process.env.DB_HOST || 'localhost'}:${dbPort}...`,
+    `Waiting for database to be ready on ${process.env.DB_HOST}:${dbPort}...`,
     COLORS.gray,
   );
   const dbReady = await waitForPort(dbPort);

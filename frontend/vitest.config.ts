@@ -14,7 +14,7 @@ export default defineConfig({
     testTimeout: 60000,
     hookTimeout: 60000,
     pool: 'forks',
-    maxWorkers: 4,
+    maxWorkers: 8,
     // Adding retry to handle transient network issues in integrated tests
     retry: 1,
   },

@@ -1,6 +1,7 @@
 from django.db import connection
 from django.conf import settings
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -69,9 +70,10 @@ class E2ETenantMiddleware:
 
         for attempt in range(max_retries):
             try:
-                # Force a fresh connection to the database if we are in retry mode
-                if max_retries > 1:
+                # Fresh connection check: only close if this is a retry after failure
+                if attempt > 0:
                     connection.close()
+                    time.sleep(min(attempt * 0.5, 2)) # Exponential backoff
                 
                 with schema_context('public'):
                     if tenant_slug:
@@ -89,22 +91,20 @@ class E2ETenantMiddleware:
                                          Tenant.objects.all().first()
                 
                 if tenant:
+                    if attempt > 0:
+                        print(f"[E2E DEBUG] Tenant '{tenant_slug or hostname}' found after {attempt+1} attempts.")
                     break
 
                 if max_retries > 1:
-                    # If no tenant found yet, wait and retry
-                    import time
                     if attempt % 5 == 0:
                         print(f"[E2E DEBUG] Still waiting for tenant '{tenant_slug or hostname}' (Attempt {attempt+1}/{max_retries})...")
-                    time.sleep(1)
                 else:
                     break
                 
             except Exception as e:
-                if max_retries > 1:
-                    import time
-                    time.sleep(1)
-                else:
+                if attempt % 5 == 0:
+                    print(f"[E2E DEBUG] Error resolving tenant '{tenant_slug or hostname}': {str(e)}")
+                if max_retries <= 1:
                     break
 
         if not tenant:

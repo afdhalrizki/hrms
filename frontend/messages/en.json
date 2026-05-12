@@ -161,8 +161,14 @@
       "basic": "Basic Salary",
       "net": "Net Pay",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "subtitle": "Historical records and generated slips"
     },
+    "syncActive": "Live Sync Active",
+    "taxCategory": "TER 2024 Category A/B/C",
+    "bpjsShare": "Est. Employer Share (4%)",
+    "export_recap": "Export Recap",
+    "empty": "No payslips found for this period.",
     "modal": {
       "generateTitle": "Bulk Generate Payroll",
       "selectPeriod": "Select Period",

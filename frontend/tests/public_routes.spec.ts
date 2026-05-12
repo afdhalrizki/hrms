@@ -4,11 +4,11 @@ import { getTenantUrl } from './test_helper';
 test.describe('Public Routes Accessibility', () => {
   // Test accessibility of new and existing public routes
   const publicRoutes = [
-    { path: '/en', expectedTitle: /harikerja/i },
-    { path: '/en/about', expectedTitle: /Tentang|About/i },
-    { path: '/en/pricelist', expectedTitle: /Pilih Paket|Price|Pricelist/i },
+    { path: '/en', expectedTitle: /SDM|Simpel|Akurat|Scale|Workforce/i },
+    { path: '/en/about', expectedTitle: /HariKerja|Tentang|About/i },
+    { path: '/en/pricelist', expectedTitle: /Pilih Paket|Price|Pricelist|Plan|Harga/i },
     { path: '/en/login', expectedTitle: /Sign In|Masuk|Login/i },
-    { path: '/en/signup', expectedTitle: /Start|Daftar|Get Started|Account|Scale/i },
+    { path: '/en/signup', expectedTitle: /Scale|Create|Account|Kembangkan|Buat/i },
   ];
 
   for (const route of publicRoutes) {

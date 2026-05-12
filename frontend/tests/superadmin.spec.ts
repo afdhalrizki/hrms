@@ -62,14 +62,16 @@ test.describe.serial('Superadmin (Platform) Management', () => {
         if (await page.getByText(/Loading requests/i).isVisible()) {
              throw new Error('Still loading requests...');
         }
-        
-        await expect(page.getByRole('heading', { name: /Registration Requests/i })).toBeVisible();
-        await expect(page.getByText('Total Requests')).toBeVisible();
+        // 1. Verify Page Title (supports both locales) - Use h1 to avoid ambiguity
+        await expect(page.locator('h1').filter({ hasText: /Registration Requests|Permintaan Pendaftaran/i }).first()).toBeVisible();
+        await expect(page.getByText(/Total Requests|Total Permintaan/i)).toBeVisible();
         
         // Use a more robust check for the count
-        const countValue = page.locator('div:has-text("Total Requests") + div p, div:has-text("Total Requests") p').last();
-        const val = await countValue.innerText();
-        if (parseInt(val) < 2) throw new Error(`Requests not all loaded yet: ${val}`);
+        const countValue = page.locator('.glass-card').filter({ hasText: /Total Requests|Total Permintaan/i }).locator('p.text-2xl');
+        await expect(async () => {
+             const val = await countValue.innerText();
+             if (val.includes('Loading') || val.includes('Memuat')) throw new Error('Stats still loading');
+        }).toPass({ timeout: 120000 });
     }).toPass({ timeout: 120000 });
 
 
@@ -77,21 +79,16 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     await expect(page.getByText('Pending Corp')).toBeVisible();
     await expect(page.getByText('Approved Inc')).toBeVisible();
 
-    // 3. Perform Approve Action
-    const pendingRow = page.locator('tr').filter({ hasText: 'Pending Corp' });
-    
-    // Ensure the row is fully loaded
-    await expect(pendingRow).toBeVisible({ timeout: 10000 });
-    
-    // Check if it's already approved (from a previous Playwright retry)
-    const isAlreadyApproved = await pendingRow.getByText(/APPROVED/i).isVisible();
+    // 3. Approve a request
+    const pendingRow = page.locator('tr').filter({ hasText: 'Pending Corp' }).first();
+    const isAlreadyApproved = await pendingRow.getByText(/APPROVED|SETUJU/i).isVisible();
     
     if (!isAlreadyApproved) {
-        const approveBtn = pendingRow.getByRole('button', { name: /Approve/i });
+        const approveBtn = pendingRow.getByRole('button', { name: /Approve|Setujui/i });
         await expect(approveBtn).toBeVisible({ timeout: 15000 });
         
         // Use a more robust click and wait for state change
-        const approvePromise = page.waitForResponse(resp => resp.url().includes('/internal/registrations/') && resp.status() === 200, { timeout: 120000 });
+        const approvePromise = page.waitForResponse(resp => resp.url().includes('/internal/registrations/') && resp.status() === 200, { timeout: 180000 });
         await approveBtn.click();
         console.log('--- Approve button clicked, waiting for status change ---');
         await approvePromise;

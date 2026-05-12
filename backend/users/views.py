@@ -75,6 +75,9 @@ class LoginAPIView(viewsets.GenericViewSet):
         email = request.data.get('email')
         password = request.data.get('password')
         
+        if email:
+            email = email.lower().strip()
+            
         user = authenticate(request, username=email, password=password)
         if user:
             # Multi-tenant isolation check: Ensure user belongs to the current tenant

@@ -13,8 +13,22 @@ export const test = base.extend({
     const workerIndex = testInfo.workerIndex;
     const tenant = workerIndex === 0 ? 'company1' : `worker_${workerIndex}`;
     
+    // Global API response monitoring
+    page.on('response', async (res) => {
+      const url = res.url();
+      if (url.includes('/api/') && res.status() >= 400) {
+        const method = res.request().method();
+        let body = '';
+        try {
+          body = await res.text();
+        } catch (e) {
+          body = '<failed to read body>';
+        }
+        console.error(`[API ERROR] ${method} ${url} -> ${res.status()} - BODY: ${body}`);
+      }
+    });
+
     // Inject into sessionStorage so frontend JS knows which tenant to use
-    // But ONLY if not overridden by a URL parameter or already set
     await page.addInitScript((t) => {
       try {
         const urlParams = new URLSearchParams(window.location.search);

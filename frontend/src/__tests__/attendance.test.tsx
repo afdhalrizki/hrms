@@ -41,24 +41,13 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({ 
-    user: { 
-      id: 1, 
-      fullname: 'Employee One', 
-      is_staff: false,
-      permissions: { manage_hr: true } 
-    }, 
-    loading: false 
-  }),
-  AuthProvider: ({ children }: any) => children,
-}));
-
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <NextIntlClientProvider locale="en" messages={{}}>
       <TenantProvider>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </TenantProvider>
     </NextIntlClientProvider>
   );

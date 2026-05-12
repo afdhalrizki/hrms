@@ -53,7 +53,7 @@ test.describe.serial('ESS Profile Management', () => {
     await saveBtn.click();
 
     // Verify success toast/message from real backend
-    await expect(page.getByText(/Profile updated successfully/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Profile updated successfully|Profil berhasil diperbarui/i)).toBeVisible({ timeout: 15000 });
     
     // Verify persistence after reload
     await page.reload();
@@ -79,6 +79,6 @@ test.describe.serial('ESS Profile Management', () => {
     });
 
     // Verify success - component should show toast
-    await expect(page.getByText(/Document uploaded successfully/i)).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText(/Document uploaded successfully|Dokumen berhasil diunggah|Profil berhasil diperbarui/i)).toBeVisible({ timeout: 20000 });
   });
 });

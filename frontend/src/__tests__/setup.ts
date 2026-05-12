@@ -118,7 +118,7 @@ afterEach(() => {
 if (typeof window !== 'undefined') {
   const workerId = process.env.VITEST_WORKER_ID || '';
   const workerIdx = parseInt(workerId, 10);
-  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '4', 10);
+  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '8', 10);
   const tenant = (!isNaN(workerIdx)) ? `worker_${((workerIdx - 1) % numWorkers + numWorkers) % numWorkers}` : 'company1';
   
   // ONLY inject test_tenant for worker-based runs (integrated tests)
@@ -148,7 +148,7 @@ global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 
   const workerId = process.env.VITEST_WORKER_ID || '';
   const workerIdx = parseInt(workerId, 10);
-  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '4', 10);
+  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '8', 10);
   const tenant = (!isNaN(workerIdx)) ? `worker_${((workerIdx - 1) % numWorkers + numWorkers) % numWorkers}` : 'company1';
   
   if (url.includes('localhost:8000') || url.includes('127.0.0.1:8000')) {
@@ -183,7 +183,7 @@ global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 export async function loginAs(email: string, password = 'password123') {
   const workerId = process.env.VITEST_WORKER_ID || '';
   const workerIdx = parseInt(workerId, 10);
-  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '4', 10);
+  const numWorkers = parseInt(process.env.TEST_WORKER_COUNT || '8', 10);
   const tenant = (!isNaN(workerIdx)) ? `worker_${((workerIdx - 1) % numWorkers + numWorkers) % numWorkers}` : 'company1';
 
   // In parallel tests, we must use the users of the specific worker tenant

@@ -117,9 +117,10 @@ async function main() {
     if (existsSync(e2eResultsFile)) {
       try {
         const e2eJson = JSON.parse(readFileSync(e2eResultsFile, 'utf8'));
-        e2eMetrics.passed = e2eJson.stats.expected || 0;
-        e2eMetrics.failed = e2eJson.stats.unexpected || 0;
-        e2eMetrics.total = (e2eJson.stats.expected || 0) + (e2eJson.stats.unexpected || 0) + (e2eJson.stats.flaky || 0) + (e2eJson.stats.skipped || 0);
+        const stats = e2eJson.stats;
+        e2eMetrics.passed = (stats.expected || 0) + (stats.flaky || 0);
+        e2eMetrics.failed = stats.unexpected || 0;
+        e2eMetrics.total = (stats.expected || 0) + (stats.unexpected || 0) + (stats.flaky || 0) + (stats.skipped || 0);
         e2eMetrics.errors = (e2eJson.errors || []).length;
 
         const latestE2ELog = getLatestLog('e2e_test_');

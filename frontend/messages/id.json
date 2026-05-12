@@ -147,8 +147,14 @@
       "basic": "Gaji Pokok",
       "net": "Gaji Bersih",
       "status": "Status",
-      "actions": "Aksi"
+      "actions": "Aksi",
+      "subtitle": "Catatan riwayat dan slip yang telah dibuat"
     },
+    "syncActive": "Sinkronisasi Aktif",
+    "taxCategory": "Kategori TER 2024 A/B/C",
+    "bpjsShare": "Estimasi Kontribusi (4%)",
+    "export_recap": "Ekspor Rekap",
+    "empty": "Tidak ada slip gaji ditemukan.",
     "modal": {
       "generateTitle": "Hasilkan Payroll Massal",
       "selectPeriod": "Pilih Periode",

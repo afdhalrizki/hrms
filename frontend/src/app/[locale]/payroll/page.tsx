@@ -119,7 +119,7 @@ export default function PayrollPage() {
                     className="px-6 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-2xl font-bold hover:bg-emerald-500/20 transition-all flex items-center gap-2"
                   >
                     <FileText size={20} />
-                    Export Recap
+                    {t('export_recap')}
                   </button>
                 )}
                 {canManage && (
@@ -150,7 +150,7 @@ export default function PayrollPage() {
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-[10px] text-emerald-500 font-bold uppercase tracking-wider">
                   <TrendingUp size={14} />
-                  Live Sync Active
+                  {t('syncActive')}
                 </div>
               </motion.div>
 
@@ -164,7 +164,7 @@ export default function PayrollPage() {
                 <p className="text-4xl font-black text-white tracking-tighter">
                   Rp {totalTax.toLocaleString()}
                 </p>
-                <div className="mt-4 text-[10px] text-muted-foreground uppercase tracking-widest">TER 2024 Category A/B/C</div>
+                <div className="mt-4 text-[10px] text-muted-foreground uppercase tracking-widest">{t('taxCategory')}</div>
               </motion.div>
 
               <motion.div
@@ -177,7 +177,7 @@ export default function PayrollPage() {
                 <p className="text-4xl font-black text-white tracking-tighter">
                   Rp {(totalPayroll * 0.04).toLocaleString()}
                 </p>
-                <div className="mt-4 text-[10px] text-muted-foreground uppercase tracking-widest">Est. Employer Share (4%)</div>
+                <div className="mt-4 text-[10px] text-muted-foreground uppercase tracking-widest">{t('bpjsShare')}</div>
               </motion.div>
             </div>
 
@@ -190,7 +190,7 @@ export default function PayrollPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white uppercase tracking-tighter">{t('period')}</h2>
-                    <p className="text-xs text-muted-foreground">Historical records and generated slips</p>
+                    <p className="text-xs text-muted-foreground">{t('table.subtitle')}</p>
                   </div>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function PayrollPage() {
                     {isLoading ? (
                       <tr><td colSpan={5} className="p-20 text-center text-gray-500 animate-pulse font-mono uppercase tracking-widest">Syncing with Financial Engine...</td></tr>
                     ) : payslips.length === 0 ? (
-                      <tr><td colSpan={5} className="p-20 text-center text-gray-500 italic">No payslips found for this period.</td></tr>
+                      <tr><td colSpan={5} className="p-20 text-center text-gray-500 italic">{t('empty')}</td></tr>
                     ) : payslips.map((row, index) => (
                       <motion.tr 
                         initial={{ opacity: 0, x: -20 }}
