@@ -14,7 +14,7 @@ import {
   MoreVertical,
   Filter
 } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getDomainSuffix } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -191,7 +191,7 @@ export default function RegistrationsPage() {
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-1.5">
                           <code className="text-sm bg-white/5 px-2 py-0.5 rounded border border-white/5 text-blue-400">
-                            {request.subdomain_prefix}.harikerja.com
+                            {request.subdomain_prefix}.{getDomainSuffix()}
                           </code>
                           <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
                         </div>

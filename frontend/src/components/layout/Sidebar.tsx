@@ -85,12 +85,12 @@ export function Sidebar() {
               </div>
             ) : (
               <div className="h-12 w-12 shrink-0 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30">
-                <Briefcase size={24} />
+                HK
               </div>
             )}
             <div className="overflow-hidden">
               <h1 className="text-xl font-black tracking-tighter truncate">
-                {tenantName === 'Public' ? 'harikerja' : tenantName}
+                {tenantName === 'Public' ? 'HariKerja' : tenantName}
               </h1>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block truncate opacity-60">
                 {tenantName === 'Public' ? 'Public Portal' : 'Workspace'}

@@ -1,6 +1,6 @@
-# harikerja HRMS - Infrastructure & Deployment Hub
+# HariKerja HRMS - Infrastructure & Deployment Hub
 
-This directory is the **Single Point of Truth** for all things related to infrastructure, environment configurations, and deployment procedures for the harikerja HRMS platform.
+This directory is the **Single Point of Truth** for all things related to infrastructure, environment configurations, and deployment procedures for the HariKerja HRMS platform.
 
 ## 📂 Structure Overview
 

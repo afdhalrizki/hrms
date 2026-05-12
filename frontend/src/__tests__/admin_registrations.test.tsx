@@ -12,6 +12,7 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
 vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(),
   getBaseUrl: vi.fn(),
+  getDomainSuffix: vi.fn(() => 'harikerja.com'),
 }));
 
 vi.mock('@/context/AuthContext', () => ({

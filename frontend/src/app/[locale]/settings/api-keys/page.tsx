@@ -99,7 +99,7 @@ export default function ApiKeysPage() {
           <div>
             <h3 className="text-sm font-bold text-white mb-1">Developer Integration</h3>
             <p className="text-xs text-gray-400 leading-relaxed max-w-2xl">
-              Use these keys to integrate harikerja with your internal ERP, accounting software, or automation tools. 
+              Use these keys to integrate HariKerja with your internal ERP, accounting software, or automation tools. 
               API keys provide full administrative access to your workspace data.
             </p>
           </div>

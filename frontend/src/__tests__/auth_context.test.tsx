@@ -8,6 +8,7 @@ import * as api from '@/lib/api';
 vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(),
   getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+  getDomainSuffix: vi.fn(() => 'harikerja.com'),
 }));
 
 const TestComponent = () => {

@@ -217,7 +217,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                     
                     if created:
                         # Set default password for newly provisioned users
-                        user.set_password('harikerja2026!')
+                        user.set_password('HariKerja2026!')
                         user.save()
                     elif is_admin_flag and not user.is_staff:
                         # If user exists but is being upgraded to admin in this context
@@ -233,7 +233,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                     service = NotificationService()
                     
                     # Determine domain name for the login link
-                    domain_name = "app.harikerja.com"
+                    domain_name = "app.HariKerja.com"
                     if hasattr(request, 'tenant') and request.tenant:
                         domain = request.tenant.domains.first()
                         if domain:

@@ -147,7 +147,7 @@ export default function BillingPage() {
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Subscription & Billing</h1>
             <p className="text-muted-foreground max-w-lg">
-              Empower your workforce with harikerja. Professional plans include full ID compliance.
+              Empower your workforce with HariKerja. Professional plans include full ID compliance.
             </p>
           </div>
           

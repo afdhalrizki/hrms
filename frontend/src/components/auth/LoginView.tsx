@@ -8,6 +8,7 @@ import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
+import { getDomainSuffix } from '@/lib/api';
 
 export interface LoginViewProps {
   forceShowForm?: boolean;
@@ -69,7 +70,7 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
           {/* Logo & Header */}
           <div className="text-center space-y-3">
             <div className="inline-flex h-16 w-16 rounded-2xl bg-primary items-center justify-center text-white shadow-xl shadow-primary/30 mx-auto mb-2">
-              <Briefcase size={32} />
+              HK
             </div>
             <h1 className="text-3xl font-bold tracking-tight">{t('loginTitle')}</h1>
             
@@ -79,7 +80,7 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
                   {t('restrictedTitle')}
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {t('restrictedDesc', { example: 'perusahaan.harikerja.com' })}
+                  {t('restrictedDesc', { example: `perusahaan.${getDomainSuffix()}` })}
                 </p>
                 
                 <div className="pt-4 flex flex-col gap-3">

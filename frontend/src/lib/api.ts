@@ -1,3 +1,20 @@
+export const getDomainSuffix = () => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host.endsWith('.localhost')) {
+      return process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'harikerja.com';
+    }
+    
+    // Try to extract the base domain (harikerja.com, harikerja.web.id, etc)
+    const match = host.match(/harikerja\.(com|web\.id|my\.id)/);
+    if (match) return match[0];
+  }
+  return process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'harikerja.com';
+};
+
+export const getSupportEmail = () => `support@${getDomainSuffix()}`;
+export const getSalesEmail = () => `sales@${getDomainSuffix()}`;
+
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { Check, Info, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getSalesEmail } from '@/lib/api';
 
 export default function PriceListPage() {
   const plans = [
@@ -151,7 +152,7 @@ export default function PriceListPage() {
               </div>
 
               <a 
-                href={plan.name === 'ENTERPRISE' ? 'mailto:sales@harikerja.id' : '/signup'}
+                href={plan.name === 'ENTERPRISE' ? `mailto:${getSalesEmail()}` : '/signup'}
                 className={cn(
                   "w-full py-4 rounded-xl font-bold text-center transition-all",
                   plan.highlight

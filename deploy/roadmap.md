@@ -1,6 +1,6 @@
 # HRMS Infrastructure Roadmap
 
-This document outlines the strategic growth plan for the harikerja HRMS platform infrastructure, transitioning from initial QA to high-traffic production.
+This document outlines the strategic growth plan for the HariKerja HRMS platform infrastructure, transitioning from initial QA to high-traffic production.
 
 ## 📍 Phase 1: Quality Assurance (Current)
 - **Target**: Internal testing, UAT, and Automated E2E.

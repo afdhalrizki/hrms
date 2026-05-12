@@ -12,7 +12,7 @@ import {
   Zap,
   Layout
 } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getDomainSuffix } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 export default function SignupPage() {
@@ -65,7 +65,7 @@ export default function SignupPage() {
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Request Submitted!</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Thank you for choosing harikerja HRMS. Your registration request for 
+            Thank you for choosing HariKerja HRMS. Your registration request for 
             <span className="text-white font-semibold"> {formData.company_name}</span> is being reviewed by our team.
           </p>
           <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-left">
@@ -96,9 +96,9 @@ export default function SignupPage() {
         <div className="hidden lg:flex flex-col justify-between p-16 bg-white/[0.02] border-r border-white/5">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center">
-              <div className="h-5 w-5 bg-black rounded-sm rotate-45" />
+              <span className="text-black font-black text-xl">HK</span>
             </div>
-            <span className="text-xl font-bold tracking-tighter">harikerja HRMS</span>
+            <span className="text-xl font-bold tracking-tighter">HariKerja HRMS</span>
           </div>
 
           <div className="space-y-8">
@@ -139,7 +139,7 @@ export default function SignupPage() {
           </div>
 
           <div className="text-sm text-muted-foreground font-medium">
-            © 2026 harikerja HRMS. All rights reserved.
+            © 2026 HariKerja HRMS. All rights reserved.
           </div>
         </div>
 
@@ -191,7 +191,7 @@ export default function SignupPage() {
                       className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-32 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-white/20"
                     />
                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                      <span className="text-sm font-bold text-muted-foreground">.harikerja.com</span>
+                      <span className="text-sm font-bold text-muted-foreground">.{getDomainSuffix()}</span>
                     </div>
                   </div>
                 </div>

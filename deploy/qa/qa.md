@@ -1,6 +1,6 @@
 # QA Deployment Guide - Cloud Providers
 
-This document contains a step-by-step (End-to-End) guide to deploy the harikerja HRMS application to the *QA Environment*. We provide recommendations for three major providers: **Biznet GIO**, **IDCloudHost**, and **Hostinger**.
+This document contains a step-by-step (End-to-End) guide to deploy the HariKerja HRMS application to the *QA Environment*. We provide recommendations for three major providers: **Biznet GIO**, **IDCloudHost**, and **Hostinger**.
 
 ## Server Specifications & Environment Purpose
 
@@ -220,7 +220,7 @@ Once all containers are active, enter the `backend` container and run migrations
 ```bash
 docker compose exec backend bash
 python manage.py migrate_schemas --shared
-python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=harikerja.web.id --is_primary=True
+python manage.py create_tenant --schema_name=public --name="HariKerja QA Master" --domain-domain=harikerja.web.id --is_primary=True
 ```
 
 ---

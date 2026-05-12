@@ -22,9 +22,9 @@ export const PublicNav = () => {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-            H
+            HK
           </div>
-          <span className="text-xl font-black tracking-tighter">harikerja <span className="text-primary">HRMS</span></span>
+          <span className="text-xl font-black tracking-tighter">HariKerja <span className="text-primary">HRMS</span></span>
         </Link>
 
         {/* Desktop Nav */}

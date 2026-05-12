@@ -1,4 +1,4 @@
-# harikerja HRMS SaaS
+# HariKerja HRMS SaaS
 
 A next-generation, multi-tenant Human Resource Management System (HRMS) built for enterprise scale. This platform provides a comprehensive suite for HR management, attendance tracking with AI biometric verification, Indonesian payroll compliance (TER 2024), and Executive Analytics.
 
@@ -134,7 +134,7 @@ The platform achieves a unified **100% test pass rate** across all layers of the
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
 
-As **harikerja** transitions from a solo-developed MVP to a mission-critical enterprise platform, we have established a clear technical organization roadmap to ensure 99.9% uptime and data integrity for 1 million users.
+As **HariKerja** transitions from a solo-developed MVP to a mission-critical enterprise platform, we have established a clear technical organization roadmap to ensure 99.9% uptime and data integrity for 1 million users.
 
 ### Technical Team Organization
 

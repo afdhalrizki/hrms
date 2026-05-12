@@ -6,6 +6,7 @@ import { apiFetch } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(() => Promise.resolve({})),
+  getDomainSuffix: vi.fn(() => 'harikerja.com'),
 }));
 
 // Helper component to consume context

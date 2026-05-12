@@ -3,6 +3,7 @@
 import React from 'react';
 import { Link } from '@/i18n/routing';
 import { Github, Twitter, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { getSupportEmail } from '@/lib/api';
 
 export const PublicFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -14,9 +15,9 @@ export const PublicFooter = () => {
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2">
               <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl">
-                H
+                HK
               </div>
-              <span className="text-xl font-black tracking-tighter">harikerja HRMS</span>
+              <span className="text-xl font-black tracking-tighter">HariKerja HRMS</span>
             </Link>
             <p className="text-muted-foreground leading-relaxed">
               Solusi manajemen SDM terintegrasi untuk bisnis modern di Indonesia. 
@@ -68,7 +69,7 @@ export const PublicFooter = () => {
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Mail size={18} className="text-primary" />
-                <span>support@harikerja.id</span>
+                <span>{getSupportEmail()}</span>
               </li>
             </ul>
           </div>

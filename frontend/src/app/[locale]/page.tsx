@@ -214,10 +214,8 @@ export default function Home() {
         {/* Stats Section */}
         <section className="py-32">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="flex flex-wrap justify-center gap-12 md:gap-32">
               {[
-                { label: "Pengguna Aktif", value: "10,000+" },
-                { label: "Perusahaan", value: "500+" },
                 { label: "Akurasi Payroll", value: "99.9%" },
                 { label: "Dukungan", value: "24/7" }
               ].map((stat, i) => (

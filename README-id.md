@@ -1,4 +1,4 @@
-# harikerja HRMS SaaS
+# HariKerja HRMS SaaS
 
 Sistem Manajemen Sumber Daya Manusia (HRMS) multi-tenant generasi terbaru yang dibangun untuk skala perusahaan besar. Platform ini menyediakan rangkaian lengkap untuk manajemen SDM, pelacakan kehadiran dengan verifikasi biometrik AI, kepatuhan penggajian Indonesia (TER 2024), dan Analitik Eksekutif.
 
@@ -134,7 +134,7 @@ Platform ini mencapai tingkat kelulusan tes **100% terpadu** di semua lapisan st
 
 ## 📈 Strategi Skalabilitas: Jalan Menuju 1 Juta Pengguna
 
-Saat **harikerja** bertransisi dari MVP yang dikembangkan secara mandiri menjadi platform perusahaan yang krusial bagi bisnis, kami telah menetapkan peta jalan organisasi teknis yang jelas untuk memastikan uptime 99,9% dan integritas data bagi 1 juta pengguna.
+Saat **HariKerja** bertransisi dari MVP yang dikembangkan secara mandiri menjadi platform perusahaan yang krusial bagi bisnis, kami telah menetapkan peta jalan organisasi teknis yang jelas untuk memastikan uptime 99,9% dan integritas data bagi 1 juta pengguna.
 
 ### Organisasi Tim Teknis
 

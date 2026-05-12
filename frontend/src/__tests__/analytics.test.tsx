@@ -7,6 +7,9 @@ vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(),
   apiDownload: vi.fn(),
   getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+  getDomainSuffix: vi.fn(() => 'harikerja.com'),
+  getSupportEmail: vi.fn(() => 'support@harikerja.com'),
+  getSalesEmail: vi.fn(() => 'sales@harikerja.com'),
 }));
 
 vi.mock('next-intl', () => ({
