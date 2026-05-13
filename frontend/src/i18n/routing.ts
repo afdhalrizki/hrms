@@ -6,7 +6,7 @@ export const routing = defineRouting({
   locales: ['en', 'id'],
 
   // Used when no locale matches
-  defaultLocale: 'en',
+  defaultLocale: 'id',
   
   // Disable prefix for default locale if desired, but for clear multi-tenancy + multi-language, 
   // keeping prefixes is often better.

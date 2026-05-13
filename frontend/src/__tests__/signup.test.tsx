@@ -18,10 +18,11 @@ describe('SignupPage Component', () => {
 
   it('renders all registration fields', () => {
     render(<SignupPage />);
-    expect(screen.getByPlaceholderText('Acme Inc.')).toBeDefined();
-    expect(screen.getByPlaceholderText('acme')).toBeDefined();
-    expect(screen.getByPlaceholderText('admin@acme.com')).toBeDefined();
-    expect(screen.getByText('Create Workspace')).toBeDefined();
+    // Sync with actual keys in SignupPage.tsx
+    expect(screen.getByPlaceholderText(/companyPlaceholder/i)).toBeDefined();
+    expect(screen.getByPlaceholderText(/subdomainPlaceholder/i)).toBeDefined();
+    expect(screen.getByPlaceholderText(/adminPlaceholder/i)).toBeDefined();
+    expect(screen.getByText(/submitBtn/i)).toBeDefined();
   });
 
   it('handles successful form submission', async () => {
@@ -29,11 +30,11 @@ describe('SignupPage Component', () => {
     
     render(<SignupPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('Acme Inc.'), { target: { value: 'Acme Corp', name: 'company_name' } });
-    fireEvent.change(screen.getByPlaceholderText('acme'), { target: { value: 'acmecorp', name: 'subdomain_prefix' } });
-    fireEvent.change(screen.getByPlaceholderText('admin@acme.com'), { target: { value: 'test@acme.com', name: 'admin_email' } });
+    fireEvent.change(screen.getByPlaceholderText(/companyPlaceholder/i), { target: { value: 'Acme Corp', name: 'company_name' } });
+    fireEvent.change(screen.getByPlaceholderText(/subdomainPlaceholder/i), { target: { value: 'acmecorp', name: 'subdomain_prefix' } });
+    fireEvent.change(screen.getByPlaceholderText(/adminPlaceholder/i), { target: { value: 'test@acme.com', name: 'admin_email' } });
 
-    fireEvent.click(screen.getByText('Create Workspace'));
+    fireEvent.click(screen.getByText(/submitBtn/i));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/public/signup', expect.objectContaining({
@@ -44,7 +45,7 @@ describe('SignupPage Component', () => {
           admin_email: 'test@acme.com',
         }),
       }));
-      expect(screen.getByText('Request Submitted!')).toBeDefined();
+      expect(screen.getByText(/successTitle/i)).toBeDefined();
     });
   });
 
@@ -54,11 +55,11 @@ describe('SignupPage Component', () => {
     render(<SignupPage />);
     
     // Fill ALL required fields
-    fireEvent.change(screen.getByPlaceholderText('Acme Inc.'), { target: { value: 'Fail Corp', name: 'company_name' } });
-    fireEvent.change(screen.getByPlaceholderText('acme'), { target: { value: 'fail', name: 'subdomain_prefix' } });
-    fireEvent.change(screen.getByPlaceholderText('admin@acme.com'), { target: { value: 'fail@test.com', name: 'admin_email' } });
+    fireEvent.change(screen.getByPlaceholderText(/companyPlaceholder/i), { target: { value: 'Fail Corp', name: 'company_name' } });
+    fireEvent.change(screen.getByPlaceholderText(/subdomainPlaceholder/i), { target: { value: 'fail', name: 'subdomain_prefix' } });
+    fireEvent.change(screen.getByPlaceholderText(/adminPlaceholder/i), { target: { value: 'fail@test.com', name: 'admin_email' } });
     
-    fireEvent.click(screen.getByText('Create Workspace'));
+    fireEvent.click(screen.getByText(/submitBtn/i));
 
     await waitFor(() => {
       expect(screen.queryByText(/Subdomain already exists/i)).not.toBeNull();

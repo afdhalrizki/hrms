@@ -6,7 +6,7 @@ import { Mail, Lock, Briefcase, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from '@/i18n/routing';
+import { useRouter, Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { getDomainSuffix } from '@/lib/api';
 
@@ -69,9 +69,9 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
         <div className="glass-card rounded-[2.5rem] border p-10 shadow-2xl space-y-8">
           {/* Logo & Header */}
           <div className="text-center space-y-3">
-            <div className="inline-flex h-16 w-16 rounded-2xl bg-primary items-center justify-center text-white shadow-xl shadow-primary/30 mx-auto mb-2">
+            <Link href="/" className="inline-flex h-16 w-16 rounded-xl bg-primary items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/20 mx-auto mb-2 hover:scale-110 transition-transform">
               HK
-            </div>
+            </Link>
             <h1 className="text-3xl font-bold tracking-tight">{t('loginTitle')}</h1>
             
             {!showForm ? (

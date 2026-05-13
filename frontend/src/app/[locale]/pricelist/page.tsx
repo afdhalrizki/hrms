@@ -202,9 +202,9 @@ export default function PriceListPage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-20 p-8 rounded-[2rem] bg-blue-500/5 border border-blue-500/10 flex flex-col md:flex-row items-center gap-6">
-          <div className="h-12 w-12 rounded-2xl bg-blue-500/20 flex items-center justify-center shrink-0">
-            <Info className="text-blue-500" />
+        <div className="mt-20 p-8 rounded-[2rem] bg-primary/5 border border-primary/10 flex flex-col md:flex-row items-center gap-6">
+          <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
+            <Info className="text-primary" />
           </div>
           <div className="flex-grow text-center md:text-left">
             <h4 className="font-bold">Butuh Kapasitas Penyimpanan Tambahan?</h4>
@@ -212,7 +212,7 @@ export default function PriceListPage() {
               Anda dapat membeli add-on penyimpanan tambahan sebesar 1 GB seharga Rp 50.000/bulan tanpa harus melakukan upgrade paket utama.
             </p>
           </div>
-          <a href="#" className="font-bold text-blue-500 hover:underline">Pelajari Add-on</a>
+          <a href="#" className="font-bold text-primary hover:underline">Pelajari Add-on</a>
         </div>
       </div>
     </PublicLayout>

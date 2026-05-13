@@ -248,15 +248,19 @@ vi.mock('sonner', () => ({
   },
 }));
 
-vi.mock('next-intl', () => ({
-  __esModule: true,
-  useTranslations: () => (key: string) => key,
-  useLocale: () => 'en',
-  useMessages: () => ({}),
-  useTimeZone: () => 'UTC',
-  useNow: () => new Date(),
-  NextIntlClientProvider: ({ children }: any) => children,
-}));
+vi.mock('next-intl', () => {
+  const t = (key: string) => key;
+  t.raw = (key: string) => key;
+  return {
+    __esModule: true,
+    useTranslations: () => t,
+    useLocale: () => 'en',
+    useMessages: () => ({}),
+    useTimeZone: () => 'UTC',
+    useNow: () => new Date(),
+    NextIntlClientProvider: ({ children }: any) => children,
+  };
+});
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({

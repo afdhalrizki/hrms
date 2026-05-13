@@ -37,10 +37,11 @@ describe('Landing Pages Unit Tests', () => {
 
       render(<Home />);
 
-      expect(screen.getByText(/Kelola SDM Jadi Lebih/i)).toBeDefined();
-      expect(screen.getAllByText(/Simpel & Akurat/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/Mulai Sekarang \(Gratis\)/i)).toBeDefined();
-      expect(screen.getByText(/Fitur Utama HariKerja/i)).toBeDefined();
+      // Use translation keys as mocked in setup.ts
+      expect(screen.getByText(/heroTitle1/i)).toBeDefined();
+      expect(screen.getByText(/heroTitle2/i)).toBeDefined();
+      expect(screen.getByText(/ctaStart/i)).toBeDefined();
+      expect(screen.getByText(/featuresTitle/i)).toBeDefined();
     });
 
     it('renders specific features on landing page', () => {
@@ -54,9 +55,10 @@ describe('Landing Pages Unit Tests', () => {
 
       render(<Home />);
 
-      expect(screen.getByText(/Absensi & Kehadiran/i)).toBeDefined();
-      expect(screen.getByText(/Otomatisasi Payroll/i)).toBeDefined();
-      expect(screen.getByText(/Manajemen Kinerja/i)).toBeDefined();
+      // Feature titles are also translated
+      expect(screen.getByText(/feature1.title/i)).toBeDefined();
+      expect(screen.getByText(/feature3.title/i)).toBeDefined();
+      expect(screen.getByText(/feature6.title/i)).toBeDefined();
     });
   });
 
@@ -64,18 +66,17 @@ describe('Landing Pages Unit Tests', () => {
     it('renders mission and vision content', () => {
       render(<AboutPage />);
 
-      expect(screen.getAllByText(/Tentang/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/HariKerja/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/Visi & Misi Kami/i)).toBeDefined();
-      expect(screen.getByText(/Klien Terpercaya/i)).toBeDefined();
+      expect(screen.getAllByText(/title/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/visionTitle/i)).toBeDefined();
+      // "Klien Terpercaya" was removed, so we don't expect it anymore
     });
 
     it('renders core principles', () => {
       render(<AboutPage />);
 
-      expect(screen.getByText(/Keamanan Data/i)).toBeDefined();
-      expect(screen.getByText(/Kecepatan & Efisiensi/i)).toBeDefined();
-      expect(screen.getByText(/Dukungan Lokal/i)).toBeDefined();
+      expect(screen.getByText(/principle1Title/i)).toBeDefined();
+      expect(screen.getByText(/principle2Title/i)).toBeDefined();
+      expect(screen.getByText(/principle3Title/i)).toBeDefined();
     });
   });
 

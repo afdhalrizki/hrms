@@ -74,7 +74,7 @@ export function Sidebar() {
         {/* Logo Section */}
         <div className="p-8 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
-          <div className="flex items-center gap-4 overflow-hidden relative z-10">
+          <Link href="/" className="flex items-center gap-4 overflow-hidden relative z-10 hover:opacity-80 transition-opacity">
             {logo ? (
               <div className="h-12 w-12 shrink-0 rounded-2xl bg-white flex items-center justify-center shadow-xl shadow-black/10 overflow-hidden border border-white/20">
                 <img 
@@ -84,7 +84,7 @@ export function Sidebar() {
                 />
               </div>
             ) : (
-              <div className="h-12 w-12 shrink-0 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30">
+              <div className="h-12 w-12 shrink-0 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-primary/20">
                 HK
               </div>
             )}
@@ -96,7 +96,7 @@ export function Sidebar() {
                 {tenantName === 'Public' ? 'Public Portal' : 'Workspace'}
               </span>
             </div>
-          </div>
+          </Link>
           <div className="mt-8">
             <LanguageSwitcher />
           </div>

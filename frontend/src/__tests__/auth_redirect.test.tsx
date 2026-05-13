@@ -31,14 +31,6 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: any) => <div>{children}</div>,
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
-    h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
-  },
-}));
-
 describe('Home Page Redirection', () => {
   const mockPush = vi.fn();
 
@@ -62,13 +54,13 @@ describe('Home Page Redirection', () => {
 
     const { getByText } = render(<Home />);
 
-    // Should NOT redirect to /signup
+    // Should NOT redirect to /login
     await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(mockPush).not.toHaveReturnedWith('/signup');
+    expect(mockPush).not.toHaveBeenCalledWith('/login');
     
-    // Should render landing page content
+    // Should render landing page content - use translation key
     await waitFor(() => {
-      expect(getByText(/Kelola SDM Jadi Lebih/i)).toBeDefined();
+      expect(getByText(/heroTitle1/i)).toBeDefined();
     }, { timeout: 2000 });
   });
 

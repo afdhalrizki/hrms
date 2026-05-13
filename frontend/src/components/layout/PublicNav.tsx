@@ -6,15 +6,17 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export const PublicNav = () => {
+  const t = useTranslations('PublicNav');
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Pricing', href: '/pricelist' },
+    { name: t('home'), href: '/' },
+    { name: t('about'), href: '/about' },
+    { name: t('pricing'), href: '/pricelist' },
   ];
 
   return (
@@ -33,7 +35,7 @@ export const PublicNav = () => {
             const isActive = pathname === link.href || (link.href !== '/' && pathname.includes(link.href));
             return (
               <Link 
-                key={link.name} 
+                key={link.href} 
                 href={link.href as any}
                 className={cn(
                   "text-sm font-bold uppercase tracking-widest transition-colors relative group",
@@ -54,13 +56,13 @@ export const PublicNav = () => {
 
         <div className="hidden md:flex items-center gap-4">
           <Link href="/login" className="text-sm font-bold px-6 py-2 hover:text-primary transition-colors">
-            Login
+            {t('login')}
           </Link>
           <Link 
             href="/signup" 
             className="text-sm font-bold px-6 py-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
           >
-            Get Started <ArrowRight size={16} />
+            {t('getStarted')} <ArrowRight size={16} />
           </Link>
         </div>
 
@@ -83,7 +85,7 @@ export const PublicNav = () => {
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link 
-                key={link.name} 
+                key={link.href} 
                 href={link.href as any}
                 onClick={() => setIsOpen(false)}
                 className="text-lg font-bold"
@@ -94,10 +96,10 @@ export const PublicNav = () => {
           </div>
           <div className="flex flex-col gap-3 pt-6 border-t border-glass-border">
             <Link href="/login" className="text-center font-bold py-4 rounded-xl border border-glass-border">
-              Login
+              {t('login')}
             </Link>
             <Link href="/signup" className="text-center font-bold py-4 rounded-xl bg-primary text-white">
-              Get Started
+              {t('getStarted')}
             </Link>
           </div>
         </motion.div>
