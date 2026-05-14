@@ -56,12 +56,19 @@ class BillingViewSet(viewsets.GenericViewSet):
         # Storage Pricing per 1 GB
         STORAGE_GB_PRICE = 50000
         
+        PLAN_BASE_EMPLOYEES = {
+            'FREE': 10,
+            'ESSENTIAL': 50,
+            'PROFESSIONAL': 100,
+            'PREMIUM': 500,
+            'ENTERPRISE': 2000
+        }
+
         if is_addon:
             # Employee Add-on Purchase Logic
             if plan not in ADDON_PRICES:
                 return Response({"error": "Plan does not support employee add-ons."}, status=status.HTTP_400_BAD_REQUEST)
             
-            # ... (Existing cap logic) ...
             MAX_TIER_CAPACITY = {
                 'ESSENTIAL': 100,
                 'PROFESSIONAL': 1000,
@@ -91,11 +98,35 @@ class BillingViewSet(viewsets.GenericViewSet):
             description = f"HRMS Storage Quota Add-on (+{storage_gb} GB)"
             
         else:
-            # Standard Plan Renewal/Upgrade
+            # Standard Plan Renewal/Upgrade with optional bundled add-ons
+            # 1. Plan Quota Validation
+            target_max_employees = PLAN_BASE_EMPLOYEES.get(plan, 0) + addon_count + request.tenant.extra_employees
+            if request.tenant.employee_count > target_max_employees:
+                return Response({
+                    "error": f"Jumlah karyawan saat ini ({request.tenant.employee_count}) melebihi kapasitas total ({target_max_employees}) untuk plan target.",
+                    "code": "QUOTA_EXCEEDED"
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            # 2. Pricing calculation
             gross_amount = PRICES[plan] * months
             if months == 12:
                 gross_amount = int(gross_amount * 0.8) # 20% discount for annual
+                
+            # Add optional bundled addon costs
+            if addon_count > 0:
+                if addon_count % 10 != 0:
+                    return Response({"error": "Add-ons must be purchased in blocks of 10."}, status=status.HTTP_400_BAD_REQUEST)
+                blocks = addon_count // 10
+                gross_amount += ADDON_PRICES.get(plan, 100000) * blocks
+                
+            if storage_gb > 0:
+                gross_amount += STORAGE_GB_PRICE * storage_gb
+
             description = f"HRMS {plan.capitalize()} Subscription ({months} Months)"
+            if addon_count > 0:
+                description += f" + {addon_count} Employees"
+            if storage_gb > 0:
+                description += f" + {storage_gb} GB Storage"
             
         # Create a unique order ID: SUB-[tenant_id]-[timestamp]
         order_id = f"SUB-{request.tenant.id}-{int(time.time())}"
@@ -205,6 +236,12 @@ class BillingViewSet(viewsets.GenericViewSet):
                     tenant.expiry_date = new_expiry
                     tenant.plan_type = invoice.plan_type
                     tenant.subscription_status = 'ACTIVE'
+                    
+                    # Apply any bundled add-ons in the invoice
+                    if invoice.addon_count > 0:
+                        tenant.extra_employees += invoice.addon_count
+                    if invoice.storage_gb_count > 0:
+                        tenant.extra_storage_mb += (invoice.storage_gb_count * 1024)
                 
                 tenant.save()
                 

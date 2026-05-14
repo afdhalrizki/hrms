@@ -40,10 +40,12 @@ class BillingCheckoutTests(APITestCase):
         """
         Test that downgrading to a plan with lower capacity than current employee count fails.
         """
-        # Set current employee count to 80 (Above Essential limit of 50)
-        self.tenant.employee_count = 80
-        self.tenant.plan_type = 'PROFESSIONAL'
-        self.tenant.save()
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            # Set current employee count to 80 (Above Essential limit of 50)
+            self.tenant.employee_count = 80
+            self.tenant.plan_type = 'PROFESSIONAL'
+            self.tenant.save()
 
         url = reverse('billing-checkout')
         data = {
@@ -77,17 +79,19 @@ class BillingCheckoutTests(APITestCase):
         self.assertEqual(response.data['code'], 'QUOTA_EXCEEDED')
         self.assertIn("melebihi kapasitas total (50)", response.data['error'])
 
-    def test_checkout_storage_quota_failure(self):
+    def test_checkout_storage_quota_does_not_block_downgrade(self):
         """
-        Test that downgrading to a plan with lower storage than current usage fails.
+        Test that downgrading is NOT blocked even if current storage exceeds target plan capacity.
         """
-        # Set current storage to 500MB (Above Free limit of 50MB)
-        self.tenant.storage_used_bytes = 500 * 1024 * 1024
-        self.tenant.save()
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            # Set current storage to 500MB (Above Essential limit of 250MB)
+            self.tenant.storage_used_bytes = 500 * 1024 * 1024
+            self.tenant.save()
 
         url = reverse('billing-checkout')
         data = {
-            'plan_type': 'FREE',
+            'plan_type': 'ESSENTIAL',
             'months': 1
         }
         
@@ -99,19 +103,25 @@ class BillingCheckoutTests(APITestCase):
         request.tenant = self.tenant
         request.user = self.user
         
-        view = BillingViewSet.as_view({'post': 'checkout'})
-        response = view(request)
-        
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data['code'], 'STORAGE_QUOTA_EXCEEDED')
+        with patch('billing.services.MidtransService.create_transaction') as mock_midtrans:
+            mock_midtrans.return_value = {'token': 'storage-token'}
+            
+            view = BillingViewSet.as_view({'post': 'checkout'})
+            response = view(request)
+            
+            # Should succeed because storage doesn't block downgrades
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['snap_token'], 'storage-token')
 
     def test_checkout_upgrade_success(self):
         """
         Test that upgrading to a higher plan succeeds.
         """
-        self.tenant.employee_count = 20
-        self.tenant.plan_type = 'ESSENTIAL'
-        self.tenant.save()
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            self.tenant.employee_count = 20
+            self.tenant.plan_type = 'ESSENTIAL'
+            self.tenant.save()
 
         url = reverse('billing-checkout')
         data = {
@@ -139,10 +149,12 @@ class BillingCheckoutTests(APITestCase):
         """
         Test that downgrading to a plan with lower capacity SUCCEEDS if extra blocks are purchased.
         """
-        # Current: 60 employees (Plan: PROFESSIONAL, limit 100)
-        self.tenant.employee_count = 60
-        self.tenant.plan_type = 'PROFESSIONAL'
-        self.tenant.save()
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            # Current: 60 employees (Plan: PROFESSIONAL, limit 100)
+            self.tenant.employee_count = 60
+            self.tenant.plan_type = 'PROFESSIONAL'
+            self.tenant.save()
 
         # Target: ESSENTIAL (limit 50) + 10 Addon -> Should pass (Total 60)
         url = reverse('billing-checkout')

@@ -159,8 +159,25 @@ class AttendanceService:
         attendance.check_out = now_time
         attendance.latitude_out = latitude
         attendance.longitude_out = longitude
+        from django.db import connection
+        from django_tenants.utils import get_tenant_model
+        tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+        
+        photo_size = 0
         if photo:
-            attendance.photo_out = photo
+            try:
+                photo_size = photo.size
+            except (AttributeError, ValueError):
+                photo_size = 0
+
+        storage_full = (tenant.storage_used_bytes + photo_size) > tenant.total_storage_capacity_bytes
+        
+        final_photo = photo
+        if photo:
+            if not getattr(tenant, 'is_biometric_enabled', True) or storage_full:
+                final_photo = None
+                attendance.biometric_skipped = True
+            attendance.photo_out = final_photo
             
         attendance.save()
         return attendance

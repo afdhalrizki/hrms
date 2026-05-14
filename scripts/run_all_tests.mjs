@@ -205,7 +205,7 @@ async function main() {
                      (stackIdx !== -1 ? args[stackIdx + 1] : null);
 
     const suites = [
-      { name: 'Backend Stack', path: 'backend/scripts/run_tests.mjs', args: ['--no-start'] },
+      { name: 'Backend Stack', path: 'backend/scripts/run_tests.mjs', args: ['--no-start', '--create-db'] },
       { name: 'Frontend Stack', path: 'frontend/scripts/run_tests.mjs' },
       { name: 'Mobile Stack', path: 'mobile/scripts/run_tests.mjs' },
     ].filter(s => !onlyStack || s.name.toLowerCase().includes(onlyStack.toLowerCase()));

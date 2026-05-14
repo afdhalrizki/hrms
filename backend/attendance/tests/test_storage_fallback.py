@@ -119,3 +119,50 @@ class StorageFallbackTestCase(HRMSTestCase):
             # Should be skipped because it would exceed quota
             self.assertFalse(bool(att.photo_in))
             self.assertTrue(att.biometric_skipped)
+
+    def test_clock_out_biometric_skip_when_quota_full(self):
+        """
+        Verify that AttendanceService automatically skips biometric (discards photo)
+        during clock-out if the tenant's storage quota is already full.
+        """
+        # 1. Perform normal clock-in first (quota still available)
+        self.tenant.storage_limit_mb = 100
+        self.tenant.storage_used_bytes = 0
+        self.tenant.save()
+
+        with schema_context(self.tenant.schema_name):
+            test_date = date.today()
+            att = AttendanceService.process_clock_in(
+                employee=self.employee,
+                latitude=0,
+                longitude=0,
+                photo=None,
+                date=test_date,
+                check_in_time=time(8, 0)
+            )
+            
+        # 2. Now simulate full storage BEFORE clock-out
+        self.tenant.storage_used_bytes = 100 * 1024 * 1024
+        self.tenant.save()
+
+        with schema_context(self.tenant.schema_name):
+            # 3. Perform clock-out with a photo
+            from django.core.files.base import ContentFile
+            photo = ContentFile(b"fake clockout image", name="clockout_photo.jpg")
+            
+            att_out = AttendanceService.process_clock_out(
+                employee=self.employee,
+                latitude=0,
+                longitude=0,
+                photo=photo,
+                date=test_date,
+                check_out_time=time(17, 0)
+            )
+            
+            # 4. Assertions
+            # The clock-out photo should have been cleared because storage is full
+            self.assertFalse(bool(att_out.photo_out))
+            # biometric_skipped should be True
+            self.assertTrue(att_out.biometric_skipped)
+            # It should have successfully recorded check_out time
+            self.assertEqual(att_out.check_out, time(17, 0))
