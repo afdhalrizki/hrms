@@ -110,6 +110,8 @@ async function main() {
   const skipE2E = args.includes('-SkipE2E') || args.includes('--skip-e2e');
   const skipMobile =
     args.includes('-SkipMobile') || args.includes('--skip-mobile');
+  const skipBackend =
+    args.includes('-SkipBackend') || args.includes('--skip-backend');
   const maxSuiteRetries = 1;
 
   await ensureDir(LogDir);
@@ -198,8 +200,9 @@ async function main() {
       }
     }
 
+    const stackIdx = args.indexOf('--stack');
     const onlyStack = args.find(a => a.startsWith('--stack='))?.split('=')[1] || 
-                     args[args.indexOf('--stack') + 1];
+                     (stackIdx !== -1 ? args[stackIdx + 1] : null);
 
     const suites = [
       { name: 'Backend Stack', path: 'backend/scripts/run_tests.mjs', args: ['--no-start'] },
@@ -215,10 +218,25 @@ async function main() {
     const results = [];
     for (const s of suites) {
       if (s.name.includes('Mobile') && skipMobile) {
-        log(`\n⏭ SKIPPED: ${s.name}`, COLORS.yellow);
+        log(`\n\u23ED SKIPPED: ${s.name}`, COLORS.yellow);
         results.push({
           name: s.name,
-          status: '⏭ SKIPPED',
+          status: '\u23ED SKIPPED',
+          p: '-',
+          f: '-',
+          e: '-',
+          w: '-',
+          exit: 0,
+          log: '-',
+        });
+        continue;
+      }
+
+      if (s.name.includes('Backend') && skipBackend) {
+        log(`\n\u23ED SKIPPED: ${s.name}`, COLORS.yellow);
+        results.push({
+          name: s.name,
+          status: '\u23ED SKIPPED',
           p: '-',
           f: '-',
           e: '-',
@@ -275,7 +293,7 @@ async function main() {
 
         // Restart and ensure ready
         await startBackendRunserver();
-        await ensureBackendServerReady(2, 120);
+        await ensureBackendServerReady(2, 300);
       }
 
       log(`\n🚀 RUNNING: ${s.name}`, COLORS.yellow);
@@ -323,7 +341,7 @@ async function main() {
           {
             cwd: dirname(join(RootDir, s.path)),
             logFile: suiteLog,
-            env: { ...process.env, NO_RESEED: 'true' },
+            env: { ...process.env, NO_RESEED: 'true', SKIP_BACKEND_SETUP: '1' },
           },
         );
 

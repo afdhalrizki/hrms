@@ -251,6 +251,7 @@ export default function ProfilePage() {
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={18} />
                       <input 
                         type="text" 
+                        data-testid="profile-phone"
                         value={profile?.phone || ''}
                         onChange={(e) => profile && setProfile({...profile, phone: e.target.value})}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
@@ -264,6 +265,7 @@ export default function ProfilePage() {
                       <MapPin className="absolute left-4 top-4 text-primary" size={18} />
                       <textarea 
                         rows={3}
+                        data-testid="profile-address"
                         value={profile?.address || ''}
                         onChange={(e) => profile && setProfile({...profile, address: e.target.value})}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium resize-none"
@@ -333,6 +335,7 @@ export default function ProfilePage() {
                       <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">{t('form.ktp')}</label>
                       <input 
                         type="text" 
+                        data-testid="profile-ktp"
                         value={profile?.ktp_number || ''}
                         onChange={(e) => profile && setProfile({...profile, ktp_number: e.target.value})}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
@@ -342,6 +345,7 @@ export default function ProfilePage() {
                       <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">{t('form.npwp')}</label>
                       <input 
                         type="text" 
+                        data-testid="profile-npwp"
                         value={profile?.npwp_number || ''}
                         onChange={(e) => profile && setProfile({...profile, npwp_number: e.target.value})}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"

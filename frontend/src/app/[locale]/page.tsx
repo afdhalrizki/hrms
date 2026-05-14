@@ -29,8 +29,7 @@ import { apiFetch } from '@/lib/api';
 
 import StatCard from '@/components/dashboard/StatCard';
 import QuotaUsageCard from '@/components/dashboard/QuotaUsageCard';
-import { PublicNav } from '@/components/layout/PublicNav';
-import { PublicFooter } from '@/components/layout/PublicFooter';
+import { PublicLayout } from '@/components/layout/PublicLayout';
 
 const AttendanceChart = dynamic(() => import('@/components/dashboard/AttendanceChart'), {
   loading: () => <Skeleton className="w-full h-64" />,
@@ -89,26 +88,25 @@ export default function Home() {
   // 1. Landing Page (Public)
   if (!user && isPublicDomain) {
     return (
-      <div className="flex flex-col min-h-screen bg-black text-white selection:bg-primary/30">
-        <PublicNav />
-        
-        {/* Hero Section */}
-        <section className="relative pt-40 pb-24 overflow-hidden">
-          <div className="absolute top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-50" />
-          <div className="absolute bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] opacity-40" />
-          
-          <div className="max-w-7xl mx-auto px-6 text-center space-y-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-8"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
+      <PublicLayout>
+        <div className="bg-black text-white selection:bg-primary/30">
+          {/* Hero Section */}
+          <section className="relative pt-40 pb-24 overflow-hidden">
+            <div className="absolute top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-50" />
+            <div className="absolute bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] opacity-40" />
+            
+            <div className="max-w-7xl mx-auto px-6 text-center space-y-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="space-y-8"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  </span>
                 {tLanding('heroBadge')}
               </div>
               <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[1] md:leading-[0.95]">
@@ -231,8 +229,8 @@ export default function Home() {
           </div>
         </section>
 
-        <PublicFooter />
-      </div>
+        </div>
+      </PublicLayout>
     );
   }
 

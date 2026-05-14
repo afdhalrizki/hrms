@@ -184,23 +184,13 @@ describe('ProfilePage (Integrated)', () => {
     render(<ProfilePage />, { wrapper: AllProviders });
     await waitFor(() => screen.getByText(/EMP001/i), { timeout: 15000 });
 
-    // Since we are integrated, ktp_number might be empty if seeded empty
-    const inputs = screen.getAllByRole('textbox');
-    // Using placeholders or display values is tricky if data varies.
-    // In our component: 
-    // ktp_number is the 3rd or 4th textbox usually, but let's query smartly.
-    // The previous test used `screen.getByDisplayValue('1234567890')`. Let's just find the inputs.
-    const ktpInput = document.querySelector('input[value="' + (screen.getByText(/EMP001/i).closest('form')?.querySelector('input:nth-of-type(1)') as HTMLInputElement)?.value + '"]') || document.querySelectorAll('input[type="text"]')[1] as HTMLInputElement;
-    const npwpInput = document.querySelectorAll('input[type="text"]')[2] as HTMLInputElement;
+    const ktpInput = screen.getByTestId('profile-ktp');
+    const npwpInput = screen.getByTestId('profile-npwp');
     const ptkpSelect = document.querySelector('select') as HTMLSelectElement;
 
-    // Use querySelector if testing specifically for them
-    const ktpInputRef = document.querySelectorAll('input.px-4.py-3\\.5')[0] as HTMLInputElement;
-    const npwpInputRef = document.querySelectorAll('input.px-4.py-3\\.5')[1] as HTMLInputElement;
-
-    if (ktpInputRef && npwpInputRef && ptkpSelect) {
-      fireEvent.change(ktpInputRef, { target: { value: '9999999999' } });
-      fireEvent.change(npwpInputRef, { target: { value: 'NPWP99999' } });
+    if (ktpInput && npwpInput && ptkpSelect) {
+      fireEvent.change(ktpInput, { target: { value: '9999999999' } });
+      fireEvent.change(npwpInput, { target: { value: 'NPWP99999' } });
       fireEvent.change(ptkpSelect, { target: { value: 'K/1' } });
 
       vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {

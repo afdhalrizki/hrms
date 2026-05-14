@@ -15,20 +15,21 @@ async function main() {
   const skipBackendRestart = args.includes('--skip-backend-restart');
   const coverage = args.includes('--coverage');
   const quick = args.includes('--quick');
-  const numWorkers = 2;
+  const numWorkers = 1;
 
   log("--- HRMS Frontend Integrated Unit Test Automation ---", COLORS.cyan);
 
   // 1. Backend Orchestration
   log("[1/3] Ensuring Backend is running and seeded...", COLORS.yellow);
-  const backendHealthy = await isPortInUse(8000) && await waitForHttp('http://localhost:8000/api/', 2000, 'Backend Check');
+  const skipSetup = process.env.SKIP_BACKEND_SETUP === '1';
+  const backendHealthy = await isPortInUse(8000) && await waitForHttp('http://localhost:8000/api/', 30000, 'Backend Check');
   
   const logDir = join(FrontendDir, 'logs');
   await ensureDir(logDir);
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
   const logFile = join(logDir, `unit_test_${timestamp}.log`);
 
-  if (!backendHealthy) {
+  if (!backendHealthy && !skipSetup) {
     log("Backend not detected or unhealthy. Starting local backend...", COLORS.gray);
     const backendLog = join(logDir, `backend_integrated_${timestamp}.log`);
     log(`Backend logs will be at: ${backendLog}`, COLORS.gray);

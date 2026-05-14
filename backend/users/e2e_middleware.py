@@ -10,7 +10,7 @@ class E2ETenantMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.method == 'OPTIONS':
+        if (request.method == 'OPTIONS' or request.path.startswith('/api/public/')):
             return self.get_response(request)
             
         from tenants.models import Tenant, Domain

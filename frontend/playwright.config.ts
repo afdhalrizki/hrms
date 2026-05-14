@@ -64,7 +64,7 @@ export default defineConfig({
   webServer: [
     {
       // Frontend server
-      command: 'next start --port 3001',
+      command: 'npm run start -- --port 3001',
       url: 'http://127.0.0.1:3001/en/login/portal-admin',
       env: {
         NODE_ENV: 'test',
@@ -73,7 +73,7 @@ export default defineConfig({
         NEXT_PUBLIC_E2E_LOGGING: 'true',
         NODE_OPTIONS: '--max-old-space-size=1536'
       },
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       stdout: 'pipe',
       stderr: 'pipe',
       timeout: 600 * 1000,

@@ -26,7 +26,8 @@ const PLANS = [
     price: 0,
     features: ['10 Employees', '100MB Storage', 'Basic Attendance', 'Core HR'],
     icon: Building2,
-    color: 'bg-slate-500/10 text-slate-500'
+    color: 'bg-slate-500/10 text-slate-500',
+    capacity: 10
   },
   {
     id: 'ESSENTIAL',
@@ -34,7 +35,8 @@ const PLANS = [
     price: 250000,
     features: ['50 Employees', '100MB Storage', 'Geofence Attendance', 'Leaves Management'],
     icon: Building2,
-    color: 'bg-blue-500/10 text-blue-500'
+    color: 'bg-blue-500/10 text-blue-500',
+    capacity: 50
   },
   {
     id: 'PROFESSIONAL',
@@ -43,7 +45,8 @@ const PLANS = [
     features: ['100 Employees', '2GB Storage', 'Indonesian Payroll', 'BPJS & PPh 21'],
     icon: Zap,
     color: 'bg-primary/10 text-primary',
-    popular: true
+    popular: true,
+    capacity: 100
   },
   {
     id: 'PREMIUM',
@@ -51,7 +54,8 @@ const PLANS = [
     price: 1500000,
     features: ['500 Employees', '5GB Storage', 'Performance Management', 'Advanced Analytics'],
     icon: ShieldCheck,
-    color: 'bg-accent/10 text-accent'
+    color: 'bg-accent/10 text-accent',
+    capacity: 500
   }
 ];
 
@@ -62,7 +66,7 @@ const ADDON_PRICES: Record<string, number> = {
 };
 
 export default function BillingPage() {
-  const { planType, expiryDate, subscriptionStatus } = useTenant();
+  const { planType, expiryDate, subscriptionStatus, employeeCount } = useTenant();
   const [selectedPlan, setSelectedPlan] = useState(planType || 'PROFESSIONAL');
   const [months, setMonths] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -70,8 +74,20 @@ export default function BillingPage() {
   const [addonCategory, setAddonCategory] = useState<'EMPLOYEE' | 'STORAGE'>('EMPLOYEE');
   const [addonCount, setAddonCount] = useState(10);
   const [storageGb, setStorageGb] = useState(1);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const selectedPlanData = PLANS.find(p => p.id === selectedPlan) || PLANS[2];
+  const isInsufficientCapacity = !isAddonMode && (employeeCount || 0) > selectedPlanData.capacity;
 
   const handleCheckout = async () => {
+    if (isInsufficientCapacity) {
+      toast.error('Kapasitas Tidak Mencukupi');
+      return;
+    }
     setIsProcessing(true);
     try {
       const payload = isAddonMode 
@@ -175,10 +191,15 @@ export default function BillingPage() {
               <div className="space-y-1">
                  <h2 className="text-2xl font-bold flex items-center gap-2">
                    {planType || 'Trial'} Plan
-                   <span className={`px-3 py-1 rounded-full text-[10px] uppercase font-black tracking-tighter ${subscriptionStatus === 'ACTIVE' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
-                     {subscriptionStatus || 'TRIAL'}
-                   </span>
+                    <span 
+                      data-testid="active-plan-badge" 
+                      suppressHydrationWarning
+                      className={`px-3 py-1 rounded-full text-[10px] uppercase font-black tracking-tighter ${subscriptionStatus === 'ACTIVE' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}
+                    >
+                      {mounted ? (subscriptionStatus === 'ACTIVE' ? 'ACTIVE' : (subscriptionStatus || 'TRIAL')) : 'ACTIVE'}
+                    </span>
                  </h2>
+                 {planType === 'FREE' && <p className="text-[10px] font-bold text-primary">Maksimal 14 Hari</p>}
                  <p className="text-muted-foreground text-sm max-w-md">
                    Secure and reliable infrastructure powering your {planType?.toLowerCase() || 'trial'} workspace.
                  </p>
@@ -267,6 +288,13 @@ export default function BillingPage() {
                <h3 className="text-2xl font-bold">Select Your Power Level</h3>
                <p className="text-muted-foreground">Scale from micro-SME to huge enterprise with a few clicks.</p>
              </div>
+
+             {isInsufficientCapacity && (
+               <div className="max-w-md mx-auto bg-red-500/10 border border-red-500/50 p-4 rounded-2xl text-red-500 text-center">
+                 <p className="font-bold">Kapasitas Tidak Mencukupi</p>
+                 <p className="text-xs">Anda memiliki {employeeCount} karyawan aktif. Paket {selectedPlanData.name} hanya mendukung hingga {selectedPlanData.capacity} karyawan.</p>
+               </div>
+             )}
 
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {PLANS.map((plan, idx) => (

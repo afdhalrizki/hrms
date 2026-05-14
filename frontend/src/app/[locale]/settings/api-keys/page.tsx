@@ -124,6 +124,7 @@ export default function ApiKeysPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 key={key.id}
+                data-testid="api-key-item"
                 className="glass-card p-8 rounded-[32px] border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all relative group overflow-hidden"
               >
                 <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
@@ -144,7 +145,7 @@ export default function ApiKeysPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight truncate pr-8">{key.label}</h3>
+                    <h3 data-testid="api-key-label" className="text-xl font-bold text-white tracking-tight truncate pr-8">{key.label}</h3>
                     <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-1">Pre: {key.key_prefix}***</p>
                   </div>
 

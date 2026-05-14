@@ -101,7 +101,7 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || 
                     hostname.endsWith('.localhost') || hostname.endsWith('.127.0.0.1');
     
-    if (testTenant && isLocal) {
+    if (testTenant && isLocal && !endpoint.includes('/public/')) {
       headers['X-Tenant'] = testTenant;
     }
     if (process.env.NEXT_PUBLIC_E2E_LOGGING === 'true' || process.env.NODE_ENV === 'test') {

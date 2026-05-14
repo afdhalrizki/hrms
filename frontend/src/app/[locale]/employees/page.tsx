@@ -45,6 +45,7 @@ export default function EmployeesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showTerminated, setShowTerminated] = useState(false);
   
   // Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -80,11 +81,11 @@ export default function EmployeesPage() {
       fetchEmployees();
       fetchDropdownData();
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, showTerminated]);
 
   const fetchEmployees = async () => {
     try {
-      const data = await apiFetch('employees');
+      const data = await apiFetch(`employees${showTerminated ? '?show_terminated=true' : ''}`);
       setEmployees(data);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -188,6 +189,16 @@ export default function EmployeesPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <button 
+            onClick={() => setShowTerminated(!showTerminated)}
+            className={cn(
+              "px-4 py-2.5 rounded-xl border font-medium transition-all flex items-center gap-2",
+              showTerminated ? "bg-primary/10 border-primary/50 text-primary" : "bg-white/5 hover:bg-white/10"
+            )}
+          >
+            <Filter size={18} />
+            <span>{showTerminated ? "Hiding Terminated Staff" : "Show Terminated Staff"}</span>
+          </button>
         </div>
 
         {/* Table */}
@@ -256,6 +267,59 @@ export default function EmployeesPage() {
                       <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                         <span className="flex items-center gap-2"><Mail size={12}/> {emp.email}</span>
                         <span className="flex items-center gap-2"><Phone size={12}/> {emp.phone || '-'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="relative inline-block text-left">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const menu = document.getElementById(`menu-${emp.id}`);
+                            if (menu) menu.classList.toggle('hidden');
+                          }}
+                          className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+                        <div 
+                          id={`menu-${emp.id}`}
+                          className="hidden absolute right-0 mt-2 w-48 rounded-xl bg-[#1A1A1A] border border-white/10 shadow-2xl z-50 py-1 overflow-hidden"
+                        >
+                          <button 
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (confirm("Terminate this employee?")) {
+                                try {
+                                  await apiFetch(`employees/${emp.id}/terminate/`, { method: 'POST' });
+                                  toast.success("Staff terminated");
+                                  fetchEmployees();
+                                } catch (err: any) {
+                                  toast.error(err.message);
+                                }
+                              }
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                          >
+                            Terminate Staff
+                          </button>
+                          <button 
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (confirm("Delete permanently? This cannot be undone.")) {
+                                try {
+                                  await apiFetch(`employees/${emp.id}/`, { method: 'DELETE' });
+                                  toast.success("Employee deleted");
+                                  fetchEmployees();
+                                } catch (err: any) {
+                                  toast.error(err.message);
+                                }
+                              }
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+                          >
+                            Delete Permanently
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </motion.tr>

@@ -100,7 +100,7 @@ async function main() {
   }
 
   // 3. Run E2E Tests (Playwright)
-  if (allPassed && !skipE2E) {
+  if (!skipE2E) {
     log("\n🌐 [2/2] Running E2E Tests (Playwright)...", COLORS.yellow);
     const e2eArgs = ['--skip-install'];
     if (live) e2eArgs.push('--live');

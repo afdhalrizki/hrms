@@ -162,16 +162,30 @@ export async function login(page: Page, email: string, password = 'password123',
     }
   });
 
-  // 0. Preliminary Backend Reachability Check (Fail Fast)
-  try {
-    const backendUrl = 'http://127.0.0.1:8000/api/';
-    const response = await page.request.get(backendUrl, { timeout: 15000 });
-    if (!response.ok() && response.status() >= 500) {
-      throw new Error(`Backend at ${backendUrl} returned status ${response.status()}`);
+  // 0. Preliminary Backend Reachability Check (Fail Fast) with Retry
+  let backendOk = false;
+  let lastError = '';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const backendUrl = 'http://127.0.0.1:8000/api/';
+      const response = await page.request.get(backendUrl, { timeout: 15000 });
+      if (response.ok() || response.status() < 500) {
+        backendOk = true;
+        console.log(`✅ Backend reachability verified on attempt ${attempt}: ${backendUrl}`);
+        break;
+      }
+      lastError = `Status ${response.status()}`;
+    } catch (e: any) {
+      lastError = e.message || String(e);
+      if (attempt < 3) {
+        console.warn(`⚠️ Backend reachability attempt ${attempt} failed: ${lastError}. Retrying in 5s...`);
+        await new Promise(r => setTimeout(r, 5000));
+      }
     }
-    console.log(`✅ Backend reachability verified: ${backendUrl}`);
-  } catch (e: any) {
-    const errorMsg = `❌ CRITICAL: Backend is UNREACHABLE at http://localhost:8000/api/. Login cannot proceed. Error: ${e.message || e}`;
+  }
+
+  if (!backendOk) {
+    const errorMsg = `❌ CRITICAL: Backend is UNREACHABLE at http://localhost:8000/api/ after 3 attempts. Login cannot proceed. Last error: ${lastError}`;
     console.error(errorMsg);
     throw new Error(errorMsg);
   }

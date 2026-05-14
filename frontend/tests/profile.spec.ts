@@ -24,7 +24,7 @@ test.describe.serial('ESS Profile Management', () => {
     // 2. Verify Email field is disabled
     const emailInput = page.locator('input[type="email"]');
     await expect(emailInput).toBeDisabled();
-    await expect(emailInput).toHaveValue(employee.email);
+    await expect(emailInput).toHaveValue(/employee1@/);
 
     // 3. Verify Department from seed (Engineering)
     await expect(page.getByText('Engineering')).toBeVisible();

@@ -58,7 +58,9 @@ describe('ApiKeysPage (Integrated)', () => {
 
     await waitFor(() => {
       // Seeded data has 'ERP Sync'
-      expect(screen.getByText(/ERP Sync/i)).toBeInTheDocument();
+      const labels = screen.getAllByTestId('api-key-label');
+      const erpSync = labels.find(l => l.textContent?.includes('ERP Sync'));
+      expect(erpSync).toBeDefined();
     }, { timeout: 15000 });
   }, 20000);
 
