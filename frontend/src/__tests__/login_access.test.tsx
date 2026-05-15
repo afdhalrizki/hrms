@@ -128,4 +128,32 @@ describe('LoginPage Access Restrictions', () => {
     await waitFor(() => expect(mockLogin).toHaveBeenCalledWith('a@b.com', 'pass123'));
     expect(mockPush).toHaveBeenCalledWith('/');
   });
+
+  it('renders an explicit error box when login attempts fail with invalid credentials', async () => {
+    const mockLogin = vi.fn().mockRejectedValue(new Error('Invalid credentials'));
+
+    (useTenant as any).mockReturnValue({ isPublic: false, tenantName: 'Acme Corp' });
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      error: null,
+      login: mockLogin,
+      logout: vi.fn(),
+      refreshProfile: vi.fn(),
+    });
+
+    render(<LoginView />);
+
+    // Fill form
+    fireEvent.change(screen.getByLabelText(/emailLabel/i), { target: { value: 'wrong@example.com' } });
+    fireEvent.change(screen.getByLabelText(/passwordLabel/i), { target: { value: 'wrongpass123' } });
+
+    // Submit
+    fireEvent.click(screen.getByRole('button', { name: /signIn/i }));
+
+    // Verify the error message is successfully captured and rendered in the DOM
+    await waitFor(() => {
+      expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+    });
+  });
 });

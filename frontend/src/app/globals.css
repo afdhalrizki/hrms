@@ -7,6 +7,7 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: #f3f4f6;
   --color-accent: #a3b18a;
+  --color-destructive: #ef4444;
   --color-glass: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
 }

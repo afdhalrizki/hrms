@@ -19,7 +19,8 @@ import {
   GitMerge,
   TrendingUp,
   FileText,
-  Palette
+  Palette,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -59,7 +60,7 @@ export function Sidebar() {
     return enabledModules?.includes(item.module);
   });
   const { logo, tenantName } = useTenant();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const { hasPermission } = usePermission();
   const pathname = usePathname();
 
@@ -143,7 +144,7 @@ export function Sidebar() {
             <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center text-accent font-black text-sm border border-accent/10 shadow-lg">
               {loading ? '...' : getInitials(user?.fullname || user?.email || 'Admin')}
             </div>
-            <div className="overflow-hidden">
+            <div className="overflow-hidden flex-1">
               <p data-testid="sidebar-fullname" className="text-sm font-bold truncate group-hover/user:text-accent transition-colors">
                 {loading ? tCommon('loading') : (user?.fullname || 'Admin User')}
               </p>
@@ -151,6 +152,13 @@ export function Sidebar() {
                 {user?.email || 'admin@hrms.com'}
               </p>
             </div>
+            <button 
+              onClick={logout}
+              className="p-2 rounded-xl text-muted-foreground hover:bg-red-500/10 hover:text-red-500 hover:scale-110 active:scale-95 transition-all shrink-0" 
+              title="Logout"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </div>

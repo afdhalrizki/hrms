@@ -81,9 +81,37 @@ def create_superuser(self, email, password=None, **extra_fields):
 
 ---
 
-## 6. Related File References
+## 6. How to Manually Create a Superadmin Account on the Server
+
+Since production or remote deployment scripts (like QA) **do not** seed databases by default for security purposes, you must provision the initial Global Admin account manually via the Django terminal utilities.
+
+Follow these steps on your remote server terminal:
+
+1. **Log into your Server via SSH** and navigate to the project root (usually `/opt/hrms`).
+2. **Execute the Django command** inside the backend docker container using the matching env file:
+
+   **For QA Environment (`harikerja.web.id`):**
+   ```bash
+   docker compose -f deploy/qa/docker-compose.qa.yml --env-file deploy/environments/.env.qa exec backend python manage.py createsuperuser
+   ```
+
+   **For Standard Local / Production:**
+   ```bash
+   docker compose exec backend python manage.py createsuperuser
+   ```
+
+3. **Enter the Credentials** in the interactive shell prompts:
+   *   Input your desired email address.
+   *   Type and confirm a strong password.
+
+Once complete, you should see the `Superuser created successfully.` confirmation. The system will automatically apply the `is_global_admin=True` tag, rendering the account immediately operational for logins.
+
+---
+
+## 7. Related File References
 * **User Model:** [users/models.py](file:///home/afdhal/data/hr/hrms/backend/users/models.py)
 * **Security Middleware:** [users/middleware.py](file:///home/afdhal/data/hr/hrms/backend/users/middleware.py)
 * **Database Seeder:** [scripts/seeds/core.py](file:///home/afdhal/data/hr/hrms/backend/scripts/seeds/core.py)
 * **E2E Test Suites:** [tests/superadmin.spec.ts](file:///home/afdhal/data/hr/hrms/frontend/tests/superadmin.spec.ts)
+
 

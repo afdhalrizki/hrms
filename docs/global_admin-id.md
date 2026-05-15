@@ -81,9 +81,37 @@ def create_superuser(self, email, password=None, **extra_fields):
 
 ---
 
-## 6. Referensi Berkas Terkait
+## 6. Cara Membuat Akun Superadmin Baru di Server (Manual)
+
+Karena skrip deployment pada server remote (seperti QA/Production) secara default **tidak** menjalankan database seeding demi keamanan, Anda harus membuat akun Global Admin pertama kali secara manual menggunakan tool terminal Django.
+
+Ikuti langkah-langkah berikut pada terminal VPS Anda:
+
+1. **Akses Server via SSH** dan pindah ke folder root proyek (biasanya `/opt/hrms`).
+2. **Jalankan Perintah Django Shell** di dalam kontainer docker backend dengan file `.env` yang sesuai:
+
+   **Untuk Lingkungan QA (`harikerja.web.id`):**
+   ```bash
+   docker compose -f deploy/qa/docker-compose.qa.yml --env-file deploy/environments/.env.qa exec backend python manage.py createsuperuser
+   ```
+
+   **Untuk Lingkungan Lokal / Produksi Utama:**
+   ```bash
+   docker compose exec backend python manage.py createsuperuser
+   ```
+
+3. **Isi Formulir Kredensial** yang muncul di layar interaktif:
+   *   Masukkan Alamat Email baru Anda.
+   *   Buat Password yang aman dan konfirmasikan.
+
+Begitu proses selesai dengan pesan `Superuser created successfully.`, sistem secara otomatis akan menyematkan flag `is_global_admin=True` pada akun tersebut, dan akun siap digunakan untuk login.
+
+---
+
+## 7. Referensi Berkas Terkait
 * **Model Pengguna:** [users/models.py](file:///home/afdhal/data/hr/hrms/backend/users/models.py)
 * **Middleware Keamanan:** [users/middleware.py](file:///home/afdhal/data/hr/hrms/backend/users/middleware.py)
 * **Database Seeder:** [scripts/seeds/core.py](file:///home/afdhal/data/hr/hrms/backend/scripts/seeds/core.py)
 * **E2E Test Suites:** [tests/superadmin.spec.ts](file:///home/afdhal/data/hr/hrms/frontend/tests/superadmin.spec.ts)
+
 

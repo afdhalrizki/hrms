@@ -107,7 +107,8 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
                 {/* Form */}
                 <form className="space-y-5 pt-4" onSubmit={handleSubmit}>
                   {error && (
-                    <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium animate-in fade-in slide-in-from-top-1">
+                    <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-red-500/5 animate-in fade-in slide-in-from-top-1 duration-300">
+                      <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
                       {error}
                     </div>
                   )}
