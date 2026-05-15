@@ -12,6 +12,7 @@ import {
   getPythonExec,
   ensureDockerRunning,
   getDockerComposeCommand,
+  formatDuration,
 } from '../../scripts/lib.mjs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -181,6 +182,7 @@ async function ensureBackendStarted(isIntegrated) {
 }
 
 async function runE2ETests() {
+  const startTime = Date.now();
   const isIntegrated = true; // Always on integrated mode by default
 
   log(
@@ -333,10 +335,11 @@ async function runE2ETests() {
   log('\n========================================', COLORS.white);
   log('🏁 E2E TEST SUMMARY (MOBILE)', COLORS.cyan);
   log('========================================', COLORS.white);
-  log(`✅ TOTAL PASSED:   ${filePassed}`, COLORS.green);
-  log(`❌ TOTAL FAILED:   ${fileFailed}`, COLORS.red);
-  log(`⚠️ TOTAL ERRORS:   ${fileErrors}`, COLORS.magenta);
-  log(`🔍 TOTAL WARNINGS: ${hasWarning ? 1 : 0}`, COLORS.yellow);
+  log(`✅ TOTAL PASSED:       ${filePassed}`, COLORS.green);
+  log(`❌ TOTAL FAILED:       ${fileFailed}`, COLORS.red);
+  log(`⚠️ TOTAL ERRORS:       ${fileErrors}`, COLORS.magenta);
+  log(`🔍 TOTAL WARNINGS:     ${hasWarning ? 1 : 0}`, COLORS.yellow);
+  log(`⏱️ TEST TIME DURATION: ${formatDuration(Date.now() - startTime)}`, COLORS.cyan);
   log('========================================', COLORS.white);
 
   if (fileFailed > 0 || fileErrors > 0) {

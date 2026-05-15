@@ -17,6 +17,7 @@ import {
   ensureDockerRunning,
   saveDockerLogs,
   moveFailureScreenshots,
+  formatDuration,
 } from './lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -106,6 +107,7 @@ async function ensureBackendServerReady(maxAttempts = 3, waitSeconds = 240) {
 }
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const skipE2E = args.includes('-SkipE2E') || args.includes('--skip-e2e');
   const skipMobile =
@@ -416,6 +418,11 @@ async function main() {
     if (!allPassed) {
       await saveDockerLogs('master_failure', LogDir, RootDir);
     }
+
+    const totalMs = Date.now() - startTime;
+    log('\n========================================', COLORS.cyan);
+    log(`⏱️ TOTAL GLOBAL TEST TIME: ${formatDuration(totalMs)}`, COLORS.cyan);
+    log('========================================', COLORS.cyan);
 
     process.exit(allPassed ? 0 : 1);
   }

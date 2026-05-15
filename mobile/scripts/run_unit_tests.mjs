@@ -14,7 +14,8 @@ import {
   isPortInUse,
   getPythonExec,
   ensureDockerRunning,
-  getDockerComposeCommand
+  getDockerComposeCommand,
+  formatDuration
 } from '../../scripts/lib.mjs';
 
 const execAsync = promisify(exec);
@@ -61,6 +62,7 @@ async function ensureBackendStarted() {
 }
 
 async function main() {
+  const startTime = Date.now();
   log("\n🚀 Running Mobile Integrated Unit Tests...", COLORS.cyan);
   log('🔗 Using real backend and database.', COLORS.yellow);
 
@@ -204,10 +206,11 @@ async function main() {
   log('\n========================================', COLORS.white);
   log('🏁 UNIT TEST SUMMARY (MOBILE INTEGRATED)', COLORS.cyan);
   log('========================================', COLORS.white);
-  log(`✅ TOTAL PASSED:   ${filePassed}`, COLORS.green);
-  log(`❌ TOTAL FAILED:   ${fileFailed}`, COLORS.red);
-  log(`⚠️ TOTAL ERRORS:   ${fileErrors}`, COLORS.magenta);
-  log(`🔍 TOTAL WARNINGS: ${hasWarning ? 1 : 0}`, COLORS.yellow);
+  log(`✅ TOTAL PASSED:       ${filePassed}`, COLORS.green);
+  log(`❌ TOTAL FAILED:       ${fileFailed}`, COLORS.red);
+  log(`⚠️ TOTAL ERRORS:       ${fileErrors}`, COLORS.magenta);
+  log(`🔍 TOTAL WARNINGS:     ${hasWarning ? 1 : 0}`, COLORS.yellow);
+  log(`⏱️ TEST TIME DURATION: ${formatDuration(Date.now() - startTime)}`, COLORS.cyan);
   log('========================================', COLORS.white);
 
   if (fileFailed > 0 || fileErrors > 0) {

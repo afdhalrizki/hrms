@@ -12,6 +12,7 @@ import {
   waitForPort,
   getPythonExec,
   parseMetrics,
+  formatDuration,
 } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -74,6 +75,7 @@ async function ensureBackendStarted(noStart) {
 }
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const noSeed = args.includes('--no-seed');
   const noStart = args.includes('--no-start');
@@ -246,10 +248,11 @@ async function main() {
   log(`Status:         ${statusText}`, statusColor);
   log(`Exit Code:      ${exitCode}`, exitCode === 0 ? COLORS.white : COLORS.red);
   log('-'.repeat(60), COLORS.gray);
-  log(`Tests Passed:   ${metrics.p}`, COLORS.green);
-  log(`Tests Failed:   ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
-  log(`Tests Errored:  ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
-  log(`Warnings:       ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log(`Tests Passed:       ${metrics.p}`, COLORS.green);
+  log(`Tests Failed:       ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
+  log(`Tests Errored:      ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
+  log(`Warnings:           ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log(`Test Time Duration: ${formatDuration(Date.now() - startTime)}`, COLORS.cyan);
   log('='.repeat(60), COLORS.cyan);
 
   process.exit(exitCode);

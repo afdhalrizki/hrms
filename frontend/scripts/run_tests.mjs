@@ -1,7 +1,7 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, existsSync, readdirSync, statSync, unlinkSync } from 'node:fs';
-import { ensureDir, log, COLORS, spawnStream, stripAnsi } from '../../scripts/lib.mjs';
+import { ensureDir, log, COLORS, spawnStream, stripAnsi, formatDuration } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FrontendDir = resolve(__dirname, '..');
@@ -31,6 +31,7 @@ function countWarnings(logFilePath) {
 }
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const skipE2E = args.includes('--skip-e2e');
   const skipUnit = args.includes('--skip-unit');
@@ -157,15 +158,17 @@ async function main() {
   const grandTotal = unitMetrics.total + e2eMetrics.total;
   const overallPercent = grandTotal > 0 ? Math.round((totalPass / grandTotal) * 1000) / 10 : 0;
   const totalErrors = e2eMetrics.errors;
+  const durationMs = Date.now() - startTime;
 
   log("-".repeat(60), COLORS.gray);
-  log(`OVERALL SUCCESS: ${overallPercent}%`, overallPercent === 100 ? COLORS.green : COLORS.red);
-  log(`TOTAL ERRORS   : ${totalErrors}`, totalErrors > 0 ? COLORS.red : COLORS.gray);
+  log(`OVERALL SUCCESS    : ${overallPercent}%`, overallPercent === 100 ? COLORS.green : COLORS.red);
+  log(`TOTAL ERRORS       : ${totalErrors}`, totalErrors > 0 ? COLORS.red : COLORS.gray);
+  log(`TEST TIME DURATION : ${formatDuration(durationMs)}`, COLORS.cyan);
 
   if (overallPercent === 100 && allPassed) {
-    log(" STATUS  : ✅ ALL TESTS PASSED", COLORS.green);
+    log(" STATUS             : ✅ ALL TESTS PASSED", COLORS.green);
   } else {
-    log(` STATUS  : ❌ ${!allPassed ? 'EXECUTION FAILED' : 'SOME TESTS FAILED OR SKIPPED'}`, COLORS.red);
+    log(` STATUS             : ❌ ${!allPassed ? 'EXECUTION FAILED' : 'SOME TESTS FAILED OR SKIPPED'}`, COLORS.red);
   }
   log("=".repeat(60), COLORS.gray);
 

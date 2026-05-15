@@ -1,12 +1,13 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
-import { log, COLORS, spawnStream, ensureDir, parseMetrics } from '../../scripts/lib.mjs';
+import { log, COLORS, spawnStream, ensureDir, parseMetrics, formatDuration } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BackendDir = resolve(__dirname, '..');
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const skipE2E = args.includes('--skip-e2e');
   const skipUnit = args.includes('--skip-unit');
@@ -62,6 +63,7 @@ async function main() {
   // 3. Final Summary
   const logContent = readFileSync(masterLogFile, 'utf8');
   const metrics = parseMetrics(logContent, 'Backend');
+  const durationMs = Date.now() - startTime;
 
   log('\n' + '='.repeat(60), COLORS.cyan);
   log('           TOTAL HARIKERJA BACKEND TESTS SUMMARY', COLORS.cyan);
@@ -72,10 +74,11 @@ async function main() {
 
   log(`Overall Status: ${statusText}`, statusColor);
   log("-".repeat(60), COLORS.gray);
-  log(`Total Passed:   ${metrics.p}`, COLORS.green);
-  log(`Total Failed:   ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
-  log(`Total Errored:  ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
-  log(`Total Warnings: ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log(`Total Passed:       ${metrics.p}`, COLORS.green);
+  log(`Total Failed:       ${metrics.f}`, metrics.f > 0 ? COLORS.red : COLORS.white);
+  log(`Total Errored:      ${metrics.e}`, metrics.e > 0 ? COLORS.red : COLORS.white);
+  log(`Total Warnings:     ${metrics.w}`, metrics.w > 0 ? COLORS.yellow : COLORS.white);
+  log(`Test Time Duration: ${formatDuration(durationMs)}`, COLORS.cyan);
   log('='.repeat(60), COLORS.cyan);
 
   if (allPassed) {

@@ -1,11 +1,12 @@
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ensureDir, log, COLORS, spawnStream } from '../../scripts/lib.mjs';
+import { ensureDir, log, COLORS, spawnStream, formatDuration } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MobileDir = resolve(__dirname, '..');
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const skipE2E = args.includes('--skip-e2e');
   const skipUnit = args.includes('--skip-unit');
@@ -43,6 +44,14 @@ async function main() {
       log("✅ E2E Tests Passed.", COLORS.green);
     }
   }
+
+  // Final Summary
+  log('\n' + '='.repeat(60), COLORS.cyan);
+  log('           TOTAL HARIKERJA MOBILE TESTS SUMMARY', COLORS.cyan);
+  log('='.repeat(60), COLORS.cyan);
+  log(`Overall Status:     ${allPassed ? "PASSED" : "FAILED"}`, allPassed ? COLORS.green : COLORS.red);
+  log(`Test Time Duration: ${formatDuration(Date.now() - startTime)}`, COLORS.cyan);
+  log('='.repeat(60), COLORS.cyan);
 
   if (allPassed) {
     log("\n🏆 ALL HARIKERJA MOBILE TESTS PASSED.", COLORS.green);

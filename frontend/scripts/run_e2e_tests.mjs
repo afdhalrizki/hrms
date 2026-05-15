@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { 
-  ensureDir, log, COLORS, spawnStream, waitForHttp, isPortInUse, waitForPort, spawnBackground, moveFailureScreenshots, getPythonExec
+  ensureDir, log, COLORS, spawnStream, waitForHttp, isPortInUse, waitForPort, spawnBackground, moveFailureScreenshots, getPythonExec, formatDuration
 } from '../../scripts/lib.mjs';
 
 const execAsync = promisify(exec);
@@ -64,7 +64,7 @@ async function cleanupPort(port) {
   }
 }
 
-function printE2ESummary(jsonPath) {
+function printE2ESummary(jsonPath, durationMs) {
   if (!existsSync(jsonPath)) {
     log("\nWarning: E2E results JSON not found, cannot generate summary.", COLORS.yellow);
     return;
@@ -113,11 +113,14 @@ function printE2ESummary(jsonPath) {
     log(`Status:         ${statusText}`, statusColor);
     log(`Total Tests:    ${total}`, COLORS.white);
     log("-".repeat(50), COLORS.gray);
-    log(`Tests Passed:   ${passed}`, COLORS.green);
-    log(`Tests Flaky:    ${flaky}`, flaky > 0 ? COLORS.yellow : COLORS.white);
-    log(`Tests Failed:   ${failed}`, failed > 0 ? COLORS.red : COLORS.white);
-    log(`Tests Errored:  ${errored}`, errored > 0 ? COLORS.red : COLORS.white);
-    log(`Warnings:       ${warningCount}`, warningCount > 0 ? COLORS.yellow : COLORS.white);
+    log(`Tests Passed:       ${passed}`, COLORS.green);
+    log(`Tests Flaky:        ${flaky}`, flaky > 0 ? COLORS.yellow : COLORS.white);
+    log(`Tests Failed:       ${failed}`, failed > 0 ? COLORS.red : COLORS.white);
+    log(`Tests Errored:      ${errored}`, errored > 0 ? COLORS.red : COLORS.white);
+    log(`Warnings:           ${warningCount}`, warningCount > 0 ? COLORS.yellow : COLORS.white);
+    if (durationMs !== undefined) {
+      log(`Test Time Duration: ${formatDuration(durationMs)}`, COLORS.cyan);
+    }
     log("=".repeat(50), COLORS.cyan);
 
   } catch (e) {
@@ -126,6 +129,7 @@ function printE2ESummary(jsonPath) {
 }
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const skipInstall = args.includes('--skip-install');
   const skipSeed = args.includes('--skip-seed') || process.env.NO_RESEED === 'true';
@@ -296,7 +300,7 @@ async function main() {
   }
 
   const resultsJson = join(FrontendDir, 'logs', 'e2e_results.json');
-  printE2ESummary(resultsJson);
+  printE2ESummary(resultsJson, Date.now() - startTime);
 
   process.exit(exitCode);
 }

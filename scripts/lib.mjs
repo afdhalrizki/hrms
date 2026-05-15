@@ -431,3 +431,10 @@ export function getPythonExec(backendDir) {
     ? join(backendDir, 'venv', 'Scripts', 'python.exe')
     : join(backendDir, 'venv', 'bin', 'python');
 }
+
+export function formatDuration(ms) {
+  if (ms < 60000) return `${(ms / 1000).toFixed(2)}s`;
+  const min = Math.floor(ms / 60000);
+  const sec = ((ms % 60000) / 1000).toFixed(2);
+  return `${min}m ${sec}s`;
+}

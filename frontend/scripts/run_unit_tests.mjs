@@ -2,7 +2,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, readdirSync, writeFileSync, appendFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
-import { ensureDir, log, COLORS, spawnStream, spawnBackground, waitForHttp, isPortInUse, parseMetrics, getPythonExec } from '../../scripts/lib.mjs';
+import { ensureDir, log, COLORS, spawnStream, spawnBackground, waitForHttp, isPortInUse, parseMetrics, getPythonExec, formatDuration } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FrontendDir = resolve(__dirname, '..');
@@ -10,6 +10,7 @@ const RootDir = resolve(FrontendDir, '..');
 const BackendDir = join(RootDir, 'backend');
 
 async function main() {
+  const startTime = Date.now();
   const args = process.argv.slice(2);
   const skipInstall = args.includes('--skip-install');
   const skipBackendRestart = args.includes('--skip-backend-restart');
@@ -148,10 +149,11 @@ async function main() {
     errors: metrics.e || 0,
     warnings: metrics.w || 0
   };
-  log(`Tests Passed:   ${m.passed}`, COLORS.green);
-  log(`Tests Failed:   ${m.failed}`, m.failed > 0 ? COLORS.red : COLORS.white);
-  log(`Tests Errored:  ${m.errors}`, m.errors > 0 ? COLORS.red : COLORS.white);
-  log(`Warnings:       ${m.warnings}`, m.warnings > 0 ? COLORS.yellow : COLORS.white);
+  log(`Tests Passed:       ${m.passed}`, COLORS.green);
+  log(`Tests Failed:       ${m.failed}`, m.failed > 0 ? COLORS.red : COLORS.white);
+  log(`Tests Errored:      ${m.errors}`, m.errors > 0 ? COLORS.red : COLORS.white);
+  log(`Warnings:           ${m.warnings}`, m.warnings > 0 ? COLORS.yellow : COLORS.white);
+  log(`Test Time Duration: ${formatDuration(Date.now() - startTime)}`, COLORS.cyan);
   log("=".repeat(50), COLORS.cyan);
 
   // Save metrics to JSON for the master orchestrator
