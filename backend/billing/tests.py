@@ -77,7 +77,7 @@ class BillingCheckoutTests(APITestCase):
         
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['code'], 'QUOTA_EXCEEDED')
-        self.assertIn("melebihi kapasitas total (50)", response.data['error'])
+        self.assertIn("melebihi kapasitas total (25)", response.data['error'])
 
     def test_checkout_storage_quota_does_not_block_downgrade(self):
         """
@@ -151,12 +151,12 @@ class BillingCheckoutTests(APITestCase):
         """
         from django_tenants.utils import schema_context
         with schema_context('public'):
-            # Current: 60 employees (Plan: PROFESSIONAL, limit 100)
-            self.tenant.employee_count = 60
+            # Current: 30 employees (Plan: PROFESSIONAL, limit 100)
+            self.tenant.employee_count = 30
             self.tenant.plan_type = 'PROFESSIONAL'
             self.tenant.save()
 
-        # Target: ESSENTIAL (limit 50) + 10 Addon -> Should pass (Total 60)
+        # Target: ESSENTIAL (limit 25) + 10 Addon -> Should pass (Total 35)
         url = reverse('billing-checkout')
         data = {
             'plan_type': 'ESSENTIAL',
@@ -225,3 +225,52 @@ class BillingCheckoutTests(APITestCase):
             self.assertEqual(self.tenant.plan_type, 'ESSENTIAL')
             self.assertEqual(self.tenant.extra_employees, 20)
             self.assertEqual(self.tenant.subscription_status, 'ACTIVE')
+
+    def test_checkout_addon_per_5_blocks(self):
+        """
+        Test that employee addons must be purchased in blocks of 5.
+        """
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            self.tenant.plan_type = 'ESSENTIAL'
+            self.tenant.save()
+
+        url = reverse('billing-checkout')
+        
+        # Case 1: Valid addon of 5 employees (should pass)
+        data_valid = {
+            'plan_type': 'ESSENTIAL',
+            'is_addon': True,
+            'addon_count': 5
+        }
+        
+        from billing.views import BillingViewSet
+        from rest_framework.test import APIRequestFactory
+        
+        factory = APIRequestFactory()
+        request = factory.post(url, data_valid, format='json')
+        request.tenant = self.tenant
+        request.user = self.user
+        
+        with patch('billing.services.MidtransService.create_transaction') as mock_midtrans:
+            mock_midtrans.return_value = {'token': 'addon-5-token'}
+            view = BillingViewSet.as_view({'post': 'checkout'})
+            response = view(request)
+            
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['snap_token'], 'addon-5-token')
+            
+        # Case 2: Invalid addon of 7 employees (should fail validation)
+        data_invalid = {
+            'plan_type': 'ESSENTIAL',
+            'is_addon': True,
+            'addon_count': 7
+        }
+        
+        request_invalid = factory.post(url, data_invalid, format='json')
+        request_invalid.tenant = self.tenant
+        request_invalid.user = self.user
+        
+        response_invalid = view(request_invalid)
+        self.assertEqual(response_invalid.status_code, 400)
+        self.assertIn("must be purchased in blocks of 5", response_invalid.data['error'])

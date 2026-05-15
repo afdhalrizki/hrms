@@ -137,7 +137,7 @@ class Tenant(TenantMixin):
             if not is_testing or self.max_employees is None: self.max_employees = 10
             if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 50
         elif self.plan_type == 'ESSENTIAL':
-            if not is_testing or self.max_employees is None: self.max_employees = 50
+            if not is_testing or self.max_employees is None: self.max_employees = 25
             if not is_testing or self.storage_limit_mb is None: self.storage_limit_mb = 250
         elif self.plan_type == 'PROFESSIONAL':
             if not is_testing or self.max_employees is None: self.max_employees = 100

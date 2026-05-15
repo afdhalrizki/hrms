@@ -11,7 +11,7 @@ Penetapan harga kami tetap berfokus pada **Tingkatan Berbasis Nilai**. Pelanggan
 | Paket | Target Audiens | Kapasitas Dasar | Harga (Bulanan) | Modul Utama yang Disertakan |
 | :--- | :--- | :--- | :--- | :--- |
 | **FREE** | UMKM Mikro / Startup | **10 Karyawan** | **Rp 0** | HR Inti, Kehadiran Dasar |
-| **ESSENTIAL** | Bisnis Kecil | **50 Karyawan** | **Rp 250.000** | Kehadiran + Geofencing, Cuti |
+| **ESSENTIAL** | Bisnis Kecil | **25 Karyawan** | **Rp 125.000** | Kehadiran + Geofencing, Cuti |
 | **PROFESSIONAL** | Organisasi Menengah | **100 Karyawan** | **Rp 750.000** | **Penggajian Indonesia (PPh 21/BPJS)**, Reimbursement |
 | **PREMIUM** | Perusahaan Pertumbuhan Tinggi | **500 Karyawan** | **Rp 1.500.000** | Manajemen Kinerja, KPI, RBAC Lanjutan |
 | **ENTERPRISE** | Organisasi Inti | **2.000+** | **Hubungi Kami** | Suite Lengkap + Analitik, Audit, SLA Khusus |
@@ -22,25 +22,25 @@ Penetapan harga kami tetap berfokus pada **Tingkatan Berbasis Nilai**. Pelanggan
 
 Alih-alih memaksa perusahaan untuk melompat ke tingkatan yang jauh lebih tinggi (dan mahal) hanya untuk beberapa karyawan tambahan, kami menawarkan **Tambahan Kapasitas**. Ini memastikan perkembangan biaya yang mulus bagi klien.
 
-### 2.1 Harga Unit (Per Blok 10 Karyawan)
-Unit dasar untuk pembelian kuota tambahan adalah blok **10 Karyawan**.
+### 2.1 Harga Unit (Per Blok 5 Karyawan)
+Unit dasar untuk pembelian kuota tambahan adalah blok **5 Karyawan**.
 
-| Paket Induk | Harga per Blok (+10) | Harga per Karyawan (pax) |
+| Paket Induk | Harga per Blok (+5) | Harga per Karyawan (pax) |
 | :--- | :--- | :--- |
-| **ESSENTIAL** | **Rp 50.000** | Rp 5.000 |
-| **PROFESSIONAL** | **Rp 100.000** | Rp 10.000 |
-| **PREMIUM** | **Rp 150.000** | Rp 15.000 |
+| **ESSENTIAL** | **Rp 25.000** | Rp 5.000 |
+| **PROFESSIONAL** | **Rp 50.000** | Rp 10.000 |
+| **PREMIUM** | **Rp 75.000** | Rp 15.000 |
 
 ### 2.2 Opsi Pembelian yang Tersedia (UI)
-Meskipun unit dasarnya adalah 10, pelanggan dapat memilih paket-paket ini di Dasbor Penagihan untuk checkout yang lebih cepat:
-*   **Kecil**: +10 Karyawan
-*   **Menengah**: +20 Karyawan
-*   **Besar**: +50 Karyawan (Direkomendasikan untuk Premium)
-*   **Enterprise**: +100 Karyawan
+Meskipun unit dasarnya adalah 5, pelanggan dapat memilih paket-paket ini di Dasbor Penagihan untuk checkout yang lebih cepat:
+*   **Kecil**: +5 Karyawan
+*   **Menengah**: +10 Karyawan
+*   **Besar**: +25 Karyawan (Direkomendasikan untuk Premium)
+*   **Enterprise**: +50 Karyawan
 
 ### 2.3 Batasan & Aturan (Ditegakkan oleh Sistem)
 *   **Kapasitas Maksimum**: 
-    *   **Essential**: Maksimal **100** total karyawan (Dasar 50 + 5 Tambahan).
+    *   **Essential**: Maksimal **100** total karyawan (Dasar 25 + Tambahan).
     *   **Professional**: Maksimal **1.000** total karyawan (Dasar 100 + 90 Tambahan).
     *   **Premium**: Tidak terbatas (Tidak ada batas keras untuk tambahan).
     

@@ -11,7 +11,7 @@ Our pricing remains focused on **Value-Based Tiers**. Customers upgrade to unloc
 | Plan | Target Audience | Base Capacity | Price (Monthly) | Key Modules Included |
 | :--- | :--- | :--- | :--- | :--- |
 | **FREE** | Micro-SMEs / Startups | **10 Employees** | **Rp 0** | Core HR, Basic Attendance |
-| **ESSENTIAL** | Small Businesses | **50 Employees** | **Rp 250,000** | Attendance + Geofencing, Leaves |
+| **ESSENTIAL** | Small Businesses | **25 Employees** | **Rp 125,000** | Attendance + Geofencing, Leaves |
 | **PROFESSIONAL** | Mid-size Organizations | **100 Employees** | **Rp 750,000** | **Indonesian Payroll (PPh 21/BPJS)**, Reimbursements |
 | **PREMIUM** | High-growth Enterprises | **500 Employees** | **Rp 1,500,000** | Performance Management, KPI, Advanced RBAC |
 | **ENTERPRISE** | Core Organizations | **2,000+** | **Contact Us** | Full Suite + Analytics, Audit, Dedicated SLA |
@@ -22,25 +22,25 @@ Our pricing remains focused on **Value-Based Tiers**. Customers upgrade to unloc
 
 Instead of forcing a company to leap to a much higher (and expensive) tier just for a few extra employees, we offer **Capacity Add-ons**. This ensures a smooth cost progression for the client.
 
-### 2.1 Unit Pricing (Per Block of 10 Employees)
-The base unit for purchasing extra quota is a block of **10 Employees**. 
+### 2.1 Unit Pricing (Per Block of 5 Employees)
+The base unit for purchasing extra quota is a block of **5 Employees**. 
 
-| Parent Plan | Price per Block (+10) | Price per Employee (pax) |
+| Parent Plan | Price per Block (+5) | Price per Employee (pax) |
 | :--- | :--- | :--- |
-| **ESSENTIAL** | **Rp 50,000** | Rp 5,000 |
-| **PROFESSIONAL** | **Rp 100,000** | Rp 10,000 |
-| **PREMIUM** | **Rp 150,000** | Rp 15,000 |
+| **ESSENTIAL** | **Rp 25,000** | Rp 5.000 |
+| **PROFESSIONAL** | **Rp 50,000** | Rp 10.000 |
+| **PREMIUM** | **Rp 75,000** | Rp 15,000 |
 
 ### 2.2 Available Purchase Options (UI)
-While the base unit is 10, customers can select these packages in the Billing Dashboard for faster checkout:
-*   **Small**: +10 Employees
-*   **Medium**: +20 Employees
-*   **Large**: +50 Employees (Recommended for Premium)
-*   **Enterprise**: +100 Employees
+While the base unit is 5, customers can select these packages in the Billing Dashboard for faster checkout:
+*   **Small**: +5 Employees
+*   **Medium**: +10 Employees
+*   **Large**: +25 Employees (Recommended for Premium)
+*   **Enterprise**: +50 Employees
 
 ### 2.3 Limits & Rules (System Enforced)
 *   **Maximum Capacity**: 
-    *   **Essential**: Max **100** total employees (Base 50 + 5 Add-ons).
+    *   **Essential**: Max **100** total employees (Base 25 + Add-ons).
     *   **Professional**: Max **1,000** total employees (Base 100 + 90 Add-ons).
     *   **Premium**: Unlimited (No hard cap on add-ons).
     

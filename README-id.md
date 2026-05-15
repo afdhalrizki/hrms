@@ -128,8 +128,8 @@ Untuk kontrol yang lebih spesifik, Anda dapat menjalankan tes di dalam setiap di
 
 Platform ini mencapai tingkat kelulusan tes **100% terpadu** di semua lapisan stack.
 
-- **Backend**: 354 Tes (335 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 15 Mei 2026)
-- **Frontend**: 266 Tes (205 Unit + 61 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 15 Mei 2026)
+- **Backend**: 355 Tes (336 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 15 Mei 2026)
+- **Frontend**: 268 Tes (206 Unit + 62 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 15 Mei 2026)
 - **Mobile**: 158 Tes (135 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 15 Mei 2026)
 
 ## 📈 Strategi Skalabilitas: Jalan Menuju 1 Juta Pengguna

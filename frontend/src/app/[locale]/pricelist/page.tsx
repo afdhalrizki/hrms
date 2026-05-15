@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { PublicLayout } from '@/components/layout/PublicLayout';
-import { Check, Info, HelpCircle } from 'lucide-react';
+import { Check, Info, HelpCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getSalesEmail } from '@/lib/api';
 
@@ -25,11 +25,11 @@ export default function PriceListPage() {
     },
     {
       name: "ESSENTIAL",
-      price: "250.000",
+      price: "125.000",
       period: "/bulan",
       description: "Standar baru untuk bisnis kecil yang fokus pada kehadiran.",
       features: [
-        "Maksimal 50 Karyawan",
+        "Maksimal 25 Karyawan",
         "Penyimpanan 250 MB",
         "Absensi Geofencing (GPS)",
         "Manajemen Cuti & Izin",
@@ -124,7 +124,7 @@ export default function PriceListPage() {
             >
               {plan.highlight && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 bg-accent text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-xl">
-                  Paling Populer
+                  Paling Direkomendasikan
                 </div>
               )}
               
@@ -204,15 +204,15 @@ export default function PriceListPage() {
         {/* Info Box */}
         <div className="mt-20 p-8 rounded-[2rem] bg-primary/5 border border-primary/10 flex flex-col md:flex-row items-center gap-6">
           <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
-            <Info className="text-primary" />
+            <Zap className="text-primary" />
           </div>
           <div className="flex-grow text-center md:text-left">
-            <h4 className="font-bold">Butuh Kapasitas Penyimpanan Tambahan?</h4>
+            <h4 className="font-bold">Butuh Tambahan Kuota Elastis?</h4>
             <p className="text-muted-foreground text-sm">
-              Anda dapat membeli add-on penyimpanan tambahan sebesar 1 GB seharga Rp 50.000/bulan tanpa harus melakukan upgrade paket utama.
+              Kapasitas plan Anda dapat bertumbuh secara fleksibel! Anda bisa membeli add-on <strong>+5 Karyawan</strong> mulai dari <strong>Rp 25.000/bulan</strong>, atau <strong>+1 GB Penyimpanan</strong> seharga <strong>Rp 50.000/bulan</strong> tanpa harus melakukan upgrade paket utama.
             </p>
           </div>
-          <a href="#" className="font-bold text-primary hover:underline">Pelajari Add-on</a>
+          <a href="/signup" className="font-bold text-primary hover:underline">Pelajari Add-on</a>
         </div>
       </div>
     </PublicLayout>

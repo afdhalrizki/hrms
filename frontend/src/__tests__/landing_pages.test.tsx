@@ -94,7 +94,7 @@ describe('Landing Pages Unit Tests', () => {
     it('renders specific plan prices', () => {
       render(<PriceListPage />);
 
-      expect(screen.getByText(/250.000/i)).toBeDefined();
+      expect(screen.getByText(/125.000/i)).toBeDefined();
       expect(screen.getByText(/750.000/i)).toBeDefined();
       expect(screen.getByText(/1.500.000/i)).toBeDefined();
       expect(screen.getAllByText(/Custom/i).length).toBeGreaterThan(0);

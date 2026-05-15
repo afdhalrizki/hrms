@@ -15,9 +15,9 @@ The system offers five distinct tiers to support organizations from startups to 
 
 | Feature / Benefit | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Pricing (IDR)** | **Rp 0** | **Rp 250,000 /mo** | **Rp 750,000 /mo** | **Rp 1,500,000 /mo** | **Contact Us** |
+| **Pricing (IDR)** | **Rp 0** | **Rp 125,000 /mo** | **Rp 750,000 /mo** | **Rp 1,500,000 /mo** | **Contact Us** |
 | **Billing Cycle** | N/A | Annual Only | Monthly/Annual | Monthly/Annual | Custom |
-| **Employee Limit** | 10 | 50 | 100 | 500 | 2,000+ |
+| **Employee Limit** | 10 | 25 | 100 | 500 | 2,000+ |
 | **Storage Limit** | **50 MB** | **250 MB** | **1 GB** | **5 GB** | **20 GB+** |
 | **Employee Data (Core)** | ✅ Basic | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
 | **Attendance** | ✅ Basic | ✅ Geofencing | ✅ Geofencing & Photo | ✅ Correction | ✅ Advanced (Shift) |

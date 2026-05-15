@@ -40,7 +40,7 @@ class TenantQuotaAndPlansTestCase(TenantTestCase):
             # Essential Plan
             t_essential = Tenant(schema_name='essential_tenant', name='Essential', plan_type='ESSENTIAL', max_employees=None)
             t_essential.save()
-            self.assertEqual(t_essential.max_employees, 50)
+            self.assertEqual(t_essential.max_employees, 25)
             self.assertIn('attendance', t_essential.enabled_modules)
             self.assertNotIn('payroll', t_essential.enabled_modules)
             self.assertFalse(t_essential.is_module_enabled('payroll'))

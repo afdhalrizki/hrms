@@ -32,11 +32,11 @@ const PLANS = [
   {
     id: 'ESSENTIAL',
     name: 'Essential HR',
-    price: 250000,
-    features: ['50 Employees', '100MB Storage', 'Geofence Attendance', 'Leaves Management'],
+    price: 125000,
+    features: ['25 Employees', '250MB Storage', 'Geofence Attendance', 'Leaves Management'],
     icon: Building2,
     color: 'bg-blue-500/10 text-blue-500',
-    capacity: 50
+    capacity: 25
   },
   {
     id: 'PROFESSIONAL',
@@ -60,9 +60,9 @@ const PLANS = [
 ];
 
 const ADDON_PRICES: Record<string, number> = {
-  ESSENTIAL: 50000,
-  PROFESSIONAL: 100000,
-  PREMIUM: 150000
+  ESSENTIAL: 25000,
+  PROFESSIONAL: 50000,
+  PREMIUM: 75000
 };
 
 export default function BillingPage() {
@@ -72,7 +72,7 @@ export default function BillingPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAddonMode, setIsAddonMode] = useState(false);
   const [addonCategory, setAddonCategory] = useState<'EMPLOYEE' | 'STORAGE'>('EMPLOYEE');
-  const [addonCount, setAddonCount] = useState(10);
+  const [addonCount, setAddonCount] = useState(5);
   const [storageGb, setStorageGb] = useState(1);
   const [mounted, setMounted] = React.useState(false);
 
@@ -139,7 +139,7 @@ export default function BillingPage() {
   const currentPlanDetails = PLANS.find(p => p.id === (isAddonMode ? planType : selectedPlan)) || PLANS[2];
   
   const STORAGE_GB_PRICE = 50000;
-  const employeeAddonCost = (ADDON_PRICES[planType || 'ESSENTIAL'] || 0) * (addonCount / 10);
+  const employeeAddonCost = (ADDON_PRICES[planType || 'ESSENTIAL'] || ADDON_PRICES['ESSENTIAL']) * (addonCount / 5);
   const storageAddonCost = storageGb * STORAGE_GB_PRICE;
   const addonCost = addonCategory === 'EMPLOYEE' ? employeeAddonCost : storageAddonCost;
 
@@ -246,14 +246,12 @@ export default function BillingPage() {
 
                 {addonCategory === 'EMPLOYEE' ? (
                   <div className="flex flex-wrap gap-4 justify-center">
-                    {[10, 20, 50, 100].map(count => (
+                    {[5, 10, 25, 50].map(count => (
                       <button
                           key={count}
                           onClick={() => setAddonCount(count)}
                           className={`px-8 py-4 rounded-2xl font-bold transition-all text-lg ${addonCount === count ? 'bg-primary text-white shadow-xl shadow-primary/30' : 'bg-white/5 border border-white/10 hover:bg-white/10'}`}
-                      >
-                          +{count}
-                      </button>
+                      >+{count}</button>
                     ))}
                   </div>
                 ) : (
@@ -263,9 +261,7 @@ export default function BillingPage() {
                           key={gb}
                           onClick={() => setStorageGb(gb)}
                           className={`px-8 py-4 rounded-2xl font-bold transition-all text-lg ${storageGb === gb ? 'bg-primary text-white shadow-xl shadow-primary/30' : 'bg-white/5 border border-white/10 hover:bg-white/10'}`}
-                      >
-                          +{gb} GB
-                      </button>
+                      >+{gb} GB</button>
                     ))}
                   </div>
                 )}
@@ -275,7 +271,7 @@ export default function BillingPage() {
                    <p className="text-3xl font-black text-primary">Rp {addonCost.toLocaleString()}</p>
                    <p className="text-xs text-muted-foreground mt-2 italic">
                      {addonCategory === 'EMPLOYEE' 
-                       ? `Based on your ${planType} plan rate (Rp ${(ADDON_PRICES[planType || 'ESSENTIAL'] || 0).toLocaleString()} per 10 employees)`
+                       ? `Based on your ${planType} plan rate (Rp ${(ADDON_PRICES[planType || 'ESSENTIAL'] || ADDON_PRICES['ESSENTIAL']).toLocaleString()} per 5 employees)`
                        : `Flat rate Rp ${STORAGE_GB_PRICE.toLocaleString()} per 1 GB`}
                    </p>
                 </div>
@@ -300,6 +296,7 @@ export default function BillingPage() {
                 {PLANS.map((plan, idx) => (
                   <motion.div 
                     key={plan.id}
+                    data-testid={`plan-card-${plan.id}`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
@@ -308,7 +305,7 @@ export default function BillingPage() {
                   >
                     {plan.popular && (
                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">
-                          Best Seller
+                          Recommended
                        </div>
                     )}
 

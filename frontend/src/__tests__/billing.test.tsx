@@ -97,9 +97,9 @@ describe('BillingPage', () => {
 
   it('prevents downgrade if employeeCount exceeds new plan capacity', () => {
     // Current plan is PROFESSIONAL (100 capacity), but user has 150 employees (e.g. from previous addons or enterprise)
-    // Or user is on PROFESSIONAL and wants to downgrade to ESSENTIAL (50 capacity)
+    // Or user is on PROFESSIONAL and wants to downgrade to ESSENTIAL (25 capacity)
     mockTenant.planType = 'PROFESSIONAL';
-    mockTenant.employeeCount = 80; // Above Essential limit of 50
+    mockTenant.employeeCount = 80; // Above Essential limit of 25
 
     render(<BillingPage />);
 
@@ -118,5 +118,30 @@ describe('BillingPage', () => {
 
     // handleCheckout should not have proceeded (we can't easily check internal state, 
     // but the presence of the warning and the fact it returns early is what we implemented)
+  });
+
+  it('calculates correct addon cost per 5-employee blocks', () => {
+    mockTenant.planType = 'ESSENTIAL';
+    mockTenant.subscriptionStatus = 'ACTIVE';
+
+    render(<BillingPage />);
+
+    // Click "Buy More Quota" to enter addon mode
+    const toggleAddonButton = screen.getByRole('button', { name: /Buy More Quota/i });
+    fireEvent.click(toggleAddonButton);
+
+    // Confirm we are in addon mode by checking title
+    expect(screen.getByRole('heading', { name: /Elastic Quota: Add Employees/i })).toBeInTheDocument();
+
+    // Should have a "+5" selector button
+    const plusFiveButton = screen.getByRole('button', { name: /^\+5$/ });
+    expect(plusFiveButton).toBeInTheDocument();
+
+    // Click on "+5"
+    fireEvent.click(plusFiveButton);
+
+    // Verify price calculations: Essential addon for 5 employees is 25,000
+    const totalInvoice = screen.getAllByText(/Rp\s+25[.,]000/);
+    expect(totalInvoice.length).toBeGreaterThanOrEqual(1);
   });
 });

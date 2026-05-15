@@ -41,16 +41,16 @@ class BillingViewSet(viewsets.GenericViewSet):
         # New pricing in IDR (Strategy v2)
         PRICES = {
             'FREE': 0,
-            'ESSENTIAL': 250000,
+            'ESSENTIAL': 125000,
             'PROFESSIONAL': 750000,
             'PREMIUM': 1500000
         }
 
-        # Addon Pricing per 10 employees
+        # Addon Pricing per 5 employees
         ADDON_PRICES = {
-            'ESSENTIAL': 50000,
-            'PROFESSIONAL': 100000,
-            'PREMIUM': 150000
+            'ESSENTIAL': 25000,
+            'PROFESSIONAL': 50000,
+            'PREMIUM': 75000
         }
 
         # Storage Pricing per 1 GB
@@ -58,7 +58,7 @@ class BillingViewSet(viewsets.GenericViewSet):
         
         PLAN_BASE_EMPLOYEES = {
             'FREE': 10,
-            'ESSENTIAL': 50,
+            'ESSENTIAL': 25,
             'PROFESSIONAL': 100,
             'PREMIUM': 500,
             'ENTERPRISE': 2000
@@ -82,10 +82,10 @@ class BillingViewSet(viewsets.GenericViewSet):
                     "code": "TIER_LIMIT_REACHED"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            if addon_count % 10 != 0 or addon_count <= 0:
-                return Response({"error": "Add-ons must be purchased in blocks of 10."}, status=status.HTTP_400_BAD_REQUEST)
+            if addon_count % 5 != 0 or addon_count <= 0:
+                return Response({"error": "Add-ons must be purchased in blocks of 5."}, status=status.HTTP_400_BAD_REQUEST)
                 
-            blocks = addon_count // 10
+            blocks = addon_count // 5
             gross_amount = ADDON_PRICES[plan] * blocks
             description = f"HRMS Employee Quota Add-on (+{addon_count} employees)"
             
@@ -114,10 +114,10 @@ class BillingViewSet(viewsets.GenericViewSet):
                 
             # Add optional bundled addon costs
             if addon_count > 0:
-                if addon_count % 10 != 0:
-                    return Response({"error": "Add-ons must be purchased in blocks of 10."}, status=status.HTTP_400_BAD_REQUEST)
-                blocks = addon_count // 10
-                gross_amount += ADDON_PRICES.get(plan, 100000) * blocks
+                if addon_count % 5 != 0:
+                    return Response({"error": "Add-ons must be purchased in blocks of 5."}, status=status.HTTP_400_BAD_REQUEST)
+                blocks = addon_count // 5
+                gross_amount += ADDON_PRICES.get(plan, 50000) * blocks
                 
             if storage_gb > 0:
                 gross_amount += STORAGE_GB_PRICE * storage_gb
