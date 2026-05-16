@@ -52,7 +52,7 @@ With the latest implementation of **Tenant Storage Isolation**, data security an
 
 Our plan structure is built specifically with the Indonesian market in mind:
 1.  **Compliance-First**: BPJS and PPh 21 support (TER 2024) is built-in for all Professional users and above.
-2.  **Scalable Quotas**: Generous employee limits that grow with your business, up to unlimited enterprise support.
+2.  **Scalable Quotas**: Paid plans start with a base employee count and can be upgraded in increments of 5 employees up to the tier's maximum limit.
 3.  **Automated Integrity**: Powered by **Midtrans Payment Gateway** for seamless renewals and high-security compliance.
 4.  **Grace Period**: All plans include a 14-day grace period after expiry before entering **Suspended (Block)** mode.
 

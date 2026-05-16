@@ -29,11 +29,11 @@ export default function PriceListPage() {
       period: "/bulan",
       description: "Standar baru untuk bisnis kecil yang fokus pada kehadiran.",
       features: [
-        "Maksimal 25 Karyawan",
+        "Kuota Dasar 25 Karyawan",
+        "Hingga 100 Karyawan",
+        "Upgrade tiap +5 Karyawan",
         "Penyimpanan 250 MB",
-        "Absensi Geofencing (GPS)",
-        "Manajemen Cuti & Izin",
-        "Ekspor Laporan (Excel/PDF)"
+        "Absensi Geofencing (GPS)"
       ],
       buttonText: "Pilih Essential",
       highlight: false
@@ -44,11 +44,11 @@ export default function PriceListPage() {
       period: "/bulan",
       description: "Terbaik untuk bisnis berkembang yang butuh penggajian.",
       features: [
-        "Maksimal 100 Karyawan",
-        "Penyimpanan 1 GB",
+        "Kuota Dasar 100 Karyawan",
+        "Hingga 1.000 Karyawan",
+        "Upgrade tiap +5 Karyawan",
         "Payroll PPh 21 & BPJS",
-        "Sistem Reimbursement",
-        "Absensi Foto (Anti-Fraud)"
+        "Sistem Reimbursement"
       ],
       buttonText: "Pilih Professional",
       highlight: true
@@ -59,11 +59,11 @@ export default function PriceListPage() {
       period: "/bulan",
       description: "Solusi lengkap untuk perusahaan high-growth.",
       features: [
-        "Maksimal 500 Karyawan",
-        "Penyimpanan 5 GB",
+        "Kuota Dasar 500 Karyawan",
+        "Tanpa Batas Karyawan",
+        "Upgrade tiap +5 Karyawan",
         "Manajemen Kinerja (KPI)",
-        "Self-Appraisal Karyawan",
-        "RBAC Lanjutan (Izin Khusus)"
+        "Self-Appraisal Karyawan"
       ],
       buttonText: "Pilih Premium",
       highlight: false
@@ -74,9 +74,9 @@ export default function PriceListPage() {
       description: "Keamanan, skala, dan dukungan prioritas untuk organisasi besar.",
       features: [
         "2.000+ Karyawan",
-        "Penyimpanan 20 GB+",
-        "Audit Trail Lengkap",
+        "Kapasitas Skala Enterprise",
         "SLA & Dukungan Prioritas",
+        "Audit Trail Lengkap",
         "Integrasi Custom API"
       ],
       buttonText: "Hubungi Kami",

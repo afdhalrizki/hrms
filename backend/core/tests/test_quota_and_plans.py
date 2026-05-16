@@ -49,7 +49,7 @@ class TenantQuotaAndPlansTestCase(TenantTestCase):
             # Professional Plan
             t_prof = Tenant(schema_name='prof_tenant', name='Prof', plan_type='PROFESSIONAL', max_employees=None)
             t_prof.save()
-            self.assertEqual(t_prof.max_employees, 100) # Strategy v2.0
+            self.assertEqual(t_prof.max_employees, 100) # Reverted to 100
             self.assertIn('payroll', t_prof.enabled_modules)
             self.assertIn('leaves', t_prof.enabled_modules)
             self.assertTrue(t_prof.is_module_enabled('payroll'))
@@ -57,14 +57,14 @@ class TenantQuotaAndPlansTestCase(TenantTestCase):
             # Premium Plan
             t_prem = Tenant(schema_name='prem_tenant', name='Prem', plan_type='PREMIUM', max_employees=None)
             t_prem.save()
-            self.assertEqual(t_prem.max_employees, 500) # Strategy v2.0
+            self.assertEqual(t_prem.max_employees, 500) # Reverted to 500
             self.assertTrue(t_prem.is_module_enabled('performance'))
             self.assertIn('rbac', t_prem.enabled_modules)
 
             # Enterprise Plan
             t_ent = Tenant(schema_name='ent_tenant', name='Ent', plan_type='ENTERPRISE', max_employees=None)
             t_ent.save()
-            self.assertEqual(t_ent.max_employees, 2000) # Strategy v2.0
+            self.assertEqual(t_ent.max_employees, 2000) # Reverted to 2000
             self.assertTrue(t_ent.is_module_enabled('super_unknown_module')) # Enterprise has everything true
 
     def test_subscription_status_properties(self):
