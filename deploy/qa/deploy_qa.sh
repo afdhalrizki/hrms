@@ -1,123 +1,137 @@
 #!/bin/bash
 
-# --- HRMS QA Deployment Script ---
-# This script automates the manual steps in deployment/qa.md
-# Designed for Ubuntu 22.04 / 24.04
+# --- Script Deployment Aman HRMS (Lingkungan QA) ---
+# Script ini dirancang untuk melakukan deployment dengan aman ke server QA.
+# Urutan proses: Memastikan koneksi stabil, backup database, tarik kode terbaru (git pull),
+# build container docker baru, jalankan migrasi database, dan tes kesehatan (smoke test).
 
-set -e # Exit on error
+set -e # Hentikan script secara otomatis jika ada perintah yang gagal (mengembalikan exit code selain 0)
+set -o pipefail # Hentikan script jika ada perintah di dalam pipe (|) yang gagal
 
-# --- Configuration & Paths ---
+# ==========================================
+# Konfigurasi Direktori dan Environment
+# ==========================================
+# Mengambil direktori tempat script ini berada, lalu kembali 2 tingkat ke root project
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." &> /dev/null && pwd )"
-
-DOMAIN="harikerja.web.id"
-PROJECT_DIR="/opt/hrms"
-SWAP_SIZE="4G"
-
-# Text Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
-
-echo -e "${GREEN}--- Starting HRMS QA Deployment ---${NC}"
-
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then 
-  echo -e "${RED}Please run as root or with sudo${NC}"
-  exit 1
-fi
-
-# Detect Ubuntu
-if ! grep -qi "ubuntu" /etc/os-release; then
-  echo -e "${RED}This script is intended for Ubuntu.${NC}"
-  exit 1
-fi
-
-# --- Stage 1: Initial Server Provisioning ---
-echo -e "${GREEN}[Stage 1] Updating OS & Basic Utilities...${NC}"
-apt update && apt upgrade -y
-apt install -y curl wget git vim htop ufw
-
-# Setup Swap
-if [ ! -f /swapfile ]; then
-    echo -e "${GREEN}Creating ${SWAP_SIZE} swap file...${NC}"
-    fallocate -l $SWAP_SIZE /swapfile
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
-    echo '/swapfile none swap sw 0 0' >> /etc/fstab
-else
-    echo -e "${GREEN}Swap file already exists.${NC}"
-fi
-
-# Firewall Configuration
-echo -e "${GREEN}Configuring Firewall (UFW)...${NC}"
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow ssh
-ufw allow http
-ufw allow https
-echo "y" | ufw enable
-
-# --- Stage 2: Core Infrastructure ---
-echo -e "${GREEN}[Stage 2] Installing Docker...${NC}"
-
-    # Docker Installation (Official Guide - Ubuntu 24.04 compatible)
-    apt-get update
-    apt-get install -y ca-certificates curl gnupg
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
-    chmod a+r /etc/apt/keyrings/docker.gpg
-
-    echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-    tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-    apt-get update
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-else
-    echo -e "${GREEN}Docker is already installed.${NC}"
-fi
-
-# --- Stage 3: Repository & Configuration ---
-echo -e "${GREEN}[Stage 3] Preparing Application...${NC}"
-
-# Create project dir if not exists
-mkdir -p $PROJECT_DIR
-
-# If already in a git repo, assume we use current files
-if [ -d "$PROJECT_ROOT/.git" ]; then
-    echo -e "${GREEN}Detected HRMS repository at $PROJECT_ROOT${NC}"
-    cd "$PROJECT_ROOT"
-else
-    echo -e "${RED}Error: Cannot find .git directory at $PROJECT_ROOT. Please ensure you are in the correct repository.${NC}"
-    exit 1
-fi
-
-# Ensure .env.qa exists
 ENV_FILE="deploy/environments/.env.qa"
-if [ ! -f "$ENV_FILE" ]; then
-    echo -e "${RED}Error: $ENV_FILE not found! Please ensure it exists in the repository.${NC}"
+
+# ==========================================
+# Tahap 0: Stabilitas Koneksi SSH
+# ==========================================
+# Mencegah terminal terputus (freeze/timeout) saat proses deployment yang memakan waktu lama.
+echo "🛡️ Tahap 0: Memastikan Stabilitas Terminal (SSH KeepAlive)..."
+if grep -q "ClientAliveInterval 0" /etc/ssh/sshd_config; then
+    echo "🔧 Mengoptimalkan pengaturan SSH untuk mencegah terminal terputus..."
+    # Mengirim paket "alive" setiap 60 detik ke client agar koneksi tetap aktif
+    sudo sed -i 's/ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config
+    sudo sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config
+    sudo systemctl restart ssh
+    echo "✅ SSH dioptimalkan. Terminal sekarang lebih stabil."
+else
+    echo "✅ Stabilitas SSH sudah terkonfigurasi."
+fi
+
+# Pindah ke direktori utama project
+cd "$PROJECT_ROOT"
+
+echo "🚀 Memulai Proses Deployment Aman untuk HRMS QA..."
+
+# ==========================================
+# Tahap 1: Pencadangan Database (Backup)
+# ==========================================
+# Sangat krusial! Memastikan kita punya titik pemulihan jika deployment gagal atau merusak data.
+echo "📦 Tahap 1: Membuat backup database..."
+if ! "$SCRIPT_DIR/backup_qa.sh"; then
+    echo "❌ Backup gagal! Menghentikan proses deployment demi keamanan."
     exit 1
 fi
 
-# --- Stage 4: Build and Deploy ---
-echo -e "${GREEN}[Stage 4] Building and Starting Containers using $ENV_FILE...${NC}"
+# ==========================================
+# Tahap 2: Pembaruan Kode (Git Pull)
+# ==========================================
+# Mengambil pembaruan kode terbaru dari repositori git.
+# Mengecek apakah direktori saat ini adalah repositori git yang valid.
+if [ -d ".git" ]; then
+    echo "⬇️ Tahap 2: Menarik kode terbaru dari repositori (git pull)..."
+    git pull || echo "⚠️ Tahap 2: Git pull gagal (mungkin ada perubahan lokal). Tetap melanjutkan..."
+else
+    echo "⚠️ Tahap 2: Bukan repositori git, melewati proses git pull."
+fi
 
-docker compose -f deploy/qa/docker-compose.qa.yml --env-file $ENV_FILE up -d --build --remove-orphans
+# ==========================================
+# Tahap 3: Membangun Ulang & Menjalankan Container (Deployment)
+# ==========================================
+echo "🏗️ Tahap 3: Membangun ulang (rebuild) dan menjalankan container..."
+# Mematikan dan menghapus container lama ('down') untuk membersihkan IP dan cache DNS Docker.
+# '--remove-orphans' akan menghapus container yang tidak terdefinisi di docker-compose saat ini.
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" down --remove-orphans
 
-echo -e "${GREEN}Waiting for containers to be healthy (30s)...${NC}"
-sleep 30
+# Menjalankan ulang ('up') container di latar belakang ('-d') dan memaksa build ulang image ('--build') 
+# agar kode terbaru teraplikasikan.
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d --build
 
-# Run Migrations
-echo -e "${GREEN}Running Migrations (Shared & Tenants)...${NC}"
-docker compose -f deploy/qa/docker-compose.qa.yml --env-file $ENV_FILE exec -T backend python manage.py migrate_schemas
+# ==========================================
+# Tahap 4: Migrasi Database
+# ==========================================
+echo "⚙️ Tahap 4: Menjalankan migrasi database (Schema Publik & Tenant)..."
+# Mengeksekusi perintah Django 'migrate_schemas' di dalam container 'backend' untuk menerapkan 
+# perubahan struktur database ke schema utama dan semua schema tenant yang ada.
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
-# Create Public Tenant (Schema)
-echo -e "${GREEN}Creating Public Tenant...${NC}"
-# Note: This might fail if tenant already exists, so we use || true
-docker compose -f deploy/qa/docker-compose.qa.yml --env-file $ENV_FILE exec -T backend python manage.py create_tenant --schema_name=public --name="harikerja QA Master" --domain-domain=$DOMAIN --is_primary=True || echo "Tenant/Domain might already exist, skipping..."
+# ==========================================
+# Tahap 4.1: Inisialisasi Tenant
+# ==========================================
+echo "🏗️ Tahap 4.1: Menginisialisasi Public Tenant dan Domain..."
+# Menjalankan script khusus untuk memastikan setup awal tenant untuk QA sudah sesuai dan terdaftar di database.
+docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python scripts/setup_qa_tenant.py
 
-echo -e "${GREEN}--- Deployment Finished! ---${NC}"
-echo "Application should be accessible at: http://$DOMAIN (if port 80/443 is open)"
+# ==========================================
+# Tahap 5: Pengujian Unit (Unit Testing) - Diabaikan
+# ==========================================
+# (Komentar asli dipertahankan, saat ini tidak dijalankan karena masih di-comment)
+# echo "🧪 Tahap 5: Menjalankan Backend Unit Tests..."
+# if ! docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
+#     echo "❌ Unit Tests Gagal! Deployment mungkin tidak stabil."
+#     echo "Cek output test di atas."
+#     exit 1
+# fi
+# echo "✅ Unit Tests Berhasil!"
+
+# ==========================================
+# Tahap 6: Smoke Test (Cek Kesehatan Sistem)
+# ==========================================
+echo "🔍 Tahap 6: Menjalankan Smoke Test (Cek Status API)..."
+echo "Menunggu 15 detik agar semua layanan siap dan stabil..."
+sleep 15
+
+# Mengecek endpoint API `/api/health/`. Kita melakukan request ke localhost:80 
+# tetapi memanipulasi Header ('Host' dan 'X-Forwarded-Proto') untuk menyimulasikan 
+# request aslinya (harikerja.web.id dengan HTTPS) sehingga Nginx atau Backend tidak melakukan redirect.
+API_STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
+  -H "Host: harikerja.web.id" \
+  -H "X-Forwarded-Proto: https" \
+  http://localhost:80/api/health/ || echo "000")
+
+if [ "$API_STATUS" -eq 200 ]; then
+    echo "✅ Smoke Test Berhasil! API merespons dengan baik (HTTP $API_STATUS)."
+else
+    echo "❌ Smoke Test Gagal! API tidak merespons dengan benar (HTTP $API_STATUS)."
+    echo "Menampilkan 100 baris log backend terakhir untuk menganalisa masalah:"
+    # Tampilkan log dari container backend, filter kata 'health' agar tidak berisik, lalu keluar dengan kode error
+    docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" logs --tail=100 backend | grep -v "health"
+    exit 1
+fi
+
+# ==========================================
+# Tahap 7: Pembersihan (Cleanup)
+# ==========================================
+echo "🧹 Tahap 7: Membersihkan artifact Docker yang tidak terpakai..."
+# Menghapus image Docker yang lama (dangling images) untuk menghemat ruang disk di server.
+docker image prune -f
+
+# ==========================================
+# Selesai
+# ==========================================
+echo "✅ Deployment Aman Berhasil Diselesaikan!"
+echo "Aplikasi telah diperbarui dan cadangan data telah disimpan di folder 'backups/'."

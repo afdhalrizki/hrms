@@ -38,23 +38,24 @@ Even without automated testing, we maintain **8GB RAM** as the ideal target to s
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
 - **QA Domain:** `harikerja.web.id`
-- **DNS Setup:** Menggunakan **NEO DNS Manager** di dashboard Biznet GIO.
+- **DNS Setup:** Using **NEO DNS Manager** in the Biznet GIO dashboard.
+
 ---
 
 ## Stage 0: DNS Configuration (Biznet GIO Dashboard)
 
-Sebelum memulai di server, hubungkan domain Anda ke IP VPS Biznet:
+Before starting on the server, connect your domain to the Biznet VPS IP:
 
-1.  Dapatkan **Public IP** dari panel `Compute > harikerja-qa`.
-2.  Masuk ke menu **Network > NEO DNS**.
-3.  Pilih domain `harikerja.web.id`.
-4.  Tambahkan **A Record** baru:
-    *   **Host/Name:** `@` (atau kosongkan)
-    *   **IP Address:** `[Isi IP VPS Anda]`
-5.  Tambahkan **A Record (Wildcard)**:
+1.  Get the **Public IP** from the `Compute > harikerja-qa` panel.
+2.  Go to the **Network > NEO DNS** menu.
+3.  Select the `harikerja.web.id` domain.
+4.  Add a new **A Record**:
+    *   **Host/Name:** `@` (or leave blank)
+    *   **IP Address:** `[Your VPS IP]`
+5.  Add a **Wildcard A Record**:
     *   **Host/Name:** `*`
-    *   **IP Address:** `[Isi IP VPS Anda]` (Sama dengan di atas)
-    *   *Fungsi: Agar sub-domain tenant seperti `perusahaan1.harikerja.web.id` otomatis terhubung.*
+    *   **IP Address:** `[Your VPS IP]` (Same as above)
+    *   *Purpose: So tenant subdomains like `company1.harikerja.web.id` connect automatically.*
 
 ---
 
@@ -100,18 +101,18 @@ sudo ufw enable
 ## Stage 2: Core Infrastructure Installation (Docker & Nginx)
 
 ### 1. Install Docker & Docker Compose (Official Repo)
-Gunakan metode repositori resmi Docker untuk mendapatkan versi terbaru dan paling stabil:
+Use the official Docker repository to get the latest and most stable version:
 
 ```bash
-# 1. Update list paket & Install dependencies awal
+# 1. Update package list & Install initial dependencies
 sudo apt update && sudo apt install -y ca-certificates curl gnupg
 
-# 2. Tambahkan kunci GPG resmi Docker
+# 2. Add Docker's official GPG key
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-# 3. Tambahkan repository Docker ke Apt sources
+# 3. Add Docker repository to Apt sources
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
@@ -121,11 +122,11 @@ echo \
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# 5. Kelola Docker sebagai user non-root
-# Agar Anda tidak perlu mengetik 'sudo' setiap kali menjalankan perintah docker
+# 5. Manage Docker as a non-root user
+# So you don't have to type 'sudo' every time you run a docker command
 sudo usermod -aG docker $USER
 
-# PENTING: Anda harus LOGOUT dan LOGIN kembali ke SSH agar perubahan grup ini aktif.
+# IMPORTANT: You must LOG OUT and LOG IN again to SSH for this group change to take effect.
 ```
 
 ### 2. Install Nginx & Certbot
@@ -190,16 +191,21 @@ REDIS_URL=redis://redis:6379/1
 We will use the primary `docker-compose.yml` because the recommended specifications (8GB RAM) are highly capable of handling the resource isolation limits feature.
 
 ### 1. Run Safe Deployment (Recommended)
-We have provided a script `deploy/qa/safe_deploy_qa.sh` which handles the entire update process safely in one command:
-- Runs a Database Backup (via `backup_qa.sh`).
-- Pulls the latest code (`git pull`).
-- Rebuilds the Docker images.
-- Runs the Database Migrations.
-- **Starts Celery Worker** for background tasks (Email/Notifications).
+We have provided a script `deploy/qa/deploy_qa.sh` which handles the entire update process safely in one command.
+
+**What happens during the automated deployment:**
+- **Stage 0 (SSH Stability):** Modifies the SSH configuration to prevent terminal freezing or dropping connections during the process.
+- **Stage 1 (Backup):** Creates a database backup before any code changes are made. The deployment is aborted if the backup fails.
+- **Stage 2 (Code Update):** Pulls the latest source code from the Git repository.
+- **Stage 3 (Deployment):** Tears down the old containers and networks, then rebuilds and starts the new containers using the latest code.
+- **Stage 4 (Migrations):** Executes database schema migrations for both the public schema and all existing tenant schemas. Runs initialization scripts for QA tenants.
+- **Stage 5 (Unit Testing):** *(Currently disabled)* Executes `pytest` to automatically verify functionality.
+- **Stage 6 (Smoke Test):** Waits for services to start, then queries the API health endpoint to ensure the application is successfully responding.
+- **Stage 7 (Cleanup):** Prunes unused Docker images to free up disk space.
 
 **Usage:**
 ```bash
-./deploy/qa/safe_deploy_qa.sh
+./deploy/qa/deploy_qa.sh
 ```
 
 ### 2. Manual Alternative (If needed)
@@ -214,8 +220,8 @@ docker compose --env-file deploy/environments/.env.qa up -d --build
 
 The build process will take about **2 - 5 minutes**. You can monitor the RAM consumption using the `htop` command in a separate terminal window simultaneously.
 
-### 2. Run Django-Tenants Migrations
-Once all containers are active, enter the `backend` container and run migrations on the *Public Schema* (Main tenant):
+### 3. Run Django-Tenants Migrations (If Setup Fails)
+If you need to manually run migrations on the *Public Schema* (Main tenant):
 
 ```bash
 docker compose exec backend bash
@@ -227,9 +233,9 @@ python manage.py create_tenant --schema_name=public --name="HariKerja QA Master"
 
 ## Stage 5: Nginx Configuration (Containerized)
 
-**PENTING:** Sejak standarisasi terbaru, kita menggunakan **Nginx di dalam Docker** (terintegrasi di `docker-compose.qa.yml`) untuk isolasi maksimal. Anda tidak perlu menginstall Nginx di host server kecuali jika ingin menggunakannya sebagai *Load Balancer* tambahan.
+**IMPORTANT:** Since the latest standardization, we use **Nginx inside Docker** (integrated in `docker-compose.qa.yml`) for maximum isolation. You do not need to install Nginx on the host server unless you want to use it as an additional *Load Balancer*.
 
-Jika Anda tetap ingin menggunakan Nginx di host (Legacy Mode), gunakan konfigurasi berikut:
+If you still want to use Nginx on the host (Legacy Mode), use the following configuration:
 Create a specific configuration file:
 ```bash
 sudo nano /etc/nginx/sites-available/hrms_qa
@@ -303,20 +309,20 @@ sudo systemctl reload nginx
 ```
 
 ### 3. Setup Wildcard SSL (*Let's Encrypt*)
-Untuk aplikasi *Multi-Tenant* (SaaS), kita wajib menggunakan *Wildcard SSL* (`*.harikerja.web.id`).
+For a *Multi-Tenant* (SaaS) application, we must use *Wildcard SSL* (`*.harikerja.web.id`).
 
 ```bash
 sudo certbot certonly --manual --preferred-challenges=dns --email admin@harikerja.web.id --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d harikerja.web.id -d *.harikerja.web.id
 ```
 
-> **PENTING (Langkah Biznet DNS)**:
-> Certbot akan memberikan kode *TXT record* (misal: `_acme-challenge.harikerja.web.id`). 
-> 1. Salin kode tersebut.
-> 2. Masuk ke **NEO DNS Manager** di Biznet GIO.
-> 3. Tambahkan record baru: Type **TXT**, Name `_acme-challenge`, Value `[Kode dari Certbot]`.
-> 4. Tunggu 1-2 menit, lalu tekan `Enter` di terminal.
+> **IMPORTANT (Biznet DNS Step)**:
+> Certbot will provide a *TXT record* code (e.g., `_acme-challenge.harikerja.web.id`). 
+> 1. Copy that code.
+> 2. Go to **NEO DNS Manager** in Biznet GIO.
+> 3. Add a new record: Type **TXT**, Name `_acme-challenge`, Value `[Code from Certbot]`.
+> 4. Wait 1-2 minutes, then press `Enter` in the terminal.
 
-Setelah sertifikat berhasil dibuat, Nginx di dalam Docker akan otomatis membacanya jika file sertifikat di-*mount* ke dalam kontainer (cek `docker-compose.qa.yml`).
+Once the certificate is successfully created, Nginx inside Docker will automatically read it if the certificate files are mounted into the container (check `docker-compose.qa.yml`).
 
 ---
 
@@ -324,7 +330,7 @@ Setelah sertifikat berhasil dibuat, Nginx di dalam Docker akan otomatis membacan
 
 If all steps are successful, validate from your Browser:
 1. Access `https://harikerja.web.id` -> It should display the Next.js *Landing Page / Admin Panel Login*.
-2. Access `https://harikerja.web.id/api/schema/swagger-ui/` -> It should display the Django API documentation tanpa SSL errors.
+2. Access `https://harikerja.web.id/api/schema/swagger-ui/` -> It should display the Django API documentation without SSL errors.
 
 ---
 
@@ -333,11 +339,11 @@ If all steps are successful, validate from your Browser:
 Since you are managing this alone, keeping the data safe is a priority. We have provided a backup script to automate this.
 
 ### 1. Database Backup Script
-Kita menggunakan script `deploy/qa/backup_qa.sh`. Script ini sudah memiliki fitur **First-Deploy Safety**:
-- Mengecek apakah database sedang berjalan.
-- Jika kontainer belum ada (saat baru pertama kali setup), script akan melewati backup tanpa error sehingga proses deploy tetap lanjut.
-- Jika kontainer aktif, akan dibuat file `.sql.gz` di folder `backups/`.
-- Otomatis menghapus backup yang lebih tua dari 7 hari.
+We use the `deploy/qa/backup_qa.sh` script. This script has a **First-Deploy Safety** feature:
+- Checks if the database is running.
+- If the container does not exist (during the first setup), the script skips the backup without errors so the deployment can continue.
+- If the container is active, a `.sql.gz` file is created in the `backups/` folder.
+- Automatically deletes backups older than 7 days.
 
 **How to run manually:**
 ```bash

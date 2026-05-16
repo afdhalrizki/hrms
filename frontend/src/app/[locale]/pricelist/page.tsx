@@ -14,6 +14,7 @@ export default function PriceListPage() {
       price: "0",
       description: "Untuk startup & UMKM mikro yang baru memulai digitalisasi HR.",
       features: [
+        "Batas Pakai 14 Hari",
         "Maksimal 10 Karyawan",
         "Penyimpanan 50 MB",
         "Absensi Dasar (Web)",
@@ -47,6 +48,7 @@ export default function PriceListPage() {
         "Kuota Dasar 100 Karyawan",
         "Hingga 1.000 Karyawan",
         "Upgrade tiap +5 Karyawan",
+        "Penyimpanan 1 GB",
         "Payroll PPh 21 & BPJS",
         "Sistem Reimbursement"
       ],
@@ -62,6 +64,7 @@ export default function PriceListPage() {
         "Kuota Dasar 500 Karyawan",
         "Tanpa Batas Karyawan",
         "Upgrade tiap +5 Karyawan",
+        "Penyimpanan 5 GB",
         "Manajemen Kinerja (KPI)",
         "Self-Appraisal Karyawan"
       ],
@@ -75,6 +78,7 @@ export default function PriceListPage() {
       features: [
         "2.000+ Karyawan",
         "Kapasitas Skala Enterprise",
+        "Penyimpanan 20 GB+",
         "SLA & Dukungan Prioritas",
         "Audit Trail Lengkap",
         "Integrasi Custom API"

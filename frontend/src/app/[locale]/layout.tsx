@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HRMS SaaS | HariKerja",
+  title: "HariKerja HRMS",
   description: "Next-generation Human Resource Management System",
 };
 
