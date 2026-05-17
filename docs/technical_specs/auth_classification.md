@@ -30,7 +30,6 @@ No authentication is required. Accessible to all visitors.
 | :--- | :--- | :--- |
 | `/` | N/A | Static public page. No backend lock. |
 | `/[locale]/about` | N/A | Static public page. No backend lock. |
-| `/[locale]/pricelist` | N/A | Static public page. |
 | `/[locale]/signup` | `POST /api/public/signup/` | `AllowAny` (Enforces public schema only). |
 | `/[locale]/login` | `POST /api/auth/login/` | `AllowAny` (Performs initial identity validation). |
 | `/[locale]/registration`| `GET /api/internal/registrations/` | `AllowAny` |

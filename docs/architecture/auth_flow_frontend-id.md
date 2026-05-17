@@ -16,7 +16,6 @@ Komponen `DashboardLayout` mengklasifikasikan rute untuk menentukan akses.
 - `/signup`
 - `/registration`
 - `/about`
-- `/pricelist`
 - `/` (Hanya landing page utama)
 
 ### Rute Terlindungi

@@ -6,7 +6,6 @@ test.describe('Public Routes Accessibility', () => {
   const publicRoutes = [
     { path: '/en', expectedTitle: /HR Management|SDM|Simpel|Akurat|Scale|Workforce/i },
     { path: '/en/about', expectedTitle: /HariKerja|Tentang|About/i },
-    { path: '/en/pricelist', expectedTitle: /Pilih Paket|Price|Pricelist|Plan|Harga|Sesuai/i },
     { path: '/en/login', expectedTitle: /Sign In|Masuk|Login/i },
     { path: '/en/signup', expectedTitle: /Scale|Create|Account|Kembangkan|Buat/i },
   ];

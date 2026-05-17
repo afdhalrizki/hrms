@@ -16,7 +16,6 @@ export const PublicNav = () => {
   const navLinks = [
     { name: t('home'), href: '/' },
     { name: t('about'), href: '/about' },
-    { name: t('pricing'), href: '/pricelist' },
   ];
 
   return (

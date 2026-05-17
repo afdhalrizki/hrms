@@ -127,9 +127,6 @@ export default function Home() {
               <a href="/signup" className="w-full sm:w-auto px-12 py-6 bg-primary text-white rounded-2xl font-bold text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-2">
                 {tLanding('ctaStart')} <ArrowRight size={24} />
               </a>
-              <a href="/pricelist" className="w-full sm:w-auto px-12 py-6 bg-white/5 border border-white/10 rounded-2xl font-bold text-xl hover:bg-white/10 transition-all flex items-center justify-center">
-                {tLanding('ctaPrice')}
-              </a>
             </motion.div>
 
             {/* Dashboard Mockup */}

@@ -8,7 +8,7 @@ This document provides a deep dive into the subscription lifecycle architecture,
 
 ### Registration & Auto-Provisioning
 Every new customer integrates into the platform through a self-service onboarding mechanism:
-1. **Public Registration**: The prospective tenant registers via `https://harikerja.web.id/signup`.
+1. **Public Registration**: The prospective tenant registers via `https://harikerja.web.id/signup`. Note that there is no public pricing page; prospective tenants must create an account first to view detailed plan offerings.
 2. **Review & Approval**: The Super Admin reviews the registration request. Upon approval, the system atomically executes the creation of a dedicated PostgreSQL database schema (*schema isolation*), maps a unique subdomain, and generates the initial Tenant Admin account.
 3. **Free Trial Activation**: The new tenant automatically receives the **FREE** plan with a **14-day trial period** duration from the admin approval date (`expiry_date = date.today() + 14`).
 
@@ -28,7 +28,7 @@ Platform access states are strictly controlled based on the expiration date (`ex
 
 ## 3. Plan Transition Policies (Upgrade & Downgrade)
 
-Tenants can change their plan at any time through the Billing Settings page.
+Tenants can view all available commercial plans and change their plan at any time exclusively through the Billing Settings page (`/settings/billing`). This page acts as the sole source of truth for pricing and plan features.
 
 ### FREE Plan Rules
 * The **FREE** plan operates exclusively as a trial tier at the beginning of registration.

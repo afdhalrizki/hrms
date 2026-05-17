@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useTenant } from '@/context/TenantContext';
 import { apiFetch } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { 
   CreditCard, 
   CheckCircle2, 
@@ -14,50 +15,12 @@ import {
   Calendar,
   Lock,
   ArrowRight,
-  Loader2
+  Loader2,
+  HelpCircle,
+  Check
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-
-const PLANS = [
-  {
-    id: 'FREE',
-    name: 'Free Tier',
-    price: 0,
-    features: ['10 Employees', '100MB Storage', 'Basic Attendance', 'Core HR'],
-    icon: Building2,
-    color: 'bg-slate-500/10 text-slate-500',
-    capacity: 10
-  },
-  {
-    id: 'ESSENTIAL',
-    name: 'Essential HR',
-    price: 125000,
-    features: ['25 Employees', '250MB Storage', 'Geofence Attendance', 'Leaves Management'],
-    icon: Building2,
-    color: 'bg-blue-500/10 text-blue-500',
-    capacity: 25
-  },
-  {
-    id: 'PROFESSIONAL',
-    name: 'Professional',
-    price: 750000,
-    features: ['100 Employees', '2GB Storage', 'Indonesian Payroll', 'BPJS & PPh 21'],
-    icon: Zap,
-    color: 'bg-primary/10 text-primary',
-    popular: true,
-    capacity: 100
-  },
-  {
-    id: 'PREMIUM',
-    name: 'Premium',
-    price: 1500000,
-    features: ['500 Employees', '5GB Storage', 'Performance Management', 'Advanced Analytics'],
-    icon: ShieldCheck,
-    color: 'bg-accent/10 text-accent',
-    capacity: 500
-  }
-];
 
 const ADDON_PRICES: Record<string, number> = {
   ESSENTIAL: 25000,
@@ -66,6 +29,7 @@ const ADDON_PRICES: Record<string, number> = {
 };
 
 export default function BillingPage() {
+  const t = useTranslations('Pricing');
   const { planType, expiryDate, subscriptionStatus, employeeCount } = useTenant();
   const [selectedPlan, setSelectedPlan] = useState(planType || 'PROFESSIONAL');
   const [months, setMonths] = useState(1);
@@ -79,6 +43,80 @@ export default function BillingPage() {
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  const PLANS = [
+    {
+      id: 'FREE',
+      name: "Free Tier",
+      price: 0,
+      description: t('free.desc'),
+      features: [
+        t('free.f1'),
+        t('free.f2'),
+        t('free.f3'),
+        t('free.f4'),
+        t('free.f5'),
+        t('free.f6')
+      ],
+      icon: Building2,
+      color: 'bg-slate-500/10 text-slate-500',
+      capacity: 10
+    },
+    {
+      id: 'ESSENTIAL',
+      name: "Essential HR",
+      price: 125000,
+      period: t('essential.period'),
+      description: t('essential.desc'),
+      features: [
+        t('essential.f1'),
+        t('essential.f2'),
+        t('essential.f3'),
+        t('essential.f4'),
+        t('essential.f5')
+      ],
+      icon: Building2,
+      color: 'bg-blue-500/10 text-blue-500',
+      capacity: 25
+    },
+    {
+      id: 'PROFESSIONAL',
+      name: "Professional",
+      price: 750000,
+      period: t('professional.period'),
+      description: t('professional.desc'),
+      features: [
+        t('professional.f1'),
+        t('professional.f2'),
+        t('professional.f3'),
+        t('professional.f4'),
+        t('professional.f5'),
+        t('professional.f6')
+      ],
+      icon: Zap,
+      color: 'bg-primary/10 text-primary',
+      popular: true,
+      capacity: 100
+    },
+    {
+      id: 'PREMIUM',
+      name: "Premium",
+      price: 1500000,
+      period: t('premium.period'),
+      description: t('premium.desc'),
+      features: [
+        t('premium.f1'),
+        t('premium.f2'),
+        t('premium.f3'),
+        t('premium.f4'),
+        t('premium.f5'),
+        t('premium.f6')
+      ],
+      icon: ShieldCheck,
+      color: 'bg-accent/10 text-accent',
+      capacity: 500
+    }
+  ];
 
   const selectedPlanData = PLANS.find(p => p.id === selectedPlan) || PLANS[2];
   const isInsufficientCapacity = !isAddonMode && (employeeCount || 0) > selectedPlanData.capacity;
@@ -158,12 +196,12 @@ export default function BillingPage() {
         strategy="lazyOnload"
       />
       
-      <div className="max-w-6xl mx-auto space-y-12 pb-20">
+      <div className="max-w-7xl mx-auto space-y-12 pb-20">
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 pt-8">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Subscription & Billing</h1>
-            <p className="text-muted-foreground max-w-lg">
-              Empower your workforce with HariKerja. Professional plans include full ID compliance.
+            <h1 className="text-4xl font-black tracking-tight">{t('title1')} <span className="text-primary">{t('title2')}</span></h1>
+            <p className="text-muted-foreground max-w-lg font-medium text-lg">
+              {t('subtitle')}
             </p>
           </div>
           
@@ -199,10 +237,10 @@ export default function BillingPage() {
                       {mounted ? (subscriptionStatus === 'ACTIVE' ? 'ACTIVE' : (subscriptionStatus || 'TRIAL')) : 'ACTIVE'}
                     </span>
                  </h2>
-                 {planType === 'FREE' && <p className="text-[10px] font-bold text-primary">Maksimal 14 Hari</p>}
                  <p className="text-muted-foreground text-sm max-w-md">
-                   Secure and reliable infrastructure powering your {planType?.toLowerCase() || 'trial'} workspace.
+                   Status: {employeeCount} Karyawan Aktif tercatat. Paket {planType || 'TRIAL'} saat ini memungkinkan hingga {(PLANS.find(p => p.id === planType) || PLANS[0]).capacity} Karyawan.
                  </p>
+                 {planType === 'FREE' && <p className="text-[10px] font-bold text-primary">Maksimal 14 Hari</p>}
               </div>
            </div>
            <div className="flex flex-col sm:flex-row gap-3">
@@ -223,8 +261,10 @@ export default function BillingPage() {
           /* Add-on Mode UI */
           <div className="space-y-8 px-4 max-w-3xl mx-auto">
              <div className="text-center space-y-2">
-               <h3 className="text-2xl font-bold">Elastic Quota: Add Employees</h3>
-               <p className="text-muted-foreground">Expand your capacity without upgrading your plan features.</p>
+               <h3 className="text-3xl font-black">{t('addon.title')}</h3>
+               <p className="text-muted-foreground">
+                 {t('addon.desc1')} <strong>{t('addon.strong1')}</strong> {t('addon.desc2')} <strong>{t('addon.strong2')}</strong>{t('addon.desc3')} <strong>{t('addon.strong3')}</strong> {t('addon.desc4')} <strong>{t('addon.strong4')}</strong> {t('addon.desc5')}
+               </p>
              </div>
 
               <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] space-y-8">
@@ -280,11 +320,6 @@ export default function BillingPage() {
         ) : (
           /* Standard Plan Selection */
           <div className="space-y-8 px-4">
-             <div className="text-center space-y-2">
-               <h3 className="text-2xl font-bold">Select Your Power Level</h3>
-               <p className="text-muted-foreground">Scale from micro-SME to huge enterprise with a few clicks.</p>
-             </div>
-
              {isInsufficientCapacity && (
                <div className="max-w-md mx-auto bg-red-500/10 border border-red-500/50 p-4 rounded-2xl text-red-500 text-center">
                  <p className="font-bold">Kapasitas Tidak Mencukupi</p>
@@ -301,32 +336,36 @@ export default function BillingPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                     onClick={() => plan.price > 0 && setSelectedPlan(plan.id)}
-                    className={`relative flex flex-col p-8 rounded-[2.5rem] border-2 transition-all group ${plan.price > 0 ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-default'} ${selectedPlan === plan.id ? 'border-primary bg-primary/5 shadow-2xl shadow-primary/10' : 'border-white/5 bg-white/[0.02] hover:border-white/20'}`}
+                    className={`relative flex flex-col p-8 rounded-[2rem] border-2 transition-all group ${plan.price > 0 ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-default'} ${selectedPlan === plan.id ? 'border-primary bg-primary/5 shadow-2xl shadow-primary/10' : 'border-white/5 bg-white/[0.02] hover:border-white/20'}`}
                   >
                     {plan.popular && (
                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">
-                          Recommended
+                          {t('recommended')}
                        </div>
                     )}
 
-                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-6 ${plan.color}`}>
-                      <plan.icon size={28} />
+                    <div className="mb-8 text-center sm:text-left">
+                      <h3 className={`text-xl font-black tracking-widest mb-4 ${selectedPlan === plan.id ? 'text-primary' : ''}`}>
+                        {plan.name}
+                      </h3>
+                      <div className="flex items-baseline gap-1 justify-center sm:justify-start">
+                        {plan.price !== 0 && <span className="text-sm font-bold opacity-70">Rp</span>}
+                        <span className="text-4xl font-black tracking-tighter">{plan.price === 0 ? 'FREE' : (plan.price / 1000).toLocaleString() + 'k'}</span>
+                        {plan.period && <span className="text-sm font-medium opacity-70">{plan.period}</span>}
+                      </div>
+                      <p className={`mt-4 text-sm leading-relaxed ${selectedPlan === plan.id ? 'text-primary/80' : 'text-muted-foreground'}`}>
+                        {plan.description}
+                      </p>
                     </div>
 
-                    <h4 className="text-xl font-bold mb-2">{plan.name}</h4>
-                    <div className="flex items-baseline gap-1 mb-8">
-                      <span className="text-3xl font-black">{plan.price === 0 ? 'FREE' : `Rp ${(plan.price / 1000).toLocaleString()}k`}</span>
-                      {plan.price > 0 && <span className="text-muted-foreground text-sm font-medium">/mo</span>}
-                    </div>
-
-                    <ul className="space-y-4 mb-8 flex-grow">
+                    <div className="flex-grow space-y-4 mb-8 text-sm">
                       {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-3 text-sm">
-                          <CheckCircle2 size={16} className={selectedPlan === plan.id ? 'text-primary' : 'text-muted-foreground/40'} />
+                        <div key={i} className="flex items-start gap-3">
+                          <Check size={16} className={`shrink-0 mt-0.5 ${selectedPlan === plan.id ? 'text-primary' : 'text-muted-foreground/40'}`} />
                           <span className={selectedPlan === plan.id ? 'text-foreground font-medium' : 'text-muted-foreground'}>{feature}</span>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                     
                     {plan.price > 0 && (
                       <div className={`mt-auto h-2 w-2 rounded-full mx-auto transition-all ${selectedPlan === plan.id ? 'bg-primary scale-150' : 'bg-transparent'}`} />
@@ -423,6 +462,42 @@ export default function BillingPage() {
              </motion.div>
           </div>
         )}
+
+        {/* Detailed FAQ Section directly integrated in Billing page */}
+        <div className="max-w-4xl mx-auto space-y-12 pt-20 border-t border-white/5 px-4">
+          <div className="text-center">
+            <h2 className="text-3xl font-black tracking-tight flex items-center justify-center gap-3">
+              <HelpCircle className="text-primary" /> {t('faq.title')}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4 p-8 glass-card rounded-3xl">
+              <h4 className="font-bold text-lg">{t('faq.q1')}</h4>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {t('faq.a1')}
+              </p>
+            </div>
+            <div className="space-y-4 p-8 glass-card rounded-3xl">
+              <h4 className="font-bold text-lg">{t('faq.q2')}</h4>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {t('faq.a2')}
+              </p>
+            </div>
+            <div className="space-y-4 p-8 glass-card rounded-3xl">
+              <h4 className="font-bold text-lg">{t('faq.q3')}</h4>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {t('faq.a3')}
+              </p>
+            </div>
+            <div className="space-y-4 p-8 glass-card rounded-3xl">
+              <h4 className="font-bold text-lg">{t('faq.q4')}</h4>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {t('faq.a4')}
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </DashboardLayout>
   );

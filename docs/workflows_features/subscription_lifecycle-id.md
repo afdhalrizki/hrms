@@ -8,7 +8,7 @@ Dokumen ini menjelaskan secara mendalam arsitektur siklus hidup langganan, kebij
 
 ### Pendaftaran & Pembuatan Otomatis (*Auto-Provisioning*)
 Setiap pelanggan baru terintegrasi ke platform melalui mekanisme pendaftaran mandiri (*self-service*):
-1. **Registrasi Publik**: Calon tenant mendaftar via `https://harikerja.web.id/signup`.
+1. **Registrasi Publik**: Calon tenant mendaftar via `https://harikerja.web.id/signup`. Perlu diketahui bahwa tidak ada halaman harga publik; calon tenant harus membuat akun terlebih dahulu untuk melihat penawaran paket secara mendetail.
 2. **Review & Persetujuan**: Super Admin meninjau pengajuan pendaftaran. Saat disetujui, sistem secara atomik mengeksekusi pembuatan skema basis data PostgreSQL khusus (*schema isolation*), memetakan subdomain unik, dan men-generate akun Admin Tenant awal.
 3. **Aktivasi Trial Gratis**: Tenant baru otomatis mendapatkan paket **FREE** dengan durasi masa uji coba selama **14 hari** sejak tanggal persetujuan admin (`expiry_date = date.today() + 14`).
 
@@ -28,7 +28,7 @@ Status akses platform dikendalikan secara ketat berdasarkan tanggal kedaluwarsa 
 
 ## 3. Kebijakan Transisi Paket (Upgrade & Downgrade)
 
-Tenant dapat melakukan perubahan paket kapan saja melalui halaman Pengaturan Billing.
+Tenant dapat melihat semua paket komersial yang tersedia dan melakukan perubahan paket kapan saja secara eksklusif melalui halaman Pengaturan Billing (`/settings/billing`). Halaman ini bertindak sebagai satu-satunya sumber informasi untuk harga dan fitur paket.
 
 ### Aturan Paket FREE
 * Paket **FREE** beroperasi secara eksklusif sebagai tier percobaan (*trial*) di awal pendaftaran.

@@ -109,8 +109,8 @@ describe('BillingPage', () => {
 
     // Warning should appear
     expect(screen.getByText('Kapasitas Tidak Mencukupi')).toBeInTheDocument();
-    expect(screen.getByText(/Anda memiliki/)).toBeInTheDocument();
-    expect(screen.getByText(/80/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Anda memiliki/)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/80/)[0]).toBeInTheDocument();
 
     // Click Pay
     const payButton = screen.getByRole('button', { name: /Confirm & Pay/i });
@@ -131,7 +131,7 @@ describe('BillingPage', () => {
     fireEvent.click(toggleAddonButton);
 
     // Confirm we are in addon mode by checking title
-    expect(screen.getByRole('heading', { name: /Elastic Quota: Add Employees/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /addon.title/i })).toBeInTheDocument();
 
     // Should have a "+5" selector button
     const plusFiveButton = screen.getByRole('button', { name: /^\+5$/ });

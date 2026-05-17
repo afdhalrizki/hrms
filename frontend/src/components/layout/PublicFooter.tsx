@@ -43,7 +43,6 @@ export const PublicFooter = () => {
             <ul className="space-y-5">
               <li><Link href="/" className="text-muted-foreground hover:text-white transition-colors text-lg">{tNav('home')}</Link></li>
               <li><Link href="/about" className="text-muted-foreground hover:text-white transition-colors text-lg">{tNav('about')}</Link></li>
-              <li><Link href="/pricelist" className="text-muted-foreground hover:text-white transition-colors text-lg">{tNav('pricing')}</Link></li>
               <li><Link href="/signup" className="text-muted-foreground hover:text-white transition-colors text-lg">{tNav('getStarted')}</Link></li>
             </ul>
           </div>

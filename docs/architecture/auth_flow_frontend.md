@@ -16,7 +16,6 @@ The `DashboardLayout` component classifies routes to determine access.
 - `/signup`
 - `/registration`
 - `/about`
-- `/pricelist`
 - `/` (Master landing page only)
 
 ### Protected Routes

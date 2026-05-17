@@ -30,7 +30,6 @@ Tidak diperlukan otentikasi. Dapat diakses oleh semua pengunjung.
 | :--- | :--- | :--- |
 | `/` | N/A | Halaman publik statis. Tidak ada kunci backend. |
 | `/[locale]/about` | N/A | Halaman publik statis. Tidak ada kunci backend. |
-| `/[locale]/pricelist` | N/A | Halaman publik statis. |
 | `/[locale]/signup` | `POST /api/public/signup/` | `AllowAny` (Hanya menegakkan skema publik). |
 | `/[locale]/login` | `POST /api/auth/login/` | `AllowAny` (Melakukan validasi identitas awal). |
 | `/[locale]/registration`| `GET /api/internal/registrations/` | `AllowAny` |

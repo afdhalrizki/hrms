@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import Home from '@/app/[locale]/page';
 import AboutPage from '@/app/[locale]/about/page';
-import PriceListPage from '@/app/[locale]/pricelist/page';
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
 
@@ -77,34 +76,6 @@ describe('Landing Pages Unit Tests', () => {
       expect(screen.getByText(/principle1Title/i)).toBeDefined();
       expect(screen.getByText(/principle2Title/i)).toBeDefined();
       expect(screen.getByText(/principle3Title/i)).toBeDefined();
-    });
-  });
-
-  describe('Pricelist Page', () => {
-    it('renders all pricing plans', () => {
-      render(<PriceListPage />);
-
-      expect(screen.getAllByText(/FREE/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/ESSENTIAL/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/PROFESSIONAL/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/PREMIUM/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/ENTERPRISE/i).length).toBeGreaterThan(0);
-    });
-
-    it('renders specific plan prices', () => {
-      render(<PriceListPage />);
-
-      expect(screen.getByText(/125.000/i)).toBeDefined();
-      expect(screen.getByText(/750.000/i)).toBeDefined();
-      expect(screen.getByText(/1.500.000/i)).toBeDefined();
-      expect(screen.getAllByText(/enterprise.price/i).length).toBeGreaterThan(0);
-    });
-
-    it('renders FAQ section', () => {
-      render(<PriceListPage />);
-
-      expect(screen.getByText(/faq.title/i)).toBeDefined();
-      expect(screen.getByText(/faq.q1/i)).toBeDefined();
     });
   });
 });

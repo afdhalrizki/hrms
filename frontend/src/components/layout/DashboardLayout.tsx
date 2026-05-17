@@ -22,7 +22,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, []);
   
   const isPublicRoute = React.useMemo(() => {
-    const publicRoutes = ['/about', '/pricelist', '/signup', '/login', '/registration'];
+    const publicRoutes = ['/about', '/signup', '/login', '/registration'];
     
     // 1. Get raw path from window if available, else use pathname from next-intl
     let rawPath = pathname;
