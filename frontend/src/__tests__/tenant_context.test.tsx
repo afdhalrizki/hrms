@@ -39,7 +39,7 @@ describe('TenantContext', () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId('tenant-name').textContent).toBe('Public');
+      expect(getByTestId('tenant-name').textContent).toBe('HariKerja Platform');
       expect(getByTestId('is-public').textContent).toBe('true');
     });
   });

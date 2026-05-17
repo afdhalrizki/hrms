@@ -34,7 +34,7 @@ const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
   { nameKey: 'profile',    icon: Users,            href: '/profile' },
   { nameKey: 'employees', icon: Users,            href: '/employees', requiredPermission: 'manage_hr' },
-  { nameKey: 'performance', icon: TrendingUp,     href: '/performance' },
+  { nameKey: 'performance', icon: TrendingUp,     href: '/performance', module: 'performance' },
   { nameKey: 'branches',  icon: MapPin,           href: '/branches',  requiredPermission: 'manage_hr' },
   { nameKey: 'attendance',icon: Calendar,         href: '/attendance' },
   { nameKey: 'leaves',    icon: Briefcase,        href: '/leaves' },

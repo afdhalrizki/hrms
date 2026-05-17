@@ -156,10 +156,10 @@ describe('PerformancePage (Integrated)', () => {
     });
   }, 30000);
 
-  it('renders nothing if module is disabled', async () => {
-    mockTenantContextValues = { enabledModules: [] };
-    const res = render(<PerformancePage />, { wrapper: AllProviders });
-    expect(res.container.firstChild).toBeNull();
+  it('renders upgrade prompt if module is disabled', async () => {
+    mockTenantContextValues = { enabledModules: [], planType: 'FREE' };
+    render(<PerformancePage />, { wrapper: AllProviders });
+    expect(screen.getByText('upgradeTitle')).toBeInTheDocument();
   });
 
   it('calculates average score correctly', async () => {

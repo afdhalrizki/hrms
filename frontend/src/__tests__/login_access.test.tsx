@@ -66,7 +66,7 @@ describe('LoginPage Access Restrictions', () => {
   it('renders "Akses Terbatas" on public domain without forceShowForm', async () => {
     (useTenant as any).mockReturnValue({
       isPublic: true,
-      tenantName: 'Public',
+      tenantName: 'HariKerja Platform',
     });
 
     render(<LoginView />);
@@ -79,7 +79,7 @@ describe('LoginPage Access Restrictions', () => {
   it('renders login form on public domain when forceShowForm is true', async () => {
     (useTenant as any).mockReturnValue({
       isPublic: true,
-      tenantName: 'Public',
+      tenantName: 'HariKerja Platform',
     });
 
     render(<LoginView forceShowForm={true} />);

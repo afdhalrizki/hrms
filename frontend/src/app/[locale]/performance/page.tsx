@@ -104,9 +104,7 @@ export default function PerformancePage() {
     return (allRatings.reduce((a, b) => a + b, 0) / allRatings.length).toFixed(1);
   };
 
-  if (!enabledModules?.includes('performance')) {
-    return null;
-  }
+  // FeatureGuard handles the rendering if module is not enabled
 
   return (
     <DashboardLayout>
