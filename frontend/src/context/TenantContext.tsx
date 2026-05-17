@@ -40,7 +40,7 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [tenant, setTenant] = useState<TenantContextType>({
-    tenantName: 'Public',
+    tenantName: 'HariKerja Platform',
     subdomain: '',
     isPublic: true,
     isLoading: true,
@@ -69,7 +69,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         if (testTenant === 'public') {
           sessionStorage.setItem('test_tenant_e2e', 'public');
           setTenant({
-            tenantName: 'Public',
+            tenantName: 'HariKerja Platform',
             subdomain: '',
             isPublic: true,
             isLoading: false,
@@ -128,7 +128,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       // If hostname is exactly the domain suffix or localhost, it's public
       if (hostname === domainSuffix || isLocal) {
         setTenant({
-          tenantName: 'Public',
+          tenantName: 'HariKerja Platform',
           subdomain: '',
           isPublic: true,
           isLoading: false,
