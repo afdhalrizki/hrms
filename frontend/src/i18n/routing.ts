@@ -10,7 +10,7 @@ export const routing = defineRouting({
   
   // Disable prefix for default locale if desired, but for clear multi-tenancy + multi-language, 
   // keeping prefixes is often better.
-  localePrefix: 'always'
+  localePrefix: 'as-needed'
 });
 
 // Lightweight wrappers around Next.js' navigation APIs

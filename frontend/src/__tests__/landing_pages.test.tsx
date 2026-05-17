@@ -97,14 +97,14 @@ describe('Landing Pages Unit Tests', () => {
       expect(screen.getByText(/125.000/i)).toBeDefined();
       expect(screen.getByText(/750.000/i)).toBeDefined();
       expect(screen.getByText(/1.500.000/i)).toBeDefined();
-      expect(screen.getAllByText(/Custom/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/enterprise.price/i).length).toBeGreaterThan(0);
     });
 
     it('renders FAQ section', () => {
       render(<PriceListPage />);
 
-      expect(screen.getByText(/Pertanyaan Umum/i)).toBeDefined();
-      expect(screen.getByText(/Apakah saya bisa ganti paket kapan saja\?/i)).toBeDefined();
+      expect(screen.getByText(/faq.title/i)).toBeDefined();
+      expect(screen.getByText(/faq.q1/i)).toBeDefined();
     });
   });
 });

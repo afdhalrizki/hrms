@@ -357,5 +357,88 @@
     "address": "Jakarta, Indonesia",
     "privacy": "Kebijakan Privasi",
     "terms": "Ketentuan Layanan"
+  },
+  "Pricing": {
+    "title1": "Pilih Paket yang Sesuai dengan",
+    "title2": "Skala Bisnis Anda",
+    "subtitle": "Transparan, kompetitif, dan dirancang untuk membantu Anda tumbuh tanpa hambatan biaya operasional HR.",
+    "recommended": "Paling Direkomendasikan",
+    "free": {
+      "desc": "Untuk startup & UMKM mikro yang baru memulai digitalisasi HR.",
+      "f1": "Batas Pakai 14 Hari",
+      "f2": "Maksimal 10 Karyawan",
+      "f3": "Penyimpanan 50 MB",
+      "f4": "Absensi Dasar (Web)",
+      "f5": "Manajemen Karyawan Dasar",
+      "f6": "Dashboard Analitik Dasar",
+      "btn": "Mulai Gratis"
+    },
+    "essential": {
+      "period": "/bulan",
+      "desc": "Standar baru untuk bisnis kecil yang fokus pada kehadiran.",
+      "f1": "Kuota Dasar 25 Karyawan",
+      "f2": "Hingga 100 Karyawan",
+      "f3": "Upgrade tiap +5 Karyawan",
+      "f4": "Penyimpanan 250 MB",
+      "f5": "Absensi Geofencing (GPS)",
+      "btn": "Pilih Essential"
+    },
+    "professional": {
+      "period": "/bulan",
+      "desc": "Terbaik untuk bisnis berkembang yang butuh penggajian.",
+      "f1": "Kuota Dasar 100 Karyawan",
+      "f2": "Hingga 1.000 Karyawan",
+      "f3": "Upgrade tiap +5 Karyawan",
+      "f4": "Penyimpanan 1 GB",
+      "f5": "Payroll PPh 21 & BPJS",
+      "f6": "Sistem Reimbursement",
+      "btn": "Pilih Professional"
+    },
+    "premium": {
+      "period": "/bulan",
+      "desc": "Solusi lengkap untuk perusahaan high-growth.",
+      "f1": "Kuota Dasar 500 Karyawan",
+      "f2": "Tanpa Batas Karyawan",
+      "f3": "Upgrade tiap +5 Karyawan",
+      "f4": "Penyimpanan 5 GB",
+      "f5": "Manajemen Kinerja (KPI)",
+      "f6": "Self-Appraisal Karyawan",
+      "btn": "Pilih Premium"
+    },
+    "enterprise": {
+      "price": "Custom",
+      "desc": "Keamanan, skala, dan dukungan prioritas untuk organisasi besar.",
+      "f1": "2.000+ Karyawan",
+      "f2": "Kapasitas Skala Enterprise",
+      "f3": "Penyimpanan 20 GB+",
+      "f4": "SLA & Dukungan Prioritas",
+      "f5": "Audit Trail Lengkap",
+      "f6": "Integrasi Custom API",
+      "btn": "Hubungi Kami"
+    },
+    "faq": {
+      "title": "Pertanyaan Umum",
+      "q1": "Apakah saya bisa ganti paket kapan saja?",
+      "a1": "Ya, Anda bisa melakukan upgrade paket kapan saja. Biaya akan dihitung secara prorata berdasarkan sisa masa aktif langganan Anda.",
+      "q2": "Bagaimana dengan keamanan data saya?",
+      "a2": "Kami menggunakan enkripsi tingkat lanjut dan isolasi database untuk setiap tenant. Data Anda tidak akan tercampur dengan data perusahaan lain.",
+      "q3": "Apakah sudah sesuai TER 2024?",
+      "a3": "Tentu. Sistem penggajian kami selalu diperbarui mengikuti regulasi pajak terbaru di Indonesia, termasuk skema Tarif Efektif Rata-Rata (TER) 2024.",
+      "q4": "Berapa lama masa tenggang jika lupa bayar?",
+      "a4": "Kami memberikan masa tenggang selama 14 hari setelah masa berlaku paket habis sebelum sistem menonaktifkan akses ke modul tertentu."
+    },
+    "addon": {
+      "title": "Butuh Tambahan Kuota Elastis?",
+      "desc1": "Kapasitas plan Anda dapat bertumbuh secara fleksibel! Anda bisa membeli add-on",
+      "strong1": "+5 Karyawan",
+      "desc2": "mulai dari",
+      "strong2": "Rp 25.000/bulan",
+      "desc3": ", atau",
+      "strong3": "+1 GB Penyimpanan",
+      "desc4": "seharga",
+      "strong4": "Rp 50.000/bulan",
+      "desc5": "tanpa harus melakukan upgrade paket utama.",
+      "link": "Pelajari Add-on"
+    }
   }
 }

@@ -392,5 +392,88 @@
     "address": "Jakarta, Indonesia",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
+  },
+  "Pricing": {
+    "title1": "Choose the Plan that Fits Your",
+    "title2": "Business Scale",
+    "subtitle": "Transparent, competitive, and designed to help you grow without HR operational cost hurdles.",
+    "recommended": "Highly Recommended",
+    "free": {
+      "desc": "For startups & micro SMEs just starting HR digitalization.",
+      "f1": "14-Day Trial Limit",
+      "f2": "Maximum 10 Employees",
+      "f3": "50 MB Storage",
+      "f4": "Basic Attendance (Web)",
+      "f5": "Basic Employee Management",
+      "f6": "Basic Analytics Dashboard",
+      "btn": "Start for Free"
+    },
+    "essential": {
+      "period": "/month",
+      "desc": "The new standard for small businesses focusing on attendance.",
+      "f1": "Base Quota 25 Employees",
+      "f2": "Up to 100 Employees",
+      "f3": "Upgrade per +5 Employees",
+      "f4": "250 MB Storage",
+      "f5": "Geofencing Attendance (GPS)",
+      "btn": "Choose Essential"
+    },
+    "professional": {
+      "period": "/month",
+      "desc": "Best for growing businesses that need payroll.",
+      "f1": "Base Quota 100 Employees",
+      "f2": "Up to 1,000 Employees",
+      "f3": "Upgrade per +5 Employees",
+      "f4": "1 GB Storage",
+      "f5": "Payroll PPh 21 & BPJS",
+      "f6": "Reimbursement System",
+      "btn": "Choose Professional"
+    },
+    "premium": {
+      "period": "/month",
+      "desc": "Complete solution for high-growth companies.",
+      "f1": "Base Quota 500 Employees",
+      "f2": "Unlimited Employees",
+      "f3": "Upgrade per +5 Employees",
+      "f4": "5 GB Storage",
+      "f5": "Performance Management (KPI)",
+      "f6": "Employee Self-Appraisal",
+      "btn": "Choose Premium"
+    },
+    "enterprise": {
+      "price": "Custom",
+      "desc": "Security, scale, and priority support for large organizations.",
+      "f1": "2,000+ Employees",
+      "f2": "Enterprise Scale Capacity",
+      "f3": "20 GB+ Storage",
+      "f4": "SLA & Priority Support",
+      "f5": "Complete Audit Trail",
+      "f6": "Custom API Integration",
+      "btn": "Contact Us"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "Can I change plans at any time?",
+      "a1": "Yes, you can upgrade your plan at any time. Costs will be prorated based on the remaining active period of your subscription.",
+      "q2": "What about my data security?",
+      "a2": "We use advanced encryption and database isolation for each tenant. Your data will not be mixed with other companies' data.",
+      "q3": "Is it compliant with TER 2024?",
+      "a3": "Certainly. Our payroll system is always updated following the latest tax regulations in Indonesia, including the Average Effective Rate (TER) 2024 scheme.",
+      "q4": "How long is the grace period if I forget to pay?",
+      "a4": "We provide a 14-day grace period after the plan's validity expires before the system disables access to certain modules."
+    },
+    "addon": {
+      "title": "Need Additional Elastic Quota?",
+      "desc1": "Your plan capacity can grow flexibly! You can buy add-ons",
+      "strong1": "+5 Employees",
+      "desc2": "starting from",
+      "strong2": "Rp 25.000/month",
+      "desc3": ", or",
+      "strong3": "+1 GB Storage",
+      "desc4": "for",
+      "strong4": "Rp 50.000/month",
+      "desc5": "without having to upgrade the main plan.",
+      "link": "Learn about Add-ons"
+    }
   }
 }
