@@ -28,10 +28,10 @@ interface AccessRole {
 }
 
 const PERMISSION_KEYS = [
-  { key: 'manage_hr', label: 'HR Management', description: 'Access to employees, departments, and roles.' },
-  { key: 'manage_attendance', label: 'Attendance Management', description: 'Access to clock-in logs, leave requests, and schedules.' },
-  { key: 'manage_payroll', label: 'Payroll Management', description: 'Access to salary components, periods, and payslips.' },
-  { key: 'manage_settings', label: 'Settings Management', description: 'Access to company profile and system configurations.' },
+  { key: 'tenant_manage_hr', label: 'HR Management', description: 'Access to employees, departments, and roles.' },
+  { key: 'tenant_manage_attendance', label: 'Attendance Management', description: 'Access to clock-in logs, leave requests, and schedules.' },
+  { key: 'tenant_manage_payroll', label: 'Payroll Management', description: 'Access to salary components, periods, and payslips.' },
+  { key: 'tenant_manage_settings', label: 'Settings Management', description: 'Access to company profile and system configurations.' },
 ];
 
 export default function RolesPage() {
@@ -73,10 +73,10 @@ export default function RolesPage() {
       name: '',
       description: '',
       permissions: {
-        manage_hr: false,
-        manage_attendance: false,
-        manage_payroll: false,
-        manage_settings: false
+        tenant_manage_hr: false,
+        tenant_manage_attendance: false,
+        tenant_manage_payroll: false,
+        tenant_manage_settings: false
       }
     });
   };

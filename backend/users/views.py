@@ -3,15 +3,18 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import login, authenticate
 from .models import User
-from .serializers import UserSerializer
-from core.permissions import HasRBACPermission, TenantAccessPermission
 from core.mixins import TenantIsolationMixin
+from core.permissions import HasTenantRBACPermission, TenantAccessPermission
+from users.permissions import HasGlobalPermission
+from users.global_constants import GLOBAL_MANAGE_USERS
+from rest_framework.exceptions import ValidationError
+from .serializers import UserSerializer, GlobalAdminSerializer
 
 class UserViewSet(TenantIsolationMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, TenantAccessPermission]
-    required_rbac_permission = 'manage_access_roles'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, TenantAccessPermission]
+    required_rbac_permission = 'tenant_manage_access_roles'
     allow_self_service = True
     allow_self_service_list = True
 
@@ -26,7 +29,7 @@ class UserViewSet(TenantIsolationMixin, viewsets.ModelViewSet):
         # 2. Management Access
         from core.models import Employee
         employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_access_roles'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_access_roles'))
         
         if is_manager:
             return User.objects.all()
@@ -111,3 +114,24 @@ from rest_framework.decorators import api_view, permission_classes
 @permission_classes([permissions.AllowAny])
 def health_check(request):
     return Response({"status": "healthy"}, status=status.HTTP_200_OK)
+
+class GlobalAdminViewSet(viewsets.ModelViewSet):
+    serializer_class = GlobalAdminSerializer
+    permission_classes = [permissions.IsAuthenticated, HasGlobalPermission]
+    required_global_permission = GLOBAL_MANAGE_USERS
+
+    def get_queryset(self):
+        return User.objects.exclude(global_role__isnull=True).exclude(global_role='')
+
+    def perform_destroy(self, instance):
+        if instance.global_role == 'SUPERADMIN':
+            superadmin_count = User.objects.filter(global_role='SUPERADMIN').count()
+            if superadmin_count <= 1:
+                raise ValidationError({"detail": "Cannot delete the last SUPERADMIN."})
+        # Django's ORM collector crashes when calling instance.delete() in the public schema
+        # because it tries to query Tenant-only models to SET_NULL or CASCADE, which don't exist.
+        # We use raw SQL to bypass the ORM collector. PostgreSQL handles DB-level M2M cascades.
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM users_user WHERE id = %s", [instance.id])
+

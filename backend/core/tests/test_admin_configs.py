@@ -17,14 +17,14 @@ class AdminConfigsTestCase(TenantTestCase):
         self.admin_role = AccessRole.objects.create(
             name="Admin",
             permissions={
-                'manage_settings': True, 
-                'view_audit_logs': True,
-                'manage_hr': True
+                'tenant_manage_settings': True, 
+                'tenant_view_audit_logs': True,
+                'tenant_manage_hr': True
             }
         )
         self.staff_role = AccessRole.objects.create(
             name="Staff",
-            permissions={'manage_settings': False, 'view_audit_logs': False}
+            permissions={'tenant_manage_settings': False, 'tenant_view_audit_logs': False}
         )
 
         # 2. Setup Users
@@ -34,7 +34,7 @@ class AdminConfigsTestCase(TenantTestCase):
         self.user_staff = User.objects.create_user(email='staff@configs.com', password='password')
         self.user_staff.tenants.add(self.tenant)
 
-        # 3. Setup Employees (needed for HasRBACPermission)
+        # 3. Setup Employees (needed for HasTenantRBACPermission)
         self.dept = Department.objects.create(name="HQ")
         self.branch = Branch.objects.create(
             name="HQ",
@@ -77,7 +77,7 @@ class AdminConfigsTestCase(TenantTestCase):
         )
 
     def test_api_key_permissions(self):
-        """Verify that only users with manage_settings can access API Keys."""
+        """Verify that only users with tenant_manage_settings can access API Keys."""
         url = reverse('apikey-list')
         
         # 1. Staff (Denied) - Should return 403
@@ -92,7 +92,7 @@ class AdminConfigsTestCase(TenantTestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_audit_log_permissions(self):
-        """Verify that only users with view_audit_logs can access Audit Logs."""
+        """Verify that only users with tenant_view_audit_logs can access Audit Logs."""
         url = reverse('auditlog-list')
         
         # 1. Staff (Denied) - AuditLogViewSet raises PermissionDenied (403) explicitly

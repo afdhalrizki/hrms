@@ -65,7 +65,7 @@ Exclusively restricted to Global Administrators and Superusers.
 
 | Frontend Next.js Route | Relevant Backend Endpoint | Required Permission |
 | :--- | :--- | :--- |
-| `/[locale]/admin/registrations` | `/api/internal/registrations/` | `request.user.is_superuser` or `is_global_admin` |
+| `/[locale]/admin/registrations` | `/api/internal/registrations/` | `request.user.is_superuser` or `global_role` |
 | `/[locale]/portal-admin` | N/A (Admin interface) | Global system admin only |
 
 ---

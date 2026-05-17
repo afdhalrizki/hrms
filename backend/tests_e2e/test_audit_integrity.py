@@ -75,6 +75,6 @@ def test_unauthorized_user_cannot_view_audit_logs(base_url, tenant1_domain, clie
         headers=get_auth_headers(tenant1_domain, token)
     )
     # Depending on RBAC, it should return 403 Forbidden or empty list if filtered
-    # In our AuditLogViewSet, required_rbac_permission = 'view_audit_logs'
+    # In our AuditLogViewSet, required_rbac_permission = 'tenant_view_audit_logs'
     # Regular employees (Staff role) don't have this.
     assert audit_resp.status_code in [403, 401]

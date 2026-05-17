@@ -48,7 +48,7 @@ vi.mock('@/context/AuthContext', () => ({
       id: 1, 
       fullname: 'Admin One', 
       is_staff: true,
-      permissions: { manage_hr: true, manage_payroll: true } 
+      permissions: { tenant_manage_hr: true, tenant_manage_payroll: true } 
     }, 
     loading: false 
   }),

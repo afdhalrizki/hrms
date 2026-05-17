@@ -56,6 +56,8 @@ router.register(r'appraisals', AppraisalViewSet)
 router.register(r'appraisal-reviews', AppraisalReviewViewSet)
 router.register(r'public/signup', PublicSignupViewSet, basename='public-signup')
 router.register(r'internal/registrations', RegistrationApprovalViewSet, basename='internal-registration')
+from users.views import GlobalAdminViewSet
+router.register(r'internal/global-admins', GlobalAdminViewSet, basename='internal-global-admins')
 router.register(r'quota-reduction', QuotaReductionRequestViewSet, basename='quota-reduction')
 router.register(r'billing', BillingViewSet, basename='billing')
 

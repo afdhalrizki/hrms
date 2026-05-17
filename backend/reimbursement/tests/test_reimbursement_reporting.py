@@ -18,7 +18,7 @@ class ReimbursementReportingTestCase(TenantTestCase):
 
         with schema_context(self.tenant.schema_name):
             self.dept = Department.objects.create(name="Finance")
-            self.mgr_role = AccessRole.objects.create(name="Manager", permissions={'manage_reimbursement': True})
+            self.mgr_role = AccessRole.objects.create(name="Manager", permissions={'tenant_manage_reimbursement': True})
             
             self.user_admin = User.objects.create_user(email='admin@test.com', password='password', is_staff=True)
             self.user_admin.tenants.add(self.tenant)

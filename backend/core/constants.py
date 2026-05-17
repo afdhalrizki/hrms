@@ -4,39 +4,39 @@ These strings are used as keys in the AccessRole.permissions JSONField.
 """
 
 # Management & Settings
-MANAGE_SETTINGS = 'manage_settings'
-MANAGE_HR = 'manage_hr'
-MANAGE_ACCESS_ROLES = 'manage_access_roles'
-VIEW_AUDIT_LOGS = 'view_audit_logs'
-VIEW_ALL_PAYSLIPS = 'view_all_payslips'
-VIEW_PERFORMANCE_REPORT = 'view_performance_report'
+TENANT_MANAGE_SETTINGS = 'tenant_manage_settings'
+TENANT_MANAGE_HR = 'tenant_manage_hr'
+TENANT_MANAGE_ACCESS_ROLES = 'tenant_manage_access_roles'
+TENANT_VIEW_AUDIT_LOGS = 'tenant_view_audit_logs'
+TENANT_VIEW_ALL_PAYSLIPS = 'tenant_view_all_payslips'
+TENANT_VIEW_PERFORMANCE_REPORT = 'tenant_view_performance_report'
 
 # Operational Modules
-MANAGE_ATTENDANCE = 'manage_attendance'
-MANAGE_PAYROLL = 'manage_payroll'
-MANAGE_REIMBURSEMENT = 'manage_reimbursement'
-MANAGE_PERFORMANCE = 'manage_performance'
+TENANT_MANAGE_ATTENDANCE = 'tenant_manage_attendance'
+TENANT_MANAGE_PAYROLL = 'tenant_manage_payroll'
+TENANT_MANAGE_REIMBURSEMENT = 'tenant_manage_reimbursement'
+TENANT_MANAGE_PERFORMANCE = 'tenant_manage_performance'
 
 # Approval Workflows
-APPROVE_LEAVE = 'approve_leave'
-APPROVE_REIMBURSEMENT = 'approve_reimbursement'
-APPROVE_ATTENDANCE_CORRECTION = 'approve_attendance_correction'
-APPROVE_OVERTIME = 'approve_overtime'
+TENANT_APPROVE_LEAVE = 'tenant_approve_leave'
+TENANT_APPROVE_REIMBURSEMENT = 'tenant_approve_reimbursement'
+TENANT_APPROVE_ATTENDANCE_CORRECTION = 'tenant_approve_attendance_correction'
+TENANT_APPROVE_OVERTIME = 'tenant_approve_overtime'
 
 # Permission Pool for UI and Initialization
 PERMISSIONS_POOL = {
-    MANAGE_SETTINGS: "Can modify tenant branding and system settings",
-    MANAGE_HR: "Can manage employees, departments, and roles",
-    MANAGE_ACCESS_ROLES: "Can define and assign RBAC roles",
-    VIEW_AUDIT_LOGS: "Can view system audit trails",
-    VIEW_ALL_PAYSLIPS: "Can view payslips for all employees",
-    VIEW_PERFORMANCE_REPORT: "Can view global performance reports",
-    MANAGE_ATTENDANCE: "Can manage shifts and view global attendance",
-    MANAGE_PAYROLL: "Can calculate salaries and view payslips",
-    MANAGE_REIMBURSEMENT: "Can manage reimbursement categories",
-    MANAGE_PERFORMANCE: "Can manage appraisal cycles and KPIs",
-    APPROVE_LEAVE: "Can approve leave requests",
-    APPROVE_REIMBURSEMENT: "Can approve reimbursement claims",
-    APPROVE_ATTENDANCE_CORRECTION: "Can approve attendance corrections",
-    APPROVE_OVERTIME: "Can approve overtime requests",
+    TENANT_MANAGE_SETTINGS: "Can modify tenant branding and system settings",
+    TENANT_MANAGE_HR: "Can manage employees, departments, and roles",
+    TENANT_MANAGE_ACCESS_ROLES: "Can define and assign RBAC roles",
+    TENANT_VIEW_AUDIT_LOGS: "Can view system audit trails",
+    TENANT_VIEW_ALL_PAYSLIPS: "Can view payslips for all employees",
+    TENANT_VIEW_PERFORMANCE_REPORT: "Can view global performance reports",
+    TENANT_MANAGE_ATTENDANCE: "Can manage shifts and view global attendance",
+    TENANT_MANAGE_PAYROLL: "Can calculate salaries and view payslips",
+    TENANT_MANAGE_REIMBURSEMENT: "Can manage reimbursement categories",
+    TENANT_MANAGE_PERFORMANCE: "Can manage appraisal cycles and KPIs",
+    TENANT_APPROVE_LEAVE: "Can approve leave requests",
+    TENANT_APPROVE_REIMBURSEMENT: "Can approve reimbursement claims",
+    TENANT_APPROVE_ATTENDANCE_CORRECTION: "Can approve attendance corrections",
+    TENANT_APPROVE_OVERTIME: "Can approve overtime requests",
 }

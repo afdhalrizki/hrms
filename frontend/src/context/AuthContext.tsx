@@ -8,6 +8,7 @@ interface UserProfile {
   email: string;
   is_staff: boolean;
   is_global_admin: boolean;
+  global_role: string | null;
   role: string;
   permissions: Record<string, boolean>;
   employee_id: number | null;

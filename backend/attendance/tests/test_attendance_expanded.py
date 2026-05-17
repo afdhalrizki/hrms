@@ -69,7 +69,7 @@ class AttendanceExpandedTestCase(TenantTestCase):
         
         url = reverse('attendance-list')
         res = self.client.post(url, {'latitude_in': 0, 'longitude_in': 0}, format='json', SERVER_NAME=self.tenant.domains.first().domain)
-        # It hits HasRBACPermission which blocks if no employee profile found
+        # It hits HasTenantRBACPermission which blocks if no employee profile found
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_attendance_get_queryset_none_fallback(self):

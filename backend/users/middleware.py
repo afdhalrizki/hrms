@@ -23,10 +23,25 @@ class TenantAccessMiddleware:
                 login_url = getattr(settings, 'LOGIN_URL', '/admin/login/')
                 return redirect(login_url)
 
-            # 1. Global Admins and Superusers bypass all checks
-            is_internal = getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
-            if is_internal:
-                return self.get_response(request)
+            # 1. Global Admins and Superusers bypass checks based on Role
+            user = request.user
+            is_legacy_internal = getattr(user, 'is_global_admin', False) or user.is_superuser
+            
+            if user.global_role or is_legacy_internal:
+                from users.global_constants import GLOBAL_MASQUERADE, GLOBAL_ROLE_PERMISSIONS
+                user_perms = GLOBAL_ROLE_PERMISSIONS.get(user.global_role, [])
+                
+                if user.global_role == 'SUPERADMIN' or is_legacy_internal:
+                    return self.get_response(request)
+                
+                current_tenant = getattr(request, 'tenant', None)
+                if current_tenant and current_tenant.schema_name == 'public':
+                    return self.get_response(request)
+                    
+                # If trying to access client tenant
+                if GLOBAL_MASQUERADE in user_perms:
+                    if current_tenant and user.tenants.filter(id=current_tenant.id).exists():
+                        return self.get_response(request)
 
             # 2. Get current tenant from django-tenants middleware
             current_tenant = getattr(request, 'tenant', None)
@@ -73,7 +88,8 @@ class SubscriptionMiddleware:
         if not current_tenant or getattr(current_tenant, 'schema_name', 'public') == 'public':
             return self.get_response(request)
             
-        if request.user.is_authenticated and (request.user.is_superuser or getattr(request.user, 'is_global_admin', False)):
+        user = request.user
+        if user.is_authenticated and (user.is_superuser or getattr(user, 'is_global_admin', False) or user.global_role):
             return self.get_response(request)
 
         # 1. Total Suspension Check

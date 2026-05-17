@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission, FeatureRequiredPermission
+from core.permissions import HasTenantRBACPermission, FeatureRequiredPermission
 from .models import KPI, KPITarget, Appraisal, AppraisalReview
 from .serializers import (
     KPISerializer, 
@@ -16,16 +16,16 @@ from core.mixins import TenantIsolationMixin
 class KPIViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPI.objects.all()
     serializer_class = KPISerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_performance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_performance'
     required_feature = 'performance'
     allow_self_service_list = True
 
 class KPITargetViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = KPITarget.objects.all()
     serializer_class = KPITargetSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_performance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_performance'
     required_feature = 'performance'
     allow_self_service_list = True
 
@@ -34,7 +34,7 @@ class KPITargetViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
         employee = Employee.objects.filter(email=user.email).first()
         
         # Managers/Admins see all
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_performance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_performance')):
             return KPITarget.objects.all()
         
         # Employees see their own targets
@@ -45,8 +45,8 @@ class KPITargetViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
 class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Appraisal.objects.all()
     serializer_class = AppraisalSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_performance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_performance'
     required_feature = 'performance'
     allow_self_service_list = True
 
@@ -60,8 +60,8 @@ class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
 
         # Managers/Admins with specific permissions also see everything
         if employee and employee.access_role:
-            has_manage = employee.access_role.permissions.get('manage_performance')
-            has_view = employee.access_role.permissions.get('view_performance_report')
+            has_manage = employee.access_role.permissions.get('tenant_manage_performance')
+            has_view = employee.access_role.permissions.get('tenant_view_performance_report')
             if has_manage or has_view:
                 return Appraisal.objects.all()
         
@@ -142,8 +142,8 @@ class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         is_manager = user.is_staff or (employee and employee.access_role and (
-            employee.access_role.permissions.get('manage_performance') or 
-            employee.access_role.permissions.get('view_performance_report')
+            employee.access_role.permissions.get('tenant_manage_performance') or 
+            employee.access_role.permissions.get('tenant_view_performance_report')
         ))
         
         if not is_manager:
@@ -187,8 +187,8 @@ class AppraisalViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelView
 class AppraisalReviewViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = AppraisalReview.objects.all()
     serializer_class = AppraisalReviewSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_performance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_performance'
     required_feature = 'performance'
     allow_self_service = True
     allow_self_service_list = True

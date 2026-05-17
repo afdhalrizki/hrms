@@ -52,8 +52,8 @@ export default function PayrollPage() {
   const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
   const { user, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
-  const canManage = hasPermission('manage_payroll');
-  const canViewAll = hasPermission('view_all_payslips');
+  const canManage = hasPermission('tenant_manage_payroll');
+  const canViewAll = hasPermission('tenant_view_all_payslips');
   const isManagerMode = canManage || canViewAll;
 
   const fetchData = React.useCallback(async () => {

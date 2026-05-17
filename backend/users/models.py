@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from tenants.models import Tenant
+from .global_constants import GLOBAL_ROLE_CHOICES
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -16,6 +17,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_global_admin', True)
+        extra_fields.setdefault('global_role', 'SUPERADMIN')
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -38,8 +40,17 @@ class User(AbstractUser):
     # Mapping user to multiple tenants if necessary (e.g. for multi-tenant support users)
     tenants = models.ManyToManyField(Tenant, blank=True, related_name='users')
     
-    # Global admin can bypass tenant restrictions
+    # Global admin can bypass tenant restrictions (Deprecated, use global_role instead)
     is_global_admin = models.BooleanField(default=False)
+    
+    # NEW: Global RBAC
+    global_role = models.CharField(
+        max_length=50, 
+        choices=GLOBAL_ROLE_CHOICES, 
+        null=True, 
+        blank=True,
+        help_text="Menentukan akses pada Portal Admin Utama (SaaS)"
+    )
 
     objects = UserManager()
 
@@ -70,24 +81,26 @@ class User(AbstractUser):
         Synthesized role for frontend consumption.
         Derives from Employee's capabilities instead of just the role name.
         """
+        if self.global_role:
+            return self.global_role
         if self.is_superuser or self.is_global_admin:
             return 'SUPERADMIN'
             
         from core import constants
         perms = self.permissions
         
-        # 1. Admin Capability (manage_settings / manage_hr / manage_access_roles)
+        # 1. Admin Capability (tenant_manage_settings / tenant_manage_hr / tenant_manage_access_roles)
         # Even if role name is renamed, presence of these permissions signals ADMIN status to UI
-        if perms.get(constants.MANAGE_SETTINGS) or perms.get(constants.MANAGE_ACCESS_ROLES) or self.is_staff:
+        if perms.get(constants.TENANT_MANAGE_SETTINGS) or perms.get(constants.TENANT_MANAGE_ACCESS_ROLES) or self.is_staff:
             return 'ADMIN'
             
         # 2. Manager Capability (approve_* things or view_reports)
         is_manager = any([
-            perms.get(constants.APPROVE_LEAVE),
-            perms.get(constants.APPROVE_REIMBURSEMENT),
-            perms.get(constants.APPROVE_ATTENDANCE_CORRECTION),
-            perms.get(constants.APPROVE_OVERTIME),
-            perms.get(constants.VIEW_PERFORMANCE_REPORT)
+            perms.get(constants.TENANT_APPROVE_LEAVE),
+            perms.get(constants.TENANT_APPROVE_REIMBURSEMENT),
+            perms.get(constants.TENANT_APPROVE_ATTENDANCE_CORRECTION),
+            perms.get(constants.TENANT_APPROVE_OVERTIME),
+            perms.get(constants.TENANT_VIEW_PERFORMANCE_REPORT)
         ])
         if is_manager:
             return 'MANAGER'

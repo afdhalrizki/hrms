@@ -13,7 +13,7 @@ class AccessRole(AuditModel):
     description = models.TextField(_("description"), blank=True, null=True)
     
     # Store dynamic permissions as a JSON dictionary
-    # e.g. {"manage_hr": True, "manage_payroll": False}
+    # e.g. {"tenant_manage_hr": True, "tenant_manage_payroll": False}
     permissions = models.JSONField(_("permissions"), default=dict, blank=True)
     
     # If True, this is a system-generated default role that shouldn't be deleted

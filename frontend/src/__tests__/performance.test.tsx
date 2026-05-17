@@ -32,7 +32,7 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
 
 vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({ 
-    user: { id: 1, fullname: 'Employee One', is_staff: false, permissions: { manage_hr: false } }, 
+    user: { id: 1, fullname: 'Employee One', is_staff: false, permissions: { tenant_manage_hr: false } }, 
     loading: false 
   }),
   AuthProvider: ({ children }: any) => children,

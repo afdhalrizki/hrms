@@ -137,9 +137,15 @@ Authorization: Bearer <access_token>
 ---
 
 ## 🏢 System Administration
-### Public Registration
+### Public Registration & Global Management
 - `POST /api/public/signup/` - Public signup for new company tenants.
 - `GET /api/internal/registrations/` - List pending registrations (Global Admin).
+- `POST /api/internal/registrations/{id}/approve/` - Approve registration (Global Admin).
+- `POST /api/internal/registrations/{id}/reject/` - Reject registration (Global Admin).
+- `GET /api/internal/global-admins/` - List global admins (Superadmin only).
+- `POST /api/internal/global-admins/` - Create a new global admin (Superadmin only).
+- `PATCH /api/internal/global-admins/{id}/` - Update global admin (Superadmin only).
+- `DELETE /api/internal/global-admins/{id}/` - Delete global admin (Superadmin only).
 
 ### Security & Auditing
 - `GET /api/api-keys/` - Manage API keys for external integration.

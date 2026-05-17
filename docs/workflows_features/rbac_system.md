@@ -14,7 +14,7 @@ The RBAC system is built on three core pillars:
 
 ## Global Base User (Django AbstractUser)
 
-As a global baseline, the system utilizes the native boolean flags provided by Django's `AbstractUser`, alongside our custom `is_global_admin` field, to establish fundamental access levels before applying the custom RBAC capabilities.
+As a global baseline, the system utilizes the native boolean flags provided by Django's `AbstractUser`, alongside our custom `global_role` field, to establish fundamental access levels before applying the custom RBAC capabilities.
 
 ### Native Django Flags
 *   **`is_superuser`**: Designates absolute access to the entire system. If `True`, the system ignores all other permission checks and grants full access. 
@@ -22,7 +22,7 @@ As a global baseline, the system utilizes the native boolean flags provided by D
 *   **`is_active`**: Determines whether the user account is active. This serves as our soft-deletion and account-blocking mechanism.
 
 ### Custom Multi-Tenant Flags
-*   **`is_global_admin`**: A custom field designed specifically for our multi-tenant SaaS architecture. It allows system administrators (e.g., the platform owners) to bypass standard tenant isolation restrictions to manage cross-company configurations and provide support, cleanly separating "SaaS Administration" from "Company Administration".
+*   **`global_role`**: A custom field designed specifically for our multi-tenant SaaS architecture (Global RBAC). It allows system administrators (e.g., the platform owners, support agents) to bypass standard tenant isolation restrictions based on their specific role to manage cross-company configurations and provide support, cleanly separating "SaaS Administration" from "Company Administration". This replaces the deprecated `is_global_admin` boolean flag.
 
 ---
 
@@ -33,27 +33,27 @@ The following keys are the "source of truth" for the system. Using these keys co
 ### 1. Management & Settings
 | Permission Key | Description |
 | :--- | :--- |
-| `manage_settings` | Modify tenant-wide configuration, branding, and API integrations. |
-| `manage_hr` | Full control over Employees, Departments, Roles, and Branches. |
-| `manage_access_roles` | Define and assign RBAC roles to other employees. |
-| `view_audit_logs` | Access the system-wide audit trail for traceability. |
-| `view_all_payslips` | View payslips for all employees (Finance/HR Manager). |
-| `view_performance_report` | Access global or department-wide performance reports. |
+| `tenant_manage_settings` | Modify tenant-wide configuration, branding, and API integrations. |
+| `tenant_manage_hr` | Full control over Employees, Departments, Roles, and Branches. |
+| `tenant_manage_access_roles` | Define and assign RBAC roles to other employees. |
+| `tenant_view_audit_logs` | Access the system-wide audit trail for traceability. |
+| `tenant_view_all_payslips` | View payslips for all employees (Finance/HR Manager). |
+| `tenant_view_performance_report` | Access global or department-wide performance reports. |
 
 ### 2. Operational Modules
 | Permission Key | Description |
 | :--- | :--- |
-| `manage_attendance` | Manage shifts, schedules, and view global attendance records. |
-| `manage_payroll` | Calculate salaries, generate payslips, and manage pay grades. |
-| `manage_reimbursement` | Configure reimbursement categories and global limits. |
-| `manage_performance` | Create appraisal templates, KPIs, and Manage review cycles. |
+| `tenant_manage_attendance` | Manage shifts, schedules, and view global attendance records. |
+| `tenant_manage_payroll` | Calculate salaries, generate payslips, and manage pay grades. |
+| `tenant_manage_reimbursement` | Configure reimbursement categories and global limits. |
+| `tenant_manage_performance` | Create appraisal templates, KPIs, and Manage review cycles. |
 
 ### 3. Approval Workflow (Middle Management)
 | Permission Key | Description |
 | :--- | :--- |
-| `approve_leave` | Approve or reject leave and time-off requests. |
-| `approve_reimbursement` | Approve or reject expense and reimbursement claims. |
-| `approve_attendance_correction` | Approve attendance corrections or manual clock-ins. |
+| `tenant_approve_leave` | Approve or reject leave and time-off requests. |
+| `tenant_approve_reimbursement` | Approve or reject expense and reimbursement claims. |
+| `tenant_approve_attendance_correction` | Approve attendance corrections or manual clock-ins. |
 
 ---
 
@@ -68,7 +68,7 @@ Every new tenant is automatically initialized with these roles via the `post_sch
 
 ### 2. HR Manager (is_default: True)
 *   **Purpose**: Operational HR management.
-*   **Permissions**: `manage_hr`, `manage_attendance`, `manage_payroll`, and all `approve_*` permissions.
+*   **Permissions**: `tenant_manage_hr`, `tenant_manage_attendance`, `tenant_manage_payroll`, and all `tenant_approve_*` permissions.
 *   **Primary Identity**: `MANAGER`
 
 ### 3. Staff (is_default: True)
@@ -81,9 +81,9 @@ Every new tenant is automatically initialized with these roles via the `post_sch
 ## Security Implementation Details
 
 ### Backend Enforcement
-Views use the `HasRBACPermission` class. It checks:
+Views use the `HasTenantRBACPermission` class. It checks:
 1.  If the user is a **Tenant Admin** (`is_staff`): Full access is granted immediately.
-2.  If a `required_rbac_permission` is set: The user's associated `AccessRole.permissions` JSON is checked for that key.
+2.  If a `required_tenant_rbac_permission` is set: The user's associated `AccessRole.permissions` JSON is checked for that key.
 3.  **Ownership Check**: Even without a management permission, users can always `retrieve` or `update` their *own* records (e.g., their own profile or leave requests).
 
 ### Deletion Guard

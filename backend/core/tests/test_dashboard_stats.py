@@ -32,11 +32,11 @@ class DashboardStatsTestCase(HRMSTestCase):
         # 1. Setup Roles and Permissions
         self.admin_role = AccessRole.objects.create(
             name="Admin",
-            permissions={'manage_hr': True, 'manage_settings': True}
+            permissions={'tenant_manage_hr': True, 'tenant_manage_settings': True}
         )
         self.staff_role = AccessRole.objects.create(
             name="Staff",
-            permissions={'manage_hr': False}
+            permissions={'tenant_manage_hr': False}
         )
 
         # 3. Setup Users (staff)
@@ -165,7 +165,7 @@ class DashboardStatsTestCase(HRMSTestCase):
         self.assertEqual(dept_dist.get('HR'), 1)
 
     def test_dashboard_stats_permission(self):
-        """Verify that only users with manage_hr permission can access dashboard stats."""
+        """Verify that only users with tenant_manage_hr permission can access dashboard stats."""
         self.client.force_authenticate(user=self.user_staff)
         url = reverse('dashboard-stats')
         response = self.client.get(url, SERVER_NAME=self.domain, secure=True)

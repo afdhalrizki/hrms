@@ -29,7 +29,7 @@ class TenantAccessPermission(permissions.BasePermission):
             
         return True
 
-class HasRBACPermission(permissions.BasePermission):
+class HasTenantRBACPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         from django.db import connection
         if not request.user or not request.user.is_authenticated:

@@ -17,6 +17,7 @@
   "Navigation": {
     "overview": "Ikhtisar",
     "profile": "Profil Saya",
+    "global_admins": "Admin Global",
     "employees": "Karyawan",
     "branches": "Cabang",
     "attendance": "Kehadiran",

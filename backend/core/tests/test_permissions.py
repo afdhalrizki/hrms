@@ -2,7 +2,7 @@ from unittest.mock import Mock, MagicMock
 from django.test import RequestFactory, TestCase
 from django.contrib.auth import get_user_model
 from core.tests.base import HRMSTestCase as TenantTestCase
-from core.permissions import TenantAccessPermission, HasRBACPermission, FeatureRequiredPermission
+from core.permissions import TenantAccessPermission, HasTenantRBACPermission, FeatureRequiredPermission
 from core.models import Employee, AccessRole
 from tenants.models import Tenant
 
@@ -22,8 +22,8 @@ class PermissionsTestCase(TenantTestCase):
             self.admin_user, _ = User.objects.get_or_create(email='admin@test.com', defaults={'password': 'pwd', 'is_staff': True})
             self.global_admin, _ = User.objects.get_or_create(email='global@test.com', defaults={'password': 'pwd', 'is_superuser': True})
             
-            self.role_with_perm = AccessRole.objects.create(name='Manager Role', permissions={'manage_attendance': True})
-            self.role_without_perm = AccessRole.objects.create(name='Staff Role', permissions={'manage_attendance': False})
+            self.role_with_perm = AccessRole.objects.create(name='Manager Role', permissions={'tenant_manage_attendance': True})
+            self.role_without_perm = AccessRole.objects.create(name='Staff Role', permissions={'tenant_manage_attendance': False})
 
             self.spv_emp = Employee.objects.create(email=self.supervisor_user.email, fullname="Spv", nik="SPV01", join_date="2024-01-01", ktp_number="123")
             self.user_emp = Employee.objects.create(email=self.regular_user.email, fullname="User", nik="USR01", supervisor=self.spv_emp, join_date="2024-01-01", ktp_number="456", access_role=self.role_without_perm)
@@ -54,7 +54,7 @@ class PermissionsTestCase(TenantTestCase):
         self.assertFalse(perm.has_permission(request, view))
 
     def test_has_rbac_permission_public_schema(self):
-        perm = HasRBACPermission()
+        perm = HasTenantRBACPermission()
         view = Mock(allow_self_service=False, detail=False)
         request = self.factory.get('/')
         request.user = self.regular_user
@@ -67,7 +67,7 @@ class PermissionsTestCase(TenantTestCase):
         self.assertFalse(perm.has_permission(request, view))
 
     def test_has_rbac_permission_no_employee(self):
-        perm = HasRBACPermission()
+        perm = HasTenantRBACPermission()
         view = Mock(allow_self_service=False, detail=False)
         request = self.factory.get('/')
         # Stranger with no employee record
@@ -78,7 +78,7 @@ class PermissionsTestCase(TenantTestCase):
         self.assertFalse(perm.has_permission(request, view))
 
     def test_has_rbac_permission_admin_bypass(self):
-        perm = HasRBACPermission()
+        perm = HasTenantRBACPermission()
         view = Mock(allow_self_service=False, detail=False)
         request = self.factory.get('/')
         request.user = self.admin_user
@@ -87,12 +87,12 @@ class PermissionsTestCase(TenantTestCase):
         self.assertTrue(perm.has_permission(request, view))
 
     def test_has_rbac_permission_with_rbac(self):
-        perm = HasRBACPermission()
+        perm = HasTenantRBACPermission()
         view = Mock(allow_self_service=False, detail=False)
-        view.required_rbac_permission = 'manage_attendance'
+        view.required_rbac_permission = 'tenant_manage_attendance'
         
         request = self.factory.post('/')
-        request.user = self.regular_user # Has no manage_attendance perm
+        request.user = self.regular_user # Has no tenant_manage_attendance perm
         request.tenant = self.tenant
         
         self.assertFalse(perm.has_permission(request, view))
@@ -109,11 +109,11 @@ class PermissionsTestCase(TenantTestCase):
         self.assertTrue(perm.has_permission(request, view))
 
     def test_has_rbac_permission_self_service(self):
-        perm = HasRBACPermission()
-        view = Mock(allow_self_service=True, detail=False, required_rbac_permission='manage_attendance', action='create')
+        perm = HasTenantRBACPermission()
+        view = Mock(allow_self_service=True, detail=False, required_rbac_permission='tenant_manage_attendance', action='create')
         
         request = self.factory.post('/')
-        request.user = self.regular_user # Has no manage_attendance
+        request.user = self.regular_user # Has no tenant_manage_attendance
         request.tenant = self.tenant
         
         self.assertTrue(perm.has_permission(request, view))
@@ -127,8 +127,8 @@ class PermissionsTestCase(TenantTestCase):
         self.assertTrue(perm.has_permission(request, view))
 
     def test_has_rbac_object_permission(self):
-        perm = HasRBACPermission()
-        view = Mock(allow_self_service=False, detail=False, required_rbac_permission='manage_attendance', action='retrieve')
+        perm = HasTenantRBACPermission()
+        view = Mock(allow_self_service=False, detail=False, required_rbac_permission='tenant_manage_attendance', action='retrieve')
         
         request = self.factory.get('/')
         request.user = self.regular_user

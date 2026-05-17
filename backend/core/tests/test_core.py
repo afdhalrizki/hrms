@@ -183,7 +183,7 @@ class RBACManagementTestCase(HRMSTestCase):
                 join_date=date(2025,1,1), ktp_number='RBAC123'
             )
         
-        self.role = AccessRole.objects.create(name="HR Specialist", permissions={"manage_hr": True}, is_default=True)
+        self.role = AccessRole.objects.create(name="HR Specialist", permissions={"tenant_manage_hr": True}, is_default=True)
 
     def test_default_role_protection(self):
         """Verify that system default roles cannot be easily deleted if implemented (at least check the flag)."""

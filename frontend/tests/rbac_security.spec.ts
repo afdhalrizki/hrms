@@ -32,7 +32,7 @@ test.describe('RBAC Security & Permissions', () => {
     await login(page, manager.email, manager.password);
 
     console.log('--- Testing Manager Access for Performance ---');
-    // Manager has manage_performance permission in seed
+    // Manager has tenant_manage_performance permission in seed
     await page.goto(getTenantUrl('/en/performance'));
     await page.waitForLoadState('networkidle');
 

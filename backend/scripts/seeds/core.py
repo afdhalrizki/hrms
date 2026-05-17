@@ -13,7 +13,7 @@ def create_public_data():
         from tenants.models import RegistrationRequest
         super_user, _ = User.objects.update_or_create(
             email='superadmin@harikerja.com',
-            defaults={'is_staff': True, 'is_superuser': True, 'is_active': True, 'is_global_admin': True}
+            defaults={'is_staff': True, 'is_superuser': True, 'is_active': True, 'is_global_admin': True, 'global_role': 'SUPERADMIN'}
         )
         super_user.set_password('password123')
         super_user.save()
@@ -100,11 +100,11 @@ def seed_base_data(tenant, admin_email=None):
             name='Administrator',
             defaults={
                 'permissions': {
-                    'manage_hr': True, 'manage_attendance': True, 'manage_payroll': True,
-                    'manage_reimbursement': True, 'manage_performance': True, 'manage_settings': True,
-                    'change_tenant_settings': True, 'view_audit_logs': True, 'manage_api_keys': True,
-                    'manage_access_roles': True, 'approve_leave': True, 'approve_reimbursement': True,
-                    'approve_attendance_correction': True, 'view_all_payslips': True, 'view_performance_report': True
+                    'tenant_manage_hr': True, 'tenant_manage_attendance': True, 'tenant_manage_payroll': True,
+                    'tenant_manage_reimbursement': True, 'tenant_manage_performance': True, 'tenant_manage_settings': True,
+                    'change_tenant_settings': True, 'tenant_view_audit_logs': True, 'manage_api_keys': True,
+                    'tenant_manage_access_roles': True, 'tenant_approve_leave': True, 'tenant_approve_reimbursement': True,
+                    'tenant_approve_attendance_correction': True, 'tenant_view_all_payslips': True, 'tenant_view_performance_report': True
                 }
             }
         )
@@ -112,8 +112,8 @@ def seed_base_data(tenant, admin_email=None):
             name='Manager',
             defaults={
                 'permissions': {
-                    'manage_hr': False, 'manage_attendance': True, 'manage_payroll': False,
-                    'manage_reimbursement': True, 'manage_performance': True, 'manage_settings': False,
+                    'tenant_manage_hr': False, 'tenant_manage_attendance': True, 'tenant_manage_payroll': False,
+                    'tenant_manage_reimbursement': True, 'tenant_manage_performance': True, 'tenant_manage_settings': False,
                     'view_payroll': True
                 }
             }
@@ -122,9 +122,9 @@ def seed_base_data(tenant, admin_email=None):
             name='Finance Staff',
             defaults={
                 'permissions': {
-                    'manage_hr': False, 'manage_attendance': False, 'manage_payroll': True,
-                    'manage_reimbursement': True, 'manage_performance': False, 'manage_settings': False,
-                    'view_all_payslips': True
+                    'tenant_manage_hr': False, 'tenant_manage_attendance': False, 'tenant_manage_payroll': True,
+                    'tenant_manage_reimbursement': True, 'tenant_manage_performance': False, 'tenant_manage_settings': False,
+                    'tenant_view_all_payslips': True
                 }
             }
         )
@@ -132,9 +132,9 @@ def seed_base_data(tenant, admin_email=None):
             name='HR Manager',
             defaults={
                 'permissions': {
-                    'manage_hr': True, 'manage_attendance': True, 'manage_payroll': True,
-                    'manage_reimbursement': True, 'manage_performance': True, 'manage_settings': True,
-                    'view_all_payslips': True
+                    'tenant_manage_hr': True, 'tenant_manage_attendance': True, 'tenant_manage_payroll': True,
+                    'tenant_manage_reimbursement': True, 'tenant_manage_performance': True, 'tenant_manage_settings': True,
+                    'tenant_view_all_payslips': True
                 }
             }
         )

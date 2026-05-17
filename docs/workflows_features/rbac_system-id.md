@@ -14,7 +14,7 @@ Sistem RBAC dibangun di atas tiga pilar utama:
 
 ## Pengguna Dasar Global (Django AbstractUser)
 
-Sebagai dasar global, sistem memanfaatkan flag boolean bawaan yang disediakan oleh `AbstractUser` Django, bersama dengan bidang kustom `is_global_admin` kami, untuk menetapkan tingkat akses fundamental sebelum menerapkan kemampuan RBAC kustom.
+Sebagai dasar global, sistem memanfaatkan flag boolean bawaan yang disediakan oleh `AbstractUser` Django, bersama dengan bidang kustom `global_role` kami, untuk menetapkan tingkat akses fundamental sebelum menerapkan kemampuan RBAC kustom.
 
 ### Flag Bawaan Django
 *   **`is_superuser`**: Menandakan akses mutlak ke seluruh sistem. Jika `True`, sistem mengabaikan semua pemeriksaan izin lainnya dan memberikan akses penuh.
@@ -22,7 +22,7 @@ Sebagai dasar global, sistem memanfaatkan flag boolean bawaan yang disediakan ol
 *   **`is_active`**: Menentukan apakah akun pengguna aktif. Ini berfungsi sebagai mekanisme penghapusan lunak (soft-deletion) dan pemblokiran akun kami.
 
 ### Flag Multi-Tenant Kustom
-*   **`is_global_admin`**: Bidang kustom yang dirancang khusus untuk arsitektur SaaS multi-tenant kami. Ini memungkinkan administrator sistem (misalnya, pemilik platform) untuk melewati batasan isolasi tenant standar untuk mengelola konfigurasi lintas perusahaan dan memberikan dukungan, memisahkan "Administrasi SaaS" dari "Administrasi Perusahaan" secara bersih.
+*   **`global_role`**: Bidang kustom yang dirancang khusus untuk arsitektur SaaS multi-tenant kami (Global RBAC). Ini memungkinkan administrator sistem (misalnya, pemilik platform, agen *support*) untuk melewati batasan isolasi tenant standar berdasarkan peran spesifik mereka untuk mengelola konfigurasi lintas perusahaan dan memberikan dukungan, memisahkan "Administrasi SaaS" dari "Administrasi Perusahaan" secara bersih. Ini menggantikan flag boolean `is_global_admin` yang sudah *deprecated*.
 
 ---
 
@@ -33,27 +33,27 @@ Kunci-kunci berikut adalah "sumber kebenaran" (source of truth) bagi sistem. Pen
 ### 1. Manajemen & Pengaturan
 | Kunci Izin | Deskripsi |
 | :--- | :--- |
-| `manage_settings` | Mengubah konfigurasi seluruh tenant, branding, dan integrasi API. |
-| `manage_hr` | Kontrol penuh atas Karyawan, Departemen, Peran, dan Cabang. |
-| `manage_access_roles` | Menentukan dan menetapkan peran RBAC ke karyawan lain. |
-| `view_audit_logs` | Mengakses jejak audit seluruh sistem untuk ketertelusuran. |
-| `view_all_payslips` | Melihat slip gaji untuk semua karyawan (Manajer Keuangan/SDM). |
-| `view_performance_report` | Mengakses laporan kinerja global atau tingkat departemen. |
+| `tenant_manage_settings` | Mengubah konfigurasi seluruh tenant, branding, dan integrasi API. |
+| `tenant_manage_hr` | Kontrol penuh atas Karyawan, Departemen, Peran, dan Cabang. |
+| `tenant_manage_access_roles` | Menentukan dan menetapkan peran RBAC ke karyawan lain. |
+| `tenant_view_audit_logs` | Mengakses jejak audit seluruh sistem untuk ketertelusuran. |
+| `tenant_view_all_payslips` | Melihat slip gaji untuk semua karyawan (Manajer Keuangan/SDM). |
+| `tenant_view_performance_report` | Mengakses laporan kinerja global atau tingkat departemen. |
 
 ### 2. Modul Operasional
 | Kunci Izin | Deskripsi |
 | :--- | :--- |
-| `manage_attendance` | Mengelola shift, jadwal, dan melihat catatan kehadiran global. |
-| `manage_payroll` | Menghitung gaji, membuat slip gaji, dan mengelola grade (golongan) gaji. |
-| `manage_reimbursement` | Mengonfigurasi kategori reimbursement dan batas global. |
-| `manage_performance` | Membuat templat penilaian, KPI, dan Mengelola siklus peninjauan. |
+| `tenant_manage_attendance` | Mengelola shift, jadwal, dan melihat catatan kehadiran global. |
+| `tenant_manage_payroll` | Menghitung gaji, membuat slip gaji, dan mengelola grade (golongan) gaji. |
+| `tenant_manage_reimbursement` | Mengonfigurasi kategori reimbursement dan batas global. |
+| `tenant_manage_performance` | Membuat templat penilaian, KPI, dan Mengelola siklus peninjauan. |
 
 ### 3. Alur Kerja Persetujuan (Manajemen Menengah)
 | Kunci Izin | Deskripsi |
 | :--- | :--- |
-| `approve_leave` | Menyetujui atau menolak permintaan cuti dan izin. |
-| `approve_reimbursement` | Menyetujui atau menolak klaim biaya dan reimbursement. |
-| `approve_attendance_correction` | Menyetujui koreksi kehadiran atau clock-in manual. |
+| `tenant_approve_leave` | Menyetujui atau menolak permintaan cuti dan izin. |
+| `tenant_approve_reimbursement` | Menyetujui atau menolak klaim biaya dan reimbursement. |
+| `tenant_approve_attendance_correction` | Menyetujui koreksi kehadiran atau clock-in manual. |
 
 ---
 
@@ -68,7 +68,7 @@ Setiap tenant baru secara otomatis diinisialisasi dengan peran-peran ini melalui
 
 ### 2. Manajer HR (is_default: True)
 *   **Tujuan**: Manajemen operasional SDM.
-*   **Izin**: `manage_hr`, `manage_attendance`, `manage_payroll`, dan semua izin `approve_*`.
+*   **Izin**: `tenant_manage_hr`, `tenant_manage_attendance`, `tenant_manage_payroll`, dan semua izin `tenant_approve_*`.
 *   **Identitas Utama**: `MANAGER`
 
 ### 3. Staf (is_default: True)
@@ -81,9 +81,9 @@ Setiap tenant baru secara otomatis diinisialisasi dengan peran-peran ini melalui
 ## Detail Implementasi Keamanan
 
 ### Penegakan Backend
-View menggunakan kelas `HasRBACPermission`. Kelas ini memeriksa:
+View menggunakan kelas `HasTenantRBACPermission`. Kelas ini memeriksa:
 1.  Jika pengguna adalah **Admin Tenant** (`is_staff`): Akses penuh diberikan segera.
-2.  Jika `required_rbac_permission` diatur: JSON `AccessRole.permissions` yang terkait dengan pengguna diperiksa untuk kunci tersebut.
+2.  Jika `required_tenant_rbac_permission` diatur: JSON `AccessRole.permissions` yang terkait dengan pengguna diperiksa untuk kunci tersebut.
 3.  **Pemeriksaan Kepemilikan**: Bahkan tanpa izin manajemen, pengguna selalu dapat mengambil (`retrieve`) atau memperbarui (`update`) catatan *mereka sendiri* (misalnya, profil mereka sendiri atau permintaan cuti).
 
 ### Penjaga Penghapusan

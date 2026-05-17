@@ -137,9 +137,15 @@ Authorization: Bearer <access_token>
 ---
 
 ## 🏢 Administrasi Sistem
-### Pendaftaran Publik
+### Pendaftaran Publik & Manajemen Global
 - `POST /api/public/signup/` - Pendaftaran publik untuk tenant perusahaan baru.
 - `GET /api/internal/registrations/` - Mencantumkan pendaftaran tertunda (Admin Global).
+- `POST /api/internal/registrations/{id}/approve/` - Menyetujui pendaftaran (Admin Global).
+- `POST /api/internal/registrations/{id}/reject/` - Menolak pendaftaran (Admin Global).
+- `GET /api/internal/global-admins/` - Mencantumkan admin global (Hanya Superadmin).
+- `POST /api/internal/global-admins/` - Membuat admin global baru (Hanya Superadmin).
+- `PATCH /api/internal/global-admins/{id}/` - Memperbarui admin global (Hanya Superadmin).
+- `DELETE /api/internal/global-admins/{id}/` - Menghapus admin global (Hanya Superadmin).
 
 ### Keamanan & Audit
 - `GET /api/api-keys/` - Mengelola kunci API untuk integrasi eksternal.

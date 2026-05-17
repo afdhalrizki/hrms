@@ -4,7 +4,7 @@ from django_tenants.utils import schema_context
 from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import AccessRole, Employee
-from core.constants import MANAGE_PAYROLL, APPROVE_OVERTIME, PERMISSIONS_POOL
+from core.constants import TENANT_MANAGE_PAYROLL, TENANT_APPROVE_OVERTIME, PERMISSIONS_POOL
 from datetime import date
 
 class RBACDeepTestCase(TenantTestCase):
@@ -25,13 +25,13 @@ class RBACDeepTestCase(TenantTestCase):
             # 1. Create a specialized role: Only Payroll, No Overtime
             self.payroll_role = AccessRole.objects.create(
                 name="Payroll Officer",
-                permissions={MANAGE_PAYROLL: True} 
+                permissions={TENANT_MANAGE_PAYROLL: True} 
             )
             
             # 2. Create another specialized role: Only Overtime, No Payroll
             self.overtime_role = AccessRole.objects.create(
                 name="Supervisor",
-                permissions={APPROVE_OVERTIME: True}
+                permissions={TENANT_APPROVE_OVERTIME: True}
             )
             
             # 3. Create users
@@ -67,7 +67,7 @@ class RBACDeepTestCase(TenantTestCase):
         # B. Payroll User attempts to approve overtime (Forbidden)
         # Assuming there is an overtime approval endpoint
         url_ot = reverse('overtime-list') # Using list as proxy for now
-        # But wait, we need to check if OvertimeViewSet requires APPROVE_OVERTIME
+        # But wait, we need to check if OvertimeViewSet requires TENANT_APPROVE_OVERTIME
         pass
 
     def test_rbac_view_only_logic(self):

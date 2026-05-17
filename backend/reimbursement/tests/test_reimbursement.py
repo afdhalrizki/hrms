@@ -157,7 +157,7 @@ class ReimbursementTestCase(TenantTestCase):
             # Try to approve self claim
             url = reverse('reimbursement-approve-supervisor', args=[reimb.id])
             response = self.client.post(url, HTTP_HOST=host, secure=True)
-            # HasRBACPermission should block this (requires manage_reimbursement)
+            # HasTenantRBACPermission should block this (requires tenant_manage_reimbursement)
             self.assertEqual(response.status_code, 403)
 
     def test_supervisor_subordinate_visibility(self):

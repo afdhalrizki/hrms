@@ -6,7 +6,7 @@ from django.db.models import Count, Sum
 from datetime import date, timedelta
 from django.utils import timezone
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission
+from core.permissions import HasTenantRBACPermission
 from .models import (
     Department, Role, Grade, Employee, AccessRole,
     Branch, WorkflowConfig, WorkflowStage, WorkflowAction,
@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 class APIKeyViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = APIKey.objects.all()
     serializer_class = APIKeySerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_settings'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_settings'
 
     def get_queryset(self):
         user = self.request.user
@@ -39,7 +39,7 @@ class APIKeyViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet
             from .models import Employee
             employee = Employee.objects.filter(email=user.email).first()
             
-        if employee and employee.access_role and employee.access_role.permissions.get('manage_settings'):
+        if employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_settings'):
             return APIKey.objects.all()
         return APIKey.objects.none()
 
@@ -47,8 +47,8 @@ class APIKeyViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet
 class AuditLogViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'view_audit_logs'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_view_audit_logs'
 
     def get_queryset(self):
         user = self.request.user
@@ -60,7 +60,7 @@ class AuditLogViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
             from .models import Employee
             employee = Employee.objects.filter(email=user.email).first()
             
-        if employee and employee.access_role and employee.access_role.permissions.get('view_audit_logs'):
+        if employee and employee.access_role and employee.access_role.permissions.get('tenant_view_audit_logs'):
             return AuditLog.objects.all()
             
         # Raise 403 instead of returning empty list to be strict with audit logs
@@ -71,64 +71,64 @@ class AuditLogViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
 class BranchViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_hr'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_hr'
 
 
 class WorkflowConfigViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = WorkflowConfig.objects.all()
     serializer_class = WorkflowConfigSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_settings'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_settings'
 
 
 class WorkflowStageViewSet(AuditModelMixin, viewsets.ModelViewSet):
     queryset = WorkflowStage.objects.all()
     serializer_class = WorkflowStageSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_settings'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_settings'
 
 
 class WorkflowActionViewSet(AuditModelMixin, viewsets.ReadOnlyModelViewSet):
     queryset = WorkflowAction.objects.all()
     serializer_class = WorkflowActionSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_attendance' # Actors need this to see history
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_attendance' # Actors need this to see history
 
 
 class DepartmentViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_hr'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_hr'
 
 
 class RoleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_hr'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_hr'
 
 
 class GradeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_hr'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_hr'
 
 
 class AccessRoleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = AccessRole.objects.all()
     serializer_class = AccessRoleSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_access_roles'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_access_roles'
 
 
 class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Employee.objects.none()
     serializer_class = EmployeeSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_hr'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_hr'
     allow_self_service = True
 
     def get_queryset(self):
@@ -138,7 +138,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         employee = Employee.objects.filter(email=user.email).first()
 
         # Managers/HR see everyone
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_hr')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_hr')):
             queryset = Employee.objects.all().select_related(
                 'department', 'role', 'role__department', 'grade', 'branch', 'access_role', 'supervisor'
             )
@@ -164,7 +164,7 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         user = self.request.user
         if not user.is_staff:
             employee = Employee.objects.filter(email=user.email).select_related('access_role').first()
-            if employee and not (employee.access_role and employee.access_role.permissions.get('manage_hr')):
+            if employee and not (employee.access_role and employee.access_role.permissions.get('tenant_manage_hr')):
                 from .serializers import EmployeeProfileSerializer
                 return EmployeeProfileSerializer
                 
@@ -255,8 +255,8 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DashboardStatsAPIView(TenantIsolationMixin, views.APIView):
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission]
-    required_rbac_permission = 'manage_hr'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]
+    required_rbac_permission = 'tenant_manage_hr'
 
     def get(self, request):
         from django.db import connection

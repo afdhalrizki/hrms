@@ -32,7 +32,7 @@ export default function BrandingPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { user, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
-  const isAdmin = hasPermission('manage_settings');
+  const isAdmin = hasPermission('tenant_manage_settings');
   const [isLoading, setIsLoading] = React.useState(false);
 
   // Sync state with tenant context when it loads

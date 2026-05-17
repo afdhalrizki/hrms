@@ -65,7 +65,7 @@ Terbatas secara eksklusif untuk Administrator Global dan Superuser.
 
 | Rute Next.js Frontend | Endpoint Backend Terkait | Izin yang Diperlukan |
 | :--- | :--- | :--- |
-| `/[locale]/admin/registrations` | `/api/internal/registrations/` | `request.user.is_superuser` atau `is_global_admin` |
+| `/[locale]/admin/registrations` | `/api/internal/registrations/` | `request.user.is_superuser` atau `global_role` |
 | `/[locale]/portal-admin` | N/A (Antarmuka Admin) | Admin sistem global saja |
 
 ---

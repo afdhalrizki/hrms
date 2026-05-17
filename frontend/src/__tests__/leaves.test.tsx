@@ -42,7 +42,7 @@ vi.mock('@/context/AuthContext', () => ({
       id: 1, 
       fullname: 'Employee One', 
       is_staff: false,
-      permissions: { manage_hr: false } 
+      permissions: { tenant_manage_hr: false } 
     }, 
     loading: false 
   }),

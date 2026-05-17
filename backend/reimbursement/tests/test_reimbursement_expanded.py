@@ -105,5 +105,5 @@ class ReimbursementExpandedTestCase(HRMSTestCase):
         self.client.force_authenticate(user=ghost_user)
         url = reverse('reimbursement-list')
         res = self.client.get(url, HTTP_HOST=self.host, secure=True)
-        # It hits HasRBACPermission which blocks if no employee profile found
+        # It hits HasTenantRBACPermission which blocks if no employee profile found
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)

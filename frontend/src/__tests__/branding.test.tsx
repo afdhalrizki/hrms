@@ -35,7 +35,7 @@ vi.mock('@/components/layout/DashboardLayout', () => ({
 
 vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({ 
-    user: { id: 1, fullname: 'Admin', is_staff: true, permissions: { manage_hr: true } }, 
+    user: { id: 1, fullname: 'Admin', is_staff: true, permissions: { tenant_manage_hr: true } }, 
     loading: false 
   }),
   AuthProvider: ({ children }: any) => children,

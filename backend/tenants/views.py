@@ -179,13 +179,13 @@ class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
     PUT/PATCH requires Admin authentication.
     """
     serializer_class = TenantSettingsSerializer
-    required_rbac_permission = 'manage_settings'
+    required_rbac_permission = 'tenant_manage_settings'
 
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS:
             return [permissions.AllowAny()]
-        from core.permissions import HasRBACPermission
-        return [permissions.IsAuthenticated(), HasRBACPermission()]
+        from core.permissions import HasTenantRBACPermission
+        return [permissions.IsAuthenticated(), HasTenantRBACPermission()]
 
     def get_object(self):
         # request.tenant is injected by TenantMainMiddleware

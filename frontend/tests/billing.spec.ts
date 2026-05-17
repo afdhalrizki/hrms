@@ -14,7 +14,7 @@ test.describe('Billing and Subscription Management', () => {
     await page.goto(getTenantUrl('/en/settings/billing'));
 
     // Wait for the page to load
-    await expect(page.getByText(/Subscription & Billing/i)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByTestId('active-plan-badge')).toBeVisible({ timeout: 30000 });
 
     // 1. Verify "FREE" plan card is present
     // Note: The seeded tenant 'company1' might be on PROFESSIONAL or FREE.
@@ -34,7 +34,7 @@ test.describe('Billing and Subscription Management', () => {
 
   test('should show warning when selecting a plan with insufficient capacity', async ({ page }) => {
     await page.goto(getTenantUrl('/en/settings/billing'));
-    await expect(page.getByText(/Subscription & Billing/i)).toBeVisible();
+    await expect(page.getByTestId('active-plan-badge')).toBeVisible({ timeout: 30000 });
 
     // Select Essential HR plan by clicking the card via robust testid
     await page.getByTestId('plan-card-ESSENTIAL').click();
@@ -46,7 +46,7 @@ test.describe('Billing and Subscription Management', () => {
 
   test('should toggle addon mode and display correct price for 5 employees block', async ({ page }) => {
     await page.goto(getTenantUrl('/en/settings/billing'));
-    await expect(page.getByText(/Subscription & Billing/i)).toBeVisible();
+    await expect(page.getByTestId('active-plan-badge')).toBeVisible({ timeout: 30000 });
 
     // Click the "Buy More Quota" button
     const toggleButton = page.getByRole('button', { name: /Buy More Quota/i });
@@ -54,7 +54,7 @@ test.describe('Billing and Subscription Management', () => {
     await toggleButton.click();
 
     // Assert in addon mode title
-    await expect(page.getByText(/Elastic Quota: Add Employees/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Need Additional Elastic Quota?/i)).toBeVisible({ timeout: 15000 });
 
     // Select the "+5" employees block button
     const plusFiveBtn = page.getByRole('button', { name: '+5', exact: true });

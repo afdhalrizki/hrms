@@ -95,11 +95,11 @@ class WorkflowService:
                 sequence__gt=current_stage.sequence
             ).first()
 
-            # Admin Bypass: If the actor is a tenant admin (has manage_settings), 
+            # Admin Bypass: If the actor is a tenant admin (has tenant_manage_settings), 
             # they can finalize the approval in one step, bypassing subsequent stages.
             is_admin = False
             if actor_employee and actor_employee.access_role:
-                is_admin = actor_employee.access_role.permissions.get('manage_settings', False)
+                is_admin = actor_employee.access_role.permissions.get('tenant_manage_settings', False)
 
             if next_stage and not is_admin:
                 instance.current_stage = next_stage
@@ -142,16 +142,16 @@ class RoleService:
         # 2. HR Manager Role (Operational & Approval Access)
         hr_perms = {k: False for k in constants.PERMISSIONS_POOL.keys()}
         hr_keys = [
-            constants.MANAGE_HR, 
-            constants.MANAGE_PAYROLL, 
-            constants.MANAGE_ATTENDANCE,
-            constants.MANAGE_REIMBURSEMENT,
-            constants.APPROVE_LEAVE,
-            constants.APPROVE_REIMBURSEMENT,
-            constants.APPROVE_ATTENDANCE_CORRECTION,
-            constants.APPROVE_OVERTIME,
-            constants.VIEW_ALL_PAYSLIPS,
-            constants.VIEW_PERFORMANCE_REPORT
+            constants.TENANT_MANAGE_HR, 
+            constants.TENANT_MANAGE_PAYROLL, 
+            constants.TENANT_MANAGE_ATTENDANCE,
+            constants.TENANT_MANAGE_REIMBURSEMENT,
+            constants.TENANT_APPROVE_LEAVE,
+            constants.TENANT_APPROVE_REIMBURSEMENT,
+            constants.TENANT_APPROVE_ATTENDANCE_CORRECTION,
+            constants.TENANT_APPROVE_OVERTIME,
+            constants.TENANT_VIEW_ALL_PAYSLIPS,
+            constants.TENANT_VIEW_PERFORMANCE_REPORT
         ]
         for k in hr_keys: 
             hr_perms[k] = True

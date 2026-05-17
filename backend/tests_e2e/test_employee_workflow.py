@@ -254,7 +254,7 @@ def test_employee_profile_update_restrictions(base_url, tenant1_domain, client):
     # Verify phone is updated but NIK/Email remain same
     # Note: If the backend ignores the fields, it still returns 200. 
     # If the backend blocks the fields, it returns 403.
-    # Our RBAC `HasRBACPermission` + `allow_self_service` often allows the action but the serializer filters the fields.
+    # Our RBAC `HasTenantRBACPermission` + `allow_self_service` often allows the action but the serializer filters the fields.
     data = res_patch.json()
     assert data["phone"] == "555-GET-HARDENED"
     assert data["nik"] != "HACKED_NIK"

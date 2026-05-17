@@ -40,7 +40,7 @@ Permintaan bisnis (Cuti, Reimbursement, Koreksi) mengikuti alur kerja otomatis b
     - `SUPERVISOR`: Penyetuju adalah atasan langsung dari karyawan yang meminta.
     - `EMPLOYEE`: Penyetuju adalah ID karyawan spesifik yang ditunjuk untuk tahap tersebut.
 3. **Pemrosesan Multi-Tahap**: Permintaan bergerak melalui urutan (1 → 2 → N) setelah tindakan `APPROVED`.
-4. **Bypass Admin**: Jika Admin Tenant (dengan `manage_settings`) menyetujui permintaan, tahap selanjutnya dilewati, dan permintaan segera difinalisasi.
+4. **Bypass Admin**: Jika Admin Tenant (dengan `tenant_manage_settings`) menyetujui permintaan, tahap selanjutnya dilewati, dan permintaan segera difinalisasi.
 5. **Finalisasi**: Saat tahap terakhir disetujui, status berpindah ke `APPROVED`, dan otomatisasi sekunder dipicu (misalnya, memotong saldo cuti atau memperbarui log kehadiran).
 
 ---

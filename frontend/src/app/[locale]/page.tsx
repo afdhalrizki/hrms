@@ -71,7 +71,7 @@ export default function Home() {
       }
     };
 
-    const canViewStats = user?.is_staff || user?.permissions?.manage_hr;
+    const canViewStats = user?.is_staff || user?.permissions?.tenant_manage_hr;
     if (user && canViewStats) {
       fetchStats();
     } else if (user) {

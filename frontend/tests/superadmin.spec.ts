@@ -121,4 +121,32 @@ test.describe.serial('Superadmin (Platform) Management', () => {
         await expect(page.getByText(/Registration rejected successfully/i)).toBeVisible({ timeout: 20000 });
     }
   });
+  test('should hide HR operational modules from superadmin on public tenant', async ({ page }) => {
+    // Navigate to any page to ensure sidebar is loaded
+    await page.goto(`${BASE_URL}/en/admin/registrations`);
+    const tenantVal = await page.evaluate(() => sessionStorage.getItem('test_tenant_e2e'));
+    console.log(`[DEBUG_TEST] test_tenant_e2e is: ${tenantVal}`);
+    await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
+
+    // The sidebar should NOT contain links to these HR modules
+    // because the public tenant has no enabled modules.
+    const hiddenMenus = [
+      'Employees',
+      'Performance',
+      'Attendance',
+      'Leaves',
+      'Reimbursements',
+      'Payroll'
+    ];
+
+    for (const menu of hiddenMenus) {
+      await expect(page.locator('aside').getByText(menu, { exact: true })).not.toBeVisible();
+    }
+
+    // It SHOULD contain global/platform menus
+    const visibleMenus = ['Overview', 'Settings'];
+    for (const menu of visibleMenus) {
+      await expect(page.locator('aside').getByText(new RegExp(menu, 'i')).first()).toBeVisible();
+    }
+  });
 });

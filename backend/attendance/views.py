@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.cache import cache
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission, FeatureRequiredPermission
+from core.permissions import HasTenantRBACPermission, FeatureRequiredPermission
 # Using absolute import from core
 from core.models import Employee
 from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest
@@ -26,8 +26,8 @@ from core.mixins import TenantIsolationMixin
 class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
     allow_self_service_list = True
@@ -37,7 +37,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
         employee = Employee.objects.filter(email=user.email).first()
         
         # Managers and Staff see everything
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance')):
             queryset = Attendance.objects.all()
             skipped = self.request.query_params.get('biometric_skipped')
             if skipped:
@@ -55,7 +55,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
         employee = Employee.objects.filter(email=user.email).first()
         
         # If user is not a manager, they can only create attendance for themselves
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
         
         if not is_manager and employee:
             instance = serializer.save(employee=employee, created_by=user, updated_by=user)
@@ -87,7 +87,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
         # Allow managers to specify target employee
         target_employee = employee
         if request.data.get('employee'):
-            is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+            is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
             if is_manager:
                 target_employee_id = request.data.get('employee')
                 if isinstance(target_employee_id, dict):
@@ -163,7 +163,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
 
         # Permission check
         if target_employee_id:
-            is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+            is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
             if not is_manager:
                 return Response({'error': 'Permission denied.'}, status=403)
             target_employee = Employee.objects.get(id=target_employee_id)
@@ -229,7 +229,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
         # Security: Only allow managers/staff to export full reports
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
         
         if not is_manager:
             return Response({'detail': 'Permission denied.'}, status=403)
@@ -268,7 +268,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
         # Security: Only allow managers/staff to export full reports
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
         
         if not is_manager:
             return Response({'detail': 'Permission denied. Only managers can export reports.'}, status=403)
@@ -308,7 +308,7 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
     def perform_update(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
 
         if not is_manager:
             instance = serializer.instance
@@ -335,8 +335,8 @@ from core.services import WorkflowService
 class LeaveRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = LeaveRequest.objects.all()
     serializer_class = LeaveRequestSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
     allow_self_service_list = True
@@ -346,7 +346,7 @@ class LeaveRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelV
         employee = Employee.objects.filter(email=user.email).first()
         
         # Admin/HR can see everything
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance')):
             return LeaveRequest.objects.all()
             
         # Supervisors can see their own + subordinates
@@ -371,7 +371,7 @@ class LeaveRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelV
     def perform_create(self, serializer):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
         
         target_employee = employee
         if is_manager and self.request.data.get('employee'):
@@ -429,8 +429,8 @@ class LeaveRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelV
 class OvertimeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Overtime.objects.all()
     serializer_class = OvertimeSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
     allow_self_service_list = True
@@ -439,7 +439,7 @@ class OvertimeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance')):
             return Overtime.objects.all()
             
         if employee:
@@ -481,16 +481,16 @@ class OvertimeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
 class ShiftViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
 
 
 class ScheduleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
     allow_self_service_list = True
@@ -500,7 +500,7 @@ class ScheduleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         employee = Employee.objects.filter(email=user.email).first()
         
         # Managers see all schedules
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance')):
             queryset = Schedule.objects.all()
         elif employee:
             # Employees only see their own schedules
@@ -510,7 +510,7 @@ class ScheduleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
 
         employee_id = self.request.query_params.get('employee_id')
         date_param = self.request.query_params.get('date')
-        if employee_id and (user.is_staff or employee.access_role.permissions.get('manage_attendance')):
+        if employee_id and (user.is_staff or employee.access_role.permissions.get('tenant_manage_attendance')):
             queryset = queryset.filter(employee_id=employee_id)
         if date_param:
             queryset = queryset.filter(date=date_param)
@@ -518,8 +518,8 @@ class ScheduleViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
 class LeaveBalanceViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
     queryset = LeaveBalance.objects.all()
     serializer_class = LeaveBalanceSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
     allow_self_service_list = True
@@ -528,7 +528,7 @@ class LeaveBalanceViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance')):
             return LeaveBalance.objects.all()
             
         if employee:
@@ -539,8 +539,8 @@ class LeaveBalanceViewSet(TenantIsolationMixin, viewsets.ReadOnlyModelViewSet):
 class AttendanceCorrectionRequestViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = AttendanceCorrectionRequest.objects.all()
     serializer_class = AttendanceCorrectionRequestSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_attendance'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
     required_feature = 'attendance'
     allow_self_service = True
     allow_self_service_list = True
@@ -549,7 +549,7 @@ class AttendanceCorrectionRequestViewSet(TenantIsolationMixin, AuditModelMixin, 
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
         
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_attendance')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance')):
             return AttendanceCorrectionRequest.objects.all()
             
         if employee:

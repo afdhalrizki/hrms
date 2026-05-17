@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import viewsets, permissions
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission, FeatureRequiredPermission
+from core.permissions import HasTenantRBACPermission, FeatureRequiredPermission
 from .models import SalaryComponent, PayrollPeriod, Payslip, PayslipDetail, EmployeeSalaryComponent
 from .serializers import (
     SalaryComponentSerializer,
@@ -17,15 +17,15 @@ from core.mixins import TenantIsolationMixin
 class SalaryComponentViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = SalaryComponent.objects.all()
     serializer_class = SalaryComponentSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_payroll'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_payroll'
     required_feature = 'payroll'
 
 class EmployeeSalaryComponentViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = EmployeeSalaryComponent.objects.all()
     serializer_class = EmployeeSalaryComponentSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_payroll'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_payroll'
     required_feature = 'payroll'
 
     def get_queryset(self):
@@ -38,8 +38,8 @@ class EmployeeSalaryComponentViewSet(TenantIsolationMixin, AuditModelMixin, view
 class PayrollPeriodViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayrollPeriod.objects.all()
     serializer_class = PayrollPeriodSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_payroll'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_payroll'
     required_feature = 'payroll'
 
 from rest_framework.decorators import action
@@ -50,8 +50,8 @@ from core.models import Employee
 class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Payslip.objects.all()
     serializer_class = PayslipSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_payroll'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_payroll'
     required_feature = 'payroll'
     allow_self_service = True
     allow_self_service_list = True
@@ -105,7 +105,7 @@ class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSe
         is_payroll_admin = False
         if employee and employee.access_role:
             perms = employee.access_role.permissions
-            is_payroll_admin = perms.get('manage_payroll', False) or perms.get('view_all_payslips', False)
+            is_payroll_admin = perms.get('tenant_manage_payroll', False) or perms.get('tenant_view_all_payslips', False)
 
         if user.is_staff or is_payroll_admin:
             queryset = Payslip.objects.all()
@@ -196,7 +196,7 @@ class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSe
         # Security: Only allow managers/staff to export full reports
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_payroll'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_payroll'))
         
         if not is_manager:
             return Response({'detail': 'Permission denied.'}, status=403)
@@ -233,8 +233,8 @@ class PayslipViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSe
 class PayslipDetailViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = PayslipDetail.objects.all()
     serializer_class = PayslipDetailSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_payroll'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_payroll'
     required_feature = 'payroll'
     allow_self_service = True
     allow_self_service_list = True
@@ -245,7 +245,7 @@ class PayslipDetailViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.Model
         
         is_payroll_admin = False
         if employee and employee.access_role:
-            is_payroll_admin = employee.access_role.permissions.get('manage_payroll', False)
+            is_payroll_admin = employee.access_role.permissions.get('tenant_manage_payroll', False)
 
         if user.is_staff or is_payroll_admin:
             queryset = PayslipDetail.objects.all()

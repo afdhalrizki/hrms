@@ -19,7 +19,7 @@ class AttendanceCorrectionTestCase(TenantTestCase):
             
             # 2. Setup Roles
             self.role_emp = AccessRole.objects.create(name="Employee", permissions={"attendance": True})
-            self.role_mgr = AccessRole.objects.create(name="Manager", permissions={"manage_attendance": True})
+            self.role_mgr = AccessRole.objects.create(name="Manager", permissions={"tenant_manage_attendance": True})
             
             # 3. Setup Users & Employees
             self.user_john = User.objects.create_user(email='john@example.com', password='password')

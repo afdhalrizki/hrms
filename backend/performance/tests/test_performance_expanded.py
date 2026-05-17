@@ -92,8 +92,8 @@ class PerformanceExpandedTestCase(TenantTestCase):
             serializer.is_valid(raise_exception=True)
 
     def test_appraisal_review_manager_permission_via_rbac(self):
-        """Test that MANAGER review is allowed if reviewer has 'manage_performance' permission even if not supervisor."""
-        role = AccessRole.objects.create(name="Lead", permissions={'manage_performance': True})
+        """Test that MANAGER review is allowed if reviewer has 'tenant_manage_performance' permission even if not supervisor."""
+        role = AccessRole.objects.create(name="Lead", permissions={'tenant_manage_performance': True})
         self.staff_emp.access_role = role
         self.staff_emp.save()
         

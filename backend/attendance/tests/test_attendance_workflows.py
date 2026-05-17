@@ -22,7 +22,7 @@ class AttendanceWorkflowsTestCase(TenantTestCase):
         # Management Role
         cls.mgt_role = AccessRole.objects.create(
             name="Attendance Manager",
-            permissions={'manage_attendance': True}
+            permissions={'tenant_manage_attendance': True}
         )
         
         cls.admin_user = User.objects.create_user(email='admin@com.com', password='pwd', is_staff=True)

@@ -17,6 +17,7 @@
   "Navigation": {
     "overview": "Overview",
     "profile": "My Profile",
+    "global_admins": "Global Admins",
     "employees": "Employees",
     "branches": "Branches",
     "attendance": "Attendance",

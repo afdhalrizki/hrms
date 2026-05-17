@@ -20,7 +20,8 @@ import {
   TrendingUp,
   FileText,
   Palette,
-  LogOut
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -32,35 +33,43 @@ import { usePermission } from '@/hooks/usePermission';
 
 const menuItems = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
+  { nameKey: 'global_admins', icon: ShieldCheck, href: '/admin/global-admins', isGlobalAdminMenu: true },
   { nameKey: 'profile',    icon: Users,            href: '/profile' },
-  { nameKey: 'employees', icon: Users,            href: '/employees', requiredPermission: 'manage_hr' },
+  { nameKey: 'employees', icon: Users,            href: '/employees', requiredPermission: 'tenant_manage_hr', module: 'core' },
   { nameKey: 'performance', icon: TrendingUp,     href: '/performance', module: 'performance' },
-  { nameKey: 'branches',  icon: MapPin,           href: '/branches',  requiredPermission: 'manage_hr' },
-  { nameKey: 'attendance',icon: Calendar,         href: '/attendance' },
-  { nameKey: 'leaves',    icon: Briefcase,        href: '/leaves' },
-  { nameKey: 'reimbursements', icon: Receipt,      href: '/reimbursements' },
-  { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   requiredPermission: 'manage_payroll' },
-  { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', requiredPermission: 'manage_settings' },
-  { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', requiredPermission: 'manage_hr' },
-  { nameKey: 'reports',   icon: FileText,        href: '/reports',   requiredPermission: 'manage_hr' },
-  { nameKey: 'settings',  icon: Settings,         href: '/settings',  requiredPermission: 'manage_settings' },
-  { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', requiredPermission: 'view_audit_logs', module: 'audit' },
-  { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', requiredPermission: 'manage_settings', module: 'core' },
-  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', requiredPermission: 'manage_settings', module: 'core' },
+  { nameKey: 'branches',  icon: MapPin,           href: '/branches',  requiredPermission: 'tenant_manage_hr', module: 'core' },
+  { nameKey: 'attendance',icon: Calendar,         href: '/attendance', module: 'attendance' },
+  { nameKey: 'leaves',    icon: Briefcase,        href: '/leaves', module: 'leaves' },
+  { nameKey: 'reimbursements', icon: Receipt,      href: '/reimbursements', module: 'reimbursement' },
+  { nameKey: 'payroll',   icon: CreditCard,       href: '/payroll',   requiredPermission: 'tenant_manage_payroll', module: 'payroll' },
+  { nameKey: 'workflows', icon: GitMerge,         href: '/workflows', requiredPermission: 'tenant_manage_settings', module: 'core' },
+  { nameKey: 'analytics', icon: BarChart2,        href: '/analytics', requiredPermission: 'tenant_manage_hr', module: 'analytics' },
+  { nameKey: 'reports',   icon: FileText,        href: '/reports',   requiredPermission: 'tenant_manage_hr', module: 'core' },
+  { nameKey: 'settings',  icon: Settings,         href: '/settings',  requiredPermission: 'tenant_manage_settings' },
+  { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', requiredPermission: 'tenant_view_audit_logs', module: 'audit' },
+  { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', requiredPermission: 'tenant_manage_settings', module: 'core' },
+  { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', requiredPermission: 'tenant_manage_settings', module: 'core' },
 ];
 
 export function Sidebar() {
   const t = useTranslations('Navigation');
   const tCommon = useTranslations('Common');
-  const { enabledModules, planType } = useTenant();
+  const { enabledModules, planType, isPublic } = useTenant();
 
+  const { user, loading, logout } = useAuth();
+  
   const filteredItems = menuItems.filter(item => {
+    if (item.isGlobalAdminMenu) {
+      return isPublic && user?.global_role === 'SUPERADMIN';
+    }
+    if (isPublic && item.module) return false;
     if (planType === 'ENTERPRISE') return true;
     if (!item.module) return true;
     return enabledModules?.includes(item.module);
   });
+  
+  console.log('[DEBUG_SIDEBAR] isPublic:', isPublic, 'user:', user?.email, 'global_role:', user?.global_role, 'modules:', filteredItems.map(i => i.nameKey));
   const { logo, tenantName } = useTenant();
-  const { user, loading, logout } = useAuth();
   const { hasPermission } = usePermission();
   const pathname = usePathname();
 

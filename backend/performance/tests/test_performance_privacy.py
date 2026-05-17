@@ -18,7 +18,7 @@ class PerformancePrivacyTestCase(TenantTestCase):
 
         with schema_context(self.tenant.schema_name):
             self.dept = Department.objects.create(name="HR")
-            self.mgr_role = AccessRole.objects.create(name="Manager", permissions={'manage_performance': True})
+            self.mgr_role = AccessRole.objects.create(name="Manager", permissions={'tenant_manage_performance': True})
             
             # Users and Employees
             self.user_admin = User.objects.create_user(email='admin@test.com', password='password', is_staff=True)

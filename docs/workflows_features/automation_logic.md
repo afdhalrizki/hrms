@@ -40,7 +40,7 @@ Business requests (Leaves, Reimbursements, Corrections) follow a rule-based auto
     - `SUPERVISOR`: Approver is the direct supervisor of the requesting employee.
     - `EMPLOYEE`: Approver is a specific employee ID designated for that stage.
 3. **Multi-Stage Processing**: Requests move through sequences (1 → 2 → N) upon `APPROVED` actions.
-4. **Admin Bypass**: If a Tenant Admin (with `manage_settings`) approves a request, subsequent stages are bypassed, and the request is immediately finalized.
+4. **Admin Bypass**: If a Tenant Admin (with `tenant_manage_settings`) approves a request, subsequent stages are bypassed, and the request is immediately finalized.
 5. **Finalization**: When the last stage is approved, the status moves to `APPROVED`, and secondary automation is triggered (e.g., deducting leave balance or updating attendance logs).
 
 ---

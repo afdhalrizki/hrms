@@ -4,8 +4,25 @@ import React from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { loginAs } from './setup';
 import { AuthProvider } from '@/context/AuthContext';
-import { TenantProvider } from '@/context/TenantContext';
+import { TenantProvider, useTenant } from '@/context/TenantContext';
 import { NextIntlClientProvider } from 'next-intl';
+
+// Mock TenantContext so we can override it in specific tests
+let mockTenantContextValues: any = null;
+vi.mock('@/context/TenantContext', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    useTenant: () => {
+      if (mockTenantContextValues) return mockTenantContextValues;
+      // Default to returning everything so basic tests pass
+      return {
+        enabledModules: ['core', 'attendance', 'leaves', 'reimbursement', 'payroll', 'performance', 'rbac', 'analytics', 'audit'],
+        planType: 'ENTERPRISE',
+      };
+    }
+  };
+});
 
 // Mock next-intl
 vi.mock('next-intl', async (importOriginal) => {
@@ -57,6 +74,7 @@ describe('Sidebar Component (Integrated)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockTenantContextValues = null;
   });
 
   it('renders real user data from backend', async () => {
@@ -68,5 +86,41 @@ describe('Sidebar Component (Integrated)', () => {
       const emailPattern = /admin@(worker_\d+|company1)\.com/i;
       expect(screen.getByText(emailPattern)).toBeInTheDocument();
     }, { timeout: 20000 });
+  });
+
+  it('hides module-specific menus if not in enabledModules', () => {
+    mockTenantContextValues = {
+      enabledModules: ['core', 'attendance'], // Missing payroll, performance, etc.
+      planType: 'FREE',
+    };
+    render(<Sidebar />, { wrapper: AllProviders });
+    
+    // Should render 'attendance' and 'employees' (core)
+    expect(screen.getByText('attendance')).toBeInTheDocument();
+    expect(screen.getByText('employees')).toBeInTheDocument();
+
+    // Should NOT render 'payroll', 'leaves', 'performance'
+    expect(screen.queryByText('payroll')).not.toBeInTheDocument();
+    expect(screen.queryByText('leaves')).not.toBeInTheDocument();
+    expect(screen.queryByText('performance')).not.toBeInTheDocument();
+  });
+
+  it('hides all operational menus for Public Tenant', () => {
+    mockTenantContextValues = {
+      enabledModules: [],
+      isPublic: true,
+      planType: undefined,
+    };
+    render(<Sidebar />, { wrapper: AllProviders });
+    
+    // Should render generic things
+    expect(screen.getByText('overview')).toBeInTheDocument();
+    expect(screen.getByText('profile')).toBeInTheDocument();
+    expect(screen.getByText('settings')).toBeInTheDocument();
+
+    // Should NOT render HR menus
+    expect(screen.queryByText('employees')).not.toBeInTheDocument();
+    expect(screen.queryByText('attendance')).not.toBeInTheDocument();
+    expect(screen.queryByText('branches')).not.toBeInTheDocument();
   });
 });

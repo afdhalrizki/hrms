@@ -5,7 +5,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from core.audit import AuditModelMixin
-from core.permissions import HasRBACPermission, FeatureRequiredPermission
+from core.permissions import HasTenantRBACPermission, FeatureRequiredPermission
 from core.models import Employee
 from core.services import WorkflowService
 from .models import Reimbursement, ReimbursementCategory
@@ -16,16 +16,16 @@ from core.mixins import TenantIsolationMixin
 class ReimbursementCategoryViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = ReimbursementCategory.objects.all()
     serializer_class = ReimbursementCategorySerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_settings'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_settings'
     required_feature = 'reimbursement'
     allow_self_service_list = True
 
 class ReimbursementViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
     queryset = Reimbursement.objects.all()
     serializer_class = ReimbursementSerializer
-    permission_classes = [permissions.IsAuthenticated, HasRBACPermission, FeatureRequiredPermission]
-    required_rbac_permission = 'manage_reimbursement'
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_reimbursement'
     required_feature = 'reimbursement'
     allow_self_service = True
     allow_self_service_list = True
@@ -35,7 +35,7 @@ class ReimbursementViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.Model
         employee = Employee.objects.filter(email=user.email).first()
         
         # Managers/Finance see all
-        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_reimbursement')):
+        if user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_reimbursement')):
             return Reimbursement.objects.all()
             
         # Supervisors see their subordinates
@@ -96,7 +96,7 @@ class ReimbursementViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.Model
             # Legacy handling if no workflow is active
             if action == 'APPROVED':
                 is_supervisor = reimbursement.employee.supervisor == employee
-                is_finance = request.user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_reimbursement'))
+                is_finance = request.user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_reimbursement'))
                 
                 if is_supervisor:
                     reimbursement.supervisor_status = 'APPROVED'
@@ -204,7 +204,7 @@ class ReimbursementViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.Model
         # Security: Only allow managers/staff to export full reports
         user = self.request.user
         employee = Employee.objects.filter(email=user.email).first()
-        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('manage_reimbursement'))
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_reimbursement'))
         
         if not is_manager:
             return Response({'detail': 'Permission denied. Only managers can export reports.'}, status=403)

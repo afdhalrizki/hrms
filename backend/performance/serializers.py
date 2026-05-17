@@ -43,11 +43,11 @@ class AppraisalReviewSerializer(serializers.ModelSerializer):
 
         if reviewer_type == 'MANAGER':
             # Check if reviewer is the supervisor of the appraisal employee
-            # OR if the reviewer has 'manage_performance' permission
+            # OR if the reviewer has 'tenant_manage_performance' permission
             is_supervisor = appraisal.employee.supervisor == reviewer
             
             has_perm = False
-            if reviewer.access_role and reviewer.access_role.permissions.get('manage_performance'):
+            if reviewer.access_role and reviewer.access_role.permissions.get('tenant_manage_performance'):
                 has_perm = True
             
             if not is_supervisor and not has_perm:

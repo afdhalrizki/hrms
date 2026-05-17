@@ -104,7 +104,7 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
         payload = {'phone': '089999999'}
         response = self.client.patch(url, payload, format='json', SERVER_NAME=self.domain)
         
-        # HasRBACPermission (is_owner) should return False for other records,
+        # HasTenantRBACPermission (is_owner) should return False for other records,
         # but because get_queryset is restrictive, it will return 404.
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
