@@ -128,15 +128,17 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     console.log(`[DEBUG_TEST] test_tenant_e2e is: ${tenantVal}`);
     await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
 
-    // The sidebar should NOT contain links to these HR modules
-    // because the public tenant has no enabled modules.
+    // The sidebar should NOT contain links to these HR/profile modules
+    // because the public tenant has no enabled modules and profile is disabled in public.
     const hiddenMenus = [
       'Employees',
       'Performance',
       'Attendance',
       'Leaves',
       'Reimbursements',
-      'Payroll'
+      'Payroll',
+      'My Profile',
+      'Profil Saya'
     ];
 
     for (const menu of hiddenMenus) {

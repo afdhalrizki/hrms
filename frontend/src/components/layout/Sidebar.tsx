@@ -62,6 +62,10 @@ export function Sidebar() {
     if (item.isGlobalAdminMenu) {
       return isPublic && user?.global_role === 'SUPERADMIN';
     }
+    // Hide profile page in Public Tenant (since there is no associated Employee profile)
+    if (isPublic && item.nameKey === 'profile') {
+      return false;
+    }
     if (isPublic && item.module) return false;
     if (planType === 'ENTERPRISE') return true;
     if (!item.module) return true;

@@ -115,10 +115,10 @@ describe('Sidebar Component (Integrated)', () => {
     
     // Should render generic things
     expect(screen.getByText('overview')).toBeInTheDocument();
-    expect(screen.getByText('profile')).toBeInTheDocument();
     expect(screen.getByText('settings')).toBeInTheDocument();
 
-    // Should NOT render HR menus
+    // Should NOT render profile or HR menus
+    expect(screen.queryByText('profile')).not.toBeInTheDocument();
     expect(screen.queryByText('employees')).not.toBeInTheDocument();
     expect(screen.queryByText('attendance')).not.toBeInTheDocument();
     expect(screen.queryByText('branches')).not.toBeInTheDocument();
