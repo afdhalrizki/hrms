@@ -110,6 +110,11 @@ class Employee(AuditModel):
         ('PERMANENT', _('Permanent')),
         ('CONTRACT', _('Contract')),
         ('PROBATION', _('Probation')),
+        ('TERMINATED', _('Terminated')),
+        ('RESIGNED', _('Resigned')),
+        ('SUSPENDED', _('Suspended')),
+        ('INTERN', _('Internship')),
+        ('FREELANCE', _('Freelance')),
     ]
 
     nik = models.CharField(_("NIK"), max_length=50, unique=True, help_text=_("Nomor Induk Karyawan"))

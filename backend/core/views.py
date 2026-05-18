@@ -1,5 +1,6 @@
 import logging
 from rest_framework import viewsets, permissions, status, views
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django.db.models import Count, Sum
@@ -145,6 +146,11 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
             dept_id = self.request.query_params.get('department')
             if dept_id:
                 queryset = queryset.filter(department_id=dept_id)
+
+            show_terminated = self.request.query_params.get('show_terminated') == 'true'
+            if not show_terminated:
+                queryset = queryset.exclude(status__in=['TERMINATED', 'RESIGNED'])
+
             return queryset
             
         # Employees can only see themselves
@@ -283,6 +289,23 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                     'code': 'QUOTA_EXCEEDED'
                 }, status=status.HTTP_403_FORBIDDEN)
             return Response({'error': err_msg}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def terminate(self, request, pk=None):
+        """
+        Endpoint khusus untuk menonaktifkan/menghentikan karyawan (TERMINATED).
+        Melewati validasi serializer choices untuk menulis langsung ke model status.
+        """
+        employee = self.get_object()
+        
+        # Set status secara langsung (bypassing serializer choices)
+        employee.status = 'TERMINATED'
+        employee.save()
+        
+        return Response(
+            {'status': f'Karyawan {employee.fullname} telah dinonaktifkan (TERMINATED).'},
+            status=status.HTTP_200_OK
+        )
 
 class DashboardStatsAPIView(TenantIsolationMixin, views.APIView):
     permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]

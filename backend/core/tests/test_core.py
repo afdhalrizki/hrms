@@ -146,6 +146,97 @@ class CoreModuleTestCase(BaseHRTestCase):
         # Auth should fail for inactive users (401 for JWT, 403 for some session/permission configs)
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
+    def test_employee_terminate_endpoint(self):
+        """Test the custom terminate POST action on EmployeeViewSet."""
+        self.client.force_login(self.user)
+        
+        # 1. Create a dummy employee to terminate
+        with schema_context(self.tenant.schema_name):
+            emp = Employee.objects.create(
+                nik="EMP_TO_TERM",
+                fullname="To Be Terminated",
+                email="term_target@company.com",
+                department=self.dept,
+                role=self.role,
+                grade=self.grade,
+                join_date=date.today(),
+                ktp_number="9999999999999999"
+            )
+            # Create matching user account
+            target_user = User.objects.create_user(
+                email=emp.email,
+                password="password123",
+                is_active=True
+            )
+            target_user.tenants.add(self.tenant)
+
+        # 2. Call the terminate endpoint
+        url = reverse('employee-terminate', kwargs={'pk': emp.id})
+        response = self.client.post(url, {}, format='json', SERVER_NAME=str(self.domain))
+        
+        # Check HTTP status
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # 3. Refresh and verify status & user deactivation
+        with schema_context(self.tenant.schema_name):
+            emp.refresh_from_db()
+            self.assertEqual(emp.status, 'TERMINATED')
+            
+            target_user.refresh_from_db()
+            self.assertFalse(target_user.is_active)
+
+    def test_employee_resigned_status_and_filtering(self):
+        """Test that changing an employee's status to RESIGNED deactivates their user and handles list filtering."""
+        self.client.force_login(self.user)
+        
+        # 1. Create a dummy active employee
+        with schema_context(self.tenant.schema_name):
+            emp = Employee.objects.create(
+                nik="EMP_TO_RESIGN",
+                fullname="To Be Resigned",
+                email="resign_target@company.com",
+                department=self.dept,
+                role=self.role,
+                grade=self.grade,
+                join_date=date.today(),
+                ktp_number="8888888888888888",
+                status="PROBATION"
+            )
+            # Create matching user account
+            target_user = User.objects.create_user(
+                email=emp.email,
+                password="password123",
+                is_active=True
+            )
+            target_user.tenants.add(self.tenant)
+
+        # 2. Update status to RESIGNED via PATCH
+        url = reverse('employee-detail', kwargs={'pk': emp.id})
+        response = self.client.patch(url, {'status': 'RESIGNED'}, format='json', SERVER_NAME=str(self.domain))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 3. Refresh and verify status is updated and user account is deactivated
+        with schema_context(self.tenant.schema_name):
+            emp.refresh_from_db()
+            self.assertEqual(emp.status, 'RESIGNED')
+            
+            target_user.refresh_from_db()
+            self.assertFalse(target_user.is_active)
+
+        # 4. Verify employee-list excludes the resigned employee by default
+        list_url = reverse('employee-list')
+        list_response = self.client.get(list_url, SERVER_NAME=str(self.domain))
+        self.assertEqual(list_response.status_code, status.HTTP_200_OK)
+        employee_ids = [e['id'] for e in list_response.data]
+        self.assertNotIn(emp.id, employee_ids)
+
+        # 5. Verify employee-list includes the resigned employee when show_terminated=true
+        list_url_show = f"{reverse('employee-list')}?show_terminated=true"
+        list_response_show = self.client.get(list_url_show, SERVER_NAME=str(self.domain))
+        self.assertEqual(list_response_show.status_code, status.HTTP_200_OK)
+        employee_ids_show = [e['id'] for e in list_response_show.data]
+        self.assertIn(emp.id, employee_ids_show)
+
 class BranchTestCase(HRMSTestCase):
     def setUp(self):
         super().setUp()

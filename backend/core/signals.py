@@ -145,18 +145,26 @@ def update_storage_incremental(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Employee)
 def deactivate_user_on_termination(sender, instance, **kwargs):
     """
-    Deactivates the associated user when an employee is terminated.
+    Deactivates the associated user when an employee is terminated or resigned.
     """
-    if instance.status == 'TERMINATED' and instance.user:
-        instance.user.is_active = False
-        instance.user.save(update_fields=['is_active'])
+    user = instance.user
+    if instance.status in ['TERMINATED', 'RESIGNED'] and user:
+        # Prevent deactivating user if they are not associated with the current tenant schema
+        if not user.tenants.filter(schema_name=connection.schema_name).exists():
+            return
+            
+        user.is_active = False
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            user.save(update_fields=['is_active'])
 
         # Notify Admins about the deactivation
         from notifications.services import NotificationService
         service = NotificationService()
+        status_label = "TERTERMINASI" if instance.status == 'TERMINATED' else "MENGUNDURKAN DIRI"
         service.send_admin_notification(
             title="Akun User Dinonaktifkan",
-            message=f"Akun user {instance.user.email} telah dinonaktifkan secara otomatis karena status karyawan {instance.fullname} berubah menjadi TERTERMINASI.",
+            message=f"Akun user {user.email} telah dinonaktifkan secara otomatis karena status karyawan {instance.fullname} berubah menjadi {status_label}.",
             level='WARNING'
         )
 
@@ -178,7 +186,7 @@ def assign_default_role_to_employee(sender, instance, created, **kwargs):
 def update_employee_count_incremental(sender, instance, created, **kwargs):
     """
     Increments the tenant's employee_count when a new active employee is created,
-    or adjusts it when an employee's status changes to/from TERMINATED.
+    or adjusts it when an employee's status changes to/from TERMINATED or RESIGNED.
     """
     tenant = connection.tenant
     if not tenant or tenant.schema_name == 'public':
@@ -188,9 +196,11 @@ def update_employee_count_incremental(sender, instance, created, **kwargs):
     if not tenant_pk:
         tenant_pk = Tenant.objects.get(schema_name=tenant.schema_name).pk
 
+    inactive_statuses = ['TERMINATED', 'RESIGNED']
+
     if created:
-        # Only increment if the new employee is active (not TERMINATED)
-        if instance.status != 'TERMINATED':
+        # Only increment if the new employee is active (not TERMINATED or RESIGNED)
+        if instance.status not in inactive_statuses:
             Tenant.objects.filter(pk=tenant_pk).update(employee_count=F('employee_count') + 1)
     else:
         # It's an update. Check if the status changed!
@@ -198,14 +208,14 @@ def update_employee_count_incremental(sender, instance, created, **kwargs):
         current_status = instance.status
 
         if original_status and original_status != current_status:
-            # 1. Changed from Active to TERMINATED (release a seat)
-            if original_status != 'TERMINATED' and current_status == 'TERMINATED':
+            # 1. Changed from Active to Inactive (release a seat)
+            if original_status not in inactive_statuses and current_status in inactive_statuses:
                 from django.db.models.functions import Greatest
                 Tenant.objects.filter(pk=tenant_pk).update(
                     employee_count=Greatest(0, F('employee_count') - 1)
                 )
-            # 2. Changed from TERMINATED to Active (occupy a seat)
-            elif original_status == 'TERMINATED' and current_status != 'TERMINATED':
+            # 2. Changed from Inactive to Active (occupy a seat)
+            elif original_status in inactive_statuses and current_status not in inactive_statuses:
                 # Check quota first!
                 updated_tenant = Tenant.objects.get(pk=tenant_pk)
                 if updated_tenant.employee_count >= updated_tenant.total_employee_capacity:
