@@ -96,7 +96,8 @@ class UserModuleTestCase(TenantTestCase):
                 email=self.tenant_user.email,
                 department=dept,
                 join_date="2024-01-01",
-                ktp_number="999999"
+                ktp_number="999999",
+                status="TERMINATED"
             )
 
         url = reverse('user-me')

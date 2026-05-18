@@ -77,7 +77,7 @@ describe('ProfilePage (Integrated)', () => {
     render(<ProfilePage />, { wrapper: AllProviders });
 
     // Wait for data to load
-    await screen.findByDisplayValue(/employee1@/i, {}, { timeout: 30000 });
+    await screen.findByText(/EMP001/i, {}, { timeout: 30000 });
 
     const phoneInput = screen.getByPlaceholderText('+62...');
     const addressInput = screen.getByPlaceholderText('Write your home address...');
@@ -141,7 +141,7 @@ describe('ProfilePage (Integrated)', () => {
   it('handles update error', async () => {
     render(<ProfilePage />, { wrapper: AllProviders });
     
-    await waitFor(() => screen.getByDisplayValue(/employee1@/i), { timeout: 15000 });
+    await waitFor(() => screen.getByText(/EMP001/i), { timeout: 15000 });
     
     vi.mocked(api.apiFetch).mockImplementation((endpoint: string, options: any) => {
       if (options?.method === 'PATCH') {
@@ -214,7 +214,7 @@ describe('ProfilePage (Integrated)', () => {
 
   it('toggles notification preference and saves to user endpoint', async () => {
     render(<ProfilePage />, { wrapper: AllProviders });
-    await screen.findByDisplayValue(/employee1@/i, {}, { timeout: 30000 });
+    await screen.findByText(/EMP001/i, {}, { timeout: 30000 });
 
     const toggleButton = screen.getByRole('button', { name: /form\.notifications/i });
     const saveButton = screen.getByRole('button', { name: /save/i });

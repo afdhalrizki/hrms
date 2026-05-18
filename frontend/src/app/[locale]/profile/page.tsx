@@ -239,7 +239,7 @@ export default function ProfilePage() {
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                       <input 
                         type="email" 
-                        value={profile?.email || ''}
+                        value={profile?.email || user?.email || ''}
                         disabled
                         className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-gray-500 cursor-not-allowed"
                       />

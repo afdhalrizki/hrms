@@ -32,27 +32,35 @@ def initialize_tenant_roles(sender, tenant, **kwargs):
 def capture_old_file_size(sender, instance, **kwargs):
     """
     Captures the file size of the existing instance before it is saved.
-    Also handles employee quota enforcement.
+    Also handles employee quota enforcement and captures status changes.
     """
     tenant = connection.tenant
     
-    # 1. Employee Quota Enforcement
+    # 1. Employee Quota Enforcement (only for new active employees)
     if sender == Employee and not instance.pk:
-        if tenant and tenant.schema_name != 'public':
-            tenant_pk = getattr(tenant, 'pk', None)
-            if not tenant_pk:
-                real_tenant = Tenant.objects.get(schema_name=tenant.schema_name)
-            else:
-                real_tenant = tenant
-            
-            if real_tenant.employee_count >= real_tenant.total_employee_capacity:
-                raise ValidationError(
-                    f"Employee quota exceeded ({real_tenant.employee_count}/{real_tenant.total_employee_capacity}). "
-                    "Cannot add more employees. Please upgrade your plan."
-                )
+        if instance.status != 'TERMINATED':
+            if tenant and tenant.schema_name != 'public':
+                tenant_pk = getattr(tenant, 'pk', None)
+                if not tenant_pk:
+                    real_tenant = Tenant.objects.get(schema_name=tenant.schema_name)
+                else:
+                    real_tenant = tenant
+                
+                if real_tenant.employee_count >= real_tenant.total_employee_capacity:
+                    raise ValidationError(
+                        f"Employee quota exceeded ({real_tenant.employee_count}/{real_tenant.total_employee_capacity}). "
+                        "Cannot add more employees. Please upgrade your plan."
+                    )
 
-    # 2. File Size Capture
+    # 2. File Size Capture and original status capture
     if instance.pk:
+        if sender == Employee:
+            try:
+                original_emp = Employee.objects.get(pk=instance.pk)
+                instance._original_status = original_emp.status
+            except Employee.DoesNotExist:
+                instance._original_status = None
+
         try:
             # We fetch a fresh copy from DB to get the old file state
             # Using .only() to minimize DB load
@@ -169,26 +177,45 @@ def assign_default_role_to_employee(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Employee)
 def update_employee_count_incremental(sender, instance, created, **kwargs):
     """
-    Increments the tenant's employee_count when a new employee is created.
+    Increments the tenant's employee_count when a new active employee is created,
+    or adjusts it when an employee's status changes to/from TERMINATED.
     """
-    if not created:
-        return
-
     tenant = connection.tenant
-    if not tenant:
+    if not tenant or tenant.schema_name == 'public':
         return
 
-    if not created:
-        return
-
-    # Use atomic update to prevent race conditions. 
-    # Handle FakeTenant by falling back to schema_name lookup if pk is missing.
     tenant_pk = getattr(tenant, 'pk', None)
     if not tenant_pk:
         tenant_pk = Tenant.objects.get(schema_name=tenant.schema_name).pk
 
-    Tenant.objects.filter(pk=tenant_pk).update(employee_count=F('employee_count') + 1)
-    
+    if created:
+        # Only increment if the new employee is active (not TERMINATED)
+        if instance.status != 'TERMINATED':
+            Tenant.objects.filter(pk=tenant_pk).update(employee_count=F('employee_count') + 1)
+    else:
+        # It's an update. Check if the status changed!
+        original_status = getattr(instance, '_original_status', None)
+        current_status = instance.status
+
+        if original_status and original_status != current_status:
+            # 1. Changed from Active to TERMINATED (release a seat)
+            if original_status != 'TERMINATED' and current_status == 'TERMINATED':
+                from django.db.models.functions import Greatest
+                Tenant.objects.filter(pk=tenant_pk).update(
+                    employee_count=Greatest(0, F('employee_count') - 1)
+                )
+            # 2. Changed from TERMINATED to Active (occupy a seat)
+            elif original_status == 'TERMINATED' and current_status != 'TERMINATED':
+                # Check quota first!
+                updated_tenant = Tenant.objects.get(pk=tenant_pk)
+                if updated_tenant.employee_count >= updated_tenant.total_employee_capacity:
+                    # Note: We are already in post_save, so raising ValidationError here will rollback the transaction,
+                    # which is perfect to prevent exceeding the quota on rehire!
+                    raise ValidationError(
+                        f"Cannot reactivate employee. Employee quota exceeded ({updated_tenant.employee_count}/{updated_tenant.total_employee_capacity})."
+                    )
+                Tenant.objects.filter(pk=tenant_pk).update(employee_count=F('employee_count') + 1)
+
     # Check quota and alert
     updated_tenant = Tenant.objects.get(pk=tenant_pk)
     current_count = updated_tenant.employee_count
@@ -204,11 +231,15 @@ def update_employee_count_incremental(sender, instance, created, **kwargs):
         elif usage_percent >= 90:
             service.notify_quota_warning(current_count, capacity, level='WARNING')
 
+
 @receiver(post_delete, sender=Employee)
 def update_employee_count_on_delete(sender, instance, **kwargs):
     """
-    Decrements the tenant's employee_count when an employee is deleted.
+    Decrements the tenant's employee_count when an active employee is deleted.
     """
+    if instance.status == 'TERMINATED':
+        return
+
     tenant = connection.tenant
     if not tenant or tenant.schema_name == 'public':
         return
@@ -245,3 +276,99 @@ def update_storage_on_delete(sender, instance, **kwargs):
         Tenant.objects.filter(pk=tenant_pk).update(
             storage_used_bytes=F('storage_used_bytes') - size_to_remove
         )
+
+
+@receiver(pre_save, sender=Employee)
+def sync_employee_email_to_user(sender, instance, **kwargs):
+    """
+    Synchronizes email changes from Employee (tenant schema) to the associated User account (public schema).
+    """
+    if not instance.pk:
+        return
+
+    try:
+        original = Employee.objects.get(pk=instance.pk)
+    except Employee.DoesNotExist:
+        return
+
+    if original.email.lower().strip() != instance.email.lower().strip():
+        from users.models import User
+        new_email = instance.email.lower().strip()
+        old_email = original.email.lower().strip()
+
+        with schema_context('public'):
+            # Check if the new email is already used by another user
+            if User.objects.filter(email=new_email).exclude(email=old_email).exists():
+                raise ValidationError("Email ini sudah digunakan oleh akun User lain.")
+            
+            # Perform atomic update on User
+            User.objects.filter(email=old_email).update(email=new_email)
+
+
+@receiver(pre_save, sender='users.User')
+def sync_user_email_to_employee(sender, instance, **kwargs):
+    """
+    Synchronizes email changes from User account (public schema) to all associated Employees across their tenants.
+    """
+    if not instance.pk:
+        return
+
+    from users.models import User
+    try:
+        original = User.objects.get(pk=instance.pk)
+    except User.DoesNotExist:
+        return
+
+    if original.email.lower().strip() != instance.email.lower().strip():
+        new_email = instance.email.lower().strip()
+        old_email = original.email.lower().strip()
+
+        # User is in public schema, we get its tenants
+        with schema_context('public'):
+            tenants = list(instance.tenants.all())
+            
+        for tenant in tenants:
+            with schema_context(tenant.schema_name):
+                # Check if the new email is already used by another employee in this tenant
+                if Employee.objects.filter(email=new_email).exclude(email=old_email).exists():
+                    raise ValidationError(
+                        f"Email ini sudah digunakan oleh Karyawan lain di penyewa '{tenant.name}'."
+                    )
+                
+                # Perform update
+                Employee.objects.filter(email=old_email).update(email=new_email)
+
+
+@receiver(pre_save, sender=Employee)
+def prevent_duplicate_active_cross_tenant(sender, instance, **kwargs):
+    """
+    Prevents adding or updating an employee's email if they are already active (not TERMINATED)
+    in another tenant.
+    """
+    if not instance.email:
+        return
+
+    # Normalize email
+    email = instance.email.lower().strip()
+    
+    # We only care about active employees being created/updated as active
+    if instance.status == 'TERMINATED':
+        return
+        
+    tenant = connection.tenant
+    if not tenant or tenant.schema_name == 'public':
+        return
+
+    from tenants.models import Tenant
+    # 1. Fetch other tenants from the public schema
+    with schema_context('public'):
+        other_tenants = list(Tenant.objects.exclude(schema_name='public').exclude(schema_name=tenant.schema_name))
+        
+    # 2. Check each other tenant schema for an active employee with the same email
+    for other_tenant in other_tenants:
+        with schema_context(other_tenant.schema_name):
+            existing_active = Employee.objects.filter(email=email).exclude(status='TERMINATED').first()
+            if existing_active:
+                raise ValidationError(
+                    f"User dengan email {instance.email} masih terdaftar/aktif di perusahaan {other_tenant.name}"
+                )

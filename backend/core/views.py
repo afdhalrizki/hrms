@@ -187,7 +187,8 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                 t = Tenant.objects.get(schema_name=request.tenant.schema_name)
                 current_count = t.employee_count
                 capacity = t.total_employee_capacity
-                if current_count >= capacity:
+                is_terminated = str(request.data.get('status', '')).upper() == 'TERMINATED'
+                if not is_terminated and current_count >= capacity:
                     return Response({
                         'error': f'Employee quota exceeded for your {t.plan_type} plan (Limit: {capacity}).',
                         'code': 'QUOTA_EXCEEDED'
@@ -245,14 +246,43 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
         except Exception as e:
-            # Catch quota errors regardless of exception type (Django or DRF)
-            err_msg = str(e).lower()
-            if 'quota' in err_msg and 'exceeded' in err_msg:
+            # Catch quota or validation errors
+            err_msg = str(e)
+            if err_msg.startswith("['") and err_msg.endswith("']"):
+                err_msg = err_msg[2:-2]
+            err_msg_lower = err_msg.lower()
+            if 'quota' in err_msg_lower and 'exceeded' in err_msg_lower:
                 return Response({
-                    'error': str(e),
+                    'error': err_msg,
                     'code': 'QUOTA_EXCEEDED'
                 }, status=status.HTTP_403_FORBIDDEN)
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': err_msg}, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        """
+        Custom update method to catch Django ValidationError from pre_save signals
+        and return a clean HTTP 400 response.
+        """
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            with transaction.atomic():
+                self.perform_update(serializer)
+            return Response(serializer.data)
+        except Exception as e:
+            err_msg = str(e)
+            if err_msg.startswith("['") and err_msg.endswith("']"):
+                err_msg = err_msg[2:-2]
+            err_msg_lower = err_msg.lower()
+            if 'quota' in err_msg_lower and 'exceeded' in err_msg_lower:
+                return Response({
+                    'error': err_msg,
+                    'code': 'QUOTA_EXCEEDED'
+                }, status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': err_msg}, status=status.HTTP_400_BAD_REQUEST)
 
 class DashboardStatsAPIView(TenantIsolationMixin, views.APIView):
     permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission]

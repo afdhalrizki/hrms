@@ -75,4 +75,46 @@ test.describe.serial('Employee Management', () => {
     await page.fill('input[placeholder*="Search"]', fullname);
     await expect(page.getByText(fullname)).toBeVisible({ timeout: 15000 });
   });
+
+  test('should fail to provision a new employee if email is active in another company', async ({ page }) => {
+    await page.goto(getTenantUrl('/en/employees'));
+    
+    // Open Provisioning Modal
+    const addBtn = page.getByRole('button', { name: /Add Employee/i });
+    await expect(addBtn).toBeVisible({ timeout: 15000 });
+    await addBtn.click();
+    
+    await expect(page.getByText(/Provision New Employee/i)).toBeVisible({ timeout: 15000 });
+    
+    const timestamp = Date.now();
+    const fullname = `Cross Active Employee`;
+    const nik = `CR${String(timestamp).slice(-6)}`;
+    
+    // employee1@company2.com is an active employee seeded in company2
+    const email = `employee1@company2.com`;
+    
+    await page.locator('input[name="fullname"]').fill(fullname);
+    await page.locator('input[name="nik"]').fill(nik);
+    await page.locator('input[name="email"]').fill(email);
+    await page.locator('input[name="ktp_number"]').fill('31710' + String(timestamp).slice(-11));
+    
+    // Select options from seeded backend
+    await page.locator('select[name="department"]').selectOption({ label: 'Engineering' });
+    await page.locator('select[name="role"]').selectOption({ label: 'Software Engineer' });
+    await page.locator('select[name="grade"]').selectOption({ label: '3A' });
+    await page.locator('select[name="access_role"]').selectOption({ label: 'Finance Staff' });
+    
+    // Submit
+    const provisionBtn = page.getByRole('button', { name: /Provision Employee/i });
+    await provisionBtn.click();
+    
+    // It should NOT close the modal, instead it should show the validation error!
+    await expect(page.getByText(/masih terdaftar\/aktif di perusahaan/i)).toBeVisible({ timeout: 15000 });
+    
+    // Close modal manually
+    const cancelBtn = page.locator('button:has-text("Cancel")');
+    if (await cancelBtn.isVisible()) {
+      await cancelBtn.click();
+    }
+  });
 });

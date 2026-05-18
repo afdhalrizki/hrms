@@ -164,6 +164,13 @@ class Employee(AuditModel):
     def __str__(self):
         return f"{self.nik} - {self.fullname}"
 
+    @property
+    def user(self):
+        from users.models import User
+        from django_tenants.utils import schema_context
+        with schema_context('public'):
+            return User.objects.filter(email=self.email).first()
+
 
 class WorkflowConfig(AuditModel):
     """
