@@ -273,8 +273,11 @@ async function main() {
     ENABLE_EMAIL_NOTIFICATIONS: 'False'
   };
 
+  const specArg = args.find(a => a.endsWith('.spec.ts') || a.startsWith('tests/'));
+  const targetTests = specArg || 'tests/';
+
   const pwArgs = [
-    'playwright', 'test', 'tests/',
+    'playwright', 'test', targetTests,
     '--grep-invert', '"diagnostic|Instrumentation"',
     `--workers=${numWorkers}`,
     '--retries=2', // Allow two retries for transient network/concurrency issues

@@ -265,7 +265,7 @@ class TenantSettingsTestCase(HRMSTestCase):
     def test_settings_retrieve_public(self):
         """Verify that settings can be retrieved without authentication (for logo/branding)."""
         # Ensure domain matches what middleware expects
-        response = self.client.get(self.settings_url, SERVER_NAME=str(self.domain))
+        response = self.client.get(self.settings_url, HTTP_X_TENANT=self.tenant.schema_name)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], self.tenant.name)
 
@@ -279,7 +279,7 @@ class TenantSettingsTestCase(HRMSTestCase):
             'theme_primary_color': '#0000FF',
             'enabled_modules': ['core', 'attendance', 'performance']
         }
-        response = self.client.patch(self.settings_url, payload, format='json', SERVER_NAME=str(self.domain))
+        response = self.client.patch(self.settings_url, payload, format='json', HTTP_X_TENANT=self.tenant.schema_name)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         self.tenant.refresh_from_db()
@@ -292,7 +292,54 @@ class TenantSettingsTestCase(HRMSTestCase):
         """Verify that regular employees are blocked from updating settings."""
         self.client.force_login(self.regular)
         payload = {'name': 'Hacker Corp'}
-        response = self.client.patch(self.settings_url, payload, format='json', SERVER_NAME=str(self.domain))
+        response = self.client.patch(self.settings_url, payload, format='json', HTTP_X_TENANT=self.tenant.schema_name)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_public_settings_update_authorized_superadmin(self):
+        """Verify that a SUPERADMIN can update settings on the public schema."""
+        superadmin = User.objects.create_user(
+            email='superadmin@master.com',
+            password='password',
+            is_staff=True,
+            is_global_admin=True,
+            global_role='SUPERADMIN'
+        )
+        self.client.force_login(superadmin)
+        payload = {
+            'name': 'Updated HariKerja Platform',
+            'phone': '0811111111'
+        }
+        with schema_context('public'):
+            public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='HariKerja Platform')
+            Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
+            
+        response = self.client.patch(self.settings_url, payload, format='json', HTTP_X_TENANT='public')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        with schema_context('public'):
+            public_tenant.refresh_from_db()
+            self.assertEqual(public_tenant.name, 'Updated HariKerja Platform')
+            self.assertEqual(public_tenant.phone, '0811111111')
+
+    def test_public_settings_update_unauthorized_non_superadmin(self):
+        """Verify that a non-SUPERADMIN global role is blocked from updating settings on the public schema."""
+        support_admin = User.objects.create_user(
+            email='support@master.com',
+            password='password',
+            is_staff=True,
+            is_global_admin=True,
+            global_role='SUPPORT_AGENT'
+        )
+        self.client.force_login(support_admin)
+        payload = {
+            'name': 'Hack HariKerja Platform',
+            'phone': '0822222222'
+        }
+        with schema_context('public'):
+            public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='HariKerja Platform')
+            Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
+            
+        response = self.client.patch(self.settings_url, payload, format='json', HTTP_X_TENANT='public')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class ProvisioningDepthTestCase(TestCase):

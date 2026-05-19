@@ -184,6 +184,18 @@ class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS:
             return [permissions.AllowAny()]
+            
+        from django.db import connection
+        if connection.schema_name == 'public':
+            from rest_framework.permissions import BasePermission
+            class IsSuperadminPermission(BasePermission):
+                def has_permission(self, req, view):
+                    return req.user and req.user.is_authenticated and (
+                        req.user.is_superuser or 
+                        getattr(req.user, 'global_role', None) == 'SUPERADMIN'
+                    )
+            return [IsSuperadminPermission()]
+
         from core.permissions import HasTenantRBACPermission
         return [permissions.IsAuthenticated(), HasTenantRBACPermission()]
 

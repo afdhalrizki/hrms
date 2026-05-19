@@ -116,6 +116,9 @@ async function main() {
     args.includes('-SkipBackend') || args.includes('--skip-backend');
   const maxSuiteRetries = 1;
 
+  const knownArgs = ['--stack', '--skip-e2e', '--skip-mobile', '--skip-backend', '--skip-unit', '--skip-build', '-SkipE2E', '-SkipMobile', '-SkipBackend', '--only-backend-setup', '--docker-only', '--reset-docker'];
+  const extraArgs = args.filter(a => !knownArgs.includes(a) && !a.startsWith('--stack='));
+
   await ensureDir(LogDir);
   const timestamp = getTimestamp();
   const rootLog = join(LogDir, `run_all_test_${timestamp}.log`);
@@ -339,7 +342,7 @@ async function main() {
 
         exitCode = await spawnStream(
           'node',
-          [join(RootDir, s.path), ...(s.args || []), ...(skipE2E ? ['--skip-e2e'] : [])],
+          [join(RootDir, s.path), ...(s.args || []), ...(skipE2E ? ['--skip-e2e'] : []), ...extraArgs],
           {
             cwd: dirname(join(RootDir, s.path)),
             logFile: suiteLog,

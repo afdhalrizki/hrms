@@ -45,6 +45,7 @@ export default function SettingsPage() {
   
   const { user } = useAuth();
   const hideOperationalSettings = isPublic || user?.is_global_admin;
+  const canEditBranding = !isPublic || user?.global_role === 'SUPERADMIN';
   
   const [name, setName] = useState(tenantName || '');
   const [address, setAddress] = useState(initialAddress || '');
@@ -158,6 +159,13 @@ export default function SettingsPage() {
             >
               <form onSubmit={handleSubmit} className="space-y-8">
                 
+                {!canEditBranding && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-sm font-semibold flex items-center gap-2">
+                    <Lock size={16} />
+                    <span>Read-Only: Only SUPERADMIN can modify platform settings.</span>
+                  </div>
+                )}
+                
                 {/* Logo Upload Section */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -174,16 +182,23 @@ export default function SettingsPage() {
                           <Building2 size={40} className="text-muted-foreground/50" />
                         )}
                         
-                        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                          <Upload size={24} className="text-white mb-2" />
-                          <span className="text-xs font-semibold text-white">Upload Logo</span>
-                          <input 
-                            type="file" 
-                            accept="image/*"
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                            onChange={handleFileSelect}
-                          />
-                        </div>
+                        {!canEditBranding ? (
+                          <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] font-bold text-white text-center px-2">Read Only</span>
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <Upload size={24} className="text-white mb-2" />
+                            <span className="text-xs font-semibold text-white">Upload Logo</span>
+                            <input 
+                              type="file" 
+                              accept="image/*"
+                              disabled={!canEditBranding}
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                              onChange={handleFileSelect}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -193,9 +208,10 @@ export default function SettingsPage() {
                         <input 
                           type="text" 
                           required
+                          disabled={!canEditBranding}
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium text-foreground"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                           placeholder="e.g. PT Maju Bersama"
                         />
                       </div>
@@ -223,9 +239,10 @@ export default function SettingsPage() {
                       </label>
                       <input 
                         type="text" 
+                        disabled={!canEditBranding}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. +62 21 1234 5678"
                       />
                     </div>
@@ -233,9 +250,10 @@ export default function SettingsPage() {
                       <label className="text-sm font-medium">Headquarters Address</label>
                       <textarea 
                         value={address}
+                        disabled={!canEditBranding}
                         onChange={(e) => setAddress(e.target.value)}
                         rows={3}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground resize-none"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Street address, City, ZIP Code..."
                       />
                     </div>
@@ -407,8 +425,8 @@ export default function SettingsPage() {
                 <div className="flex justify-end pt-4">
                   <button
                     type="submit"
-                    disabled={isLoading}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg shadow-primary/25 disabled:opacity-70 disabled:cursor-not-allowed"
+                    disabled={isLoading || !canEditBranding}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg shadow-primary/25 disabled:opacity-75 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

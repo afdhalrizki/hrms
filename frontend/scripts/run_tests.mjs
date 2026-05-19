@@ -106,6 +106,8 @@ async function main() {
     const e2eArgs = ['--skip-install'];
     if (live) e2eArgs.push('--live');
     if (args.includes('--skip-build')) e2eArgs.push('--skip-build');
+    const forwardedArgs = args.filter(a => !['--skip-e2e', '--skip-unit', '--skip-install', '--skip-build', '--coverage', '--live'].includes(a));
+    e2eArgs.push(...forwardedArgs);
 
     const exitCode = await spawnStream('node', [join(FrontendDir, 'scripts/run_e2e_tests.mjs'), ...e2eArgs], { cwd: FrontendDir });
     if (exitCode !== 0) {

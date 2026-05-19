@@ -20,6 +20,7 @@ class GlobalAdminSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password', 'password123')
         validated_data['password'] = make_password(password)
         validated_data['is_staff'] = True
+        validated_data['is_global_admin'] = True
         return super().create(validated_data)
         
     def update(self, instance, validated_data):
