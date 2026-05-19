@@ -17,7 +17,7 @@ from attendance.views import (
     ShiftViewSet, ScheduleViewSet, AttendanceCorrectionRequestViewSet, LeaveBalanceViewSet
 )
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet, EmployeeSalaryComponentViewSet
-from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView
+from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView, InternalTenantViewSet
 from reimbursement.views import ReimbursementViewSet, ReimbursementCategoryViewSet
 from performance.views import KPIViewSet, KPITargetViewSet, AppraisalViewSet, AppraisalReviewViewSet
 from billing.views import BillingViewSet, QuotaReductionRequestViewSet
@@ -58,6 +58,7 @@ router.register(r'public/signup', PublicSignupViewSet, basename='public-signup')
 router.register(r'internal/registrations', RegistrationApprovalViewSet, basename='internal-registration')
 from users.views import GlobalAdminViewSet
 router.register(r'internal/global-admins', GlobalAdminViewSet, basename='internal-global-admins')
+router.register(r'internal/tenants', InternalTenantViewSet, basename='internal-tenants')
 router.register(r'quota-reduction', QuotaReductionRequestViewSet, basename='quota-reduction')
 router.register(r'billing', BillingViewSet, basename='billing')
 

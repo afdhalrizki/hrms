@@ -21,7 +21,8 @@ import {
   FileText,
   Palette,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -30,10 +31,32 @@ import { getBaseUrl } from '@/lib/api';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { usePermission } from '@/hooks/usePermission';
 
+interface MenuItem {
+  nameKey: string;
+  icon: any;
+  href: string;
+  isGlobalAdminMenu?: boolean;
+  allowedGlobalRoles?: string[];
+  requiredPermission?: string;
+  module?: string;
+}
 
-const menuItems = [
+const menuItems: MenuItem[] = [
   { nameKey: 'overview',   icon: LayoutDashboard, href: '/' },
-  { nameKey: 'global_admins', icon: ShieldCheck, href: '/admin/global-admins', isGlobalAdminMenu: true },
+  { 
+    nameKey: 'registrations', 
+    icon: ClipboardList, 
+    href: '/admin/registrations', 
+    isGlobalAdminMenu: true, 
+    allowedGlobalRoles: ['SUPERADMIN', 'ONBOARDING_AGENT'] 
+  },
+  { 
+    nameKey: 'global_admins', 
+    icon: ShieldCheck, 
+    href: '/admin/global-admins', 
+    isGlobalAdminMenu: true, 
+    allowedGlobalRoles: ['SUPERADMIN'] 
+  },
   { nameKey: 'profile',    icon: Users,            href: '/profile' },
   { nameKey: 'employees', icon: Users,            href: '/employees', requiredPermission: 'tenant_manage_hr', module: 'core' },
   { nameKey: 'performance', icon: TrendingUp,     href: '/performance', module: 'performance' },
@@ -60,7 +83,10 @@ export function Sidebar() {
   
   const filteredItems = menuItems.filter(item => {
     if (item.isGlobalAdminMenu) {
-      return isPublic && user?.global_role === 'SUPERADMIN';
+      if (!isPublic) return false;
+      const effectiveRole = user?.global_role || (user?.is_global_admin ? 'SUPERADMIN' : null);
+      const allowedRoles = item.allowedGlobalRoles || ['SUPERADMIN'];
+      return !!effectiveRole && allowedRoles.includes(effectiveRole);
     }
     // Hide profile page in Public Tenant (since there is no associated Employee profile)
     if (isPublic && item.nameKey === 'profile') {

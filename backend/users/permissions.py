@@ -9,7 +9,12 @@ class HasGlobalPermission(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
             
-        if request.user.is_superuser or getattr(request.user, 'is_global_admin', False):
+        # Django superuser always has full access
+        if request.user.is_superuser:
+            return True
+            
+        # Legacy support: global admin without global_role gets full access
+        if getattr(request.user, 'is_global_admin', False) and not request.user.global_role:
             return True
             
         if not request.user.global_role:

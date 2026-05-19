@@ -158,13 +158,18 @@ async function main() {
 
   const totalPass = unitMetrics.passed + e2eMetrics.passed;
   const grandTotal = unitMetrics.total + e2eMetrics.total;
+  const totalFailed = unitMetrics.failed + e2eMetrics.failed;
+  const totalWarnings = unitMetrics.warnings + e2eMetrics.warnings;
   const overallPercent = grandTotal > 0 ? Math.round((totalPass / grandTotal) * 1000) / 10 : 0;
   const totalErrors = e2eMetrics.errors;
   const durationMs = Date.now() - startTime;
 
   log("-".repeat(60), COLORS.gray);
   log(`OVERALL SUCCESS    : ${overallPercent}%`, overallPercent === 100 ? COLORS.green : COLORS.red);
+  log(`TOTAL PASSED       : ${totalPass} / ${grandTotal}`, COLORS.green);
+  log(`TOTAL FAILED       : ${totalFailed}`, totalFailed > 0 ? COLORS.red : COLORS.gray);
   log(`TOTAL ERRORS       : ${totalErrors}`, totalErrors > 0 ? COLORS.red : COLORS.gray);
+  log(`TOTAL WARNINGS     : ${totalWarnings}`, totalWarnings > 0 ? COLORS.yellow : COLORS.gray);
   log(`TEST TIME DURATION : ${formatDuration(durationMs)}`, COLORS.cyan);
 
   if (overallPercent === 100 && allPassed) {

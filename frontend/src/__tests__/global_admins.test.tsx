@@ -30,8 +30,29 @@ describe('GlobalAdminsPage', () => {
     { id: 2, email: 'support@harikerja.com', first_name: 'Support', last_name: 'Agent', global_role: 'SUPPORT_AGENT' },
   ];
 
+  let adminsList: any[] = [];
+
   beforeEach(() => {
     vi.clearAllMocks();
+    adminsList = [...mockAdminsData];
+
+    (apiFetch as any).mockImplementation((url: string, options?: any) => {
+      if (url.includes('/internal/tenants/')) {
+        return Promise.resolve([
+          { id: 1, name: 'Tenant A', schema_name: 'tenant_a' }
+        ]);
+      }
+      if (url.includes('/internal/global-admins/')) {
+        if (options?.method === 'POST') {
+          const body = JSON.parse(options.body);
+          const newAdmin = { id: 3, ...body };
+          adminsList.push(newAdmin);
+          return Promise.resolve(newAdmin);
+        }
+        return Promise.resolve(adminsList);
+      }
+      return Promise.resolve([]);
+    });
   });
 
   it('renders unauthorized message for non-superadmin users', () => {
@@ -50,7 +71,6 @@ describe('GlobalAdminsPage', () => {
       user: mockSuperAdmin,
       loading: false,
     });
-    (apiFetch as any).mockResolvedValue(mockAdminsData);
 
     render(<GlobalAdminsPage />);
 
@@ -73,9 +93,6 @@ describe('GlobalAdminsPage', () => {
       user: mockSuperAdmin,
       loading: false,
     });
-    (apiFetch as any).mockResolvedValueOnce(mockAdminsData) // Initial load
-                     .mockResolvedValueOnce({}) // POST request
-                     .mockResolvedValueOnce([...mockAdminsData, { id: 3, email: 'new@hr.com', first_name: 'New', last_name: 'Admin', global_role: 'ONBOARDING_AGENT' }]); // Refresh list
 
     render(<GlobalAdminsPage />);
 
@@ -92,9 +109,6 @@ describe('GlobalAdminsPage', () => {
     
     const emailInput = document.querySelector('input[type="email"]') || screen.getAllByRole('textbox')[2];
     if (emailInput) fireEvent.change(emailInput, { target: { value: 'new@hr.com' } });
-
-    const inputs = screen.getAllByRole('textbox'); // email might not be a textbox depending on test-library version, it might be input type=email
-    // Just find by display value or directly simulate submit if we don't need strict DOM interaction for every field.
     
     // Instead of deep interaction, let's just find the save button and submit the form
     const saveButton = screen.getByRole('button', { name: /Save/i });

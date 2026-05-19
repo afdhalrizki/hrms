@@ -17,6 +17,85 @@ The platform supports Segregation of Duties through several Global roles:
 *   **`SUPPORT_AGENT`**: Technical support team that is only allowed to *masquerade* into client tenants specifically assigned to them for troubleshooting purposes.
 *   **`BILLING_ADMIN`**: Finance team managing SaaS billing and subscription plans, without access to client HR data.
 
+#### Global Admin Roles Comparison Matrix
+
+| Aspect | `SUPERADMIN` | `ONBOARDING_AGENT` | `SUPPORT_AGENT` | `BILLING_ADMIN` |
+| :--- | :--- | :--- | :--- | :--- |
+| **Primary Focus** | Absolute management & SaaS infrastructure supervision. | Tenant onboarding cycle (sign-ups, validation & activation). | Customer technical support & internal tenant troubleshooting. | SaaS billing cycle, payments, invoicing & subscription limits. |
+| **Global Permission** | All permissions (`GLOBAL_MANAGE_ADMINS`, `GLOBAL_MANAGE_TENANTS`, `GLOBAL_MANAGE_BILLING`, `GLOBAL_MASQUERADE`). | `GLOBAL_MANAGE_TENANTS` | `GLOBAL_MASQUERADE` (restricted only to assigned client tenants). | `GLOBAL_MANAGE_BILLING` |
+| **Core Privilege** | • Manage global admin users.<br>• Approve/reject registrations.<br>• Full masquerade access.<br>• Manage billing & quotas. | • View registration lists.<br>• Approve/reject tenant registrations (triggers new schema creation). | • Masquerade into assigned tenant's dashboard to troubleshoot technical issues. | • View & manage transaction invoices.<br>• Approve/reject quota reduction requests (`QuotaReductionRequest`). |
+| **Access Restrictions** | No restrictions (full system context bypass). | Cannot manage billing/quotas, cannot masquerade into client tenants. | Cannot view/review registrations, cannot view billing data, cannot masquerade into unassigned tenants. | Cannot approve/reject registrations, cannot masquerade into client tenants. |
+
+### Global Admin Role Workflows
+
+#### 1. Tenant Onboarding & Activation Flow
+* **Submission**: New companies sign up via the public sign-up page. The registration requests are initially saved under the `public` schema database with a `PENDING` status.
+* **Review**: An `ONBOARDING_AGENT` or `SUPERADMIN` logs into the global admin portal at `/login/portal-admin`. 
+* **FE Guard**: The sidebar menu item and the route `/admin/registrations` are restricted so that only `SUPERADMIN` and `ONBOARDING_AGENT` roles can view or access them. All other roles see an "Unauthorized" block page.
+* **BE Enforcement**: When clicking `Approve` or `Reject`, the request is sent to `/internal/registrations/...`. The endpoint enforces `GLOBAL_MANAGE_TENANTS` permissions via `RegistrationApprovalViewSet`, ensuring unauthorized roles are blocked at the database and API level.
+* **Provisioning**: Upon approval, the backend automatically triggers PostgreSQL schema migrations to dynamically provision the new tenant's workspace and pre-populate essential master data.
+
+```mermaid
+graph TD
+    A[New Company Sign-up Form] -->|Saves Pending Request| B[(Public Schema Database)]
+    C[ONBOARDING_AGENT / SUPERADMIN] -->|Accesses /admin/registrations| D{FE Guard: Authorized?}
+    D -->|No| E[Show 'Unauthorized' Page]
+    D -->|Yes| F[Review Requests & Click Approve/Reject]
+    F -->|POST Request| G{BE Guard: Has GLOBAL_MANAGE_TENANTS?}
+    G -->|No| H[HTTP 403 Forbidden]
+    G -->|Yes| I[Execute Tenant Schema Provisioning]
+```
+
+#### 2. Troubleshooting & Masquerade Flow
+* **Support Request**: A client experiences technical issues and requests technical assistance.
+* **Assignment**: A `SUPERADMIN` assigns the specific client tenant to a designated `SUPPORT_AGENT`.
+* **Access Control**: Once assigned, the `SUPPORT_AGENT` gains the privilege to bypass multi-tenant isolation for that specific tenant.
+* **Bypass Isolation**: The security middleware (`TenantAccessMiddleware`) allows the assigned `SUPPORT_AGENT` to masquerade into the client's subdomain. When accessing the client's URL (e.g. `company.harikerja.web.id`), the sidebar and components render according to the client's active modules, enabling complete troubleshooting without compromising other clients' security.
+
+```mermaid
+graph TD
+    A[Client Submits Technical Issue] --> B[SUPERADMIN Assigns Client Tenant to SUPPORT_AGENT]
+    B --> C[SUPPORT_AGENT Accesses Client Subdomain]
+    C --> D{TenantAccessMiddleware Checks Assignment}
+    D -->|Not Assigned| E[HTTP 403 Forbidden / Access Denied]
+    D -->|Assigned / SUPERADMIN| F[Bypass Isolation & Masquerade]
+    F --> G[Render Client Workspace with Active Modules]
+```
+
+#### 3. SaaS Billing & Quota Reduction Flow
+* **Quota Request**: A tenant administrator requests a reduction in their extra storage quota (e.g. to lower monthly costs) from their local subscription panel.
+* **Review**: The `QuotaReductionRequest` is created and queued for platform admin review.
+* **BE Restriction**: The view/approval endpoint for quota reduction requests in `QuotaReductionRequestViewSet` checks for the `GLOBAL_MANAGE_BILLING` permission. Access is strictly limited to `SUPERADMIN` and `BILLING_ADMIN`. `ONBOARDING_AGENT` and `SUPPORT_AGENT` roles are completely unauthorized to view or review these requests.
+* **Reduction Execution**: Once approved, the backend executes an atomic operation updating the tenant's `extra_storage_mb` storage limits.
+
+```mermaid
+graph TD
+    A[Tenant Admin Requests Quota Reduction] --> B[(QuotaReductionRequest Created in DB)]
+    C[BILLING_ADMIN / SUPERADMIN] --> D[Review Request via API/Panel]
+    D --> E{BE Guard: Has GLOBAL_MANAGE_BILLING?}
+    E -->|No: Onboarding / Support Agent| F[HTTP 403 Forbidden]
+    E -->|Yes: Superadmin / Billing Admin| G[Approve Reduction Request]
+    G --> H[Atomic reduction of Tenant extra_storage_mb]
+```
+
+#### 4. Platform Administration & Global User Management Flow
+* **Initiation**: The `SUPERADMIN` logs into the global admin portal.
+* **Access Control**: The `SUPERADMIN` navigates to `/admin/global-admins`. The frontend routing guards restrict this page specifically to `SUPERADMIN` users; any other global admin role attempting to visit this URL is blocked and redirected to the "Unauthorized" page.
+* **Management Operations**: On this page, the `SUPERADMIN` can perform CRUD operations: adding a new global admin user, modifying an existing admin's details (such as changing their email or global role to `ONBOARDING_AGENT`, `SUPPORT_AGENT`, or `BILLING_ADMIN`), or deleting a global admin account.
+* **BE Enforcement**: API requests to `/internal/global-admins/` are intercepted by backend permission checks (`IsSuperUserOrSelf`), ensuring only `SUPERADMIN` or legacy superusers can write or mutate global admin accounts.
+
+```mermaid
+graph TD
+    A[SUPERADMIN Logs in to Portal] --> B[Accesses /admin/global-admins Page]
+    B --> C{FE Guard: Is SUPERADMIN?}
+    C -->|No| D[Show 'Unauthorized' Page]
+    C -->|Yes| E[View List of Global Admin Accounts]
+    E --> F[Click Add/Edit/Delete Global Admin]
+    F -->|Submit Form| G{BE Guard: Is Superuser / Superadmin?}
+    G -->|No| H[HTTP 403 Forbidden]
+    G -->|Yes| I[Commit User Changes to public.users]
+```
+
 ---
 
 ## 2. Relationship with Master Tenant (Public Schema)

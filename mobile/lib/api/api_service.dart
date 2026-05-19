@@ -285,6 +285,10 @@ class ApiService {
         },
       );
       
+      if (response.request != null) {
+        _log('HTTP REQUEST: ${response.request!.method} ${response.request!.url}');
+      }
+      
       _log('AUTHENTICATED REQUEST RESPONSE: ${response.statusCode}');
       if (response.statusCode >= 400) {
         _log('HTTP ERROR BODY: ${response.body}');

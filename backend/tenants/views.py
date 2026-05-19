@@ -9,6 +9,9 @@ from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer
 from users.models import User
 from core.models import Department, Role, Grade, Employee
 from .tasks import send_registration_email_task, send_welcome_email_task
+from users.permissions import HasGlobalPermission
+from users.global_constants import GLOBAL_MANAGE_TENANTS, GLOBAL_MANAGE_USERS
+
 class PublicSignupViewSet(viewsets.GenericViewSet):
     """
     Public-facing signup API for new tenants.
@@ -36,7 +39,8 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
     Internal API for admins to review and approve registrations.
     """
     serializer_class = RegistrationRequestSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, HasGlobalPermission]
+    required_global_permission = GLOBAL_MANAGE_TENANTS
 
     def get_queryset(self):
         # Always return registrations from the public schema
@@ -208,3 +212,16 @@ class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
         # Ensure we are in the public schema when saving the shared Tenant model
         with schema_context('public'):
             serializer.save()
+
+
+class InternalTenantViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated, HasGlobalPermission]
+    required_global_permission = GLOBAL_MANAGE_USERS
+
+    def get_queryset(self):
+        return Tenant.objects.exclude(schema_name='public')
+
+    def list(self, request):
+        tenants = self.get_queryset()
+        data = [{"id": t.id, "name": t.name, "schema_name": t.schema_name} for t in tenants]
+        return Response(data)

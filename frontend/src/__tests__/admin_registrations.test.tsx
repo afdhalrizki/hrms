@@ -15,11 +15,19 @@ vi.mock('@/lib/api', () => ({
   getDomainSuffix: vi.fn(() => 'harikerja.com'),
 }));
 
+const mockUseAuthResult = {
+  user: { 
+    id: 1, 
+    fullname: 'Admin', 
+    is_staff: true, 
+    global_role: 'SUPERADMIN',
+    is_global_admin: true 
+  } as any,
+  loading: false 
+};
+
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({ 
-    user: { id: 1, fullname: 'Admin', is_staff: true }, 
-    loading: false 
-  }),
+  useAuth: () => mockUseAuthResult,
   AuthProvider: ({ children }: any) => children,
 }));
 
@@ -55,6 +63,14 @@ describe('RegistrationsPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(api.apiFetch).mockResolvedValue(mockRequests);
+    // Reset to default authorized user
+    mockUseAuthResult.user = {
+      id: 1,
+      fullname: 'Admin',
+      is_staff: true,
+      global_role: 'SUPERADMIN',
+      is_global_admin: true
+    };
   });
 
   it('renders registration requests list', async () => {
@@ -127,6 +143,51 @@ describe('RegistrationsPage Component', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('APPROVED').length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  it('renders Unauthorized for billing admin and support agent', async () => {
+    // 1. Test BILLING_ADMIN
+    mockUseAuthResult.user = {
+      id: 2,
+      fullname: 'Billing Agent',
+      is_staff: true,
+      global_role: 'BILLING_ADMIN',
+      is_global_admin: true
+    };
+
+    const { rerender } = render(<RegistrationsPage />);
+    
+    expect(screen.getByText('Unauthorized')).toBeDefined();
+    expect(screen.getByText('You do not have permission to view this page.')).toBeDefined();
+    expect(screen.queryByText('Pending Corp')).toBeNull();
+
+    // 2. Test SUPPORT_AGENT
+    mockUseAuthResult.user = {
+      id: 3,
+      fullname: 'Support Agent',
+      is_staff: true,
+      global_role: 'SUPPORT_AGENT',
+      is_global_admin: true
+    };
+    
+    rerender(<RegistrationsPage />);
+    expect(screen.getByText('Unauthorized')).toBeDefined();
+  });
+
+  it('renders page correctly for onboarding agent', async () => {
+    mockUseAuthResult.user = {
+      id: 4,
+      fullname: 'Onboarding Agent',
+      is_staff: true,
+      global_role: 'ONBOARDING_AGENT',
+      is_global_admin: true
+    };
+
+    render(<RegistrationsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Pending Corp')).toBeDefined();
+      expect(screen.queryByText('Unauthorized')).toBeNull();
     });
   });
 });

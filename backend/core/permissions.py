@@ -10,11 +10,24 @@ class TenantAccessPermission(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
             
-        is_internal = getattr(request.user, 'is_global_admin', False) or request.user.is_superuser
-        if is_internal:
+        user = request.user
+        is_legacy_internal = (getattr(user, 'is_global_admin', False) and not user.global_role) or user.is_superuser
+        
+        if user.global_role == 'SUPERADMIN' or is_legacy_internal:
             return True
             
         current_tenant = getattr(request, 'tenant', None)
+        
+        if user.global_role:
+            from users.global_constants import GLOBAL_MASQUERADE, GLOBAL_ROLE_PERMISSIONS
+            user_perms = GLOBAL_ROLE_PERMISSIONS.get(user.global_role, [])
+            if GLOBAL_MASQUERADE in user_perms:
+                if current_tenant and current_tenant.schema_name == 'public':
+                    return True
+                if current_tenant and user.tenants.filter(id=current_tenant.id).exists():
+                    return True
+            return False
+
         if current_tenant and current_tenant.schema_name != 'public':
             if not request.user.tenants.filter(id=current_tenant.id).exists():
                 return False

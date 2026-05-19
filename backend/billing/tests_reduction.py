@@ -120,3 +120,57 @@ class QuotaReductionTestCase(TenantTestCase):
         self.tenant.refresh_from_db()
         # 5GB + 1GB = 6GB (6144 MB)
         self.assertEqual(self.tenant.extra_storage_mb, 6144)
+
+    def test_quota_reduction_role_permissions(self):
+        """Verify role restrictions for managing quota reduction requests."""
+        from users.global_constants import ROLE_BILLING, ROLE_ONBOARDING, ROLE_SUPPORT
+        
+        # 1. Create a request
+        req = QuotaReductionRequest.objects.create(
+            tenant=self.tenant,
+            requested_gb_reduction=2,
+            reason='Clean up'
+        )
+        detail_url = reverse('quota-reduction-detail', kwargs={'pk': req.id})
+        domain = self.tenant.domains.first().domain
+
+        # 2. Test ONBOARDING_AGENT (Should be DENIED/403)
+        onboarding_agent = User.objects.create_user(
+            email='onboarding_billing@test.com',
+            password='password123',
+            is_global_admin=True,
+            global_role=ROLE_ONBOARDING
+        )
+        self.client.force_authenticate(user=onboarding_agent)
+        res = self.client.patch(detail_url, {'status': 'APPROVED'}, format='json', SERVER_NAME=domain)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # 3. Test SUPPORT_AGENT (Should be DENIED/403)
+        support_agent = User.objects.create_user(
+            email='support_billing@test.com',
+            password='password123',
+            is_global_admin=True,
+            global_role=ROLE_SUPPORT
+        )
+        self.client.force_authenticate(user=support_agent)
+        res = self.client.patch(detail_url, {'status': 'APPROVED'}, format='json', SERVER_NAME=domain)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # 4. Test BILLING_ADMIN (Should be ALLOWED/200)
+        billing_admin = User.objects.create_user(
+            email='billing_billing@test.com',
+            password='password123',
+            is_global_admin=True,
+            global_role=ROLE_BILLING
+        )
+        self.client.force_authenticate(user=billing_admin)
+        res = self.client.patch(detail_url, {
+            'status': 'APPROVED',
+            'admin_note': 'Approved by billing agent'
+        }, format='json', SERVER_NAME=domain)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        
+        # Verify changes applied
+        self.tenant.refresh_from_db()
+        # 5GB - 2GB = 3GB (3072 MB)
+        self.assertEqual(self.tenant.extra_storage_mb, 3072)

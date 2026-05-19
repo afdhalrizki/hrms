@@ -278,8 +278,17 @@ class QuotaReductionRequestViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Super Admins see all, Tenants only see their own
-        if self.request.user.is_staff or self.request.user.is_superuser:
+        user = self.request.user
+        is_billing_manager = False
+        if user.is_superuser:
+            is_billing_manager = True
+        elif getattr(user, 'is_global_admin', False):
+            if user.global_role == 'SUPERADMIN' or user.global_role == 'BILLING_ADMIN':
+                is_billing_manager = True
+            elif not user.global_role:
+                is_billing_manager = True
+                
+        if is_billing_manager:
             return self.queryset
         
         # Ensure request.tenant is available (populated by middleware)
@@ -293,10 +302,19 @@ class QuotaReductionRequestViewSet(viewsets.ModelViewSet):
         serializer.save(tenant=self.request.tenant)
 
     def perform_update(self, serializer):
-        # Only Super Admins can approve/reject
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        user = self.request.user
+        is_billing_manager = False
+        if user.is_superuser:
+            is_billing_manager = True
+        elif getattr(user, 'is_global_admin', False):
+            if user.global_role == 'SUPERADMIN' or user.global_role == 'BILLING_ADMIN':
+                is_billing_manager = True
+            elif not user.global_role:
+                is_billing_manager = True
+
+        if not is_billing_manager:
             from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied("Only super admins can review reduction requests.")
+            raise PermissionDenied("Only super admins or billing admins can review reduction requests.")
 
         # Get the old status from the database before saving the new changes
         old_status = QuotaReductionRequest.objects.get(pk=serializer.instance.pk).status

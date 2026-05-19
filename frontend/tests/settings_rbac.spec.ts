@@ -72,14 +72,13 @@ test.describe.serial('Platform Settings RBAC E2E', () => {
     
     await page.getByRole('button', { name: /Add Admin/i }).click();
     const modal = page.locator('.glass-card').filter({ hasText: 'Add Global Admin' });
-    const inputs = modal.locator('input');
-    await inputs.nth(0).fill('Support');
-    await inputs.nth(1).fill('Agent');
-    await inputs.nth(2).fill(uniqueEmail);
+    await modal.locator('input[type="text"]').nth(0).fill('Support');
+    await modal.locator('input[type="text"]').nth(1).fill('Agent');
+    await modal.locator('input[type="email"]').fill(uniqueEmail);
     
     const select = modal.locator('select');
     await select.selectOption('SUPPORT_AGENT');
-    await inputs.nth(3).fill('password123');
+    await modal.locator('input[type="password"]').fill('password123');
     
     const savePromise = page.waitForResponse(res => res.url().includes('/internal/global-admins/') && res.request().method() === 'POST');
     await modal.getByRole('button', { name: /Save/i }).click();

@@ -250,32 +250,67 @@ export function parseMetrics(logContent, suiteName) {
     }
   } else if (suiteName.includes('Mobile')) {
     let currentSection = null;
+    let unitPassed = 0, unitFailed = 0, unitErrors = 0, unitWarnings = 0;
+    let e2ePassed = 0, e2eFailed = 0, e2eErrors = 0, e2eWarnings = 0;
+
     for (const line of lines) {
       const cleanLine = stripAnsi(line);
       
-      if (cleanLine.includes('UNIT TEST SUMMARY')) currentSection = 'unit';
-      else if (cleanLine.includes('E2E TEST SUMMARY')) currentSection = 'e2e';
+      if (cleanLine.includes('[Unit Tests]')) currentSection = 'unit';
+      else if (cleanLine.includes('[E2E Tests]')) currentSection = 'e2e';
 
-      const mPass = cleanLine.match(/TOTAL PASSED:\s+(\d+)/);
-      const mFail = cleanLine.match(/TOTAL FAILED:\s+(\d+)/);
-      const mErr = cleanLine.match(/TOTAL ERRORS:\s+(\d+)/);
-      const mWarn = cleanLine.match(/WARNINGS?:\s+(\d+)/);
+      const testsMatch = cleanLine.match(/^\s*Tests\s*:\s*(\d+)/);
+      const failMatch = cleanLine.match(/^\s*Failed\s*:\s*(\d+)/);
+      const errMatch = cleanLine.match(/^\s*Errors\s*:\s*(\d+)/);
+      const warnMatch = cleanLine.match(/^\s*Warnings\s*:\s*(\d+)/);
+
+      if (testsMatch && currentSection === 'unit') unitPassed = parseInt(testsMatch[1], 10);
+      if (testsMatch && currentSection === 'e2e') e2ePassed = parseInt(testsMatch[1], 10);
       
-      if (mPass) {
-          const count = parseInt(mPass[1], 10);
-          p += count;
-          if (currentSection === 'unit') up = count;
-          else if (currentSection === 'e2e') ep = count;
-      }
-      if (mFail) f += parseInt(mFail[1], 10);
-      if (mErr) e += parseInt(mErr[1], 10);
-      if (mWarn) w += parseInt(mWarn[1], 10);
+      if (failMatch && currentSection === 'unit') unitFailed = parseInt(failMatch[1], 10);
+      if (failMatch && currentSection === 'e2e') e2eFailed = parseInt(failMatch[1], 10);
+      
+      if (errMatch && currentSection === 'unit') unitErrors = parseInt(errMatch[1], 10);
+      if (errMatch && currentSection === 'e2e') e2eErrors = parseInt(errMatch[1], 10);
 
-      const fPassMatch = cleanLine.match(/\d{2,}:\d{2}\s+\+(\d+): (?:All tests passed|Some tests failed)/);
-      if (fPassMatch) {
-          const count = parseInt(fPassMatch[1], 10);
-          // Only update p if it's the only info we have
-          if (p === 0) p = count;
+      if (warnMatch && currentSection === 'unit') unitWarnings = parseInt(warnMatch[1], 10);
+      if (warnMatch && currentSection === 'e2e') e2eWarnings = parseInt(warnMatch[1], 10);
+    }
+
+    up = unitPassed;
+    ep = e2ePassed;
+    p = unitPassed + e2ePassed;
+    f = unitFailed + e2eFailed;
+    e = unitErrors + e2eErrors;
+    w = unitWarnings + e2eWarnings;
+
+    // Fallback if no sections parsed
+    if (p === 0 && f === 0 && e === 0) {
+      for (const line of lines) {
+        const cleanLine = stripAnsi(line);
+        if (cleanLine.includes('UNIT TEST SUMMARY')) currentSection = 'unit';
+        else if (cleanLine.includes('E2E TEST SUMMARY')) currentSection = 'e2e';
+
+        const mPass = cleanLine.match(/TOTAL PASSED:\s+(\d+)/);
+        const mFail = cleanLine.match(/TOTAL FAILED:\s+(\d+)/);
+        const mErr = cleanLine.match(/TOTAL ERRORS:\s+(\d+)/);
+        const mWarn = cleanLine.match(/WARNINGS?:\s+(\d+)/);
+        
+        if (mPass) {
+            const count = parseInt(mPass[1], 10);
+            p += count;
+            if (currentSection === 'unit') up = count;
+            else if (currentSection === 'e2e') ep = count;
+        }
+        if (mFail) f += parseInt(mFail[1], 10);
+        if (mErr) e += parseInt(mErr[1], 10);
+        if (mWarn) w += parseInt(mWarn[1], 10);
+
+        const fPassMatch = cleanLine.match(/\d{2,}:\d{2}\s+\+(\d+): (?:All tests passed|Some tests failed)/);
+        if (fPassMatch) {
+            const count = parseInt(fPassMatch[1], 10);
+            if (p === 0) p = count;
+        }
       }
     }
   }

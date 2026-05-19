@@ -12,7 +12,8 @@ import {
   Mail,
   ExternalLink,
   MoreVertical,
-  Filter
+  Filter,
+  AlertCircle
 } from 'lucide-react';
 import { apiFetch, getDomainSuffix } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -96,6 +97,24 @@ export default function RegistrationsPage() {
         return null;
     }
   };
+
+  const isAuthorized = user && (
+    user.global_role === 'SUPERADMIN' || 
+    user.global_role === 'ONBOARDING_AGENT' || 
+    (!user.global_role && user.is_global_admin)
+  );
+
+  if (!authLoading && !isAuthorized) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
+          <AlertCircle size={48} className="text-red-500" />
+          <h2 className="text-2xl font-bold">Unauthorized</h2>
+          <p className="text-muted-foreground">You do not have permission to view this page.</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

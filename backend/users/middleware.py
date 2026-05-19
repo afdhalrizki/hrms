@@ -12,6 +12,19 @@ class TenantAccessMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        if not request.user.is_authenticated:
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                from rest_framework_simplejwt.authentication import JWTAuthentication
+                try:
+                    authenticator = JWTAuthentication()
+                    res = authenticator.authenticate(request)
+                    if res:
+                        request.user = res[0]
+                        request.auth = res[1]
+                except Exception:
+                    pass
+
         if request.user.is_authenticated:
             if not request.user.is_active:
                 logout(request)
@@ -25,7 +38,7 @@ class TenantAccessMiddleware:
 
             # 1. Global Admins and Superusers bypass checks based on Role
             user = request.user
-            is_legacy_internal = getattr(user, 'is_global_admin', False) or user.is_superuser
+            is_legacy_internal = (getattr(user, 'is_global_admin', False) and not user.global_role) or user.is_superuser
             
             if user.global_role or is_legacy_internal:
                 from users.global_constants import GLOBAL_MASQUERADE, GLOBAL_ROLE_PERMISSIONS

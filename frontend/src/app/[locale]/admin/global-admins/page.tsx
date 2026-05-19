@@ -23,20 +23,37 @@ interface GlobalAdmin {
   first_name: string;
   last_name: string;
   global_role: string;
+  tenants?: number[];
+  tenant_details?: { id: number; name: string; schema_name: string }[];
+}
+
+interface Tenant {
+  id: number;
+  name: string;
+  schema_name: string;
 }
 
 export default function GlobalAdminsPage() {
   const [admins, setAdmins] = useState<GlobalAdmin[]>([]);
+  const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedAdmin, setSelectedAdmin] = useState<GlobalAdmin | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    email: string;
+    first_name: string;
+    last_name: string;
+    global_role: string;
+    password?: string;
+    tenants: number[];
+  }>({
     email: '',
     first_name: '',
     last_name: '',
     global_role: 'SUPERADMIN',
-    password: ''
+    password: '',
+    tenants: []
   });
   const [submitting, setSubmitting] = useState(false);
   const { user, loading: authLoading } = useAuth();
@@ -54,6 +71,15 @@ export default function GlobalAdminsPage() {
     }
   };
 
+  const fetchTenants = async () => {
+    try {
+      const data = await apiFetch('/internal/tenants/');
+      setTenants(data);
+    } catch (error) {
+      console.error('Failed to fetch tenants:', error);
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && user) {
       if (user.global_role !== 'SUPERADMIN') {
@@ -62,6 +88,7 @@ export default function GlobalAdminsPage() {
       }
       const controller = new AbortController();
       fetchAdmins(controller.signal);
+      fetchTenants();
       return () => controller.abort();
     }
   }, [authLoading, user]);
@@ -75,7 +102,8 @@ export default function GlobalAdminsPage() {
         first_name: admin.first_name,
         last_name: admin.last_name,
         global_role: admin.global_role,
-        password: '' // empty password means do not change
+        password: '', // empty password means do not change
+        tenants: admin.tenants || []
       });
     } else {
       setSelectedAdmin(null);
@@ -84,7 +112,8 @@ export default function GlobalAdminsPage() {
         first_name: '',
         last_name: '',
         global_role: 'SUPERADMIN',
-        password: ''
+        password: '',
+        tenants: []
       });
     }
     setIsModalOpen(true);
@@ -95,6 +124,9 @@ export default function GlobalAdminsPage() {
     setSubmitting(true);
     try {
       const payload = { ...formData };
+      if (payload.global_role !== 'SUPPORT_AGENT') {
+        payload.tenants = [];
+      }
       if (modalMode === 'edit' && !payload.password) {
         delete (payload as any).password;
       }
@@ -221,8 +253,15 @@ export default function GlobalAdminsPage() {
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20 w-max">
-                          <ShieldCheck size={12} /> {admin.global_role}
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20 w-max">
+                            <ShieldCheck size={12} /> {admin.global_role}
+                          </div>
+                          {admin.global_role === 'SUPPORT_AGENT' && admin.tenant_details && admin.tenant_details.length > 0 && (
+                            <div className="text-xs text-muted-foreground mt-1 max-w-xs truncate" title={admin.tenant_details.map(t => t.name).join(', ')}>
+                              <span className="font-semibold text-white/70">Tenants:</span> {admin.tenant_details.map(t => t.name).join(', ')}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-8 py-5 text-right">
@@ -310,6 +349,38 @@ export default function GlobalAdminsPage() {
                     <option value="BILLING_ADMIN">Billing & Finance</option>
                   </select>
                 </div>
+                {formData.global_role === 'SUPPORT_AGENT' && (
+                  <div>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                      Assign Tenants
+                    </label>
+                    <div className="max-h-40 overflow-y-auto border border-white/10 rounded-xl p-3 bg-white/5 space-y-2">
+                      {tenants.length === 0 ? (
+                        <p className="text-xs text-muted-foreground italic">No tenants available</p>
+                      ) : (
+                        tenants.map(tenant => {
+                          const isChecked = formData.tenants.includes(tenant.id);
+                          return (
+                            <label key={tenant.id} className="flex items-center gap-2 text-sm cursor-pointer select-none">
+                              <input 
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  const newTenants = isChecked
+                                    ? formData.tenants.filter(id => id !== tenant.id)
+                                    : [...formData.tenants, tenant.id];
+                                  setFormData({ ...formData, tenants: newTenants });
+                                }}
+                                className="rounded bg-white/10 border-white/10 text-primary focus:ring-primary/50"
+                              />
+                              <span>{tenant.name} <span className="text-xs text-muted-foreground">({tenant.schema_name})</span></span>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
                     Password {modalMode === 'edit' && '(Leave blank to keep unchanged)'}

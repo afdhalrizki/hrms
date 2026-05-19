@@ -222,6 +222,65 @@ class RegistrationFlowTestCase(HRMSTestCase):
         response = self.client.post(approve_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_registration_approval_role_based_access(self):
+        """Verify that only users with GLOBAL_MANAGE_TENANTS permission can access registration approval."""
+        from users.global_constants import ROLE_ONBOARDING, ROLE_SUPPORT, ROLE_BILLING
+        
+        # 1. Create registration request
+        registration = RegistrationRequest.objects.create(
+            company_name='Role Access Corp',
+            subdomain_prefix='roleaccess',
+            admin_email='admin@roleaccess.com'
+        )
+        
+        # 2. Test ONBOARDING_AGENT (Should be ALLOWED)
+        onboarding_agent = User.objects.create_user(
+            email='onboarding@master.com',
+            password='password123',
+            global_role=ROLE_ONBOARDING
+        )
+        self.client.force_authenticate(user=onboarding_agent)
+        
+        response = self.client.get(self.approval_list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # 3. Test SUPPORT_AGENT (Should be DENIED/403)
+        support_agent = User.objects.create_user(
+            email='support@master.com',
+            password='password123',
+            global_role=ROLE_SUPPORT
+        )
+        self.client.force_authenticate(user=support_agent)
+        
+        response = self.client.get(self.approval_list_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        # Test approval action with SUPPORT_AGENT (Should be DENIED/403)
+        approve_url = reverse('internal-registration-approve', args=[registration.id])
+        response = self.client.post(approve_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        # 4. Test BILLING_ADMIN (Should be DENIED/403)
+        billing_admin = User.objects.create_user(
+            email='billing@master.com',
+            password='password123',
+            global_role=ROLE_BILLING
+        )
+        self.client.force_authenticate(user=billing_admin)
+        
+        response = self.client.get(self.approval_list_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        # 5. Test normal user/employee (Should be DENIED/403)
+        normal_user = User.objects.create_user(
+            email='user@master.com',
+            password='password123'
+        )
+        self.client.force_authenticate(user=normal_user)
+        
+        response = self.client.get(self.approval_list_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_registration_prefix_collision(self):
         """Verify that duplicate subdomain prefixes are rejected."""
         with schema_context('public'):
