@@ -73,7 +73,7 @@ export default defineConfig({
         NEXT_PUBLIC_E2E_LOGGING: 'true',
         NODE_OPTIONS: '--max-old-space-size=1536'
       },
-      reuseExistingServer: false,
+      reuseExistingServer: true,
       stdout: 'pipe',
       stderr: 'pipe',
       timeout: 600 * 1000,

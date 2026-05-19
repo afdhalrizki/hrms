@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useTenant } from '@/context/TenantContext';
+import { useAuth } from '@/context/AuthContext';
 import { 
   Building2, 
   MapPin, 
@@ -30,6 +31,7 @@ import { getBaseUrl } from '@/lib/api';
 export default function SettingsPage() {
   const { 
     tenantName, 
+    isPublic,
     address: initialAddress, 
     phone: initialPhone, 
     logo: initialLogo,
@@ -40,6 +42,9 @@ export default function SettingsPage() {
     isBiometricEnabled: initialBioEnabled,
     attendancePlatformPolicy: initialPlatformPolicy
   } = useTenant();
+  
+  const { user } = useAuth();
+  const hideOperationalSettings = isPublic || user?.is_global_admin;
   
   const [name, setName] = useState(tenantName || '');
   const [address, setAddress] = useState(initialAddress || '');
@@ -236,158 +241,161 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </div>
-                
-                <hr className="border-white/10" />
+                {!hideOperationalSettings && (
+                  <>
+                    <hr className="border-white/10" />
 
-                {/* Attendance & Payroll Section */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Banknote size={20} className="text-primary" />
-                    Attendance & Payroll Policies
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium flex items-center gap-2">
-                        <Clock size={14} className="text-muted-foreground" />
-                        Late Deduction Rate (Rp)
-                      </label>
-                      <input 
-                        type="number" 
-                        value={lateDeductionRate}
-                        onChange={(e) => setLateDeductionRate(parseFloat(e.target.value) || 0)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
-                        placeholder="e.g. 5000"
-                      />
-                      <p className="text-[10px] text-muted-foreground">Potongan harian setiap kali terlambat.</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium flex items-center gap-2">
-                        <AlertCircle size={14} className="text-muted-foreground" />
-                        Absence Deduction Rate (Rp)
-                      </label>
-                      <input 
-                        type="number" 
-                        value={absenceDeductionRate}
-                        onChange={(e) => setAbsenceDeductionRate(parseFloat(e.target.value) || 0)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
-                        placeholder="e.g. 100000"
-                      />
-                      <p className="text-[10px] text-muted-foreground">Potongan harian jika alpa (tanpa izin).</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium flex items-center gap-2">
-                        <Percent size={14} className="text-muted-foreground" />
-                        JKK Rate (Decimal)
-                      </label>
-                      <input 
-                        type="number" 
-                        step="0.0001"
-                        value={jkkRate}
-                        onChange={(e) => setJkkRate(parseFloat(e.target.value) || 0)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
-                        placeholder="e.g. 0.0024"
-                      />
-                      <p className="text-[10px] text-muted-foreground">Tarif JKK BPJS (Standar: 0.0024).</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Reimbursement Approval</label>
-                      <select 
-                        value={reimbursementLevel}
-                        onChange={(e) => setReimbursementLevel(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground appearance-none"
-                      >
-                        <option value="SUPERVISOR" className="bg-slate-900">Only Supervisor</option>
-                        <option value="HR" className="bg-slate-900">Only HR/Admin</option>
-                        <option value="BOTH" className="bg-slate-900">Both (Sequential)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <hr className="border-white/10" />
-
-                {/* Security & Biometrics Section */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <ShieldCheck size={20} className="text-primary" />
-                    Security & Biometrics
-                  </h3>
-                  
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 font-medium">
-                          <Camera size={18} className="text-muted-foreground" />
-                          Require Photo Attendance
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Karyawan wajib mengambil foto saat absen (Biometrik). Menonaktifkan fitur ini akan melewati pengambilan foto jika penyimpanan Anda penuh.
-                        </p>
-                      </div>
-                      <button 
-                        type="button"
-                        onClick={() => setIsBioEnabled(!isBioEnabled)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isBioEnabled ? 'bg-primary' : 'bg-white/10'}`}
-                      >
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isBioEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 font-medium">
-                            <MonitorSmartphone size={18} className="text-muted-foreground" />
-                            Attendance Platform Restriction
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Control where employees can record their attendance.
-                          </p>
-                        </div>
-                      </div>
+                    {/* Attendance & Payroll Section */}
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Banknote size={20} className="text-primary" />
+                        Attendance & Payroll Policies
+                      </h3>
                       
-                      <div className="grid grid-cols-2 gap-4 mt-2">
-                        <button
-                          type="button"
-                          onClick={() => setAttendancePlatformPolicy('MOBILE')}
-                          className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
-                            attendancePlatformPolicy === 'MOBILE' 
-                              ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' 
-                              : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
-                          }`}
-                        >
-                          <Smartphone size={20} />
-                          <div className="text-left">
-                            <div className="text-sm font-bold">Mobile Only</div>
-                            <div className="text-[10px] opacity-70">App only</div>
-                          </div>
-                        </button>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <Clock size={14} className="text-muted-foreground" />
+                            Late Deduction Rate (Rp)
+                          </label>
+                          <input 
+                            type="number" 
+                            value={lateDeductionRate}
+                            onChange={(e) => setLateDeductionRate(parseFloat(e.target.value) || 0)}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
+                            placeholder="e.g. 5000"
+                          />
+                          <p className="text-[10px] text-muted-foreground">Potongan harian setiap kali terlambat.</p>
+                        </div>
 
-                        <button
-                          type="button"
-                          onClick={() => setAttendancePlatformPolicy('BOTH')}
-                          className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
-                            attendancePlatformPolicy === 'BOTH' 
-                              ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' 
-                              : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
-                          }`}
-                        >
-                          <MonitorSmartphone size={20} />
-                          <div className="text-left">
-                            <div className="text-sm font-bold">Web & Mobile</div>
-                            <div className="text-[10px] opacity-70">Flexible access</div>
-                          </div>
-                        </button>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <AlertCircle size={14} className="text-muted-foreground" />
+                            Absence Deduction Rate (Rp)
+                          </label>
+                          <input 
+                            type="number" 
+                            value={absenceDeductionRate}
+                            onChange={(e) => setAbsenceDeductionRate(parseFloat(e.target.value) || 0)}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
+                            placeholder="e.g. 100000"
+                          />
+                          <p className="text-[10px] text-muted-foreground">Potongan harian jika alpa (tanpa izin).</p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <Percent size={14} className="text-muted-foreground" />
+                            JKK Rate (Decimal)
+                          </label>
+                          <input 
+                            type="number" 
+                            step="0.0001"
+                            value={jkkRate}
+                            onChange={(e) => setJkkRate(parseFloat(e.target.value) || 0)}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
+                            placeholder="e.g. 0.0024"
+                          />
+                          <p className="text-[10px] text-muted-foreground">Tarif JKK BPJS (Standar: 0.0024).</p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Reimbursement Approval</label>
+                          <select 
+                            value={reimbursementLevel}
+                            onChange={(e) => setReimbursementLevel(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground appearance-none"
+                          >
+                            <option value="SUPERVISOR" className="bg-slate-900">Only Supervisor</option>
+                            <option value="HR" className="bg-slate-900">Only HR/Admin</option>
+                            <option value="BOTH" className="bg-slate-900">Both (Sequential)</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+
+                    <hr className="border-white/10" />
+
+                    {/* Security & Biometrics Section */}
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <ShieldCheck size={20} className="text-primary" />
+                        Security & Biometrics
+                      </h3>
+                      
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 font-medium">
+                              <Camera size={18} className="text-muted-foreground" />
+                              Require Photo Attendance
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              Karyawan wajib mengambil foto saat absen (Biometrik). Menonaktifkan fitur ini akan melewati pengambilan foto jika penyimpanan Anda penuh.
+                            </p>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => setIsBioEnabled(!isBioEnabled)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isBioEnabled ? 'bg-primary' : 'bg-white/10'}`}
+                          >
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isBioEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 font-medium">
+                                <MonitorSmartphone size={18} className="text-muted-foreground" />
+                                Attendance Platform Restriction
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                Control where employees can record their attendance.
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 mt-2">
+                            <button
+                              type="button"
+                              onClick={() => setAttendancePlatformPolicy('MOBILE')}
+                              className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
+                                attendancePlatformPolicy === 'MOBILE' 
+                                  ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' 
+                                  : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
+                              }`}
+                            >
+                              <Smartphone size={20} />
+                              <div className="text-left">
+                                <div className="text-sm font-bold">Mobile Only</div>
+                                <div className="text-[10px] opacity-70">App only</div>
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setAttendancePlatformPolicy('BOTH')}
+                              className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
+                                attendancePlatformPolicy === 'BOTH' 
+                                  ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' 
+                                  : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
+                              }`}
+                            >
+                              <MonitorSmartphone size={20} />
+                              <div className="text-left">
+                                <div className="text-sm font-bold">Web & Mobile</div>
+                                <div className="text-[10px] opacity-70">Flexible access</div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {message && (
                   <div className={`p-4 rounded-xl flex items-center gap-3 ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
@@ -416,28 +424,30 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="glass-card border rounded-3xl p-8 space-y-6 shadow-sm"
-            >
-              <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                <Shield size={24} />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold">Access Management</h3>
-                <p className="text-sm text-muted-foreground">
-                  Role-Based Access Control (RBAC). Define which employees can manage HR, Attendance, or Payroll.
-                </p>
-              </div>
-              <Link 
-                href="/settings/roles"
-                className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all font-semibold group"
+            {!hideOperationalSettings && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="glass-card border rounded-3xl p-8 space-y-6 shadow-sm"
               >
-                Manage Roles
-                <ChevronRight className="transition-transform group-hover:translate-x-1" size={18} />
-              </Link>
-            </motion.div>
+                <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                  <Shield size={24} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Access Management</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Role-Based Access Control (RBAC). Define which employees can manage HR, Attendance, or Payroll.
+                  </p>
+                </div>
+                <Link 
+                  href="/settings/roles"
+                  className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all font-semibold group"
+                >
+                  Manage Roles
+                  <ChevronRight className="transition-transform group-hover:translate-x-1" size={18} />
+                </Link>
+              </motion.div>
+            )}
 
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -456,29 +466,31 @@ export default function SettingsPage() {
               </div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="glass-card border rounded-3xl p-8 space-y-6 shadow-sm border-primary/20 bg-primary/5"
-            >
-              <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
-                <CreditCard size={24} />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold">Subscription & Billing</h3>
-                <p className="text-sm text-muted-foreground">
-                  Manage your plan, view invoices, and update payment methods.
-                </p>
-              </div>
-              <Link 
-                href="/settings/billing"
-                className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-primary text-white hover:bg-primary/90 transition-all font-semibold group"
+            {!hideOperationalSettings && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="glass-card border rounded-3xl p-8 space-y-6 shadow-sm border-primary/20 bg-primary/5"
               >
-                Manage Billing
-                <ChevronRight className="transition-transform group-hover:translate-x-1" size={18} />
-              </Link>
-            </motion.div>
+                <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
+                  <CreditCard size={24} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Subscription & Billing</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your plan, view invoices, and update payment methods.
+                  </p>
+                </div>
+                <Link 
+                  href="/settings/billing"
+                  className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-primary text-white hover:bg-primary/90 transition-all font-semibold group"
+                >
+                  Manage Billing
+                  <ChevronRight className="transition-transform group-hover:translate-x-1" size={18} />
+                </Link>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>

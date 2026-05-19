@@ -151,4 +151,22 @@ test.describe.serial('Superadmin (Platform) Management', () => {
       await expect(page.locator('aside').getByText(new RegExp(menu, 'i')).first()).toBeVisible();
     }
   });
+
+  test('should hide non-relevant HR operational settings for superadmin in settings page on public tenant', async ({ page }) => {
+    // Navigate to settings page
+    await page.goto(`${BASE_URL}/en/settings`);
+    await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
+    
+    // 1. Branding and contact info should exist
+    await expect(page.locator('h1').filter({ hasText: /Company Profile Settings/i })).toBeVisible();
+    await expect(page.getByText('Company Branding')).toBeVisible();
+    await expect(page.getByText('Contact Details')).toBeVisible();
+    await expect(page.locator('input[type="text"]').first()).toHaveValue('HariKerja Platform');
+
+    // 2. Non-relevant operational features should NOT exist
+    await expect(page.getByText('Attendance & Payroll Policies')).not.toBeVisible();
+    await expect(page.getByText('Security & Biometrics')).not.toBeVisible();
+    await expect(page.getByText('Access Management')).not.toBeVisible();
+    await expect(page.getByText('Subscription & Billing')).not.toBeVisible();
+  });
 });
