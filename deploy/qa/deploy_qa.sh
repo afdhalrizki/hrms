@@ -60,6 +60,51 @@ else
 fi
 
 # ==========================================
+# Tahap 2.5: Mengunduh Base Image dengan Cadangan (Fallback & Retries)
+# ==========================================
+echo "📥 Tahap 2.5: Mengunduh base images terlebih dahulu untuk mencegah timeout..."
+
+# Fungsi pembantu untuk mengunduh image dengan percobaan ulang dan fallback ke mirror ECR Public
+pre_pull_image() {
+    local target_image="$1"
+    local fallback_image="$2"
+    local max_attempts=3
+    local attempt=1
+
+    while [ $attempt -le $max_attempts ]; do
+        echo "Mencoba mengunduh $target_image dari Docker Hub (Percobaan $attempt/$max_attempts)..."
+        if docker pull "$target_image"; then
+            echo "✅ Berhasil mengunduh $target_image."
+            return 0
+        fi
+        echo "⚠️ Percobaan $attempt gagal."
+        attempt=$((attempt + 1))
+        sleep 2
+    done
+
+    if [ -n "$fallback_image" ]; then
+        echo "🔄 Mencoba mengunduh dari ECR Public Mirror: $fallback_image..."
+        if docker pull "$fallback_image"; then
+            echo "🏷️ Berhasil mengunduh dari mirror. Melakukan retag ke $target_image..."
+            docker tag "$fallback_image" "$target_image"
+            echo "✅ Selesai retag."
+            return 0
+        fi
+    fi
+
+    echo "⚠️ Gagal mengunduh $target_image setelah beberapa percobaan. Proses build docker compose akan mencobanya kembali secara mandiri."
+    return 0 # Kembalikan 0 agar tidak menghentikan script utama (set -e)
+}
+
+# Pre-pull images yang dibutuhkan agar proses build/up tidak gagal di tengah jalan
+pre_pull_image "node:22-bookworm-slim" "public.ecr.aws/docker/library/node:22-bookworm-slim"
+pre_pull_image "python:3.10-slim" "public.ecr.aws/docker/library/python:3.10-slim"
+pre_pull_image "postgres:15-alpine" "public.ecr.aws/docker/library/postgres:15-alpine"
+pre_pull_image "redis:7-alpine" "public.ecr.aws/docker/library/redis:7-alpine"
+pre_pull_image "nginx:alpine" "public.ecr.aws/docker/library/nginx:alpine"
+pre_pull_image "edoburu/pgbouncer:latest" ""
+
+# ==========================================
 # Tahap 3: Membangun Ulang & Menjalankan Container (Deployment)
 # ==========================================
 echo "🏗️ Tahap 3: Membangun ulang (rebuild) dan menjalankan container..."
