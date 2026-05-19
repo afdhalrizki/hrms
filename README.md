@@ -128,8 +128,8 @@ For more granular control, you can run tests within each module directory:
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 373 Tests (354 Unit + 19 E2E) - Pytest. (Verified 100% Passed - May 19, 2026)
-- **Frontend**: 276 Tests (210 Unit + 66 E2E) - Vitest & Playwright. (Verified 100% Passed - May 19, 2026)
+- **Backend**: 375 Tests (356 Unit + 19 E2E) - Pytest. (Verified 100% Passed - May 19, 2026)
+- **Frontend**: 278 Tests (210 Unit + 68 E2E) - Vitest & Playwright. (Verified 100% Passed - May 19, 2026)
 - **Mobile**: 158 Tests (135 Unit + 23 E2E) - Flutter. (Verified 100% Passed - May 19, 2026)
 
 ## 📈 Scalability Strategy: Road to 1 Million Users

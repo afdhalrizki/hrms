@@ -84,7 +84,7 @@ The harikerja platform follows a strict 4-tier promotion path:
 
 ## 🧪 Testing Standard
 
-The backend uses `pytest` with **100% pass rate** across **373 mission-critical tests** (354 Unit + 19 E2E).
+The backend uses `pytest` with **100% pass rate** across **375 mission-critical tests** (356 Unit + 19 E2E).
 
 **Run logic/unit tests:**
 ```bash
