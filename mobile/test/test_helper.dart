@@ -98,6 +98,7 @@ void setupSystemChannelMocks() {
 Future<void> setupTestEnvironment() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   initTestHttpOverrides();
+  await ApiService.waitForPendingRequests();
   ApiService.reset();
   ApiService(); // Real client
   SharedPreferences.setMockInitialValues({});

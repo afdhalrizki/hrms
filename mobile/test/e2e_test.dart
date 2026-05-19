@@ -361,7 +361,7 @@ void main() {
 
     testWidgets('[15] Attendance: History Highlights (Missing Out)', (tester) async {
       await tester.runAsync(() async {
-        await performLogin(tester);
+        await performLogin(tester, email: 'employee1@company1.com');
         final correctionBtn = find.byKey(const Key('qa_correction'), skipOffstage: false);
         await scrollTo(tester, correctionBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
         await safeTap(tester, correctionBtn);

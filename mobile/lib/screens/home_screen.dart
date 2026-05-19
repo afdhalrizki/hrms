@@ -726,10 +726,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBottomNavigation(BuildContext context, AppLocalizations l10n) {
-    // Ensure user data is present before requiring it
-    final settingsTarget = _userData != null
-        ? SettingsScreen(userData: _userData!.toJson())
-        : null;
+    // Ensure Settings is always navigable, falling back to basic details if user data hasn't loaded yet
+    final settingsTarget = SettingsScreen(
+      userData: _userData?.toJson() ?? {
+        'id': 0,
+        'receive_email_notifications': true,
+        'fullname': 'User',
+        'email': '',
+        'employee_nik': 'N/A',
+      },
+    );
 
     return Container(
       padding: const EdgeInsets.only(top: 16, bottom: 32),

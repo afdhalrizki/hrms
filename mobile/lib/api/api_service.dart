@@ -47,6 +47,20 @@ class ApiService {
   // Singleton pattern with internal constructor
   static ApiService? _instance;
   
+  static final List<Future> _activeRequests = [];
+
+  static Future<void> waitForPendingRequests() async {
+    while (_activeRequests.isNotEmpty) {
+      final futures = List<Future>.from(_activeRequests);
+      await Future.wait(futures.map((f) => f.catchError((_) => null)));
+    }
+  }
+
+  Future<T> _track<T>(Future<T> future) {
+    _activeRequests.add(future);
+    return future.whenComplete(() => _activeRequests.remove(future));
+  }
+
   static void reset() {
     _instance = null;
   }
@@ -60,7 +74,8 @@ class ApiService {
   
   void _log(String message) {
     if (const bool.fromEnvironment('dart.vm.product')) return;
-    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    // Show logs in test output to debug E2E issues
+    // if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     debugPrint(message);
   }
 
@@ -92,62 +107,75 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> login(String email, String password, String tenant) async {
-    final headers = _headers(tenant);
-    
-    debugPrint('HTTP REQUEST: POST $baseUrl/auth/login/');
-    debugPrint('HTTP HEADERS: $headers');
-    
-    final response = await _client.post(
-      Uri.parse("$baseUrl/auth/login/"),
-      headers: headers,
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    ).timeout(const Duration(seconds: 30));
-
-    debugPrint('HTTP RESPONSE: ${response.statusCode}');
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      // Backend returns 'access' and 'refresh' keys now
-      await _storage.write(key: 'jwt_token', value: data['access'] ?? data['token']);
-      await _storage.write(key: 'refresh_token', value: data['refresh']);
-      await _storage.write(key: 'tenant', value: tenant);
-      await setTenant(tenant);
-      return data;
-    } else {
-      throw Exception('Failed to login: ${response.body}');
-    }
-  }
-
-  Future<bool> refreshToken() async {
-    final tenant = await getTenant();
-    final refreshToken = await _storage.read(key: 'refresh_token');
-    
-    if (refreshToken == null) return false;
-
-    try {
-      print('DEBUG E2E: Refreshing token...');
+    final future = () async {
+      final headers = _headers(tenant);
+      
+      debugPrint('HTTP REQUEST: POST $baseUrl/auth/login/');
+      debugPrint('HTTP HEADERS: $headers');
+      
       final response = await _client.post(
-        Uri.parse('$baseUrl/auth/token/refresh/'),
-        headers: _headers(tenant),
-        body: jsonEncode({'refresh': refreshToken}),
-      );
+        Uri.parse("$baseUrl/auth/login/"),
+        headers: headers,
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      ).timeout(const Duration(seconds: 30));
+
+      debugPrint('HTTP RESPONSE: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        await _storage.write(key: 'jwt_token', value: data['access']);
-        return true;
+        // Backend returns 'access' and 'refresh' keys now
+        await _storage.write(key: 'jwt_token', value: data['access'] ?? data['token']);
+        await _storage.write(key: 'refresh_token', value: data['refresh']);
+        await _storage.write(key: 'tenant', value: tenant);
+        await setTenant(tenant);
+        return data;
+      } else {
+        throw Exception('Failed to login: ${response.body}');
       }
-    } catch (e) {
-      _log('REFRESH TOKEN EXCEPTION: $e');
-    }
-    
-    // If refresh failed, clear tokens to force fresh login
-    await _storage.delete(key: 'jwt_token');
-    await _storage.delete(key: 'refresh_token');
-    return false;
+    }();
+    return _track(future.then((value) => value as Map<String, dynamic>));
+  }
+
+  Future<bool> refreshToken() async {
+    final future = () async {
+      final tenant = await getTenant();
+      final currentRefreshToken = await _storage.read(key: 'refresh_token');
+      
+      if (currentRefreshToken == null) return false;
+
+      try {
+        print('DEBUG E2E: Refreshing token...');
+        final response = await _client.post(
+          Uri.parse('$baseUrl/auth/token/refresh/'),
+          headers: _headers(tenant),
+          body: jsonEncode({'refresh': currentRefreshToken}),
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final activeRefreshToken = await _storage.read(key: 'refresh_token');
+          if (activeRefreshToken == currentRefreshToken) {
+            await _storage.write(key: 'jwt_token', value: data['access']);
+            return true;
+          }
+          return false;
+        }
+      } catch (e) {
+        _log('REFRESH TOKEN EXCEPTION: $e');
+      }
+      
+      // If refresh failed, clear tokens only if the session hasn't changed
+      final activeRefreshToken = await _storage.read(key: 'refresh_token');
+      if (activeRefreshToken == currentRefreshToken) {
+        await _storage.delete(key: 'jwt_token');
+        await _storage.delete(key: 'refresh_token');
+      }
+      return false;
+    }();
+    return _track(future.then((value) => value as bool));
   }
 
   Future<String?> getToken() async {
@@ -243,39 +271,41 @@ class ApiService {
   Future<http.Response> _authenticatedRequest(
     Future<http.Response> Function(String? token) requestBuilder,
   ) async {
-    final tenant = await getTenant();
-    var token = await getToken();
-    
-    _log('AUTHENTICATED REQUEST START: $token');
-    
-    var response = await requestBuilder(token).timeout(
-      const Duration(seconds: 30),
-      onTimeout: () {
-        _log('TIMEOUT ERROR: Request timed out after 30s');
-        throw Exception('Request timed out after 30 seconds');
-      },
-    );
-    
-    _log('AUTHENTICATED REQUEST RESPONSE: ${response.statusCode}');
-    if (response.statusCode >= 400) {
-      _log('HTTP ERROR BODY: ${response.body}');
-    }
-    
-    if (response.statusCode == 401) {
-      _log('GOT 401, ATTEMPTING TOKEN REFRESH');
-      final success = await refreshToken();
-      if (success) {
-        token = await getToken();
-        response = await requestBuilder(token);
-        _log('REFRESHED REQUEST RESPONSE: ${response.statusCode}');
-      } else {
-        // Refresh failed, response remains 401
-        _log('TOKEN REFRESH FAILED');
+    final future = () async {
+      final tenant = await getTenant();
+      var token = await getToken();
+      
+      _log('AUTHENTICATED REQUEST START: $token');
+      
+      var response = await requestBuilder(token).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          _log('TIMEOUT ERROR: Request timed out after 30s');
+          throw Exception('Request timed out after 30 seconds');
+        },
+      );
+      
+      _log('AUTHENTICATED REQUEST RESPONSE: ${response.statusCode}');
+      if (response.statusCode >= 400) {
+        _log('HTTP ERROR BODY: ${response.body}');
       }
-    }
-    
-    return response;
-
+      
+      if (response.statusCode == 401) {
+        _log('GOT 401, ATTEMPTING TOKEN REFRESH');
+        final success = await refreshToken();
+        if (success) {
+          token = await getToken();
+          response = await requestBuilder(token);
+          _log('REFRESHED REQUEST RESPONSE: ${response.statusCode}');
+        } else {
+          // Refresh failed, response remains 401
+          _log('TOKEN REFRESH FAILED');
+        }
+      }
+      
+      return response;
+    }();
+    return _track(future.then((value) => value as http.Response));
   }
 
   Future<User> getUserProfile() async {
@@ -485,29 +515,32 @@ class ApiService {
   }
 
   Future<void> uploadDocument(int employeeId, String fieldName, List<int> bytes, String fileName) async {
-    final tenant = await getTenant();
-    final token = await getToken();
-    
-    final request = http.MultipartRequest(
-      'PATCH',
-      Uri.parse("$baseUrl/employees/$employeeId/"),
-    );
-    
-    request.headers.addAll(_headers(tenant, token));
-    
-    request.files.add(http.MultipartFile.fromBytes(
-      fieldName,
-      bytes,
-      filename: fileName,
-    ));
+    final future = () async {
+      final tenant = await getTenant();
+      final token = await getToken();
+      
+      final request = http.MultipartRequest(
+        'PATCH',
+        Uri.parse("$baseUrl/employees/$employeeId/"),
+      );
+      
+      request.headers.addAll(_headers(tenant, token));
+      
+      request.files.add(http.MultipartFile.fromBytes(
+        fieldName,
+        bytes,
+        filename: fileName,
+      ));
 
-    final streamedResponse = await _client.send(request);
-    final response = await http.Response.fromStream(streamedResponse);
+      final streamedResponse = await _client.send(request);
+      final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode != 200) {
-      print('DEBUG E2E: Response error for uploadDocument: ${response.statusCode} - ${response.body}');
-      throw Exception('Failed to upload document: ${response.body}');
-    }
+      if (response.statusCode != 200) {
+        print('DEBUG E2E: Response error for uploadDocument: ${response.statusCode} - ${response.body}');
+        throw Exception('Failed to upload document: ${response.body}');
+      }
+    }();
+    return _track(future.then<void>((_) {}));
   }
 
   // Phase M3: Attendance Corrections

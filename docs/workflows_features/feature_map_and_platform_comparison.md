@@ -1,114 +1,115 @@
-# Feature Map and Platform Comparison
+# Feature Map, Workflow Comparison, and Platform Analysis (Web vs. Mobile)
 
-This document provides a comprehensive overview of the HRMS features and their availability across the Web (Frontend) and Mobile (Flutter) platforms.
-
-## 1. Global Feature Overview
-
-The HRMS platform is divided into several core modules:
-
-- **Core/HR**: Employee data, documents, organizational structure.
-- **Attendance**: Real-time tracking, geolocation, leaves, overtime, and corrections.
-- **Payroll**: Automatic calculations, tax processing, and payslip distribution.
-- **Performance**: KPI tracking, self-appraisals, and management reviews.
-- **SaaS Admin**: Tenant registration, subscription management, and system auditing.
+This document provides a comprehensive overview of the architectural differences, workflows, and feature mappings between the **Web (Frontend)** and **Mobile (Flutter)** applications in the HariKerja HRMS system.
 
 ---
 
-## 2. Platform Comparison Matrix
+## 1. Platform Design Philosophy
 
-| Module | Feature | Web (Admin/Staff) | Web (Employee) | Mobile (Employee) | Min. Plan |
-| :--- | :--- | :---: | :---: | :---: | :--- |
-| **Auth** | Login / Logout | ✅ | ✅ | ✅ | FREE |
-| | Registration (SaaS) | ✅ | ❌ | ❌ | FREE |
-| | Profile Update | ✅ | ✅ | ✅ | FREE |
-| **HR** | Employee Management (CRUD) | ✅ | ❌ | ❌ | FREE |
-| | Document Management | ✅ | ✅ | ✅ (Upload) | FREE |
-| | Org Chart / Branches | ✅ | ✅ | ❌ | ESSENTIAL |
-| **Attendance** | Clock In/Out (GPS) | ✅ | ✅ | ✅ (Primary) | FREE |
-| | Leave Application | ✅ | ✅ | ✅ | ESSENTIAL |
-| | Leave Approval | ✅ | ❌ | ❌ | ESSENTIAL |
-| | Overtime Requests | ✅ | ✅ | ✅ | ESSENTIAL |
-| | Attendance Corrections | ✅ | ✅ | ✅ | PREMIUM |
-| **Payroll** | Process Payroll | ✅ | ❌ | ❌ | PROFESSIONAL |
-| | View/Download Payslips | ✅ | ✅ | ✅ | PROFESSIONAL |
-| **Performance** | Setup KPIs | ✅ | ❌ | ❌ | PREMIUM |
-| | Self-Appraisal | ✅ | ✅ | ✅ | PREMIUM |
-| | Manager Review | ✅ | ❌ | ❌ | PREMIUM |
-| **Analytics** | Dashboard Summary | ✅ | ✅ | ✅ | FREE |
-| | Detailed Export (XLSX/PDF) | ✅ | ✅ | ✅ (Limited) | ESSENTIAL |
-| | System Audit Logs | ✅ | ❌ | ❌ | ENTERPRISE |
-
----
-
-## 3. Page & Screen Mapping
-
-### Web (Frontend) Routes
-| Route | Visibility | Auth Required |
-| :--- | :--- | :---: |
-| `/login` | Public | ❌ |
-| `/signup` | Public | ❌ |
-| `/registration` | Public | ❌ |
-| `/profile` | Protected | ✅ |
-| `/employees` | Protected (Admin) | ✅ |
-| `/attendance` | Protected | ✅ |
-| `/leaves` | Protected | ✅ |
-| `/payroll` | Protected | ✅ |
-| `/analytics` | Protected (Admin) | ✅ |
-| `/settings` | Protected (Admin) | ✅ |
-
-### Mobile (Flutter) Screens
-| Screen Name | Purpose | Auth Required |
-| :--- | :--- | :---: |
-| `LoginScreen` | Authentication | ❌ |
-| `HomeScreen` | Dashboard & Quick Actions | ✅ |
-| `AttendanceScreen` | Clock In/Out (Map) | ✅ |
-| `LeaveListScreen` | History & Status | ✅ |
-| `LeaveApplyScreen` | Submit new leave | ✅ |
-| `PayslipScreen` | List & View Payslips | ✅ |
-| `PerformanceScreen` | KPI & Self-Review | ✅ |
-| `ProfileEditScreen` | Personal Data & Docs | ✅ |
-
----
-
-## 4. API & Authorization Matrix
-
-All protected endpoints require the `Authorization: Bearer <token>` header and `X-Tenant` context.
-
-| Endpoint | Method | Platform | Required Permission | Auth |
-| :--- | :--- | :--- | :--- | :---: |
-| `/auth/login/` | `POST` | All | `AllowAny` | ❌ |
-| `/public/signup/` | `POST` | Web | `AllowAny` | ❌ |
-| `/users/me/` | `GET` | All | `IsAuthenticated` | ✅ |
-| `/employees/` | `GET` | Web | `manage_employees` | ✅ |
-| `/employees/` | `POST` | Web | `manage_employees` | ✅ |
-| `/employees/{id}/` | `PATCH` | All | `IsAuthenticated` (Self or Admin) | ✅ |
-| `/attendance/` | `GET` | All | `IsAuthenticated` (Self) | ✅ |
-| `/attendance/` | `POST` | All | `IsAuthenticated` (Self) | ✅ |
-| `/leave-requests/` | `POST` | All | `IsAuthenticated` (Self) | ✅ |
-| `/leave-requests/{id}/`| `PATCH` | Web | `manage_leaves` | ✅ |
-| `/payslips/` | `GET` | All | `IsAuthenticated` (Self) | ✅ |
-| `/payslips/{id}/pdf/` | `GET` | All | `IsAuthenticated` (Self) | ✅ |
-| `/core/dashboard-stats/`| `GET` | All | `view_analytics` | ✅ | PROFESSIONAL |
-| `/tenant/settings/` | `PATCH` | Web | `manage_tenant_settings` | ✅ | ESSENTIAL |
-
----
-
-## 5. Subscription Gating & Module Access
-
-The system enforces access to features based on the tenant's active subscription plan.
-
-| Plan | Included Modules | Target Audience |
+| Aspect | Web (Frontend Portal) | Mobile (Flutter App) |
 | :--- | :--- | :--- |
-| **FREE** | Core, Basic Attendance | Startups & Micro-SMEs |
-| **ESSENTIAL** | Core, Attendance (Geo), Leaves | Small Businesses |
-| **PROFESSIONAL** | + Payroll (PPh 21/BPJS), Reimbursement | Growing SMBs |
-| **PREMIUM** | + Performance (KPI), Advanced RBAC | High-Growth Companies |
-| **ENTERPRISE** | + Analytics, Audit Trail, Custom SLA | Large Corporations |
+| **Primary Target Audience** | HR Administrators, Business Owners, Supervisors, & Desk Workers | Field Workers & Operational Employees (Mobile-First) |
+| **Interaction Pattern** | Bulk data entry, configurations, large dataset analytics, detailed exports | Quick actions, biometric authentication, single-handed ergonomics |
+| **Navigation** | URL-based routing (Routes & Layout Guards) | Stack-based navigation (Screen Stack & State) |
+| **Hardware Integration** | Limited (Browser Webcam API, Browser Geolocation API) | Native (Device GPS sensors, Native Camera, Encrypted Storage) |
 
 ---
 
-## 6. Summary of Platform Restrictions
+## 2. Feature Comparison & Authorization Matrix
 
-1.  **Mobile is for Employees**: The mobile app is streamlined for daily operational tasks. It does not include management features (approving others' leaves, processing payroll, or system configuration).
-2.  **Web is for Admin & Self-Service**: The web portal is the full-featured interface. It serves both the administrators (HR Managers, Owners) and employees who prefer a desktop view.
-3.  **Public Access**: Only landing pages, pricing, and the registration/login portals are accessible without an account. Once a tenant is identified, the system enforces strict isolation.
+The following matrix lists the availability of features across platforms and the underlying functional rationale:
+
+| Feature Area | Specific Feature | Web | Mobile | Rationale (Why are they different?) |
+| :--- | :--- | :---: | :---: | :--- |
+| **SaaS & Billing** | Tenant Sign-up | ✅ | ❌ | Corporate onboarding involves long legal/identity forms and checkout flows, which are easier and safer to perform on a desktop layout. |
+| | Subscription Management | ✅ | ❌ | Billing cycles, invoice downloads, and subscription tiers are highly sensitive business-owner workflows isolated to the Web admin portal. |
+| **Core HR** | Employee CRUD | ✅ | ❌ | Managing employee cohorts and bulk data input requires screen space to minimize typos and ensure compliance. |
+| | Document Management | ✅ | ✅ | **Web**: Upload pre-saved digital files (PDF/PNG) from local storage.<br>**Mobile**: Capture physical documents directly using the device camera. |
+| **Attendance** | Clock In/Out | ✅ | ✅ | **Web**: For office staff working at desk PCs.<br>**Mobile**: Uses GPS & face verification for dynamic or remote employees. |
+| | Precise Geofencing | ❌ | ✅ | Browser Geolocation is easily spoofed via developer tools and often defaults to IP-based routing. Mobile uses physical GPS hardware sensors. |
+| | Liveness/Face ID | ❌ | ✅ | Mobile utilizes the native device camera and face-liveness check to prevent identity spoofing using static images. |
+| **Leaves & Overtime**| Submission | ✅ | ✅ | Employees can submit requests anywhere (desktop or phone). |
+| | Approval Workflow | ✅ | ❌ | Supervisor and HR approval workflows are centralized on the Web to allow managers to view calendars and team coverage. |
+| **Payroll** | Bulk Payroll processing | ✅ | ❌ | Payroll calculations (taxes, social security, BPJS) and bank transfer exports are complex operations requiring administrative control and large screen space. |
+| | View/Download Payslips | ✅ | ✅ | Individual Self-Service access, allowing employees to view and download their slip PDFs on both Web and Mobile. |
+| **Performance** | Setup KPI Templates | ✅ | ❌ | Configured by HR Managers and Executives on the Web to map company goals. |
+| | Self-Appraisal | ✅ | ✅ | Employees can input their self-evaluations on either platform. |
+
+---
+
+## 3. Workflow Comparisons
+
+### A. Authentication and Tenant Resolution Workflow
+While both platforms use JWT tokens (`access` and `refresh`) to authenticate API requests, they locate tenant database schemas differently:
+
+```mermaid
+graph TD
+    subgraph Web Flow
+        A[Access URL: tenant.harikerja.com] --> B[Extract Subdomain from Hostname]
+        B --> C[Automatically Set X-Tenant Header]
+        C --> D[Use Layout Guards to Check JWT in localStorage]
+    end
+
+    subgraph Mobile Flow
+        E[Launch Mobile App] --> F{Token Stored?}
+        F -- Yes --> G[Retrieve Token & Subdomain from SecureStorage]
+        F -- No --> H[User Manually Inputs Subdomain]
+        H --> I[Verify Tenant & Input Credentials]
+        I --> J[Save Token & Subdomain to SecureStorage]
+    end
+```
+
+> [!NOTE]
+> On the Web, tenant mapping is automatic based on the browser DNS hostname. On Mobile, due to a single compiled binary serving all customers, the user must input their company's subdomain manually on first launch.
+
+---
+
+### B. Attendance Workflow (Clock In / Clock Out)
+The validation and security checks differ dynamically based on the platform:
+
+```mermaid
+graph LR
+    subgraph Web Attendance
+        A[Click Clock In] --> B[Request Browser Geolocation]
+        B --> C[Capture Snapshot via Browser Webcam]
+        C --> D[Send standard coordinates & photo to API]
+    end
+
+    subgraph Mobile Attendance
+        E[Click Clock In] --> F[Query Internal GPS Sensor]
+        F --> G[Perform Biometric Face & Liveness Detection]
+        G --> H[Compress Native Photo & Attach Geotag]
+        H --> I[Send encrypted payload to API]
+    end
+```
+
+> [!WARNING]
+> Web attendance is susceptible to location spoofing using browser developer tools. Therefore, for remote or on-field personnel, companies are strongly advised to enforce the use of the **Mobile App** due to native GPS sensor hardware reading and face-liveness verification.
+
+---
+
+### C. Personal Document Upload Workflow
+* **Similarities**: Both workflows allow updating metadata (`fullName`, `email`) and uploading identity records (`KTP`, `NPWP`).
+* **Differences**:
+  * **On Web**: Employees can upload pre-existing PDF or image assets using drag-and-drop.
+  * **On Mobile**: Optimized for capturing the physical documents directly. The native camera compresses images locally before transfer to reduce mobile data usage.
+
+---
+
+## 4. Token Storage & Security
+
+* **Web**:
+  * Tokens are stored in `localStorage` to keep the user logged in across tab sessions.
+  * Protection against Cross-Site Scripting (XSS) is enforced via strict frontend output encoding.
+* **Mobile**:
+  * Tokens are stored securely using `FlutterSecureStorage`, which interfaces with native OS-level encryption: **Keychain** on iOS and **AES KeyStore** on Android.
+  * This provides a higher isolation level as other applications cannot read this private storage area.
+
+---
+
+## 5. Summary of Feature Placement Rules
+
+The HariKerja architecture adheres to three core guidelines:
+1. **Employee Self-Service (ESS)** $\rightarrow$ Deployed on **Web & Mobile**. Features for personal operational tasks (attendance, leaves, overtime, payslips, self-appraisals) must be accessible everywhere.
+2. **Administration & Bulk Operations** $\rightarrow$ Deployed exclusively on the **Web**. Complex calculations, company-wide configuration, and approval dashboards require desktop layouts.
+3. **Hardware-Bound Integrity** $\rightarrow$ Deployed exclusively on **Mobile**. Face-liveness checks, background GPS tracking, and native document capture ensure data validity.
