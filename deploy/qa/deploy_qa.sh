@@ -1,70 +1,70 @@
 #!/bin/bash
 
-# --- Script Deployment Aman HRMS (Lingkungan QA) ---
-# Script ini dirancang untuk melakukan deployment dengan aman ke server QA.
-# Urutan proses: Memastikan koneksi stabil, backup database, tarik kode terbaru (git pull),
-# build container docker baru, jalankan migrasi database, dan tes kesehatan (smoke test).
+# --- Safe Deployment Script for HRMS (QA Environment) ---
+# This script is designed to safely deploy to the QA server.
+# Process flow: Ensure stable connection, backup database, pull latest code (git pull),
+# build new docker containers, run database migrations, and perform health check (smoke test).
 
-set -e # Hentikan script secara otomatis jika ada perintah yang gagal (mengembalikan exit code selain 0)
-set -o pipefail # Hentikan script jika ada perintah di dalam pipe (|) yang gagal
+set -e # Automatically stop the script if any command fails (returns non-zero exit code)
+set -o pipefail # Stop the script if any command in a pipeline (|) fails
 
 # ==========================================
-# Konfigurasi Direktori dan Environment
+# Directory and Environment Configuration
 # ==========================================
-# Mengambil direktori tempat script ini berada, lalu kembali 2 tingkat ke root project
+# Get the directory where this script is located, then go up 2 levels to the project root
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." &> /dev/null && pwd )"
 ENV_FILE="deploy/environments/.env.qa"
 
 # ==========================================
-# Tahap 0: Stabilitas Koneksi SSH
+# Phase 0: SSH Connection Stability
 # ==========================================
-# Mencegah terminal terputus (freeze/timeout) saat proses deployment yang memakan waktu lama.
-echo "🛡️ Tahap 0: Memastikan Stabilitas Terminal (SSH KeepAlive)..."
+# Prevents terminal disconnects (freezes/timeouts) during long deployment processes.
+echo "🛡️ Phase 0: Ensuring Terminal Stability (SSH KeepAlive)..."
 if grep -q "ClientAliveInterval 0" /etc/ssh/sshd_config; then
-    echo "🔧 Mengoptimalkan pengaturan SSH untuk mencegah terminal terputus..."
-    # Mengirim paket "alive" setiap 60 detik ke client agar koneksi tetap aktif
+    echo "🔧 Optimizing SSH settings to prevent terminal disconnection..."
+    # Send "alive" packets every 60 seconds to keep the connection active
     sudo sed -i 's/ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config
     sudo sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config
     sudo systemctl restart ssh
-    echo "✅ SSH dioptimalkan. Terminal sekarang lebih stabil."
+    echo "✅ SSH optimized. Terminal is now more stable."
 else
-    echo "✅ Stabilitas SSH sudah terkonfigurasi."
+    echo "✅ SSH stability already configured."
 fi
 
-# Pindah ke direktori utama project
+# Change directory to the project root
 cd "$PROJECT_ROOT"
 
-echo "🚀 Memulai Proses Deployment Aman untuk HRMS QA..."
+echo "🚀 Starting Safe Deployment Process for HRMS QA..."
 
 # ==========================================
-# Tahap 1: Pencadangan Database (Backup)
+# Phase 1: Database Backup
 # ==========================================
-# Sangat krusial! Memastikan kita punya titik pemulihan jika deployment gagal atau merusak data.
-echo "📦 Tahap 1: Membuat backup database..."
+# Crucial! Ensures we have a recovery point if the deployment fails or corrupts data.
+echo "📦 Phase 1: Creating database backup..."
 if ! "$SCRIPT_DIR/backup_qa.sh"; then
-    echo "❌ Backup gagal! Menghentikan proses deployment demi keamanan."
+    echo "❌ Backup failed! Aborting deployment process for safety."
     exit 1
 fi
 
 # ==========================================
-# Tahap 2: Pembaruan Kode (Git Pull)
+# Phase 2: Code Update (Git Pull)
 # ==========================================
-# Mengambil pembaruan kode terbaru dari repositori git.
-# Mengecek apakah direktori saat ini adalah repositori git yang valid.
+# Pulls the latest code updates from the git repository.
+# Check if the current directory is a valid git repository.
 if [ -d ".git" ]; then
-    echo "⬇️ Tahap 2: Menarik kode terbaru dari repositori (git pull)..."
-    git pull || echo "⚠️ Tahap 2: Git pull gagal (mungkin ada perubahan lokal). Tetap melanjutkan..."
+    echo "⬇️ Phase 2: Pulling latest code from repository (git pull)..."
+    git pull || echo "⚠️ Phase 2: Git pull failed (possibly local changes). Proceeding anyway..."
 else
-    echo "⚠️ Tahap 2: Bukan repositori git, melewati proses git pull."
+    echo "⚠️ Phase 2: Not a git repository, skipping git pull."
 fi
 
 # ==========================================
-# Tahap 2.5: Mengunduh Base Image dengan Cadangan (Fallback & Retries)
+# Phase 2.5: Pre-Pull Base Images (Fallback & Retries)
 # ==========================================
-echo "📥 Tahap 2.5: Mengunduh base images terlebih dahulu untuk mencegah timeout..."
+echo "📥 Phase 2.5: Pre-pulling base images to prevent timeouts..."
 
-# Fungsi pembantu untuk mengunduh image dengan percobaan ulang dan fallback ke mirror ECR Public
+# Helper function to pull docker image with retries and ECR Public mirror fallback
 pre_pull_image() {
     local target_image="$1"
     local fallback_image="$2"
@@ -72,31 +72,31 @@ pre_pull_image() {
     local attempt=1
 
     while [ $attempt -le $max_attempts ]; do
-        echo "Mencoba mengunduh $target_image dari Docker Hub (Percobaan $attempt/$max_attempts)..."
+        echo "Attempting to pull $target_image from Docker Hub (Attempt $attempt/$max_attempts)..."
         if docker pull "$target_image"; then
-            echo "✅ Berhasil mengunduh $target_image."
+            echo "✅ Successfully pulled $target_image."
             return 0
         fi
-        echo "⚠️ Percobaan $attempt gagal."
+        echo "⚠️ Attempt $attempt failed."
         attempt=$((attempt + 1))
         sleep 2
     done
 
     if [ -n "$fallback_image" ]; then
-        echo "🔄 Mencoba mengunduh dari ECR Public Mirror: $fallback_image..."
+        echo "🔄 Attempting to pull from ECR Public Mirror: $fallback_image..."
         if docker pull "$fallback_image"; then
-            echo "🏷️ Berhasil mengunduh dari mirror. Melakukan retag ke $target_image..."
+            echo "🏷️ Successfully pulled from mirror. Retagging to $target_image..."
             docker tag "$fallback_image" "$target_image"
-            echo "✅ Selesai retag."
+            echo "✅ Retag completed."
             return 0
         fi
     fi
 
-    echo "⚠️ Gagal mengunduh $target_image setelah beberapa percobaan. Proses build docker compose akan mencobanya kembali secara mandiri."
-    return 0 # Kembalikan 0 agar tidak menghentikan script utama (set -e)
+    echo "⚠️ Failed to pull $target_image after several attempts. Docker Compose build will attempt to pull it independently."
+    return 0 # Return 0 so it doesn't halt the main script (set -e)
 }
 
-# Pre-pull images yang dibutuhkan agar proses build/up tidak gagal di tengah jalan
+# Pre-pull required images so the build/up process doesn't fail midway
 pre_pull_image "node:22-bookworm-slim" "public.ecr.aws/docker/library/node:22-bookworm-slim"
 pre_pull_image "python:3.10-slim" "public.ecr.aws/docker/library/python:3.10-slim"
 pre_pull_image "postgres:15-alpine" "public.ecr.aws/docker/library/postgres:15-alpine"
@@ -105,78 +105,78 @@ pre_pull_image "nginx:alpine" "public.ecr.aws/docker/library/nginx:alpine"
 pre_pull_image "edoburu/pgbouncer:latest" ""
 
 # ==========================================
-# Tahap 3: Membangun Ulang & Menjalankan Container (Deployment)
+# Phase 3: Rebuilding & Running Containers (Deployment)
 # ==========================================
-echo "🏗️ Tahap 3: Membangun ulang (rebuild) dan menjalankan container..."
-# Mematikan dan menghapus container lama ('down') untuk membersihkan IP dan cache DNS Docker.
-# '--remove-orphans' akan menghapus container yang tidak terdefinisi di docker-compose saat ini.
+echo "🏗️ Phase 3: Rebuilding and running containers..."
+# Stop and remove old containers to clear IP and Docker DNS cache.
+# '--remove-orphans' removes containers not defined in the current docker-compose file.
 docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" down --remove-orphans
 
-# Menjalankan ulang ('up') container di latar belakang ('-d') dan memaksa build ulang image ('--build') 
-# agar kode terbaru teraplikasikan.
+# Rerun containers in the background ('-d') and force rebuilding images ('--build')
+# so the latest code changes are applied.
 docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d --build
 
 # ==========================================
-# Tahap 4: Migrasi Database
+# Phase 4: Database Migration
 # ==========================================
-echo "⚙️ Tahap 4: Menjalankan migrasi database (Schema Publik & Tenant)..."
-# Mengeksekusi perintah Django 'migrate_schemas' di dalam container 'backend' untuk menerapkan 
-# perubahan struktur database ke schema utama dan semua schema tenant yang ada.
+echo "⚙️ Phase 4: Running database migrations (Public & Tenant Schemas)..."
+# Execute Django 'migrate_schemas' in the 'backend' container to apply
+# database structure changes to the public schema and all tenant schemas.
 docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python manage.py migrate_schemas
 
 # ==========================================
-# Tahap 4.1: Inisialisasi Tenant
+# Phase 4.1: Tenant Initialization
 # ==========================================
-echo "🏗️ Tahap 4.1: Menginisialisasi Public Tenant dan Domain..."
-# Menjalankan script khusus untuk memastikan setup awal tenant untuk QA sudah sesuai dan terdaftar di database.
+echo "🏗️ Phase 4.1: Initializing Public Tenant and Domain..."
+# Run specific setup script to ensure initial QA tenant registry in database.
 docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend python scripts/setup_qa_tenant.py
 
 # ==========================================
-# Tahap 5: Pengujian Unit (Unit Testing) - Diabaikan
+# Phase 5: Unit Testing - Skipped
 # ==========================================
-# (Komentar asli dipertahankan, saat ini tidak dijalankan karena masih di-comment)
-# echo "🧪 Tahap 5: Menjalankan Backend Unit Tests..."
+# (Original commented code preserved for reference)
+# echo "🧪 Phase 5: Running Backend Unit Tests..."
 # if ! docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" exec -T backend pytest -m "not e2e" -n auto; then
-#     echo "❌ Unit Tests Gagal! Deployment mungkin tidak stabil."
-#     echo "Cek output test di atas."
+#     echo "❌ Unit Tests Failed! Deployment might be unstable."
+#     echo "Check the test output above."
 #     exit 1
 # fi
-# echo "✅ Unit Tests Berhasil!"
+# echo "✅ Unit Tests Succeeded!"
 
 # ==========================================
-# Tahap 6: Smoke Test (Cek Kesehatan Sistem)
+# Phase 6: Smoke Test (System Health Check)
 # ==========================================
-echo "🔍 Tahap 6: Menjalankan Smoke Test (Cek Status API)..."
-echo "Menunggu 15 detik agar semua layanan siap dan stabil..."
+echo "🔍 Phase 6: Running Smoke Test (Checking API Status)..."
+echo "Waiting 15 seconds for all services to become ready and stable..."
 sleep 15
 
-# Mengecek endpoint API `/api/health/`. Kita melakukan request ke localhost:80 
-# tetapi memanipulasi Header ('Host' dan 'X-Forwarded-Proto') untuk menyimulasikan 
-# request aslinya (harikerja.web.id dengan HTTPS) sehingga Nginx atau Backend tidak melakukan redirect.
+# Check the API health endpoint `/api/health/`. We request localhost:80
+# but manipulate headers ('Host' and 'X-Forwarded-Proto') to simulate the real request
+# (harikerja.web.id with HTTPS) so that Nginx/Backend does not redirect.
 API_STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
   -H "Host: harikerja.web.id" \
   -H "X-Forwarded-Proto: https" \
   http://localhost:80/api/health/ || echo "000")
 
 if [ "$API_STATUS" -eq 200 ]; then
-    echo "✅ Smoke Test Berhasil! API merespons dengan baik (HTTP $API_STATUS)."
+    echo "✅ Smoke Test Succeeded! API responded successfully (HTTP $API_STATUS)."
 else
-    echo "❌ Smoke Test Gagal! API tidak merespons dengan benar (HTTP $API_STATUS)."
-    echo "Menampilkan 100 baris log backend terakhir untuk menganalisa masalah:"
-    # Tampilkan log dari container backend, filter kata 'health' agar tidak berisik, lalu keluar dengan kode error
+    echo "❌ Smoke Test Failed! API did not respond correctly (HTTP $API_STATUS)."
+    echo "Showing the last 100 lines of backend logs for analysis:"
+    # Show logs from the backend container, filter out noisy 'health' logs, and exit with error code
     docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" logs --tail=100 backend | grep -v "health"
     exit 1
 fi
 
 # ==========================================
-# Tahap 7: Pembersihan (Cleanup)
+# Phase 7: Cleanup
 # ==========================================
-echo "🧹 Tahap 7: Membersihkan artifact Docker yang tidak terpakai..."
-# Menghapus image Docker yang lama (dangling images) untuk menghemat ruang disk di server.
+echo "🧹 Phase 7: Cleaning up unused Docker artifacts..."
+# Remove dangling images to save disk space on the server.
 docker image prune -f
 
 # ==========================================
-# Selesai
+# Completed
 # ==========================================
-echo "✅ Deployment Aman Berhasil Diselesaikan!"
-echo "Aplikasi telah diperbarui dan cadangan data telah disimpan di folder 'backups/'."
+echo "✅ Safe Deployment Successfully Completed!"
+echo "The application has been updated and a database backup has been saved in the 'backups/' directory."
