@@ -213,9 +213,11 @@ Begitu proses selesai dengan pesan `Superuser created successfully.`, sistem sec
 ---
 
 ## 8. Referensi Berkas Terkait
+* **Detail Matriks Peran & Izin (Web & Mobile):** [docs/workflows_features/rbac_matrix_details-id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_matrix_details-id.md)
 * **Model Pengguna:** [users/models.py](file:///home/afdhal/data/hr/hrms/backend/users/models.py)
 * **Middleware Keamanan:** [users/middleware.py](file:///home/afdhal/data/hr/hrms/backend/users/middleware.py)
 * **Database Seeder:** [scripts/seeds/core.py](file:///home/afdhal/data/hr/hrms/backend/scripts/seeds/core.py)
 * **E2E Test Suites:** [tests/superadmin.spec.ts](file:///home/afdhal/data/hr/hrms/frontend/tests/superadmin.spec.ts)
+
 
 

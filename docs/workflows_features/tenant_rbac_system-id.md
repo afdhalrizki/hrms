@@ -1,6 +1,6 @@
-# Dokumentasi Sistem RBAC HRMS
+# Dokumentasi Sistem RBAC Tenant HRMS
 
-Dokumen ini menguraikan arsitektur, izin, dan manajemen peran untuk Sistem Manajemen SDM (HRMS). Sistem ini menggunakan model **RBAC Dinamis Berbasis Kemampuan** untuk memberikan fleksibilitas bagi admin perusahaan dan penegakan keamanan yang ketat.
+Dokumen ini menguraikan arsitektur, izin, dan manajemen peran untuk Sistem Manajemen SDM (HRMS) pada tingkat Tenant (Perusahaan). Sistem ini menggunakan model **RBAC Dinamis Berbasis Kemampuan** untuk memberikan fleksibilitas bagi admin perusahaan dan penegakan keamanan yang ketat.
 
 ## Tinjauan Arsitektur
 
@@ -94,3 +94,11 @@ def delete(self, *args, **kwargs):
         raise ValidationError("Peran default sistem tidak dapat dihapus.")
     return super().delete(*args, **kwargs)
 ```
+
+---
+
+## Referensi Detil Matriks Peran & Halaman
+
+Untuk panduan mendalam mengenai daftar lengkap menu, halaman, serta aksi yang diperbolehkan atau dilarang untuk masing-masing peran baik di web maupun mobile, silakan merujuk ke:
+*   **[Detail Matriks Peran & Izin (Web & Mobile)](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_matrix_details-id.md)**
+

@@ -1,6 +1,6 @@
-# HRMS RBAC System Documentation
+# HRMS Tenant RBAC System Documentation
 
-This document outlines the architecture, permissions, and roles management for the HR Management System (HRMS). The system uses a **Dynamic, Capability-Based RBAC** model to provide both flexibility for company admins and strict security enforcement.
+This document outlines the architecture, permissions, and roles management for the HR Management System (HRMS) at the Tenant (Company) level. The system uses a **Dynamic, Capability-Based RBAC** model to provide both flexibility for company admins and strict security enforcement.
 
 ## Architecture Overview
 
@@ -94,3 +94,11 @@ def delete(self, *args, **kwargs):
         raise ValidationError("System default roles cannot be deleted.")
     return super().delete(*args, **kwargs)
 ```
+
+---
+
+## Detailed Role & Page Matrix Reference
+
+For a comprehensive guide showing exactly which menus, pages, and actions are allowed or restricted for each role on both web and mobile, please refer to:
+*   **[Detailed Role & Permission Matrix (Web & Mobile)](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_matrix_details.md)**
+

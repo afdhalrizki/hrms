@@ -203,9 +203,11 @@ Once complete, you should see the `Superuser created successfully.` confirmation
 ---
 
 ## 7. Related File References
+* **Detailed Role & Permission Matrix (Web & Mobile):** [docs/workflows_features/rbac_matrix_details.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_matrix_details.md)
 * **User Model:** [users/models.py](file:///home/afdhal/data/hr/hrms/backend/users/models.py)
 * **Security Middleware:** [users/middleware.py](file:///home/afdhal/data/hr/hrms/backend/users/middleware.py)
 * **Database Seeder:** [scripts/seeds/core.py](file:///home/afdhal/data/hr/hrms/backend/scripts/seeds/core.py)
 * **E2E Test Suites:** [tests/superadmin.spec.ts](file:///home/afdhal/data/hr/hrms/frontend/tests/superadmin.spec.ts)
+
 
 

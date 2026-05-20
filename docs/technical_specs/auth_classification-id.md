@@ -99,3 +99,11 @@ class SubscriptionStatusPermission(permissions.BasePermission):
         # EXPIRED -> Metode AMAN (GET) diizinkan; pembuatan/perubahan diblokir.
         # SUSPENDED -> Semua permintaan diblokir (403 Forbidden).
 ```
+
+---
+
+## 4. Referensi Terkait
+
+Untuk detail pemetaan menu dan halaman spesifik yang dapat diakses oleh masing-masing tipe pengguna di aplikasi Web maupun Mobile, lihat:
+*   **[Detail Matriks Peran & Izin (Web & Mobile)](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_matrix_details-id.md)**
+

@@ -150,15 +150,43 @@ Untuk menjamin stabilitas, kami telah menetapkan struktur **tim inti 10 orang**:
 2.  **Fase Berikutnya**: Penskalaan 1.000 - 10.000 Pengguna dengan pemantauan yang ditingkatkan
 3.  **Fase Depan**: Penskalaan 100.000+ Pengguna dengan penyebaran tim lengkap 10 orang
 
-Strategi penskalaan mendalam: [**Strategi Tim Teknis**](./docs/plans/technical_team_strategy-id.md)
+Strategi penskalaan mendalam: [**Strategi Tim Teknis**](./docs/business_strategy/organization_structure_strategy-id.md)
 
-## 📚 Dokumentasi Teknis
+## 📚 Dokumentasi Teknis & Peta Direktori
 
-Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi internal di seluruh platform:
+Platform ini mempertahankan dokumentasi bilingual (Inggris & Indonesia) yang komprehensif. Berikut adalah peta direktori yang menjelaskan tujuan dan berkas kunci dari semua folder dokumentasi serta berkas README:
 
-- [**Checklist Fitur & Peta Jalan**](./docs/project_management/feature_roadmap_checklist-id.md) - Daftar lengkap fitur yang ada dan rencana masa depan
-- [**Arsitektur High Availability AWS**](./docs/architecture/aws_high_availability_architecture-id.md) - Desain penskalaan 1 juta pengguna
-- [**Panduan Arsitektur Skalabilitas**](./docs/architecture/scaling_architecture_guide-id.md) - Penskalaan 100 ribu ke 1 juta (AWS vs VPS)
+### 📖 Berkas README Modul
+- [**README Utama**](./README.md) ([**Versi Indonesia**](./README-id.md)) - Tinjauan umum platform, strategi penskalaan, orkestrator pengujian terpadu, dan panduan memulai cepat.
+- [**README Backend**](./backend/README.md) ([**Versi Indonesia**](./backend/README-id.md)) - Pengaturan API inti Django, perintah pengujian Pytest, skema pembatasan modular (tiering), dan database seeder.
+- [**README Frontend**](./frontend/README.md) ([**Versi Indonesia**](./frontend/README-id.md)) - Konfigurasi dasbor admin Next.js, sistem desain UI, dan rangkaian pengujian Vitest/Playwright.
+- [**README Mobile**](./mobile/README.md) ([**Versi Indonesia**](./mobile/README-id.md)) - Instruksi kompilasi aplikasi Flutter, integrasi biometrik wajah, dan konfigurasi geofencing.
+- [**README Penyebaran**](./deploy/README.md) - Skrip infrastruktur, konfigurasi reverse proxy Nginx, konfigurasi lingkungan (.env), dan skrip jalur promosi deployment.
+
+### 📚 Direktori Dokumentasi Platform (`/docs`)
+- **`adr/`**: Architecture Decision Records (ADR) yang merinci keputusan teknis krusial.
+  - [Optimasi Penghitung Karyawan](./docs/adr/employee_counter_optimization-id.md) ([English](./docs/adr/employee_counter_optimization.md))
+- **`architecture/`**: Integrasi sistem, diagram alur otentikasi, dan desain infrastruktur HA.
+  - [Arsitektur High Availability AWS](./docs/architecture/aws_high_availability_architecture-id.md) ([English](./docs/architecture/aws_high_availability_architecture.md))
+  - [Strategi Penyebaran & Jalur Promosi](./docs/architecture/deployment_strategy-id.md) ([English](./docs/architecture/deployment_strategy.md))
+  - [Sistem Multi-Tenancy](./docs/architecture/multi_tenancy_system-id.md) ([English](./docs/architecture/multi_tenancy_system.md))
+  - [Panduan Arsitektur Skalabilitas](./docs/architecture/scaling_architecture_guide-id.md) ([English](./docs/architecture/scaling_architecture_guide.md))
+- **`business_strategy/`**: Rencana tingkat harga SaaS, SLA, proyeksi keuntungan, dan struktur tim.
+  - [Rencana Paket Tenant](./docs/business_strategy/tenant_plans-id.md) ([English](./docs/business_strategy/tenant_plans.md))
+  - [Standar SLA Enterprise](./docs/business_strategy/sla_enterprise_standard-id.md) ([English](./docs/business_strategy/sla_enterprise_standard.md))
+  - [Strategi Tim Teknis](./docs/business_strategy/organization_structure_strategy-id.md) ([English](./docs/business_strategy/organization_structure_strategy.md))
+- **`modules/`**: Panduan teknis spesifik untuk modul backend.
+  - [Kehadiran](./docs/modules/attendance-id.md), [Penggajian](./docs/modules/payroll-id.md), [Reimbursement](./docs/modules/reimbursement-id.md), [Tenant](./docs/modules/tenants-id.md), [Pengguna](./docs/modules/users-id.md)
+- **`project_management/`**: Checklist peta jalan implementasi dan transfer pengetahuan antar-stack.
+  - [Checklist Fitur & Peta Jalan](./docs/project_management/feature_roadmap_checklist-id.md) ([English](./docs/project_management/feature_roadmap_checklist.md))
+  - [Audit Fitur Mobile](./docs/project_management/mobile_feature_audit-id.md) ([English](./docs/project_management/mobile_feature_audit.md))
+- **`technical_specs/`**: Peta rute otorisasi, referensi API, dan audit keamanan.
+  - [Klasifikasi Otentikasi & Otorisasi](./docs/technical_specs/auth_classification-id.md) ([English](./docs/technical_specs/auth_classification.md))
+  - [Panduan Developer](./docs/technical_specs/developer_guide-id.md) ([English](./docs/technical_specs/developer_guide.md))
+- **`workflows_features/`**: Detail fungsional alur kerja bisnis utama.
+  - [Sistem RBAC Tenant](./docs/workflows_features/tenant_rbac_system-id.md) ([English](./docs/workflows_features/tenant_rbac_system.md))
+  - [Matriks Peran & Izin Detail (Web & Mobile)](./docs/workflows_features/rbac_matrix_details-id.md) ([English](./docs/workflows_features/rbac_matrix_details.md))
+  - [Matriks Global Admin](./docs/workflows_features/global_admin-id.md) ([English](./docs/workflows_features/global_admin.md))
 
 ## 🛠 Tech Stack
 

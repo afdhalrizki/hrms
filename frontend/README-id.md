@@ -111,5 +111,5 @@ Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh pl
 - [**Spesifikasi Teknis**](../docs/technical_specs/)
 
 ---
-**Status**: 🏆 **Platform Gold Release v1.3.0 (31 Maret 2026)**. Cetak Biru Skalabilitas & Pengalaman Frontend Terstandardisasi.
+**Status**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Frontend Terstandardisasi.
 **Catatan Branding**: Proyek ini diubah namanya menjadi **harikerja** pada 16 Maret 2026.

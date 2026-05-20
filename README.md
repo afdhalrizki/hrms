@@ -152,13 +152,41 @@ To guarantee stability, we have defined a **10-person core team** structure:
 
 Detailed scaling strategy: [**Technical Team Strategy**](./docs/business_strategy/organization_structure_strategy.md) ([**Versi Indonesia**](./docs/business_strategy/organization_structure_strategy-id.md))
 
-## 📚 Technical Documentation
+## 📚 Technical Documentation & Directory Map
 
-For in-depth technical details, please refer to the platform-wide internal documentation:
+The platform maintains a comprehensive bilingual (English & Indonesian) documentation vault. Below is the directory tree mapping the purposes and key files of all documentation folders and READMEs:
 
-- [**Feature Checklist & Roadmap**](./docs/project_management/feature_roadmap_checklist.md) ([**Versi Indonesia**](./docs/project_management/feature_roadmap_checklist-id.md)) - Complete list of existing features and future plans
-- [**AWS High Availability Architecture**](./docs/architecture/aws_high_availability_architecture.md) ([**Versi Indonesia**](./docs/architecture/aws_high_availability_architecture-id.md)) - 1M user scaling design
-- [**Scalability Architecture Guide**](./docs/architecture/scaling_architecture_guide.md) ([**Versi Indonesia**](./docs/architecture/scaling_architecture_guide-id.md)) - 100k to 1M scaling (AWS vs VPS)
+### 📖 Module README Files
+- [**Root README**](./README.md) ([**Indonesian**](./README-id.md)) - General platform overview, scaling strategy, unified test runner, and quick start.
+- [**Backend README**](./backend/README.md) ([**Indonesian**](./backend/README-id.md)) - Django core REST API setup, Pytest commands, modular tiering schemas, and compliance database seeders.
+- [**Frontend README**](./frontend/README.md) ([**Indonesian**](./frontend/README-id.md)) - Next.js admin dashboard configuration, styling design system, and Vitest/Playwright test suites.
+- [**Mobile README**](./mobile/README.md) ([**Indonesian**](./mobile/README-id.md)) - Flutter app build instructions, face biometrics integration details, and geofencing configurations.
+- [**Deployment README**](./deploy/README.md) - Infrastructure scripts, nginx reverse proxy configs, environment builds, and promotional path scripts.
+
+### 📚 Platform Documentation Directory (`/docs`)
+- **`adr/`**: Architecture Decision Records detailing critical technical choices.
+  - [Employee Counter Optimization](./docs/adr/employee_counter_optimization.md) ([Indonesian](./docs/adr/employee_counter_optimization-id.md))
+- **`architecture/`**: Systems integration, authentication flow diagrams, and HA designs.
+  - [AWS High Availability Architecture](./docs/architecture/aws_high_availability_architecture.md) ([Indonesian](./docs/architecture/aws_high_availability_architecture-id.md))
+  - [Deployment Strategy](./docs/architecture/deployment_strategy.md) ([Indonesian](./docs/architecture/deployment_strategy-id.md))
+  - [Multi-Tenancy System](./docs/architecture/multi_tenancy_system.md) ([Indonesian](./docs/architecture/multi_tenancy_system-id.md))
+  - [Scalability Architecture Guide](./docs/architecture/scaling_architecture_guide.md) ([Indonesian](./docs/architecture/scaling_architecture_guide-id.md))
+- **`business_strategy/`**: SaaS pricing tiers, SLAs, profit projections, and org charts.
+  - [Tenant Plans](./docs/business_strategy/tenant_plans.md) ([Indonesian](./docs/business_strategy/tenant_plans-id.md))
+  - [SLA Enterprise Standard](./docs/business_strategy/sla_enterprise_standard.md) ([Indonesian](./docs/business_strategy/sla_enterprise_standard-id.md))
+  - [Technical Team Strategy](./docs/business_strategy/organization_structure_strategy.md) ([Indonesian](./docs/business_strategy/organization_structure_strategy-id.md))
+- **`modules/`**: Specific backend module guides.
+  - [Attendance](./docs/modules/attendance.md), [Payroll](./docs/modules/payroll.md), [Reimbursement](./docs/modules/reimbursement.md), [Tenants](./docs/modules/tenants.md), [Users](./docs/modules/users.md)
+- **`project_management/`**: Implementation roadmap checklist and cross-stack knowledge transfers.
+  - [Feature Roadmap Checklist](./docs/project_management/feature_roadmap_checklist.md) ([Indonesian](./docs/project_management/feature_roadmap_checklist-id.md))
+  - [Mobile Feature Audit](./docs/project_management/mobile_feature_audit.md) ([Indonesian](./docs/project_management/mobile_feature_audit-id.md))
+- **`technical_specs/`**: Route maps, API references, and security audits.
+  - [Auth Classification](./docs/technical_specs/auth_classification.md) ([Indonesian](./docs/technical_specs/auth_classification-id.md))
+  - [Developer Guide](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide-id.md))
+- **`workflows_features/`**: Functional business flows and feature details.
+  - [Tenant RBAC System](./docs/workflows_features/tenant_rbac_system.md) ([Indonesian](./docs/workflows_features/tenant_rbac_system-id.md))
+  - [Detailed RBAC Matrix (Web & Mobile)](./docs/workflows_features/rbac_matrix_details.md) ([Indonesian](./docs/workflows_features/rbac_matrix_details-id.md))
+  - [Global Admin Matrix](./docs/workflows_features/global_admin.md) ([Indonesian](./docs/workflows_features/global_admin-id.md))
 
 ## 🛠 Tech Stack
 

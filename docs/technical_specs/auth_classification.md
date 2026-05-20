@@ -99,3 +99,11 @@ class SubscriptionStatusPermission(permissions.BasePermission):
         # EXPIRED -> SAFE methods (GET) allowed; creation/mutation blocked.
         # SUSPENDED -> All requests blocked (403 Forbidden).
 ```
+
+---
+
+## 4. Related Reference
+
+For the specific menu and page routing map accessible by each user type on both the Web and Mobile apps, see:
+*   **[Detailed Role & Permission Matrix (Web & Mobile)](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_matrix_details.md)**
+
