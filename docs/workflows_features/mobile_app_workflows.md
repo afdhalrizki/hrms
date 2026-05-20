@@ -64,7 +64,7 @@ The daily attendance log verification process (Clock-in & Clock-out) enforces tw
 ### Validation Steps:
 1.  **Geofencing Validation**: The mobile app fetches the device's current GPS coordinates. Using the *Haversine* formula, it calculates the distance to the registered company branch office:
     $$d = 2r \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)$$
-    If the calculated distance $d > \text{radius\_meters}$, the attendance status is marked as `OFF_SITE` (or blocked if the tenant enforces a *Strict Geofence* policy).
+    If the calculated distance $d > \text{radius\\_meters}$, the attendance status is marked as `OFF_SITE` (or blocked if the tenant enforces a *Strict Geofence* policy).
 2.  **Liveness Verification (Google ML Kit)**: The employee must pass a real-time liveness prompt (blinking or smiling) to prevent static spoofing (using photos or video playback).
 3.  **AI Face Matching**: The captured selfie is matched against the **Face Reference Photo** uploaded during employee onboarding.
 4.  **Full Storage Fallback**: If the tenant's cloud storage (`storage_limit_mb`) is full, the backend automatically flags the record as `biometric_skipped = True` and allows the log to save **without uploading the photo file** to keep business operations running.

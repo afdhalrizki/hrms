@@ -34,12 +34,12 @@ graph TD
     D -- Tidak --> E[Tampilkan Validasi Error: Nominal Melebihi Batas Plafon] --> B
     D -- Ya --> F[Simpan Pengajuan Status PENDING & Pemicu Workflow]
     F --> G[Tahap 1: Persetujuan Atasan Langsung / Supervisor]
-    G -->{Apakah Atasan Setuju?}
-    G -- Tidak --> H[Status = REJECTED & Selesai]
-    G -- Ya --> I[Tahap 2: Verifikasi Fisik oleh Tim Finansial / Keuangan]
-    I -->{Keuangan Setuju & Nota Sah?}
-    I -- Tidak --> H
-    I -- Ya --> J[Tentukan Nominal approved_amount & Isi Catatan Pembayaran]
+    G --> CheckSuper{Apakah Atasan Setuju?}
+    CheckSuper -- Tidak --> H[Status = REJECTED & Selesai]
+    CheckSuper -- Ya --> I[Tahap 2: Verifikasi Fisik oleh Tim Finansial / Keuangan]
+    I --> CheckFinance{Keuangan Setuju & Nota Sah?}
+    CheckFinance -- Tidak --> H
+    CheckFinance -- Ya --> J[Tentukan Nominal approved_amount & Isi Catatan Pembayaran]
     J --> K[Ubah Status = APPROVED]
     K --> L[Sistem Tandai Pembayaran Siap Ditransfer]
     L --> M[Selesai]

@@ -40,9 +40,9 @@ graph TD
     F --> G[Calculate Net Take-Home Pay: Basic + Allowance + Overtime - Deduction - Tax]
     G --> H[Generate Draft Payslip & itemized PayslipDetail records]
     H --> I[Finance / HR Administrators Audit Draft Records]
-    I -->{Calculations Correct?}
-    I -- No --> J[Adjust Components / Override Logs manually] --> B
-    I -- Yes --> K[Close Period & Dispatch Bank Transfer Exports]
+    I --> CheckResult{Calculations Correct?}
+    CheckResult -- No --> J[Adjust Components / Override Logs manually] --> B
+    CheckResult -- Yes --> K[Close Period & Dispatch Bank Transfer Exports]
     K --> L[Publish Slip: Employees view digital Payslips on dashboard]
     L --> M[End]
 ```

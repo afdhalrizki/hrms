@@ -37,9 +37,9 @@ This module integrates with the `django-tenants` engine and relies on models in 
 graph TD
     A[Start: Prospective Customer Submits Registration Form] --> B[Save Data in RegistrationRequest with PENDING Status]
     B --> C[Superadmin Reviews Request in Central Portal]
-    C -->{Approved?}
-    C -- No --> D[Set Status to REJECTED & Send Email Notice]
-    C -- Yes --> E[Set Status to APPROVED & Generate Tenant Record]
+    C --> CheckApprove{Approved?}
+    CheckApprove -- No --> D[Set Status to REJECTED & Send Email Notice]
+    CheckApprove -- Yes --> E[Set Status to APPROVED & Generate Tenant Record]
     E --> F[System Automatically Generates PostgreSQL Schema & Syncs Migrations]
     F --> G[Generate Domain Subdomain Mapping]
     G --> H[Send Confirmation Email with Subdomain & Login Link]
@@ -52,9 +52,9 @@ graph TD
 graph TD
     A[Start: Client Performs HTTP Workspace Request] --> B[Middleware Detects Subdomain & Loads Tenant Profile]
     B --> C[Retrieve and Verify expiry_date]
-    C -->{Current Date <= expiry_date?}
-    C -- Yes --> D[Status = ACTIVE: Full Read/Write Access Granted]
-    C -- No --> E{Is Current Date within Grace Period?}
+    C --> CheckExpiry{Current Date <= expiry_date?}
+    CheckExpiry -- Yes --> D[Status = ACTIVE: Full Read/Write Access Granted]
+    CheckExpiry -- No --> E{Is Current Date within Grace Period?}
     E -- Yes --> F[Status = EXPIRED: Read-Only Workspace Access]
     E -- No --> G[Status = SUSPENDED: Blocked Access Page Rendered]
     D --> H[End]

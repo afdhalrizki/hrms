@@ -37,9 +37,9 @@ Modul ini didukung oleh model-model utama dari Django App `tenants` yang terinte
 graph TD
     A[Mulai: Calon Pelanggan Mengisi Formulir Registrasi] --> B[Data Disimpan di RegistrationRequest Status PENDING]
     B --> C[Superadmin Meninjau Pengajuan di SaaS Portal]
-    C -->{Disetujui?}
-    C -- Tidak --> D[Ubah Status REJECTED & Kirim Email Penolakan]
-    C -- Ya --> E[Ubah Status APPROVED & Generate Tenant Record]
+    C --> CheckApprove{Disetujui?}
+    CheckApprove -- Tidak --> D[Ubah Status REJECTED & Kirim Email Penolakan]
+    CheckApprove -- Ya --> E[Ubah Status APPROVED & Generate Tenant Record]
     E --> F[Sistem Otomatis Membuat Skema Database Baru & Sinkronisasi Migrasi Tabel]
     F --> G[Buat Subdomain Domain Record]
     G --> H[Kirim Email Berisi Kredensial Akses & Link Subdomain]
@@ -52,9 +52,9 @@ graph TD
 graph TD
     A[Mulai: Tenant Melakukan Permintaan HTTP] --> B[Middleware Deteksi Subdomain & Muat Profil Tenant]
     B --> C[Sistem Mengevaluasi expiry_date Profil Tenant]
-    C -->{Apakah Tanggal Hari Ini <= expiry_date?}
-    C -- Ya --> D[Status = ACTIVE: Akses Penuh Baca-Tulis]
-    C -- Tidak --> E{Apakah Masuk Masa Tenggang / Grace Period?}
+    C --> CheckExpiry{Apakah Tanggal Hari Ini <= expiry_date?}
+    CheckExpiry -- Ya --> D[Status = ACTIVE: Akses Penuh Baca-Tulis]
+    CheckExpiry -- Tidak --> E{Apakah Masuk Masa Tenggang / Grace Period?}
     E -- Ya --> F[Status = EXPIRED: Akses Terbatas READ-ONLY]
     E -- Tidak --> G[Status = SUSPENDED: Akses DIBLOKIR Penuh]
     D --> H[Selesai]

@@ -33,11 +33,11 @@ graph TD
     C --> D[Save notification record in SystemNotification]
     D --> E[Render instant badge on target user's In-App Dashboard]
     E --> F[Check target user preference: receive_email_notifications]
-    F -->{Emails Enabled?}
-    H -- Failed --> I[Log SMTP failure & End]
-    F -- No --> J[End]
-    F -- Yes --> H[Request SMTP Server to dispatch HTML email]
+    F --> G{Emails Enabled?}
+    G -- No --> J[End]
+    G -- Yes --> H[Request SMTP Server to dispatch HTML email]
     H -- Success --> K[Email delivered to target user's Inbox] --> J
+    H -- Failed --> I[Log SMTP failure & End]
 ```
 
 ---

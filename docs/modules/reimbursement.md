@@ -34,12 +34,12 @@ graph TD
     D -- No --> E[Display Error: Amount exceeds category limit] --> B
     D -- Ya --> F[Save Claim as PENDING & Trigger Workflow]
     F --> G[Stage 1: Direct Supervisor Review]
-    G -->{Supervisor Approved?}
-    G -- No --> H[Set Status to REJECTED & End]
-    G -- Yes --> I[Stage 2: Finance Department Verification]
-    I -->{Finance Approved & Receipt Audited?}
-    I -- No --> H
-    I -- Yes --> J[Specify approved_amount & Review Notes]
+    G --> CheckSuper{Supervisor Approved?}
+    CheckSuper -- No --> H[Set Status to REJECTED & End]
+    CheckSuper -- Yes --> I[Stage 2: Finance Department Verification]
+    I --> CheckFinance{Finance Approved & Receipt Audited?}
+    CheckFinance -- No --> H
+    CheckFinance -- Yes --> J[Specify approved_amount & Review Notes]
     J --> K[Set Status to APPROVED]
     K --> L[Queue Request for Payout / Bank Transfer]
     L --> M[End]

@@ -64,7 +64,7 @@ Proses absensi harian karyawan (Clock-in & Clock-out) dilindungi oleh verifikasi
 ### Langkah Pembatasan:
 1.  **Validasi Geofencing**: Aplikasi mengambil koordinat GPS terkini. Menggunakan formula *Haversine*, jarak dihitung dari titik koordinat cabang terdaftar:
     $$d = 2r \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)$$
-    Jika jarak $d > \text{radius\_meters}$, status disetel ke `OFF_SITE` (atau diblokir jika tenant memberlakukan aturan absensi *Strict Branch Only*).
+    Jika jarak $d > \text{radius\\_meters}$, status disetel ke `OFF_SITE` (atau diblokir jika tenant memberlakukan aturan absensi *Strict Branch Only*).
 2.  **Verifikasi Liveness (Google ML Kit)**: Karyawan wajib melakukan deteksi liveness (berkedip atau tersenyum) di depan kamera depan untuk mencegah manipulasi menggunakan foto/video statis.
 3.  **Pengenalan Wajah AI**: Wajah yang tertangkap dicocokkan dengan **Foto Referensi Wajah** yang diunggah saat onboarding.
 4.  **Bypass Penyimpanan Penuh**: Jika kapasitas penyimpanan cloud tenant penuh (`storage_limit_mb` tercapai), sistem backend secara otomatis mengizinkan absensi diproses **tanpa mengunggah file foto** (`biometric_skipped = True`) untuk menghindari kemacetan operasional.

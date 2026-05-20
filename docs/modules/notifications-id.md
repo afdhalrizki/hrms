@@ -33,11 +33,11 @@ graph TD
     C --> D[Simpan Pesan ke Basis Data SystemNotification]
     D --> E[Tampilkan Pesan Instan di Dasbor In-App target_user]
     E --> F[Ambil Preferensi Pengguna: receive_email_notifications]
-    F -->{Apakah Email Diaktifkan?}
-    H -- Gagal --> I[Catat Log Kegagalan SMTP & Selesai]
-    F -- Tidak --> J[Selesai]
-    F -- Ya --> H[Sistem Hubungi Server SMTP untuk Dispatch Email]
+    F --> G{Apakah Email Diaktifkan?}
+    G -- Tidak --> J[Selesai]
+    G -- Ya --> H[Sistem Hubungi Server SMTP untuk Dispatch Email]
     H -- Sukses --> K[Email Diterima di Kotak Masuk Target] --> J
+    H -- Gagal --> I[Catat Log Kegagalan SMTP & Selesai]
 ```
 
 ---

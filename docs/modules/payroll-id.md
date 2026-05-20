@@ -40,9 +40,9 @@ graph TD
     F --> G[Kalkulasi Bersih Take-Home Pay: Basic + Allowance + Overtime - Deduction - Tax]
     G --> H[Simpan Sebagai Draft Payslip & Rincian di PayslipDetail]
     H --> I[Pemeriksaan & Verifikasi oleh Tim Finance / HR Admin]
-    I -->{Apakah Hasil Sesuai?}
-    I -- Tidak --> J[Sesuaikan Komponen / Perbaiki Data Log] --> B
-    I -- Ya --> K[Tutup Periode Payroll & Kirim Transfer Dana Bank]
+    I --> CheckResult{Apakah Hasil Sesuai?}
+    CheckResult -- Tidak --> J[Sesuaikan Komponen / Perbaiki Data Log] --> B
+    CheckResult -- Ya --> K[Tutup Periode Payroll & Kirim Transfer Dana Bank]
     K --> L[Rilis Slip Gaji: Karyawan Dapat Mengakses Payslip di Dasbor]
     L --> M[Selesai]
 ```
