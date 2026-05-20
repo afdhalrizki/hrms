@@ -50,7 +50,7 @@ Configuration tuned in `.env.production_1k`:
 The `deploy/production-1k/` directory contains:
 1. `docker-compose.1k.yml`: Pre-configured container orchestration.
 2. `nginx.conf`: Production-tuned reverse proxy settings.
-3. `safe_deploy_1k.sh`: Automated zero-downtime deployment script with health checks.
+3. `deploy_1k_production.sh`: Automated zero-downtime deployment script with health checks.
 4. `backup_1k.sh`: Hourly/Daily database backup automation.
 
 ---

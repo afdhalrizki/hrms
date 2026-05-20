@@ -22,12 +22,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.0"
-          memory: "4G"
+          cpus: "${DB_CPU_LIMIT:-2.0}"
+          memory: "${DB_MEM_LIMIT:-4G}"
 
   redis:
     image: redis:7-alpine
-    command: redis-server --maxmemory 1G --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory ${REDIS_MEM_LIMIT:-1G} --maxmemory-policy allkeys-lru
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -40,7 +40,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: "1G"
+          memory: "${REDIS_MEM_LIMIT:-1G}"
 
   pgbouncer:
     image: edoburu/pgbouncer:latest
@@ -91,8 +91,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.0"
-          memory: "4G"
+          cpus: "${BACKEND_CPU_LIMIT:-2.0}"
+          memory: "${BACKEND_MEM_LIMIT:-4G}"
 
   celery:
     build:
@@ -112,8 +112,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: "2G"
+          cpus: "${CELERY_CPU_LIMIT:-1.0}"
+          memory: "${CELERY_MEM_LIMIT:-2G}"
 
   frontend:
     build:
@@ -130,8 +130,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: "2G"
+          cpus: "${FRONTEND_CPU_LIMIT:-1.0}"
+          memory: "${FRONTEND_MEM_LIMIT:-2G}"
 
   nginx:
     image: nginx:alpine

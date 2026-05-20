@@ -18,7 +18,7 @@ The infrastructure is organized by target environment:
 ### 3. [Production 10K (Scaling VPS)](./production-10k/production-10k.md)
 *   **Path**: `deploy/production-10k/`
 *   **Purpose**: Initial market launch (up to 10k users) on high-spec VPS.
-*   **Automation**: Includes [deploy_10k.sh](./production-10k/deploy_10k.sh).
+*   **Automation**: Includes [deploy_10k_production.sh](./production-10k/deploy_10k_production.sh).
 
 ### 4. [Staging (Paused)](./staging/staging.md)
 *   **Path**: `deploy/staging/`

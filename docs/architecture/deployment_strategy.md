@@ -32,9 +32,10 @@ graph LR
 | Environment | Purpose | Hosting | Domain |
 | :--- | :--- | :--- | :--- |
 | **Development** | Feature coding & debugging. | Local Docker | `localhost` |
-| **QA** | Functional & UAT testing. | Single VPS (Ubuntu) | `harikerja.web.id` |
-| **Staging** | 100K User Scaling Tests | **Biznet / Bare-Metal** | `harikerja.my.id` |
-| **Production** | Live enterprise workloads. | **Biznet (100K) / AWS (1M)** | `harikerja.com` |
+| **QA** | Functional & UAT testing. | Low-Spec Biznet VPS | `harikerja.web.id` |
+| **Staging** | *Omitted in Phase 1* (Future plan). | Biznet / Bare-Metal | `harikerja.my.id` |
+| **Production** | Live workloads (Up to 10K Users). | **High-Spec Biznet VPS** | `harikerja.com` |
+| **Production AWS** | Migrated once scaling exceeds 10K. | **AWS EKS / Aurora** | `harikerja.com` |
 
 ---
 
@@ -56,20 +57,17 @@ graph LR
 *   **Duration**: 1-3 days per sprint.
 
 ### Stage 3: Staging & Performance (Pre-Prod)
-*   **Trigger**: Tag release (e.g., `v1.4.0-rc1`) or Merge to `release/*`.
-*   **Action**: Deploy to Biznet / Bare-Metal (Staging).
-*   **Testing**: 
-    1.  End-to-End Tests (Playwright).
-    2.  **100K User Load Test** (Locust).
-*   **Goal**: Verify the Horizontal Scaling architecture.
+*   **Status**: **Skipped/Deferred** for early cost optimization. QA is promoted directly to Production after functional validation.
+*   **Future Plan**: Re-enabled when user scale approaches the AWS EKS migration threshold (simulating 100K+ concurrent load).
 
 ### Stage 4: Production (Go-Live)
-*   **Trigger**: Merge to `main` branch.
-*   **Action**: Deploy to Production Cluster (Biznet or AWS).
+*   **Trigger**: Merge to `main` branch after QA release is approved.
+*   **Action**: Deploy to Biznet Production server using configurations in `deploy/production-10k/`.
 *   **Post-Deploy**: 
     1.  Health Check Verification.
-    2.  Security Scanning.
-    3.  Data Integrity checks across tenants.
+    2.  Data Integrity & Tenant verification.
+    3.  Automated database backups.
+    4.  *(Future)* Migration to AWS EKS once active scale exceeds 10,000 users.
 
 ---
 

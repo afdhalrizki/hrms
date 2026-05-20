@@ -32,9 +32,10 @@ graph LR
 | Lingkungan | Tujuan | Hosting | Domain |
 | :--- | :--- | :--- | :--- |
 | **Development** | Coding fitur & debugging. | Docker Lokal | `localhost` |
-| **QA** | Pengujian fungsional & UAT. | VPS Tunggal (Ubuntu) | `harikerja.web.id` |
-| **Staging** | Tes Penskalaan 100 Ribu Pengguna | **Biznet / Bare-Metal** | `harikerja.my.id` |
-| **Production** | Beban kerja perusahaan langsung. | **Biznet (100K) / AWS (1M)** | `harikerja.com` |
+| **QA** | Pengujian fungsional & UAT. | VPS Biznet (Spek Rendah) | `harikerja.web.id` |
+| **Staging** | *Ditiadakan pada Fase 1* (Rencana masa depan). | Biznet / Bare-Metal | `harikerja.my.id` |
+| **Production** | Beban kerja langsung (Hingga 10K User). | **VPS Biznet (Spek Tinggi)** | `harikerja.com` |
+| **Production AWS** | Migrasi setelah skala melebihi 10K User. | **AWS EKS / Aurora** | `harikerja.com` |
 
 ---
 
@@ -56,20 +57,17 @@ graph LR
 *   **Durasi**: 1-3 hari per sprint.
 
 ### Tahap 3: Staging & Performa (Pre-Prod)
-*   **Pemicu**: Tag rilis (misal, `v1.4.0-rc1`) atau Merge ke `release/*`.
-*   **Tindakan**: Deploy ke Biznet / Bare-Metal (Staging).
-*   **Pengujian**: 
-    1.  End-to-End Test (Playwright).
-    2.  **Tes Beban 100 Ribu Pengguna** (Locust).
-*   **Tujuan**: Verifikasi arsitektur Penskalaan Horizontal.
+*   **Status**: **Dilewati/Ditunda (Deferred)** untuk menghemat biaya infrastruktur awal. QA langsung dipromosikan ke Produksi setelah lolos pengujian fungsional.
+*   **Rencana Masa Depan**: Akan diaktifkan kembali jika skala pengguna mendekati transisi ke AWS EKS (simulasi beban kerja 100K+).
 
 ### Tahap 4: Produksi (Go-Live)
-*   **Pemicu**: Merge ke cabang `main`.
-*   **Tindakan**: Deploy ke Cluster Produksi (Biznet atau AWS).
+*   **Pemicu**: Merge ke cabang cabang `main` setelah rilis QA disetujui.
+*   **Tindakan**: Deploy ke server Produksi Biznet menggunakan konfigurasi di `deploy/production-10k/`.
 *   **Pasca-Penyebaran**: 
     1.  Verifikasi Pemeriksaan Kesehatan (Health Check).
-    2.  Pemindaian Keamanan (Security Scanning).
-    3.  Pemeriksaan integritas data di seluruh tenant.
+    2.  Verifikasi Integritas Data & Tenant.
+    3.  Pencadangan berkas basis data otomatis.
+    4.  *(Masa depan)* Migrasi ke AWS EKS jika skala melampaui 10.000 pengguna aktif.
 
 ---
 

@@ -207,6 +207,7 @@ if USE_S3:
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
     AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
     AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
+    AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
     AWS_S3_FILE_OVERWRITE = False
     
     # Static files storage
@@ -225,6 +226,12 @@ if USE_S3:
     if AWS_S3_CUSTOM_DOMAIN:
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    elif AWS_S3_ENDPOINT_URL:
+        # Support S3-compatible providers (e.g. Biznet GIO NEO Object Storage)
+        # Ensure trailing slash isn't duplicated
+        endpoint = AWS_S3_ENDPOINT_URL.rstrip('/')
+        STATIC_URL = f'{endpoint}/{AWS_STORAGE_BUCKET_NAME}/static/'
+        MEDIA_URL = f'{endpoint}/{AWS_STORAGE_BUCKET_NAME}/media/'
     else:
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'

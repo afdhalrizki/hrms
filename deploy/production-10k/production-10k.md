@@ -65,7 +65,7 @@ Ensure `.env.production_10k` contains production-ready SMTP credentials. Emails 
 We use the same Docker logic but with a **Production-Specific Environment File**.
 
 1. Prepare `deploy/environments/.env.production_10k`.
-2. Use `deploy/production-10k/deploy_10k.sh` for automated deployment.
+2. Use `deploy/production-10k/deploy_10k_production.sh` for automated deployment.
 3. **ZDT (Zero Downtime)**: Use a blue-green approach or Nginx reload to avoid downtime during updates.
 
 ---
