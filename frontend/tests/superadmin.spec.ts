@@ -169,4 +169,23 @@ test.describe.serial('Superadmin (Platform) Management', () => {
     await expect(page.getByText('Access Management')).not.toBeVisible();
     await expect(page.getByText('Subscription & Billing')).not.toBeVisible();
   });
+
+  test('should render SaaS platform overview dashboard on the home page', async ({ page }) => {
+    // Navigate to the home page (Overview)
+    await page.goto(`${BASE_URL}/en/`);
+    
+    // Wait for the SaaS overview dashboard to render
+    const superadminDashboard = page.locator('#superadmin-dashboard');
+    await expect(superadminDashboard).toBeVisible({ timeout: 30000 });
+    
+    // Check that SaaS metrics cards are visible
+    await expect(page.getByText('SaaS Platform Overview')).toBeVisible();
+    await expect(page.getByText('Platform Overview Dashboard')).toBeVisible();
+    await expect(page.getByText('Total Tenants')).toBeVisible();
+    
+    // Check that HR specific elements are not present
+    await expect(page.getByText('Attendance Trends')).not.toBeVisible();
+    await expect(page.locator('text=Quota Usage')).not.toBeVisible();
+  });
 });
+

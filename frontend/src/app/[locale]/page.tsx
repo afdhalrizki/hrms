@@ -296,6 +296,158 @@ export default function Home() {
     },
   ];
 
+  if (user && statsData?.is_global_admin_dashboard) {
+    const globalStatItems = [
+      {
+        name: 'Total Tenants',
+        value: statsData.total_tenants || 0,
+        icon: Layout,
+        color: 'bg-primary/10 text-primary',
+        link: '/admin/registrations'
+      },
+      {
+        name: 'Pending Registrations',
+        value: statsData.pending_registrations || 0,
+        icon: Clock,
+        color: 'bg-accent/10 text-accent',
+        link: '/admin/registrations'
+      },
+      {
+        name: 'Approved Registrations',
+        value: statsData.approved_registrations || 0,
+        icon: UserCheck,
+        color: 'bg-primary/10 text-primary',
+        link: '/admin/registrations'
+      },
+      {
+        name: 'Global Admins',
+        value: statsData.total_global_admins || 0,
+        icon: ShieldCheck,
+        color: 'bg-accent/10 text-accent',
+        link: '/admin/global-admins'
+      }
+    ];
+
+    return (
+      <DashboardLayout>
+        <div className="space-y-10 relative" id="superadmin-dashboard">
+          <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] opacity-40 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -z-10 w-[300px] h-[300px] bg-accent/5 rounded-full blur-[100px] opacity-30 pointer-events-none" />
+
+          <div className="flex flex-col gap-3">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3"
+            >
+              <div className="h-1 w-8 bg-primary rounded-full" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">SaaS Platform Overview</span>
+            </motion.div>
+            <motion.h1 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-4xl font-black tracking-tighter"
+            >
+              Platform Overview Dashboard
+            </motion.h1>
+            <p className="text-muted-foreground max-w-2xl text-lg font-medium leading-relaxed">
+              Welcome back, {user.fullname || 'Superadmin'} 👋. Here is the operational summary of your SaaS platform.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {globalStatItems.map((stat, index) => (
+              <StatCard
+                key={stat.name}
+                index={index}
+                name={stat.name}
+                value={stat.value}
+                change=""
+                trend="up"
+                icon={stat.icon}
+                color={stat.color}
+              />
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+              className="lg:col-span-2 glass-card rounded-3xl p-8 flex flex-col gap-6"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold">Registration Verification Status</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Tenant registration requests overview by status</p>
+                </div>
+                <button 
+                  onClick={() => router.push('/admin/registrations')}
+                  className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-sm font-bold transition-all flex items-center gap-1"
+                >
+                  Manage Requests <ArrowRight size={16} />
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                <div className="p-6 rounded-2xl border border-white/5 bg-white/5 flex flex-col gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Pending Requests</span>
+                  <span className="text-3xl font-black text-accent">{statsData.pending_registrations || 0}</span>
+                </div>
+                <div className="p-6 rounded-2xl border border-white/5 bg-white/5 flex flex-col gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Approved Requests</span>
+                  <span className="text-3xl font-black text-primary">{statsData.approved_registrations || 0}</span>
+                </div>
+                <div className="p-6 rounded-2xl border border-white/5 bg-white/5 flex flex-col gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Rejected Requests</span>
+                  <span className="text-3xl font-black text-muted-foreground">{statsData.rejected_registrations || 0}</span>
+                </div>
+              </div>
+            </motion.div>
+            
+            <div className="flex flex-col gap-6">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6 }}
+                className="glass-card rounded-3xl p-8 flex flex-col gap-6 relative overflow-hidden group"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-colors" />
+                <h2 className="text-xl font-bold flex items-center gap-2 relative z-10">
+                  <ShieldCheck size={20} className="text-accent" />
+                  Quick Actions
+                </h2>
+                <div className="flex flex-col gap-4 relative z-10">
+                  <button 
+                    onClick={() => router.push('/admin/registrations')}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left"
+                  >
+                    <div>
+                      <p className="text-sm font-bold">Review Pending Registrations</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Approve or reject company requests</p>
+                    </div>
+                    <ArrowRight size={16} className="text-muted-foreground" />
+                  </button>
+                  <button 
+                    onClick={() => router.push('/admin/global-admins')}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left"
+                  >
+                    <div>
+                      <p className="text-sm font-bold">Manage Global Administrators</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Create and assign access roles</p>
+                    </div>
+                    <ArrowRight size={16} className="text-muted-foreground" />
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-10 relative">

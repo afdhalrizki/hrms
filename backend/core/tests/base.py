@@ -63,6 +63,12 @@ class HRMSTestCase(FastTenantTestCase):
         
         if not hasattr(cls, 'domain') or cls.domain is None:
             cls.use_existing_tenant()
+            
+        if hasattr(cls, 'domain') and not isinstance(cls.domain, str) and cls.domain is not None:
+            if hasattr(cls.domain, 'domain'):
+                cls.domain = cls.domain.domain
+            else:
+                cls.domain = str(cls.domain)
         
         # Set connection to tenant schema
         connection.set_tenant(cls.tenant)

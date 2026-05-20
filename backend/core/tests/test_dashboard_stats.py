@@ -174,3 +174,51 @@ class DashboardStatsTestCase(HRMSTestCase):
         self.client.force_authenticate(user=self.user_admin)
         response = self.client.get(url, SERVER_NAME=self.domain, secure=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_public_schema_superadmin_dashboard_stats(self):
+        """Verify that on public schema, a superadmin can retrieve SaaS platform stats."""
+        superadmin, _ = User.objects.get_or_create(email='superadmin_dashboard_test@harikerja.com')
+        superadmin.is_staff = True
+        superadmin.is_superuser = True
+        superadmin.global_role = 'SUPERADMIN'
+        superadmin.is_global_admin = True
+        superadmin.save()
+        
+        self.client.force_authenticate(user=superadmin)
+        url = reverse('dashboard-stats')
+        
+        from django_tenants.utils import get_tenant_model, get_tenant_domain_model, schema_context
+        TenantModel = get_tenant_model()
+        DomainModel = get_tenant_domain_model()
+        
+        with schema_context('public'):
+            # Ensure public tenant exists in DB
+            public_tenant, _ = TenantModel.objects.get_or_create(
+                schema_name='public',
+                defaults={
+                    'name': 'Public Schema',
+                    'plan_type': 'ENTERPRISE',
+                    'subscription_status': 'ACTIVE'
+                }
+            )
+            
+            # Ensure public domain exists in DB
+            public_domain_obj, _ = DomainModel.objects.get_or_create(
+                tenant=public_tenant,
+                domain='public.localhost',
+                defaults={'is_primary': True}
+            )
+            public_domain = public_domain_obj.domain
+        
+        response = self.client.get(
+            url,
+            SERVER_NAME=public_domain,
+            secure=True,
+            HTTP_X_TENANT='public'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        data = response.data
+        self.assertTrue(data.get('is_global_admin_dashboard'))
+        self.assertIn('total_tenants', data)
+        self.assertIn('pending_registrations', data)

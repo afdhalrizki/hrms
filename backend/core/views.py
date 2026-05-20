@@ -327,6 +327,27 @@ class DashboardStatsAPIView(TenantIsolationMixin, views.APIView):
         }
 
         if connection.schema_name == 'public':
+            user = request.user
+            is_global = getattr(user, 'global_role', None) or getattr(user, 'is_global_admin', False) or user.is_superuser
+            if is_global:
+                from tenants.models import Tenant, RegistrationRequest
+                from users.models import User
+                
+                total_tenants = Tenant.objects.exclude(schema_name='public').count()
+                pending_regs = RegistrationRequest.objects.filter(status='PENDING').count()
+                total_admins = User.objects.exclude(global_role__isnull=True).exclude(global_role='').count()
+                
+                approved_regs = RegistrationRequest.objects.filter(status='APPROVED').count()
+                rejected_regs = RegistrationRequest.objects.filter(status='REJECTED').count()
+                
+                return Response({
+                    'is_global_admin_dashboard': True,
+                    'total_tenants': total_tenants,
+                    'pending_registrations': pending_regs,
+                    'total_global_admins': total_admins,
+                    'approved_registrations': approved_regs,
+                    'rejected_registrations': rejected_regs,
+                })
             return Response(empty_stats)
 
         try:
