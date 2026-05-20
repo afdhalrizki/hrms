@@ -62,6 +62,22 @@ flutter pub get
 node scripts/run_dev.mjs
 ```
 
+## 📦 Building the App (Build Binaries)
+
+To simplify the generation of app installation packages, you can use the following scripts:
+
+### Android (APK)
+```bash
+node scripts/build_apk.mjs
+```
+The `.apk` file will be generated at `build/app/outputs/flutter-apk/app-release.apk`.
+
+### iOS (IPA)
+```bash
+node scripts/build_ipa.mjs
+```
+*Note: iOS builds require macOS and Xcode.*
+
 ## 🌐 Deployment & Infrastructure
 
 The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
@@ -102,10 +118,11 @@ node scripts/run_tests.mjs
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
-- [**Architecture Guides**](../docs/architecture/)
-- [**Business Strategy**](../docs/business_strategy/)
-- [**Workflows & Features**](../docs/workflows_features/)
-- [**Technical Specifications**](../docs/technical_specs/)
+- [**Authentication Architecture: Web vs. Mobile**](../docs/architecture/auth_architecture.md)
+- [**Pricing & Subscription Plans**](../docs/business_strategy/pricing_and_plans.md)
+- [**Mobile App Workflows & Flowcharts**](../docs/workflows_features/mobile_app_workflows.md)
+- [**Full-Stack Developer Guide**](../docs/technical_specs/developer_guide.md)
+
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Mobile Experience Standardized.

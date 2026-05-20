@@ -105,10 +105,11 @@ node scripts/run_tests.mjs
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
-- [**Architecture Guides**](../docs/architecture/)
-- [**Business Strategy**](../docs/business_strategy/)
-- [**Workflows & Features**](../docs/workflows_features/)
-- [**Technical Specifications**](../docs/technical_specs/)
+- [**Multi-Tenancy System**](../docs/architecture/multi_tenancy_system.md)
+- [**Pricing & Subscription Plans**](../docs/business_strategy/pricing_and_plans.md)
+- [**Web App Workflows & Flowcharts**](../docs/workflows_features/web_app_workflows.md)
+- [**Full-Stack Developer Guide**](../docs/technical_specs/developer_guide.md)
+
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Frontend Experience Standardized.

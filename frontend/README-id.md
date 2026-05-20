@@ -105,10 +105,11 @@ node scripts/run_tests.mjs
 ## 📚 Dokumentasi Teknis
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh platform di direktori `docs/` akar:
-- [**Panduan Arsitektur**](../docs/architecture/)
-- [**Strategi Bisnis**](../docs/business_strategy/)
-- [**Alur Kerja & Fitur**](../docs/workflows_features/)
-- [**Spesifikasi Teknis**](../docs/technical_specs/)
+- [**Sistem Multi-Tenancy**](../docs/architecture/multi_tenancy_system-id.md)
+- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans-id.md)
+- [**Alur Kerja & Diagram Alir Aplikasi Web**](../docs/workflows_features/web_app_workflows-id.md)
+- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide-id.md)
+
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Frontend Terstandardisasi.

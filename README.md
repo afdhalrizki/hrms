@@ -50,12 +50,13 @@ _Tiered SaaS provisioning and intelligent subscription gating (Essential, Profes
 
 | Feature | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Employee Limit** | 10 | 50 | 100 | 500 | 2,000+ |
+| **Employee Limit** | 10 | 25 | 100 | 500 | 2,000+ |
 | **Core HR** | ✅ Basic | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
 | **Attendance** | ✅ Basic | ✅ Geofencing | ✅ Geo + Photo | ✅ Correction | ✅ Shift/Roster |
 | **Payroll** | ❌ | ❌ | ✅ PPh 21/BPJS | ✅ Advanced | ✅ Analytics |
 | **Performance** | ❌ | ❌ | ❌ | ✅ KPI/Appraisal | ✅ Team Coaching |
 | **Analytics** | ❌ | ❌ | ❌ | ❌ | ✅ Audit/Insight |
+
 
 ## 📦 Getting Started
 
@@ -115,6 +116,30 @@ For more granular control, you can run tests within each module directory:
 - **ESS Profile Management**: Self-service portal for employees to update personal info and upload documents.
 - **Auto-Onboarding**: Commercial-ready self-service registration and schema provisioning.
 
+### 🏗️ Multi-Tenant Architecture & Domain Routing Flow
+
+```mermaid
+graph TD
+    User([User Request]) --> DNS{Wildcard DNS Resolution}
+    DNS -->|company1.harikerja.com| Nginx[Nginx Reverse Proxy]
+    DNS -->|portal.harikerja.com| Nginx
+    
+    Nginx --> NextJS[Next.js App Server]
+    NextJS -->|API Requests with X-Tenant-Domain| Django[Django Backend API]
+    
+    Django --> Middleware[TenantMiddleware]
+    Middleware -->|Lookup Tenant Domain| DBRoute{Route Connection}
+    
+    DBRoute -->|public| SharedDB[(PostgreSQL - public schema)]
+    DBRoute -->|company1| TenantDB1[(PostgreSQL - tenant_1 schema)]
+    DBRoute -->|company2| TenantDB2[(PostgreSQL - tenant_2 schema)]
+    
+    SharedDB --- Users[Registration, Billing, Global Admins]
+    TenantDB1 --- Co1[Employee Records, Attendance, Payroll, Leaves]
+    TenantDB2 --- Co2[Employee Records, Attendance, Payroll, Leaves]
+```
+
+
 ## 🌐 Deployment & Infrastructure
 
 | Tier           | Domain                     | Hosting Platform              | Purpose                            |
@@ -150,7 +175,7 @@ To guarantee stability, we have defined a **10-person core team** structure:
 2.  **Next Phase**: 1,000 - 10,000 User Scaling with enhanced monitoring
 3.  **Future Phase**: 100,000+ User scaling with full 10-person team deployment
 
-Detailed scaling strategy: [**Technical Team Strategy**](./docs/business_strategy/organization_structure_strategy.md) ([**Versi Indonesia**](./docs/business_strategy/organization_structure_strategy-id.md))
+Detailed scaling strategy: [**Organizational Structure & Scaling Roadmap**](./docs/business_strategy/organization_and_scaling.md) ([**Versi Indonesia**](./docs/business_strategy/organization_and_scaling-id.md))
 
 ## 📚 Technical Documentation & Directory Map
 
@@ -171,22 +196,35 @@ The platform maintains a comprehensive bilingual (English & Indonesian) document
   - [Deployment Strategy](./docs/architecture/deployment_strategy.md) ([Indonesian](./docs/architecture/deployment_strategy-id.md))
   - [Multi-Tenancy System](./docs/architecture/multi_tenancy_system.md) ([Indonesian](./docs/architecture/multi_tenancy_system-id.md))
   - [Scalability Architecture Guide](./docs/architecture/scaling_architecture_guide.md) ([Indonesian](./docs/architecture/scaling_architecture_guide-id.md))
+  - [Authentication Architecture: Web vs. Mobile](./docs/architecture/auth_architecture.md) ([Indonesian](./docs/architecture/auth_architecture-id.md))
 - **`business_strategy/`**: SaaS pricing tiers, SLAs, profit projections, and org charts.
-  - [Tenant Plans](./docs/business_strategy/tenant_plans.md) ([Indonesian](./docs/business_strategy/tenant_plans-id.md))
+  - [Subscription Tiers & Pricing Strategy](./docs/business_strategy/pricing_and_plans.md) ([Indonesian](./docs/business_strategy/pricing_and_plans-id.md))
+  - [Business Projections & Financial Model](./docs/business_strategy/business_projections.md) ([Indonesian](./docs/business_strategy/business_projections-id.md))
+  - [Organizational Structure & Scaling Roadmap](./docs/business_strategy/organization_and_scaling.md) ([Indonesian](./docs/business_strategy/organization_and_scaling-id.md))
   - [SLA Enterprise Standard](./docs/business_strategy/sla_enterprise_standard.md) ([Indonesian](./docs/business_strategy/sla_enterprise_standard-id.md))
-  - [Technical Team Strategy](./docs/business_strategy/organization_structure_strategy.md) ([Indonesian](./docs/business_strategy/organization_structure_strategy-id.md))
 - **`modules/`**: Specific backend module guides.
-  - [Attendance](./docs/modules/attendance.md), [Payroll](./docs/modules/payroll.md), [Reimbursement](./docs/modules/reimbursement.md), [Tenants](./docs/modules/tenants.md), [Users](./docs/modules/users.md)
+  - [Attendance](./docs/modules/attendance.md) / [Indonesian](./docs/modules/attendance-id.md)
+  - [Billing](./docs/modules/billing.md) / [Indonesian](./docs/modules/billing-id.md)
+  - [Core HR](./docs/modules/core.md) / [Indonesian](./docs/modules/core-id.md)
+  - [Notifications](./docs/modules/notifications.md) / [Indonesian](./docs/modules/notifications-id.md)
+  - [Payroll](./docs/modules/payroll.md) / [Indonesian](./docs/modules/payroll-id.md)
+  - [Performance](./docs/modules/performance.md) / [Indonesian](./docs/modules/performance-id.md)
+  - [Reimbursement](./docs/modules/reimbursement.md) / [Indonesian](./docs/modules/reimbursement-id.md)
+  - [Tenants](./docs/modules/tenants.md) / [Indonesian](./docs/modules/tenants-id.md)
+  - [Users](./docs/modules/users.md) / [Indonesian](./docs/modules/users-id.md)
 - **`project_management/`**: Implementation roadmap checklist and cross-stack knowledge transfers.
   - [Feature Roadmap Checklist](./docs/project_management/feature_roadmap_checklist.md) ([Indonesian](./docs/project_management/feature_roadmap_checklist-id.md))
   - [Mobile Feature Audit](./docs/project_management/mobile_feature_audit.md) ([Indonesian](./docs/project_management/mobile_feature_audit-id.md))
 - **`technical_specs/`**: Route maps, API references, and security audits.
-  - [Auth Classification](./docs/technical_specs/auth_classification.md) ([Indonesian](./docs/technical_specs/auth_classification-id.md))
-  - [Developer Guide](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide-id.md))
+  - [Full-Stack Developer Guide & Technical Specifications](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide-id.md))
+  - [API Reference](./docs/technical_specs/api_reference.md) ([Indonesian](./docs/technical_specs/api_reference-id.md))
+  - [Security Audit & Compliance](./docs/technical_specs/security_audit.md) ([Indonesian](./docs/technical_specs/security_audit-id.md))
 - **`workflows_features/`**: Functional business flows and feature details.
-  - [Tenant RBAC System](./docs/workflows_features/tenant_rbac_system.md) ([Indonesian](./docs/workflows_features/tenant_rbac_system-id.md))
-  - [Detailed RBAC Matrix (Web & Mobile)](./docs/workflows_features/rbac_matrix_details.md) ([Indonesian](./docs/workflows_features/rbac_matrix_details-id.md))
-  - [Global Admin Matrix](./docs/workflows_features/global_admin.md) ([Indonesian](./docs/workflows_features/global_admin-id.md))
+  - [Mobile Application Workflows & Flowcharts](./docs/workflows_features/mobile_app_workflows.md) ([Indonesian](./docs/workflows_features/mobile_app_workflows-id.md))
+  - [Web Application Workflows & Flowcharts](./docs/workflows_features/web_app_workflows.md) ([Indonesian](./docs/workflows_features/web_app_workflows-id.md))
+  - [Registration, Subscription Lifecycles & Billing](./docs/workflows_features/registration_subscription_billing.md) ([Indonesian](./docs/workflows_features/registration_subscription_billing-id.md))
+  - [Authorization System (RBAC) & Security Classification](./docs/workflows_features/rbac_security.md) ([Indonesian](./docs/workflows_features/rbac_security-id.md))
+  - [Notification System Architecture & Event Mapping](./docs/workflows_features/notification_system.md) ([Indonesian](./docs/workflows_features/notification_system-id.md))
 
 ## 🛠 Tech Stack
 

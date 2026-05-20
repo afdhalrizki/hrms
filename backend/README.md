@@ -16,7 +16,7 @@ The mission-critical API core of the **harikerja HRMS** ecosystem. Built with Py
   
   | Feature | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
   | :--- | :---: | :---: | :---: | :---: | :---: |
-  | **Quota** | 10 Emp | 50 Emp | 100 Emp | 500 Emp | 2,000+ |
+  | **Quota** | 10 Emp | 25 Emp | 100 Emp | 500 Emp | 2,000+ |
   | **Payroll** | ❌ | ❌ | ✅ | ✅ | ✅ |
   | **Performance**| ❌ | ❌ | ❌ | ✅ | ✅ |
   | **Analytics** | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -104,10 +104,11 @@ node scripts/run_tests.mjs
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
-- [**Architecture Guides**](../docs/architecture/)
-- [**Business Strategy**](../docs/business_strategy/)
-- [**Workflows & Features**](../docs/workflows_features/)
-- [**Technical Specifications**](../docs/technical_specs/)
+- [**Multi-Tenancy System**](../docs/architecture/multi_tenancy_system.md)
+- [**Pricing & Subscription Plans**](../docs/business_strategy/pricing_and_plans.md)
+- [**Authorization System (RBAC) & Security**](../docs/workflows_features/rbac_security.md)
+- [**Full-Stack Developer Guide**](../docs/technical_specs/developer_guide.md)
+
 
 ---
 **Project Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Backend Core Standardized.

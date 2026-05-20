@@ -61,6 +61,22 @@ flutter pub get
 node scripts/run_dev.mjs
 ```
 
+## 📦 Membangun Aplikasi (Build Binaries)
+
+Untuk mempermudah pembuatan file instalan, Anda dapat menggunakan script berikut:
+
+### Android (APK)
+```bash
+node scripts/build_apk.mjs
+```
+File `.apk` akan dihasilkan di `build/app/outputs/flutter-apk/app-release.apk`.
+
+### iOS (IPA)
+```bash
+node scripts/build_ipa.mjs
+```
+*Catatan: Build iOS membutuhkan macOS dan Xcode.*
+
 ## 🌐 Penyebaran & Infrastruktur
 
 Aplikasi menangani multi-tenancy melalui `X-Tenant-Domain` dan build lingkungan.
@@ -101,10 +117,11 @@ node scripts/run_tests.mjs
 ## 📚 Dokumentasi Teknis
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh platform di direktori `docs/` akar:
-- [**Panduan Arsitektur**](../docs/architecture/)
-- [**Strategi Bisnis**](../docs/business_strategy/)
-- [**Alur Kerja & Fitur**](../docs/workflows_features/)
-- [**Spesifikasi Teknis**](../docs/technical_specs/)
+- [**Arsitektur Autentikasi: Web vs. Mobile**](../docs/architecture/auth_architecture-id.md)
+- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans-id.md)
+- [**Alur Kerja & Diagram Alir Aplikasi Mobile**](../docs/workflows_features/mobile_app_workflows-id.md)
+- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide-id.md)
+
 
 ---
 **Status**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Mobile Terstandardisasi.

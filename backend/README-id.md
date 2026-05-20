@@ -16,7 +16,7 @@ Inti API yang krusial bagi misi ekosistem **harikerja HRMS**. Dibangun dengan Py
   
   | Fitur | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
   | :--- | :---: | :---: | :---: | :---: | :---: |
-  | **Kuota** | 10 Kry | 50 Kry | 100 Kry | 500 Kry | 2.000+ |
+  | **Kuota** | 10 Kry | 25 Kry | 100 Kry | 500 Kry | 2.000+ |
   | **Payroll** | ❌ | ❌ | ✅ | ✅ | ✅ |
   | **Kinerja**| ❌ | ❌ | ❌ | ✅ | ✅ |
   | **Analitik** | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -104,10 +104,11 @@ node scripts/run_tests.mjs
 ## 📚 Dokumentasi Teknis
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh platform di direktori `docs/` akar:
-- [**Panduan Arsitektur**](../docs/architecture/)
-- [**Strategi Bisnis**](../docs/business_strategy/)
-- [**Alur Kerja & Fitur**](../docs/workflows_features/)
-- [**Spesifikasi Teknis**](../docs/technical_specs/)
+- [**Sistem Multi-Tenancy**](../docs/architecture/multi_tenancy_system-id.md)
+- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans-id.md)
+- [**Sistem Otorisasi (RBAC) & Keamanan**](../docs/workflows_features/rbac_security-id.md)
+- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide-id.md)
+
 
 ---
 **Status Proyek**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Inti Backend Terstandardisasi.
