@@ -95,7 +95,7 @@ flowchart TD
     
     PostBiometric --> CheckStorage{Apakah Kapasitas \nPenyimpanan Tenant Penuh?}
     
-    CheckStorage -- Ya --> SaveNoPhoto[Simpan Log Kehadiran \nSet biometric_skipped = True \n(Foto Wajah Dilewati)]
+    CheckStorage -- Ya --> SaveNoPhoto["Simpan Log Kehadiran \nSet biometric_skipped = True \n(Foto Wajah Dilewati)"]
     CheckStorage -- Tidak --> MatchFace[Backend: Cocokkan Wajah dengan \nFoto Referensi Karyawan]
     
     MatchFace --> CheckMatch{Apakah Wajah Cocok?}
@@ -137,7 +137,7 @@ flowchart TD
     CheckBalance -- Tidak --> ShowBalanceError[Tampilkan Eror: Saldo cuti \ntidak mencukupi]
     CheckBalance -- Ya --> CheckAttachment{Apakah Tipe Cuti \nMemerlukan Lampiran?}
     
-    CheckAttachment -- Ya --> UploadAttachment[Ambil Foto Surat Keterangan \n(Dokter / Bukti Pendukung)]
+    CheckAttachment -- Ya --> UploadAttachment["Ambil Foto Surat Keterangan \n(Dokter / Bukti Pendukung)"]
     CheckAttachment -- Tidak --> SubmitLeave[Kirim Pengajuan via POST /leave-requests/]
     UploadAttachment --> SubmitLeave
     
@@ -168,7 +168,7 @@ Mempermudah karyawan melakukan klaim biaya operasional kantor.
 
 ```mermaid
 flowchart TD
-    Start[Karyawan Membuka Layar Reimbursement] --> InputClaim[Input Rincian Klaim:\n- Judul Pengeluaran\n- Nominal (Rupiah)\n- Pilih Kategori Klaim]
+    Start[Karyawan Membuka Layar Reimbursement] --> InputClaim["Input Rincian Klaim:\n- Judul Pengeluaran\n- Nominal (Rupiah)\n- Pilih Kategori Klaim"]
     InputClaim --> CameraCapture[Ambil Foto Kuitansi / Struk Pembayaran]
     CameraCapture --> CheckFile{Apakah Validasi \nFile Sukses?}
     

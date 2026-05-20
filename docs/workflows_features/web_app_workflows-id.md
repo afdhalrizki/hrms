@@ -77,9 +77,9 @@ Pengelolaan data karyawan baru dan struktur cabang perusahaan dikendalikan oleh 
 ```mermaid
 flowchart TD
     Start[HR Membuka Formulir Tambah Karyawan] --> InputData[Input Data Karyawan:\n- Nama, Email, No. Telp\n- Pilih Departemen & Jabatan\n- Pilih Cabang & Supervisor]
-    InputData --> SetCompensation[Tentukan Grade Gaji\n(Mengunci Gaji Pokok & Tunjangan)]
+    InputData --> SetCompensation["Tentukan Grade Gaji\n(Mengunci Gaji Pokok & Tunjangan)"]
     SetCompensation --> SetRBAC[Tentukan Access Role:\nAdmin / HR Staf / Karyawan]
-    SetRBAC --> UploadDocs[Unggah Dokumen Wajib:\n- Scan KTP & NPWP\n- Foto Referensi Wajah (Face ID)]
+    SetRBAC --> UploadDocs["Unggah Dokumen Wajib:\n- Scan KTP & NPWP\n- Foto Referensi Wajah (Face ID)"]
     UploadDocs --> SubmitForm[Kirim Data via POST /employees/]
     
     SubmitForm --> CheckQuota{Apakah Jumlah Karyawan \nMasih dalam Kuota Langganan?}
@@ -115,7 +115,7 @@ Mengakomodasi birokrasi internal perusahaan untuk persetujuan cuti, lembur, reim
 
 ```mermaid
 flowchart TD
-    Start[Karyawan Mengirim Pengajuan\n(Cuti / Reimbursement / Koreksi)] --> CheckConfig{Apakah Ada WorkflowConfig \nAktif untuk Tipe Ini?}
+    Start["Karyawan Mengirim Pengajuan\n(Cuti / Reimbursement / Koreksi)"] --> CheckConfig{Apakah Ada WorkflowConfig \nAktif untuk Tipe Ini?}
     
     CheckConfig -- Tidak --> DirectApproval[Persetujuan 1 Tingkat:\nLangsung masuk antrean HR / Manager]
     CheckConfig -- Ya --> GetStages[Ambil Semua WorkflowStage \nUrut Berdasarkan Sequence]
@@ -127,12 +127,12 @@ flowchart TD
     ShowInQueue --> WaitAction{Keputusan Penyetuju?}
     
     WaitAction -- REJECTED --> RejectFlow[Status Akhir: REJECTED \nAlur Kerja Berhenti \nKirim Notifikasi Penolakan]
-    WaitAction -- APPROVED --> CheckNext{Apakah Ada Tahap \nSelanjutnya (Sequence + 1)?}
+    WaitAction -- APPROVED --> CheckNext{"Apakah Ada Tahap \nSelanjutnya (Sequence + 1)?"}
     
     CheckNext -- Ya --> AdvanceStage[Set Tahap Aktif = Sequence + 1]
     AdvanceStage --> IdentifyApprover
     
-    CheckNext -- Tidak --> ApproveFlow[Status Akhir: APPROVED \nEksekusi Aturan Bisnis \n(Potong Kuota / Siap Payout)]
+    CheckNext -- Tidak --> ApproveFlow["Status Akhir: APPROVED \nEksekusi Aturan Bisnis \n(Potong Kuota / Siap Payout)"]
 
     classDef success fill:#10B981,stroke:#059669,color:#fff;
     classDef fail fill:#EF4444,stroke:#DC2626,color:#fff;
@@ -176,15 +176,15 @@ flowchart TD
     
     CalcAllowances --> CalcDeductions[Hitung Potongan Denda:\n- Akumulasi Denda Terlambat\n- Akumulasi Potongan Alfa]
     
-    CalcDeductions --> CalcBPJS[Hitung Iuran BPJS:\n- BPJS Kesehatan (1% potong, 4% subsidi)\n- BPJS TK JHT, JP, JKK, JKM]
+    CalcDeductions --> CalcBPJS["Hitung Iuran BPJS:\n- BPJS Kesehatan (1% potong, 4% subsidi)\n- BPJS TK JHT, JP, JKK, JKM"]
     
     CalcBPJS --> CalcGross[Hitung Total Penghasilan Bruto:\nGaji Pokok + Semua Tunjangan + Premi BPJS Perusahaan]
     
-    CalcGross --> CheckPTKP[Baca Status PTKP Karyawan\n(TK/0 - K/3 untuk menentukan Kategori TER A/B/C)]
+    CalcGross --> CheckPTKP["Baca Status PTKP Karyawan\n(TK/0 - K/3 untuk menentukan Kategori TER A/B/C)"]
     
     CheckPTKP --> ApplyTER[Terapkan Tarif TER Pajak PPh 21 2024:\nPotongan PPh 21 = Penghasilan Bruto x % Tarif TER]
     
-    ApplyTER --> CalcNet[Hitung Gaji Bersih (Take Home Pay):\nGross - BPJS Karyawan - PPh 21 - Total Denda]
+    ApplyTER --> CalcNet["Hitung Gaji Bersih (Take Home Pay):\nGross - BPJS Karyawan - PPh 21 - Total Denda"]
     
     CalcNet --> GenerateSlip[Hasilkan Slip Gaji Digital & \nGenerate File PDF Slip Gaji secara Real-Time]
     
@@ -197,7 +197,7 @@ flowchart TD
     Verify -- Ya --> CommitPayroll[Kunci Periode Penggajian:\n- Status berubah menjadi APPROVED\n- Karyawan menerima notifikasi di email & mobile\n- File PDF tersimpan di secure cloud storage]
     
     CommitPayroll --> Disburse[Proses Transfer Payroll Bank]
-    Disburse --> MarkPaid[Update Status Slip Gaji: PAID \n(Periode Ditutup Permanen)]
+    Disburse --> MarkPaid["Update Status Slip Gaji: PAID \n(Periode Ditutup Permanen)"]
     
     MarkPaid --> End([Selesai])
 
@@ -253,10 +253,10 @@ flowchart TD
     AuthCheck -- Tidak --> BlockReq[Tolak - HTTP 403 Forbidden]
     AuthCheck -- Ya --> SyncDB[Mulai Proses Provisioning:]
     
-    SyncDB --> CreateSchema[1. Buat Skema PostgreSQL Baru \n(isolasi data klien)]
+    SyncDB --> CreateSchema["1. Buat Skema PostgreSQL Baru \n(isolasi data klien)"]
     CreateSchema --> RunMigrations[2. Jalankan Migrasi Tabel Django \nke skema baru]
     RunMigrations --> CreateTenantAdmin[3. Daftarkan Akun Tenant Admin \npada public.users & kaitkan ke skema]
-    CreateTenantAdmin --> SeedMasterData[4. Inisialisasi Data Master HR Dasar \n(Departemen, Peran, Shift default)]
+    CreateTenantAdmin --> SeedMasterData["4. Inisialisasi Data Master HR Dasar \n(Departemen, Peran, Shift default)"]
     SeedMasterData --> SendWelcomeEmail[5. Kirim Email Selamat Datang & \nKredensial Sesi ke Klien]
     
     SendWelcomeEmail --> UpdateStatus[Update Status Registrasi: APPROVED]

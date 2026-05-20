@@ -59,7 +59,7 @@ flowchart TD
     CheckSafe -- Ya --> CheckRBAC[HasTenantRBACPermission:\nEvaluasi Peran User]
     CheckStatus -- ACTIVE --> CheckRBAC
     
-    CheckRBAC --> CheckBypass{Apakah Memenuhi Kasus Bypass?\n1. Self-Service Catatan Sendiri\n2. Atasan Langsung (Direct Supervisor)}
+    CheckRBAC --> CheckBypass{"Apakah Memenuhi Kasus Bypass?\n1. Self-Service Catatan Sendiri\n2. Atasan Langsung (Direct Supervisor)"}
     
     CheckBypass -- Ya --> AllowAPI[Izinkan Request API]
     CheckBypass -- Tidak --> CheckDBPerm{Apakah boolean izin aktif\npada AccessRole user?}

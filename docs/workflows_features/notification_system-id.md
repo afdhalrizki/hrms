@@ -17,8 +17,8 @@ flowchart TD
     CheckCategory -- ADMIN --> RouteAdmin[Notifikasi Admin:\n- Peringatan Kuota\n- Status Pembayaran\n- Registrasi Klien]
     CheckCategory -- OPERATIONAL --> RouteOper[Notifikasi Operasional:\n- Workflow Cuti & Reimburse\n- Penerbitan Slip Gaji\n- Log Absensi]
     
-    RouteAdmin --> WriteDB[Simpan ke DB: public.SystemNotification]
-    RouteOper --> WriteDBTenant[Simpan ke DB: [tenant].SystemNotification]
+    RouteAdmin --> WriteDB["Simpan ke DB: public.SystemNotification"]
+    RouteOper --> WriteDBTenant["Simpan ke DB: [tenant].SystemNotification"]
     
     WriteDB --> CheckEmail{Apakah Email Aktif?}
     WriteDBTenant --> CheckEmail

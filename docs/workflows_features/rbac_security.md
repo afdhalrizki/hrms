@@ -53,13 +53,13 @@ flowchart TD
     CheckDomain --> CheckStatus[SubscriptionStatusPermission:\nCheck Tenant Subscription Status]
     
     CheckStatus -- SUSPENDED --> BlockAll[Block Access - HTTP 403 Forbidden]
-    CheckStatus -- EXPIRED --> CheckSafe{Is HTTP Request Method\nSafe (GET / Read-Only)?}
+    CheckStatus -- EXPIRED --> CheckSafe{"Is HTTP Request Method\nSafe (GET / Read-Only)?"}
     
     CheckSafe -- No --> BlockWrite[Block Access - HTTP 402 Payment Required]
     CheckSafe -- Yes --> CheckRBAC[HasTenantRBACPermission:\nEvaluate User Roles]
     CheckStatus -- ACTIVE --> CheckRBAC
     
-    CheckRBAC --> CheckBypass{Does Request Meet Bypass Rules?\n1. Self-Service (Own Records)\n2. Direct Supervisor}
+    CheckRBAC --> CheckBypass{"Does Request Meet Bypass Rules?\n1. Self-Service (Own Records)\n2. Direct Supervisor"}
     
     CheckBypass -- Yes --> AllowAPI[Allow API Request]
     CheckBypass -- No --> CheckDBPerm{Is Permission Flag Enabled\nin active AccessRole?}

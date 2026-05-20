@@ -95,7 +95,7 @@ flowchart TD
     
     PostBiometric --> CheckStorage{Is Tenant Cloud \nStorage Limit Reached?}
     
-    CheckStorage -- Yes --> SaveNoPhoto[Save Attendance Log \nSet biometric_skipped = True \n(Bypass photo upload)]
+    CheckStorage -- Yes --> SaveNoPhoto["Save Attendance Log \nSet biometric_skipped = True \n(Bypass photo upload)"]
     CheckStorage -- No --> MatchFace[Backend: Compare Selfie with \nFace Reference Photo]
     
     MatchFace --> CheckMatch{Do Faces Match?}
@@ -137,7 +137,7 @@ flowchart TD
     CheckBalance -- No --> ShowBalanceError[Show Error: Insufficient \nleave balance]
     CheckBalance -- Yes --> CheckAttachment{Does Leave Type \nRequire Attachment?}
     
-    CheckAttachment -- Yes --> UploadAttachment[Capture Photo of Document \n(Doctor's note / proof)]
+    CheckAttachment -- Yes --> UploadAttachment["Capture Photo of Document \n(Doctor's note / proof)"]
     CheckAttachment -- No --> SubmitLeave[Post Request via POST /leave-requests/]
     UploadAttachment --> SubmitLeave
     
@@ -168,7 +168,7 @@ Enables employees to report and submit expense claims directly.
 
 ```mermaid
 flowchart TD
-    Start[Employee Opens Reimbursement Screen] --> InputClaim[Input Claim Details:\n- Expense Name\n- Claim Amount (IDR)\n- Select Category]
+    Start[Employee Opens Reimbursement Screen] --> InputClaim["Input Claim Details:\n- Expense Name\n- Claim Amount (IDR)\n- Select Category"]
     InputClaim --> CameraCapture[Take Photo of Receipt / Invoice]
     CameraCapture --> CheckFile{Is File Validation \nSuccessful?}
     

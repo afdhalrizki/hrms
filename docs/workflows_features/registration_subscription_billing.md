@@ -137,7 +137,7 @@ The backend listens for Midtrans payment updates at:
 
 ### 5.2 Webhook Signature Verification
 To prevent spoofed payment callbacks, the backend calculates and verifies the signature key on each webhook call:
-$$\text{Signature Key} = \text{SHA512}(\text{order\_id} + \text{status\_code} + \text{gross\_amount} + \text{Server Key})$$
+$$\text{Signature Key} = \text{SHA512}(\text{order\\_id} + \text{status\\_code} + \text{gross\\_amount} + \text{Server Key})$$
 
 ```python
 import hashlib

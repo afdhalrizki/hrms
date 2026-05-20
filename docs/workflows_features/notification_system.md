@@ -17,8 +17,8 @@ flowchart TD
     CheckCategory -- ADMIN --> RouteAdmin[Admin Alert:\n- Quota Warnings\n- Billing Payments\n- Tenant Registration]
     CheckCategory -- OPERATIONAL --> RouteOper[Operational Alert:\n- Leave/Reimburse Workflow\n- Payslip Issued\n- Attendance Alerts]
     
-    RouteAdmin --> WriteDB[Save to public.SystemNotification]
-    RouteOper --> WriteDBTenant[Save to [tenant].SystemNotification]
+    RouteAdmin --> WriteDB["Save to public.SystemNotification"]
+    RouteOper --> WriteDBTenant["Save to [tenant].SystemNotification"]
     
     WriteDB --> CheckEmail{Is Email Enabled?}
     WriteDBTenant --> CheckEmail

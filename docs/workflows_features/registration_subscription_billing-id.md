@@ -137,7 +137,7 @@ Sistem backend mendengarkan status pembayaran dari server Midtrans pada rute end
 
 ### 5.2 Alur Validasi Tanda Tangan (Signature Key Verification)
 Untuk menghindari manipulasi pembayaran palsu, backend memverifikasi signature key yang dikirim Midtrans di setiap request webhook:
-$$\text{Signature Key} = \text{SHA512}(\text{order\_id} + \text{status\_code} + \text{gross\_amount} + \text{Server Key})$$
+$$\text{Signature Key} = \text{SHA512}(\text{order\\_id} + \text{status\\_code} + \text{gross\\_amount} + \text{Server Key})$$
 
 ```python
 import hashlib

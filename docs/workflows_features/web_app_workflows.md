@@ -77,9 +77,9 @@ New employee entries and physical company branch structures are managed by the H
 ```mermaid
 flowchart TD
     Start[HR Opens Add Employee Form] --> InputData[Input Employee Data:\n- Name, Email, Phone\n- Select Department & Role\n- Select Branch & Supervisor]
-    InputData --> SetCompensation[Set Salary Grade\n(Binds Base Salary & Allowances)]
+    InputData --> SetCompensation["Set Salary Grade\n(Binds Base Salary & Allowances)"]
     SetCompensation --> SetRBAC[Select Access Role:\nAdmin / HR Staff / Employee]
-    SetRBAC --> UploadDocs[Upload Required Docs:\n- Scan KTP & NPWP\n- Face Reference Photo (Face ID)]
+    SetRBAC --> UploadDocs["Upload Required Docs:\n- Scan KTP & NPWP\n- Face Reference Photo (Face ID)"]
     UploadDocs --> SubmitForm[Post Data via POST /employees/]
     
     SubmitForm --> CheckQuota{Is Employee Count \nWithin Subscription Limit?}
@@ -115,7 +115,7 @@ Enforces internal organizational hierarchy approvals for leaves, overtime, reimb
 
 ```mermaid
 flowchart TD
-    Start[Employee Submits Request\n(Leave / Reimbursement / Correction)] --> CheckConfig{Is WorkflowConfig \nActive for this Type?}
+    Start["Employee Submits Request\n(Leave / Reimbursement / Correction)"] --> CheckConfig{Is WorkflowConfig \nActive for this Type?}
     
     CheckConfig -- No --> DirectApproval[Single Stage Approval:\nDirect to HR / Manager queue]
     CheckConfig -- Yes --> GetStages[Retrieve WorkflowStages \nOrdered by Sequence]
@@ -127,12 +127,12 @@ flowchart TD
     ShowInQueue --> WaitAction{Approver Action?}
     
     WaitAction -- REJECTED --> RejectFlow[Final Status: REJECTED \nStop Workflow \nSend Rejection Notification]
-    WaitAction -- APPROVED --> CheckNext{Is There a Next Stage \n(Sequence + 1)?}
+    WaitAction -- APPROVED --> CheckNext{"Is There a Next Stage \n(Sequence + 1)?"}
     
     CheckNext -- Yes --> AdvanceStage[Set Active Stage = Sequence + 1]
     AdvanceStage --> IdentifyApprover
     
-    CheckNext -- No --> ApproveFlow[Final Status: APPROVED \nExecute Business Rule \n(Deduct Balance / Mark Payout)]
+    CheckNext -- No --> ApproveFlow["Final Status: APPROVED \nExecute Business Rule \n(Deduct Balance / Mark Payout)"]
 
     classDef success fill:#10B981,stroke:#059669,color:#fff;
     classDef fail fill:#EF4444,stroke:#DC2626,color:#fff;
@@ -176,15 +176,15 @@ flowchart TD
     
     CalcAllowances --> CalcDeductions[Calculate Deductions:\n- Late Attendance Penalties\n- Alfa Penalty Deductions]
     
-    CalcDeductions --> CalcBPJS[Calculate BPJS Contributions:\n- BPJS Kesehatan (1% employee, 4% employer)\n- BPJS TK JHT, JP, JKK, JKM]
+    CalcDeductions --> CalcBPJS["Calculate BPJS Contributions:\n- BPJS Kesehatan (1% employee, 4% employer)\n- BPJS TK JHT, JP, JKK, JKM"]
     
     CalcBPJS --> CalcGross[Calculate Gross Earnings:\nBase Salary + Allowances + Employer BPJS Premiums]
     
-    CalcGross --> CheckPTKP[Fetch Employee PTKP Status\n(TK/0 - K/3 for Category TER A/B/C)]
+    CalcGross --> CheckPTKP["Fetch Employee PTKP Status\n(TK/0 - K/3 for Category TER A/B/C)"]
     
     CheckPTKP --> ApplyTER[Apply TER PPh 21 2024 Rates:\nMonthly PPh 21 = Gross Earnings x TER Rate %]
     
-    ApplyTER --> CalcNet[Calculate Net Salary (Take Home Pay):\nGross - Employee BPJS - PPh 21 - Total Deductions]
+    ApplyTER --> CalcNet["Calculate Net Salary (Take Home Pay):\nGross - Employee BPJS - PPh 21 - Total Deductions"]
     
     CalcNet --> GenerateSlip[Generate Digital Pay Slips & \nPDF file dynamically]
     
@@ -197,7 +197,7 @@ flowchart TD
     Verify -- Yes --> CommitPayroll[Approve Payroll Period:\n- Set Period Status to APPROVED\n- Employee receives Email & Mobile alert\n- Secure PDF saved to cloud storage]
     
     CommitPayroll --> Disburse[Initiate Bank Payroll Transfer]
-    Disburse --> MarkPaid[Update Status: PAID \n(Period Permanently Closed)]
+    Disburse --> MarkPaid["Update Status: PAID \n(Period Permanently Closed)"]
     
     MarkPaid --> End([Finish])
 
@@ -253,10 +253,10 @@ flowchart TD
     AuthCheck -- No --> BlockReq[Reject - HTTP 403 Forbidden]
     AuthCheck -- Yes --> SyncDB[Start Provisioning Process:]
     
-    SyncDB --> CreateSchema[1. Create New isolated PostgreSQL Schema \n(client data separation)]
+    SyncDB --> CreateSchema["1. Create New isolated PostgreSQL Schema \n(client data separation)"]
     CreateSchema --> RunMigrations[2. Run Django Database Migrations \nto populate local schema tables]
     RunMigrations --> CreateTenantAdmin[3. Create Tenant Admin in public.users \nand link to the tenant]
-    CreateTenantAdmin --> SeedMasterData[4. Seed Basic Master Data \n(Default Department, Roles, Shifts)]
+    CreateTenantAdmin --> SeedMasterData["4. Seed Basic Master Data \n(Default Department, Roles, Shifts)"]
     SeedMasterData --> SendWelcomeEmail[5. Send Welcome Activation Email \nwith workspace credentials]
     
     SendWelcomeEmail --> UpdateStatus[Update Registration Status: APPROVED]
