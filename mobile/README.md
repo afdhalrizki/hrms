@@ -17,20 +17,20 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 - **Account Settings**: App personalization, language preferences, and secure logout management.
 
 ### 📊 Feature Status & Maturity
+
 For a detailed audit of implemented vs. mocked features, see [**Feature Audit & Gap Analysis**](../docs/project_management/mobile_feature_audit.md) ([**Versi Indonesia**](../docs/project_management/mobile_feature_audit-id.md)).
 
-| Module | Status | Dynamic? |
-| :--- | :--- | :--- |
-| Auth & Face ID | ✅ Ready | Yes |
-| Profile & Docs | ✅ Ready | Yes |
-| Attendance Logic | ✅ Ready | Yes |
-| Leave & Reimb | ✅ Ready | Yes |
-| Performance | ✅ Ready | Yes |
-| Payslips | ✅ Ready | Yes |
-| L10n | ⚠️ Polishing | No |
+| Module           | Status       | Dynamic? |
+| :--------------- | :----------- | :------- |
+| Auth & Face ID   | ✅ Ready     | Yes      |
+| Profile & Docs   | ✅ Ready     | Yes      |
+| Attendance Logic | ✅ Ready     | Yes      |
+| Leave & Reimb    | ✅ Ready     | Yes      |
+| Performance      | ✅ Ready     | Yes      |
+| Payslips         | ✅ Ready     | Yes      |
+| L10n             | ⚠️ Polishing | No       |
 
 ### 📱 Flutter UI Previews
-
 
 | ![Mobile Dashboard](../docs/assets/mobile_preview.png) | ![Face ID Verification](../docs/assets/mobile_face_id.png) |
 
@@ -48,10 +48,12 @@ For a detailed audit of implemented vs. mocked features, see [**Feature Audit & 
 ## 📦 Getting Started
 
 ### Prerequisites
+
 - **Flutter SDK**: 3.19 or later.
 - **Backend Running**: Ensure the backend is active on Port 8000.
 
 ### Setup
+
 ```powershell
 flutter pub get
 ```
@@ -67,33 +69,38 @@ node scripts/run_dev.mjs
 To simplify the generation of app installation packages, you can use the following scripts:
 
 ### Android (APK)
+
 ```bash
 node scripts/build_apk.mjs
 ```
+
 The `.apk` file will be generated at `build/app/outputs/flutter-apk/app-release.apk`.
 
 ### iOS (IPA)
+
 ```bash
 node scripts/build_ipa.mjs
 ```
-*Note: iOS builds require macOS and Xcode.*
+
+_Note: iOS builds require macOS and Xcode._
 
 ## 🌐 Deployment & Infrastructure
 
 The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 
-| Tier | API URL / Domain | Purpose |
-| :--- | :--- | :--- |
-| **Dev** | `http://10.0.2.2:8000/api` | Local Development |
-| **QA** | `https://harikerja.web.id/api` | Biznet / IDCH / Hostinger |
-| **Staging** | `https://harikerja.my.id/api` | Biznet Scaling Test |
-| **Production** | `https://harikerja.com/api` | Biznet/AWS Enterprise |
+| Tier           | API URL / Domain               | Purpose                   |
+| :------------- | :----------------------------- | :------------------------ |
+| **Dev**        | `http://10.0.2.2:8000/api`     | Local Development         |
+| **QA**         | `https://harikerja.web.id/api` | Biznet / IDCH / Hostinger |
+| **Staging**    | `https://harikerja.my.id/api`  | Biznet Scaling Test       |
+| **Production** | `https://harikerja.com/api`    | Biznet/AWS Enterprise     |
 
 ## 🧪 Testing Standard
 
-The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **159 robust tests**.
+The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **161 robust tests**.
 
-### Unit & Logic Tests - 136 Tests
+### Unit & Logic Tests - 138 Tests
+
 ```bash
 node scripts/run_unit_tests.mjs
 ```
@@ -101,16 +108,19 @@ node scripts/run_unit_tests.mjs
 ### End-to-End Testing (E2E) - 23 Tests
 
 **Run with mocked API (Isolated):**
+
 ```bash
 node scripts/run_e2e_tests.mjs
 ```
 
 **Run with real integrated API and Database:**
+
 ```bash
 node scripts/run_e2e_tests.mjs --integrated
 ```
 
 ### Run All Tests (Unit + E2E)
+
 ```bash
 node scripts/run_tests.mjs
 ```
@@ -118,13 +128,13 @@ node scripts/run_tests.mjs
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
+
 - [**Authentication Architecture: Web vs. Mobile**](../docs/architecture/auth_architecture.md)
 - [**Pricing & Subscription Plans**](../docs/business_strategy/pricing_and_plans.md)
 - [**Mobile App Workflows & Flowcharts**](../docs/workflows_features/mobile_app_workflows.md)
 - [**Full-Stack Developer Guide**](../docs/technical_specs/developer_guide.md)
 
-
 ---
+
 **Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Mobile Experience Standardized.
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
-

@@ -48,15 +48,14 @@ _Penyediaan SaaS bertingkat dan pembatasan langganan cerdas (Essential, Professi
 
 ### 📊 Rencana Komersial
 
-| Fitur | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Batas Karyawan** | 10 | 25 | 100 | 500 | 2.000+ |
-| **HR Inti** | ✅ Dasar | ✅ Dasar | ✅ Lanjutan | ✅ Lanjutan | ✅ Lanjutan |
-| **Kehadiran** | ✅ Dasar | ✅ Geofencing | ✅ Geo + Foto | ✅ Koreksi | ✅ Shift/Roster |
-| **Penggajian** | ❌ | ❌ | ✅ PPh 21/BPJS | ✅ Lanjutan | ✅ Analitik |
-| **Kinerja** | ❌ | ❌ | ❌ | ✅ KPI/Appraisal | ✅ Team Coaching |
-| **Analitik** | ❌ | ❌ | ❌ | ❌ | ✅ Audit/Insight |
-
+| Fitur              | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM**      | **ENTERPRISE**   |
+| :----------------- | :------- | :------------ | :--------------- | :--------------- | :--------------- |
+| **Batas Karyawan** | 10       | 25            | 100              | 500              | 2.000+           |
+| **HR Inti**        | ✅ Dasar | ✅ Dasar      | ✅ Lanjutan      | ✅ Lanjutan      | ✅ Lanjutan      |
+| **Kehadiran**      | ✅ Dasar | ✅ Geofencing | ✅ Geo + Foto    | ✅ Koreksi       | ✅ Shift/Roster  |
+| **Penggajian**     | ❌       | ❌            | ✅ PPh 21/BPJS   | ✅ Lanjutan      | ✅ Analitik      |
+| **Kinerja**        | ❌       | ❌            | ❌               | ✅ KPI/Appraisal | ✅ Team Coaching |
+| **Analitik**       | ❌       | ❌            | ❌               | ❌               | ✅ Audit/Insight |
 
 ## 📦 Memulai
 
@@ -88,6 +87,7 @@ node scripts/run_all_tests.mjs
 
 **Tes Stack Individual:**
 Untuk kontrol yang lebih spesifik, Anda dapat menjalankan tes di dalam setiap direktori modul:
+
 - [**Tes Backend**](./backend/README-id.md#🧪-standar-pengujian)
 - [**Tes Frontend**](./frontend/README-id.md#🧪-standar-pengujian)
 - [**Tes Mobile**](./mobile/README-id.md#🧪-standar-pengujian)
@@ -101,11 +101,11 @@ Untuk kontrol yang lebih spesifik, Anda dapat menjalankan tes di dalam setiap di
 
 ## 📁 Modul Proyek
 
-| Modul        | Tujuan                                | Dokumentasi                         |
-| :----------- | :------------------------------------ | :---------------------------------- |
-| **Backend**  | Django REST API & Inti Multi-tenant   | [**README**](./backend/README-id.md) |
-| **Frontend** | Dasbor Admin Premium Next.js          | [**README**](./frontend/README-id.md)|
-| **Mobile**   | Aplikasi Employee Self-Service Flutter| [**README**](./mobile/README-id.md)  |
+| Modul        | Tujuan                                 | Dokumentasi                           |
+| :----------- | :------------------------------------- | :------------------------------------ |
+| **Backend**  | Django REST API & Inti Multi-tenant    | [**README**](./backend/README-id.md)  |
+| **Frontend** | Dasbor Admin Premium Next.js           | [**README**](./frontend/README-id.md) |
+| **Mobile**   | Aplikasi Employee Self-Service Flutter | [**README**](./mobile/README-id.md)   |
 
 ## 🚀 Fitur Utama
 
@@ -123,39 +123,38 @@ graph TD
     User([Permintaan Pengguna]) --> DNS{Resolusi Wildcard DNS}
     DNS -->|company1.harikerja.com| Nginx[Nginx Reverse Proxy]
     DNS -->|portal.harikerja.com| Nginx
-    
+
     Nginx --> NextJS[Next.js App Server]
     NextJS -->|Permintaan API dengan X-Tenant-Domain| Django[Django Backend API]
-    
+
     Django --> Middleware[TenantMiddleware]
     Middleware -->|Cari Domain Tenant| DBRoute{Rute Koneksi DB}
-    
+
     DBRoute -->|public| SharedDB[(PostgreSQL - public schema)]
     DBRoute -->|company1| TenantDB1[(PostgreSQL - tenant_1 schema)]
     DBRoute -->|company2| TenantDB2[(PostgreSQL - tenant_2 schema)]
-    
+
     SharedDB --- Users[Registrasi, Billing, Global Admin]
     TenantDB1 --- Co1[Data Karyawan, Presensi, Gaji, Cuti]
     TenantDB2 --- Co2[Data Karyawan, Presensi, Gaji, Cuti]
 ```
 
-
 ## 🌐 Penyebaran & Infrastruktur
 
-| Tingkat        | Domain                     | Platform Hosting              | Tujuan                                |
-| :------------- | :------------------------- | :---------------------------- | :------------------------------------ |
-| **Dev**        | `localhost`                | Docker Lokal                  | Prototyping cepat & tes lokal.        |
-| **QA**         | `harikerja.web.id`      | **Biznet / IDCH / Hostinger** | UAT fungsional dan pengujian QA.      |
-| **Staging**    | `harikerja.my.id` | **Biznet / Bare-Metal**       | Tes penskalaan 100 ribu pengguna.     |
-| **Production** | `harikerja.com`            | **Biznet (100K) / AWS (1M)**  | Beban kerja perusahaan resmi.         |
+| Tingkat        | Domain             | Platform Hosting              | Tujuan                            |
+| :------------- | :----------------- | :---------------------------- | :-------------------------------- |
+| **Dev**        | `localhost`        | Docker Lokal                  | Prototyping cepat & tes lokal.    |
+| **QA**         | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | UAT fungsional dan pengujian QA.  |
+| **Staging**    | `harikerja.my.id`  | **Biznet / Bare-Metal**       | Tes penskalaan 100 ribu pengguna. |
+| **Production** | `harikerja.com`    | **Biznet (100K) / AWS (1M)**  | Beban kerja perusahaan resmi.     |
 
 ## 🧪 Standar Pengujian
 
 Platform ini mencapai tingkat kelulusan tes **100% terpadu** di semua lapisan stack.
 
-- **Backend**: 387 Tes (368 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 21 Mei 2026)
-- **Frontend**: 293 Tes (222 Unit + 71 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 21 Mei 2026)
-- **Mobile**: 159 Tes (136 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 21 Mei 2026)
+- **Backend**: 390 Tes (371 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 21 Mei 2026)
+- **Frontend**: 298 Tes (222 Unit + 76 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 21 Mei 2026)
+- **Mobile**: 161 Tes (138 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 21 Mei 2026)
 
 ## 📈 Strategi Skalabilitas: Jalan Menuju 1 Juta Pengguna
 
@@ -182,6 +181,7 @@ Strategi penskalaan mendalam: [**Struktur Organisasi & Peta Jalan Skala**](./doc
 Platform ini mempertahankan dokumentasi bilingual (Inggris & Indonesia) yang komprehensif. Berikut adalah peta direktori yang menjelaskan tujuan dan berkas kunci dari semua folder dokumentasi serta berkas README:
 
 ### 📖 Berkas README Modul
+
 - [**README Utama**](./README.md) ([**Versi Indonesia**](./README-id.md)) - Tinjauan umum platform, strategi penskalaan, orkestrator pengujian terpadu, dan panduan memulai cepat.
 - [**README Backend**](./backend/README-id.md) ([**Versi Indonesia**](./backend/README-id.md)) - Pengaturan API inti Django, perintah pengujian Pytest, skema pembatasan modular (tiering), dan database seeder.
 - [**README Frontend**](./frontend/README.md) ([**Versi Indonesia**](./frontend/README-id.md)) - Konfigurasi dasbor admin Next.js, sistem desain UI, dan rangkaian pengujian Vitest/Playwright.
@@ -189,6 +189,7 @@ Platform ini mempertahankan dokumentasi bilingual (Inggris & Indonesia) yang kom
 - [**README Penyebaran**](./deploy/README.md) - Skrip infrastruktur, konfigurasi reverse proxy Nginx, konfigurasi lingkungan (.env), dan skrip jalur promosi deployment.
 
 ### 📚 Direktori Dokumentasi Platform (`/docs`)
+
 - **`adr/`**: Architecture Decision Records (ADR) yang merinci keputusan teknis krusial.
   - [Optimasi Penghitung Karyawan](./docs/adr/employee_counter_optimization-id.md) ([English](./docs/adr/employee_counter_optimization.md))
 - **`architecture/`**: Integrasi sistem, diagram alur otentikasi, dan desain infrastruktur HA.
@@ -225,7 +226,6 @@ Platform ini mempertahankan dokumentasi bilingual (Inggris & Indonesia) yang kom
   - [Registrasi, Siklus Hidup Langganan & Billing](./docs/workflows_features/registration_subscription_billing-id.md) ([English](./docs/workflows_features/registration_subscription_billing.md))
   - [Sistem Otorisasi (RBAC) & Klasifikasi Keamanan](./docs/workflows_features/rbac_security-id.md) ([English](./docs/workflows_features/rbac_security.md))
   - [Sistem Notifikasi & Pemetaan Peristiwa](./docs/workflows_features/notification_system-id.md) ([English](./docs/workflows_features/notification_system.md))
-
 
 ## 🛠 Tech Stack
 

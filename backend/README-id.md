@@ -13,13 +13,14 @@ Inti API yang krusial bagi misi ekosistem **harikerja HRMS**. Dibangun dengan Py
 - [x] **HR Strategis**: Pelacakan KPI, siklus Penilaian, dan alur kerja persetujuan multi-tahap.
 - [x] **Manajemen Profil ESS**: API mandiri terbatas yang memungkinkan karyawan memperbarui info kontak pribadi dan mengunggah dokumen KTP/NPWP tanpa mengganggu data utama HR.
 - [x] **SaaS Tiering & Gating**: Logika tingkat model untuk pengaktifan fitur berbasis rencana (Essential, Professional, Premium, Enterprise).
-  
-  | Fitur | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
-  | :--- | :---: | :---: | :---: | :---: | :---: |
-  | **Kuota** | 10 Kry | 25 Kry | 100 Kry | 500 Kry | 2.000+ |
-  | **Payroll** | ❌ | ❌ | ✅ | ✅ | ✅ |
-  | **Kinerja**| ❌ | ❌ | ❌ | ✅ | ✅ |
-  | **Analitik** | ❌ | ❌ | ❌ | ❌ | ✅ |
+
+  | Fitur        | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
+  | :----------- | :------: | :-----------: | :--------------: | :---------: | :------------: |
+  | **Kuota**    |  10 Kry  |    25 Kry     |     100 Kry      |   500 Kry   |     2.000+     |
+  | **Payroll**  |    ❌    |      ❌       |        ✅        |     ✅      |       ✅       |
+  | **Kinerja**  |    ❌    |      ❌       |        ❌        |     ✅      |       ✅       |
+  | **Analitik** |    ❌    |      ❌       |        ❌        |     ❌      |       ✅       |
+
 - [x] **Penyimpanan Cloud-Native**: Siap untuk Amazon S3 atau penyimpanan yang kompatibel dengan AWS melalui `django-storages` untuk skalabilitas multi-node.
 
 ## 📁 Modul Inti
@@ -43,6 +44,7 @@ Inti API yang krusial bagi misi ekosistem **harikerja HRMS**. Dibangun dengan Py
 ## 📦 Memulai
 
 ### 1. Pengaturan & Instalasi
+
 ```bash
 python -m venv venv
 # Windows:
@@ -53,7 +55,9 @@ pip install -r requirements.txt
 ```
 
 ### 2. Inisialisasi Database
+
 Sistem menggunakan proses migrasi dua langkah untuk multi-tenancy:
+
 ```bash
 python manage.py migrate_schemas --shared
 python manage.py migrate_schemas --tenant
@@ -63,11 +67,13 @@ python manage.py bootstrap_tenants
 ## 🚀 Menjalankan Platform
 
 ### Mulai Server Pengembangan
+
 ```bash
 node scripts/run_dev.mjs
 ```
 
 **Verifikasi Backend**:
+
 - **Status API**: [http://localhost:8000/api/users/me/](http://localhost:8000/api/users/me/)
 - **Dokumentasi Swagger**: [http://localhost:8000/api/schema/swagger-ui/](http://localhost:8000/api/schema/swagger-ui/)
 
@@ -75,28 +81,31 @@ node scripts/run_dev.mjs
 
 Platform harikerja mengikuti jalur promosi 4-tingkat yang ketat:
 
-| Tingkat | Domain | Penyedia Hosting | Tujuan |
-| :--- | :--- | :--- | :--- |
-| **Dev** | `localhost` | Docker Lokal | Prototyping cepat & tes lokal. |
-| **QA** | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | UAT fungsional dan pengujian QA. |
-| **Staging** | `harikerja.my.id` | **Biznet / Bare-Metal** | Tes penskalaan 100 ribu pengguna. |
-| **Production** | `harikerja.com` | **Biznet (100K) / AWS (1M)** | Beban kerja perusahaan resmi. |
+| Tingkat        | Domain             | Penyedia Hosting              | Tujuan                            |
+| :------------- | :----------------- | :---------------------------- | :-------------------------------- |
+| **Dev**        | `localhost`        | Docker Lokal                  | Prototyping cepat & tes lokal.    |
+| **QA**         | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | UAT fungsional dan pengujian QA.  |
+| **Staging**    | `harikerja.my.id`  | **Biznet / Bare-Metal**       | Tes penskalaan 100 ribu pengguna. |
+| **Production** | `harikerja.com`    | **Biznet (100K) / AWS (1M)**  | Beban kerja perusahaan resmi.     |
 
 ## 🧪 Standar Pengujian
 
-Backend menggunakan `pytest` dengan **tingkat kelulusan 100%** di **387 tes krusial** (368 Unit + 19 E2E).
+Backend menggunakan `pytest` dengan **tingkat kelulusan 100%** di **390 tes krusial** (371 Unit + 19 E2E).
 
 **Jalankan tes logika/unit:**
+
 ```bash
 node scripts/run_unit_tests.mjs
 ```
 
 **Jalankan tes E2E:**
+
 ```bash
 node scripts/run_e2e_tests.mjs
 ```
 
 **Jalankan Semua Tes (Unit + E2E):**
+
 ```bash
 node scripts/run_tests.mjs
 ```
@@ -104,12 +113,13 @@ node scripts/run_tests.mjs
 ## 📚 Dokumentasi Teknis
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh platform di direktori `docs/` akar:
+
 - [**Sistem Multi-Tenancy**](../docs/architecture/multi_tenancy_system-id.md)
 - [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans-id.md)
 - [**Sistem Otorisasi (RBAC) & Keamanan**](../docs/workflows_features/rbac_security-id.md)
 - [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide-id.md)
 
-
 ---
+
 **Status Proyek**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Inti Backend Terstandardisasi.
 **Catatan Branding**: Proyek ini diubah namanya dari Antigravity menjadi **harikerja** pada 16 Maret 2026.

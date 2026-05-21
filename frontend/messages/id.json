@@ -35,6 +35,7 @@
     "reporting": "Pelaporan",
     "audit_logs": "Log Audit",
     "api_keys": "Kunci API",
+    "branding": "Branding",
     "tickets": "Bantuan & Tiket"
   },
   "HelpSupport": {
@@ -91,7 +92,11 @@
     "cancel": "Batal",
     "save": "Simpan Perubahan",
     "loading": "Memuat...",
-    "joined_days_ago": "Bergabung {days} hari yang lalu"
+    "joined_days_ago": "Bergabung {days} hari yang lalu",
+    "noData": "Tidak ada data",
+    "delete": "Hapus",
+    "edit": "Ubah",
+    "view": "Lihat"
   },
   "Subscription": {
     "readOnlyMessage": "Langganan berakhir pada {date}. Sistem sekarang dalam mode Baca-Saja.",
@@ -124,7 +129,15 @@
     "pending": "Menunggu",
     "approved": "Disetujui",
     "rejected": "Ditolak",
-    "adminComment": "Komentar Admin"
+    "adminComment": "Komentar Admin",
+    "requestedChange": "Perubahan yang Diajukan",
+    "correctionFor": "Koreksi untuk",
+    "processed": "Pengajuan {action} berhasil",
+    "empty": "Tidak ada permintaan koreksi ditemukan",
+    "reasonRequired": "Harap masukkan alasan koreksi.",
+    "success": "Permintaan koreksi berhasil dikirim!",
+    "fail": "Gagal memproses permintaan",
+    "enterComment": "Masukkan komentar untuk"
   },
   "Analytics": {
     "title": "Analitik Lanjutan",
@@ -153,6 +166,7 @@
       "type": "Jenis Cuti",
       "startDate": "Tanggal Mulai",
       "endDate": "Tanggal Selesai",
+      "annual": "Cuti Tahunan",
       "sick": "Sakit",
       "emergency": "Darurat / Keperluan Pribadi",
       "maternity": "Cuti Melahirkan",
@@ -180,7 +194,18 @@
       "date": "Tanggal Kwitansi",
       "description": "Justifikasi",
       "attachment": "Lampiran Kwitansi (PDF/Gambar)",
-      "receiptNumber": "Nomor Kwitansi / Faktur"
+      "receiptNumber": "Nomor Kwitansi / Faktur",
+      "submit": "Kirim Klaim",
+      "cancel": "Batal",
+      "success": "Klaim reimbursement berhasil dikirim!"
+    },
+    "table": {
+      "category": "Kategori",
+      "date": "Tanggal",
+      "reason": "Alasan / Justifikasi",
+      "amount": "Jumlah yang Diajukan",
+      "status": "Status",
+      "receipt": "Kuitansi"
     }
   },
   "Payroll": {
@@ -268,7 +293,15 @@
       "commentLabel": "Umpan Balik Detail / Komentar",
       "scoreLabel": "Skor Numerik (1-5)",
       "reviewType": "Peran Penilai",
-      "submitScore": "Kirim Skor"
+      "submitScore": "Kirim Skor",
+      "success": "Penilaian kinerja berhasil dikirim!"
+    },
+    "table": {
+      "period": "Periode Penilaian",
+      "status": "Status",
+      "reviews": "Tinjauan",
+      "score": "Skor Akhir",
+      "actions": "Aksi"
     }
   },
   "Branding": {
@@ -282,6 +315,8 @@
     "success": "Branding berhasil diperbarui"
   },
   "Tiering": {
+    "upgradeTitle": "Fitur Premium",
+    "upgradeNeeded": "Modul {module} tidak tersedia dalam paket Anda saat ini. Tingkatkan paket untuk membuka fitur.",
     "upgradeBtn": "Tingkatkan Paket Sekarang"
   },
   "Auth": {

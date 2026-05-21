@@ -18,19 +18,22 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 ## 🖼 UI Previews
 
 ### Admin Dashboard
+
 ![Dashboard Preview](../docs/assets/dashboard_preview.png)
 
-*Modern, glassmorphism-based dashboard with real-time analytics indicators.*
+_Modern, glassmorphism-based dashboard with real-time analytics indicators._
 
 ### Premium Signup
+
 ![Signup Preview](../docs/assets/signup_page_premium_harikerja.png)
 
-*Seamless tenant onboarding with instant domain validation.*
+_Seamless tenant onboarding with instant domain validation._
 
 ### Admin Provisioning
+
 ![Provisioning Preview](../docs/assets/add_employee_modal_before_submit_1773638661925.png)
 
-*Employee creation form integrated securely with organizational RBAC toggles.*
+_Employee creation form integrated securely with organizational RBAC toggles._
 
 ## 🛠 Tech Stack
 
@@ -52,16 +55,19 @@ The premium, high-performance admin dashboard for the **harikerja HRMS** ecosyst
 ## 📦 Getting Started
 
 ### Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 🚀 Running the Platform
+
 ```bash
 npm run dev
 ```
 
 **Verify Frontend**:
+
 - **Public Portal**: [http://localhost:3000](http://localhost:3000)
 - **Tenant Dashboard**: [http://company1.localhost:3000](http://company1.localhost:3000)
 
@@ -69,35 +75,39 @@ npm run dev
 
 The harikerja platform follows a strict 4-tier promotion path:
 
-| Tier | Domain | Hosting Provider | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Dev** | `localhost` | Local Docker | Rapid prototyping & local testing. |
-| **QA** | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing. |
-| **Staging** | `harikerja.my.id` | **Biznet / Bare-Metal** | 100K User scaling test. |
-| **Production** | `harikerja.com` | **Biznet (100K) / AWS (1M)** | Official enterprise workloads. |
+| Tier           | Domain             | Hosting Provider              | Purpose                            |
+| :------------- | :----------------- | :---------------------------- | :--------------------------------- |
+| **Dev**        | `localhost`        | Local Docker                  | Rapid prototyping & local testing. |
+| **QA**         | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
+| **Staging**    | `harikerja.my.id`  | **Biznet / Bare-Metal**       | 100K User scaling test.            |
+| **Production** | `harikerja.com`    | **Biznet (100K) / AWS (1M)**  | Official enterprise workloads.     |
 
 ## 🧪 Testing Standard
 
-The frontend uses a dual-layer strategy with **100% pass rate** across **293 mission-critical tests**.
+The frontend uses a dual-layer strategy with **100% pass rate** across **298 mission-critical tests**.
 
 ### Unit Testing (Vitest) - 222 Tests
+
 ```bash
 node scripts/run_unit_tests.mjs
 ```
 
-### End-to-End Testing (Playwright) - 71 Tests
+### End-to-End Testing (Playwright) - 76 Tests
 
 **Run with mocked API (Fast/Isolated):**
+
 ```bash
 node scripts/run_e2e_tests.mjs
 ```
 
 **Run with real integrated API and Database:**
+
 ```bash
 node scripts/run_e2e_tests.mjs --integrated
 ```
 
 ### Run All Tests (Unit + E2E)
+
 ```bash
 node scripts/run_tests.mjs
 ```
@@ -105,13 +115,13 @@ node scripts/run_tests.mjs
 ## 📚 Technical Documentation
 
 For in-depth technical details, please refer to the platform-wide documentation in the root `docs/` directory:
+
 - [**Multi-Tenancy System**](../docs/architecture/multi_tenancy_system.md)
 - [**Pricing & Subscription Plans**](../docs/business_strategy/pricing_and_plans.md)
 - [**Web App Workflows & Flowcharts**](../docs/workflows_features/web_app_workflows.md)
 - [**Full-Stack Developer Guide**](../docs/technical_specs/developer_guide.md)
 
-
 ---
+
 **Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Frontend Experience Standardized.
 **Branding Note**: This project was rebranded to **harikerja** on March 16, 2026.
-

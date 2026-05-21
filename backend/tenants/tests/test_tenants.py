@@ -404,9 +404,12 @@ class TenantSettingsTestCase(HRMSTestCase):
 class ProvisioningDepthTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='Public')
-        Domain.objects.get_or_create(domain='localhost', tenant=self.public_tenant, is_primary=True)
-        Domain.objects.get_or_create(domain='testserver', tenant=self.public_tenant, is_primary=False)
+        # Safe get_or_create to avoid race condition with parallel workers
+        self.public_tenant = Tenant.objects.filter(schema_name="public").first()
+        if not self.public_tenant:
+            self.public_tenant = Tenant.objects.create(schema_name="public", name="Public")
+        Domain.objects.get_or_create(domain="localhost", tenant=self.public_tenant, is_primary=True)
+        Domain.objects.get_or_create(domain="testserver", tenant=self.public_tenant, is_primary=False)
         
         self.admin = User.objects.create_superuser(email='master@platform.com', password='password123')
         self.client.force_authenticate(user=self.admin)

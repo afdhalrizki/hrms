@@ -48,15 +48,14 @@ _Tiered SaaS provisioning and intelligent subscription gating (Essential, Profes
 
 ### 📊 Commercial Plans
 
-| Feature | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM** | **ENTERPRISE** |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Employee Limit** | 10 | 25 | 100 | 500 | 2,000+ |
-| **Core HR** | ✅ Basic | ✅ Basic | ✅ Advanced | ✅ Advanced | ✅ Advanced |
-| **Attendance** | ✅ Basic | ✅ Geofencing | ✅ Geo + Photo | ✅ Correction | ✅ Shift/Roster |
-| **Payroll** | ❌ | ❌ | ✅ PPh 21/BPJS | ✅ Advanced | ✅ Analytics |
-| **Performance** | ❌ | ❌ | ❌ | ✅ KPI/Appraisal | ✅ Team Coaching |
-| **Analytics** | ❌ | ❌ | ❌ | ❌ | ✅ Audit/Insight |
-
+| Feature            | **FREE** | **ESSENTIAL** | **PROFESSIONAL** | **PREMIUM**      | **ENTERPRISE**   |
+| :----------------- | :------- | :------------ | :--------------- | :--------------- | :--------------- |
+| **Employee Limit** | 10       | 25            | 100              | 500              | 2,000+           |
+| **Core HR**        | ✅ Basic | ✅ Basic      | ✅ Advanced      | ✅ Advanced      | ✅ Advanced      |
+| **Attendance**     | ✅ Basic | ✅ Geofencing | ✅ Geo + Photo   | ✅ Correction    | ✅ Shift/Roster  |
+| **Payroll**        | ❌       | ❌            | ✅ PPh 21/BPJS   | ✅ Advanced      | ✅ Analytics     |
+| **Performance**    | ❌       | ❌            | ❌               | ✅ KPI/Appraisal | ✅ Team Coaching |
+| **Analytics**      | ❌       | ❌            | ❌               | ❌               | ✅ Audit/Insight |
 
 ## 📦 Getting Started
 
@@ -88,6 +87,7 @@ node scripts/run_all_tests.mjs
 
 **Individual Stack Tests:**
 For more granular control, you can run tests within each module directory:
+
 - [**Backend Tests**](./backend/README.md#🧪-testing-standard)
 - [**Frontend Tests**](./frontend/README.md#🧪-testing-standard)
 - [**Mobile Tests**](./mobile/README.md#🧪-testing-standard)
@@ -123,39 +123,38 @@ graph TD
     User([User Request]) --> DNS{Wildcard DNS Resolution}
     DNS -->|company1.harikerja.com| Nginx[Nginx Reverse Proxy]
     DNS -->|portal.harikerja.com| Nginx
-    
+
     Nginx --> NextJS[Next.js App Server]
     NextJS -->|API Requests with X-Tenant-Domain| Django[Django Backend API]
-    
+
     Django --> Middleware[TenantMiddleware]
     Middleware -->|Lookup Tenant Domain| DBRoute{Route Connection}
-    
+
     DBRoute -->|public| SharedDB[(PostgreSQL - public schema)]
     DBRoute -->|company1| TenantDB1[(PostgreSQL - tenant_1 schema)]
     DBRoute -->|company2| TenantDB2[(PostgreSQL - tenant_2 schema)]
-    
+
     SharedDB --- Users[Registration, Billing, Global Admins]
     TenantDB1 --- Co1[Employee Records, Attendance, Payroll, Leaves]
     TenantDB2 --- Co2[Employee Records, Attendance, Payroll, Leaves]
 ```
 
-
 ## 🌐 Deployment & Infrastructure
 
-| Tier           | Domain                     | Hosting Platform              | Purpose                            |
-| :------------- | :------------------------- | :---------------------------- | :--------------------------------- |
-| **Dev**        | `localhost`                | Local Docker                  | Rapid prototyping & local testing. |
-| **QA**         | `harikerja.web.id`      | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
-| **Staging**    | `harikerja.my.id` | **Biznet / Bare-Metal**       | 100K User scaling test.            |
-| **Production** | `harikerja.com`            | **Biznet (100K) / AWS (1M)**  | Official enterprise workloads.     |
+| Tier           | Domain             | Hosting Platform              | Purpose                            |
+| :------------- | :----------------- | :---------------------------- | :--------------------------------- |
+| **Dev**        | `localhost`        | Local Docker                  | Rapid prototyping & local testing. |
+| **QA**         | `harikerja.web.id` | **Biznet / IDCH / Hostinger** | Functional UAT and QA testing.     |
+| **Staging**    | `harikerja.my.id`  | **Biznet / Bare-Metal**       | 100K User scaling test.            |
+| **Production** | `harikerja.com`    | **Biznet (100K) / AWS (1M)**  | Official enterprise workloads.     |
 
 ## 🧪 Testing Standard
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 387 Tests (368 Unit + 19 E2E) - Pytest. (Verified 100% Passed - May 21, 2026)
-- **Frontend**: 293 Tests (222 Unit + 71 E2E) - Vitest & Playwright. (Verified 100% Passed - May 21, 2026)
-- **Mobile**: 159 Tests (136 Unit + 23 E2E) - Flutter. (Verified 100% Passed - May 21, 2026)
+- **Backend**: 390 Tests (371 Unit + 19 E2E) - Pytest. (Verified 100% Passed - May 21, 2026)
+- **Frontend**: 298 Tests (222 Unit + 76 E2E) - Vitest & Playwright. (Verified 100% Passed - May 21, 2026)
+- **Mobile**: 161 Tests (138 Unit + 23 E2E) - Flutter. (Verified 100% Passed - May 21, 2026)
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
 
@@ -182,6 +181,7 @@ Detailed scaling strategy: [**Organizational Structure & Scaling Roadmap**](./do
 The platform maintains a comprehensive bilingual (English & Indonesian) documentation vault. Below is the directory tree mapping the purposes and key files of all documentation folders and READMEs:
 
 ### 📖 Module README Files
+
 - [**Root README**](./README.md) ([**Indonesian**](./README-id.md)) - General platform overview, scaling strategy, unified test runner, and quick start.
 - [**Backend README**](./backend/README.md) ([**Indonesian**](./backend/README-id.md)) - Django core REST API setup, Pytest commands, modular tiering schemas, and compliance database seeders.
 - [**Frontend README**](./frontend/README.md) ([**Indonesian**](./frontend/README-id.md)) - Next.js admin dashboard configuration, styling design system, and Vitest/Playwright test suites.
@@ -189,6 +189,7 @@ The platform maintains a comprehensive bilingual (English & Indonesian) document
 - [**Deployment README**](./deploy/README.md) - Infrastructure scripts, nginx reverse proxy configs, environment builds, and promotional path scripts.
 
 ### 📚 Platform Documentation Directory (`/docs`)
+
 - **`adr/`**: Architecture Decision Records detailing critical technical choices.
   - [Employee Counter Optimization](./docs/adr/employee_counter_optimization.md) ([Indonesian](./docs/adr/employee_counter_optimization-id.md))
 - **`architecture/`**: Systems integration, authentication flow diagrams, and HA designs.
