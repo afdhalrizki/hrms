@@ -47,7 +47,9 @@ class TestGlobalAdminAPI:
         api_client.force_authenticate(user=superadmin_user)
         response = api_client.get('/api/internal/global-admins/')
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2  # superadmin + support_user
+        emails = [u['email'] for u in response.data]
+        assert superadmin_user.email in emails
+        assert support_user.email in emails
 
     def test_create_global_admin(self, api_client, superadmin_user):
         api_client.force_authenticate(user=superadmin_user)

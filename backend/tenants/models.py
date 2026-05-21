@@ -1,5 +1,7 @@
 from django.db import models
 from django_tenants.models import TenantMixin, DomainMixin
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 def tenant_logo_upload_path(instance, filename):
     from core.utils import tenant_directory_path
@@ -198,3 +200,68 @@ class RegistrationRequest(models.Model):
 
     def __str__(self):
         return f"{self.company_name} ({self.status})"
+
+
+class PlatformTicket(models.Model):
+    CATEGORY_CHOICES = [
+        ('BILLING', _('Billing & Subscription')),
+        ('BUG', _('System Bug / Error')),
+        ('FEATURE_REQUEST', _('Feature Request')),
+        ('ONBOARDING', _('Onboarding Assistance')),
+        ('OTHER', _('Other Technical Support')),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('LOW', _('Low')),
+        ('MEDIUM', _('Medium')),
+        ('HIGH', _('High')),
+        ('URGENT', _('Urgent')),
+    ]
+
+    STATUS_CHOICES = [
+        ('OPEN', _('Open')),
+        ('IN_PROGRESS', _('In Progress')),
+        ('RESOLVED', _('Resolved')),
+        ('CLOSED', _('Closed')),
+    ]
+
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='platform_tickets')
+    creator_email = models.EmailField(_("creator email"))
+    title = models.CharField(_("title"), max_length=255)
+    description = models.TextField(_("description"))
+    category = models.CharField(_("category"), max_length=20, choices=CATEGORY_CHOICES, default='OTHER')
+    priority = models.CharField(_("priority"), max_length=10, choices=PRIORITY_CHOICES, default='LOW')
+    status = models.CharField(_("status"), max_length=15, choices=STATUS_CHOICES, default='OPEN')
+    assigned_agent = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='assigned_platform_tickets',
+        limit_choices_to={'global_role__in': ['SUPERADMIN', 'SUPPORT_AGENT']}
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("platform ticket")
+        verbose_name_plural = _("platform tickets")
+
+    def __str__(self):
+        return f"Tenant {self.tenant.name} - #{self.id} {self.title} ({self.status})"
+
+
+class PlatformTicketMessage(models.Model):
+    ticket = models.ForeignKey(PlatformTicket, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField(_("message"))
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("platform ticket message")
+        verbose_name_plural = _("platform ticket messages")
+
+    def __str__(self):
+        return f"Message by {self.sender.email} on platform ticket #{self.ticket.id}"
+

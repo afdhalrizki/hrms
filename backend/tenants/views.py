@@ -4,8 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django_tenants.utils import schema_context
-from .models import RegistrationRequest, Tenant, Domain
-from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer
+from .models import RegistrationRequest, Tenant, Domain, PlatformTicket, PlatformTicketMessage
+from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer, PlatformTicketSerializer, PlatformTicketDetailSerializer, PlatformTicketMessageSerializer
 from users.models import User
 from core.models import Department, Role, Grade, Employee
 from .tasks import send_registration_email_task, send_welcome_email_task
@@ -225,3 +225,114 @@ class InternalTenantViewSet(viewsets.ReadOnlyModelViewSet):
         tenants = self.get_queryset()
         data = [{"id": t.id, "name": t.name, "schema_name": t.schema_name} for t in tenants]
         return Response(data)
+
+
+class PlatformTicketViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def _is_global_admin(self, user):
+        return user.is_superuser or getattr(user, 'global_role', None) in ['SUPERADMIN', 'SUPPORT_AGENT']
+
+    def get_queryset(self):
+        with schema_context('public'):
+            user = self.request.user
+            if self._is_global_admin(user):
+                return PlatformTicket.objects.all()
+            
+            # Tenant admins see their own tenant's platform tickets
+            tenant = getattr(self.request, 'tenant', None)
+            if tenant and tenant.schema_name != 'public':
+                return PlatformTicket.objects.filter(tenant=tenant)
+            return PlatformTicket.objects.none()
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return PlatformTicketDetailSerializer
+        return PlatformTicketSerializer
+
+    def list(self, request, *args, **kwargs):
+        with schema_context('public'):
+            queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        with schema_context('public'):
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        tenant = getattr(request, 'tenant', None)
+        if not tenant or tenant.schema_name == 'public':
+            return Response({'error': 'Platform tickets must be raised from a company tenant space.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        with schema_context('public'):
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(tenant=tenant, creator_email=user.email, status='OPEN')
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'], url_path='messages')
+    def add_message(self, request, pk=None):
+        user = request.user
+        with schema_context('public'):
+            ticket = self.get_object()
+            
+            message_text = request.data.get('message')
+            if not message_text:
+                return Response({'error': 'Message field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            msg = PlatformTicketMessage.objects.create(
+                ticket=ticket,
+                sender=user,
+                message=message_text
+            )
+            
+            # If a global admin replies, move ticket status to IN_PROGRESS
+            if self._is_global_admin(user) and ticket.status == 'OPEN':
+                ticket.status = 'IN_PROGRESS'
+                ticket.save()
+                
+            serializer = PlatformTicketMessageSerializer(msg)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'], url_path='assign')
+    def assign(self, request, pk=None):
+        user = request.user
+        if not self._is_global_admin(user):
+            return Response({'error': 'Only global support agents can assign tickets.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        agent_id = request.data.get('agent_id')
+        with schema_context('public'):
+            ticket = self.get_object()
+            if agent_id:
+                agent = User.objects.filter(id=agent_id, global_role__in=['SUPERADMIN', 'SUPPORT_AGENT']).first()
+                if not agent:
+                    return Response({'error': 'Selected user is not a valid global support agent.'}, status=status.HTTP_400_BAD_REQUEST)
+                ticket.assigned_agent = agent
+            else:
+                # Assign to current logged in support agent
+                ticket.assigned_agent = user
+            ticket.save()
+            return Response({'status': 'Ticket assigned successfully.'})
+
+    @action(detail=True, methods=['post'], url_path='resolve')
+    def resolve(self, request, pk=None):
+        user = request.user
+        with schema_context('public'):
+            ticket = self.get_object()
+            
+            # Creator or Global Admin can resolve
+            if ticket.creator_email != user.email and not self._is_global_admin(user):
+                return Response({'error': 'You do not have permission to resolve this ticket.'}, status=status.HTTP_403_FORBIDDEN)
+                
+            ticket.status = 'RESOLVED'
+            ticket.save()
+            return Response({'status': 'Ticket marked as resolved.'})
+

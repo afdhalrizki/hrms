@@ -10,7 +10,7 @@ from core.views import (
     DepartmentViewSet, RoleViewSet, GradeViewSet, EmployeeViewSet, 
     AccessRoleViewSet, BranchViewSet, WorkflowConfigViewSet, 
     WorkflowStageViewSet, WorkflowActionViewSet, APIKeyViewSet, AuditLogViewSet,
-    DashboardStatsAPIView
+    DashboardStatsAPIView, InternalTicketViewSet, HelpGuidelineAPIView
 )
 from attendance.views import (
     AttendanceViewSet, LeaveRequestViewSet, OvertimeViewSet, 
@@ -18,7 +18,7 @@ from attendance.views import (
     FingerprintDeviceViewSet, DeviceAttendanceLogViewSet
 )
 from payroll.views import SalaryComponentViewSet, PayrollPeriodViewSet, PayslipViewSet, PayslipDetailViewSet, EmployeeSalaryComponentViewSet
-from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView, InternalTenantViewSet
+from tenants.views import PublicSignupViewSet, RegistrationApprovalViewSet, TenantSettingsAPIView, InternalTenantViewSet, PlatformTicketViewSet
 from reimbursement.views import ReimbursementViewSet, ReimbursementCategoryViewSet
 from performance.views import KPIViewSet, KPITargetViewSet, AppraisalViewSet, AppraisalReviewViewSet
 from billing.views import BillingViewSet, QuotaReductionRequestViewSet
@@ -64,6 +64,8 @@ router.register(r'internal/global-admins', GlobalAdminViewSet, basename='interna
 router.register(r'internal/tenants', InternalTenantViewSet, basename='internal-tenants')
 router.register(r'quota-reduction', QuotaReductionRequestViewSet, basename='quota-reduction')
 router.register(r'billing', BillingViewSet, basename='billing')
+router.register(r'internal-tickets', InternalTicketViewSet, basename='internal-tickets')
+router.register(r'platform-tickets', PlatformTicketViewSet, basename='platform-tickets')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -71,6 +73,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/tenant/settings/', TenantSettingsAPIView.as_view(), name='tenant-settings'),
     path('api/core/dashboard-stats/', DashboardStatsAPIView.as_view(), name='dashboard-stats'),
+    path('api/help/guidelines/', HelpGuidelineAPIView.as_view(), name='help-guidelines'),
     # API Schema & Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

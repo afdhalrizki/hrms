@@ -8,6 +8,7 @@ import { SuspendedOverlay } from './SuspendedOverlay';
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from '@/i18n/routing';
+import { HelpSupportWidget } from '../shared/HelpSupportWidget';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const tenant = useTenant();
@@ -170,6 +171,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+      <HelpSupportWidget />
     </div>
   );
 }

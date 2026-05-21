@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import (
     Department, Role, Grade, Employee, AccessRole, 
     Branch, WorkflowConfig, WorkflowStage, WorkflowAction,
-    APIKey, AuditLog
+    APIKey, AuditLog, InternalTicket, InternalTicketMessage, InternalTicketAttachment
 )
 
 class APIKeySerializer(serializers.ModelSerializer):
@@ -138,3 +138,60 @@ class EmployeeProfileSerializer(serializers.ModelSerializer):
             'ktp_number': {'required': False},
             'npwp_number': {'required': False},
         }
+
+
+class InternalTicketAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InternalTicketAttachment
+        fields = ['id', 'file', 'uploaded_at']
+
+
+class InternalTicketMessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.ReadOnlyField(source='sender.fullname')
+
+    class Meta:
+        model = InternalTicketMessage
+        fields = ['id', 'sender', 'sender_name', 'message', 'is_internal', 'created_at']
+        read_only_fields = ['id', 'sender', 'created_at']
+
+
+class InternalTicketSerializer(serializers.ModelSerializer):
+    creator_name = serializers.ReadOnlyField(source='creator.fullname')
+    assigned_to_name = serializers.ReadOnlyField(source='assigned_to.fullname')
+    messages_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = InternalTicket
+        fields = ['id', 'creator', 'creator_name', 'title', 'description', 'category', 'priority', 'status', 'assigned_to', 'assigned_to_name', 'messages_count', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'creator', 'status', 'created_at', 'updated_at']
+
+    def get_messages_count(self, obj):
+        return obj.messages.count()
+
+
+class InternalTicketDetailSerializer(InternalTicketSerializer):
+    messages = serializers.SerializerMethodField()
+    attachments = InternalTicketAttachmentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = InternalTicket
+        fields = ['id', 'creator', 'creator_name', 'title', 'description', 'category', 'priority', 'status', 'assigned_to', 'assigned_to_name', 'messages', 'attachments', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'creator', 'status', 'created_at', 'updated_at']
+
+    def get_messages(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return []
+        user = request.user
+        is_hr = False
+        if user.is_staff or user.is_superuser:
+            is_hr = True
+        elif user.role in ['ADMIN', 'MANAGER']:
+            is_hr = True
+        
+        queryset = obj.messages.all().order_by('created_at')
+        if not is_hr:
+            queryset = queryset.filter(is_internal=False)
+            
+        return InternalTicketMessageSerializer(queryset, many=True).data
+

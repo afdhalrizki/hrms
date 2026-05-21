@@ -3,9 +3,11 @@ import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import 'login_screen.dart';
+import 'help_support_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+
 
 class SettingsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -189,6 +191,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     activeColor: Colors.blueAccent,
                   ),
               onTap: () {},
+            ),
+            _buildSettingItem(
+              icon: Icons.help_outline,
+              title: 'Bantuan & Tiket Bantuan',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HelpSupportScreen(userData: widget.userData),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 32),
             _buildSectionHeader('Security'),

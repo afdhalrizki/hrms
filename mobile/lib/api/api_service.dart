@@ -654,6 +654,84 @@ class ApiService {
     ));
     if (response.statusCode != 201) {
        throw Exception('Failed to submit review: ${response.body}');
+     }
+  }
+
+  // Help & Ticketing
+  Future<List<dynamic>> getHelpGuidelines() async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.get(
+      Uri.parse("$baseUrl/help/guidelines/?platform=mobile"),
+      headers: _headers(tenant, token),
+    ));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to fetch guidelines');
+  }
+
+  Future<List<dynamic>> getInternalTickets() async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.get(
+      Uri.parse("$baseUrl/internal-tickets/"),
+      headers: _headers(tenant, token),
+    ));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data is List) return data;
+      if (data is Map && data['results'] != null) return data['results'];
+      return [];
+    }
+    throw Exception('Failed to fetch internal tickets');
+  }
+
+  Future<Map<String, dynamic>> getInternalTicketDetail(int id) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.get(
+      Uri.parse("$baseUrl/internal-tickets/$id/"),
+      headers: _headers(tenant, token),
+    ));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to fetch ticket detail');
+  }
+
+  Future<Map<String, dynamic>> createInternalTicket(Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.post(
+      Uri.parse("$baseUrl/internal-tickets/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    ));
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to create ticket');
+  }
+
+  Future<Map<String, dynamic>> replyInternalTicket(int ticketId, Map<String, dynamic> data) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.post(
+      Uri.parse("$baseUrl/internal-tickets/$ticketId/add_message/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode(data),
+    ));
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to send reply');
+  }
+
+  Future<void> resolveInternalTicket(int ticketId) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.post(
+      Uri.parse("$baseUrl/internal-tickets/$ticketId/resolve/"),
+      headers: _headers(tenant, token),
+    ));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to resolve ticket');
     }
   }
 }
+

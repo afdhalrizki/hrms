@@ -33,9 +33,58 @@
     "reimbursements": "Reimbursements",
     "attendance_corrections": "Correction Requests",
     "reporting": "Reporting",
-    "audit_logs": "Audit Logs",
     "api_keys": "API Keys",
-    "branding": "Branding"
+    "branding": "Branding",
+    "tickets": "Help & Tickets"
+  },
+  "HelpSupport": {
+    "title": "Help & Support",
+    "subtitle": "Browse guides or open a support ticket.",
+    "guidelinesTab": "Guidelines",
+    "ticketsTab": "Help Tickets",
+    "searchGuides": "Search guides...",
+    "noGuides": "No matching guides found.",
+    "createTicket": "Create New Ticket",
+    "ticketList": "Ticket List",
+    "ticketTitle": "Ticket Title",
+    "ticketDesc": "Problem Description",
+    "category": "Category",
+    "priority": "Priority",
+    "status": "Status",
+    "created": "Created At",
+    "assignedTo": "Assigned To",
+    "internalNote": "Internal Note (HR Only)",
+    "send": "Send Reply",
+    "resolve": "Mark Resolved",
+    "ticketResolved": "Ticket has been resolved",
+    "successCreate": "Ticket created successfully!",
+    "internalTicket": "Internal Ticket (Employee <-> HR)",
+    "platformTicket": "Platform Ticket (SaaS Support)",
+    "noTickets": "No help tickets found.",
+    "categories": {
+      "PAYROLL": "Payroll & Compensation",
+      "ATTENDANCE": "Attendance & Correction",
+      "LEAVE": "Leaves & Overtime",
+      "TECHNICAL": "Device & Login Issues",
+      "GENERAL": "General Inquiry",
+      "BILLING": "Billing & Subscription",
+      "BUG": "System Bug / Error",
+      "FEATURE_REQUEST": "Feature Request",
+      "ONBOARDING": "Onboarding Assistance",
+      "OTHER": "Other Technical Support"
+    },
+    "priorities": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "statuses": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In Progress",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed"
+    }
   },
   "Subscription": {
     "readOnlyMessage": "Subscription expired on {date}. The system is now in Read-Only mode.",

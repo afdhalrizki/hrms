@@ -34,7 +34,57 @@
     "attendance_corrections": "Permintaan Koreksi",
     "reporting": "Pelaporan",
     "audit_logs": "Log Audit",
-    "api_keys": "Kunci API"
+    "api_keys": "Kunci API",
+    "tickets": "Bantuan & Tiket"
+  },
+  "HelpSupport": {
+    "title": "Bantuan & Tiket",
+    "subtitle": "Lihat panduan penggunaan aplikasi atau buat tiket bantuan baru.",
+    "guidelinesTab": "Panduan Penggunaan",
+    "ticketsTab": "Tiket Bantuan",
+    "searchGuides": "Cari panduan...",
+    "noGuides": "Tidak ada panduan yang cocok.",
+    "createTicket": "Buat Tiket Baru",
+    "ticketList": "Daftar Tiket",
+    "ticketTitle": "Judul Tiket",
+    "ticketDesc": "Deskripsi Masalah",
+    "category": "Kategori",
+    "priority": "Prioritas",
+    "status": "Status",
+    "created": "Dibuat Pada",
+    "assignedTo": "Ditugaskan Ke",
+    "internalNote": "Catatan Internal HR (Khusus HR)",
+    "send": "Kirim Balasan",
+    "resolve": "Tandai Selesai",
+    "ticketResolved": "Tiket telah diselesaikan",
+    "successCreate": "Tiket berhasil dibuat!",
+    "internalTicket": "Tiket Internal (Karyawan <-> HR)",
+    "platformTicket": "Tiket Platform (SaaS Support)",
+    "noTickets": "Belum ada tiket bantuan.",
+    "categories": {
+      "PAYROLL": "Payroll & Gaji",
+      "ATTENDANCE": "Kehadiran & Absensi",
+      "LEAVE": "Cuti & Cuti/Izin",
+      "TECHNICAL": "Masalah Teknis & Login",
+      "GENERAL": "Pertanyaan Umum",
+      "BILLING": "Billing & Subscription",
+      "BUG": "Bug / Error Sistem",
+      "FEATURE_REQUEST": "Permintaan Fitur",
+      "ONBOARDING": "Bantuan Onboarding",
+      "OTHER": "Bantuan Teknis Lainnya"
+    },
+    "priorities": {
+      "LOW": "Rendah",
+      "MEDIUM": "Sedang",
+      "HIGH": "Tinggi",
+      "URGENT": "Mendesak"
+    },
+    "statuses": {
+      "OPEN": "Terbuka",
+      "IN_PROGRESS": "Dalam Proses",
+      "RESOLVED": "Selesai",
+      "CLOSED": "Ditutup"
+    }
   },
   "Common": {
     "submit": "Kirim",

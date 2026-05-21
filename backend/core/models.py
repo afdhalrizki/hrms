@@ -317,3 +317,67 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.action_type} on {self.model_name}:{self.object_id} at {self.timestamp}"
+
+
+class InternalTicket(AuditModel):
+    CATEGORY_CHOICES = [
+        ('PAYROLL', _('Payroll & Compensation')),
+        ('ATTENDANCE', _('Attendance & Correction')),
+        ('LEAVE', _('Leaves & Overtime')),
+        ('TECHNICAL', _('Device & Login Issues')),
+        ('GENERAL', _('General Inquiry')),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('LOW', _('Low')),
+        ('MEDIUM', _('Medium')),
+        ('HIGH', _('High')),
+        ('URGENT', _('Urgent')),
+    ]
+
+    STATUS_CHOICES = [
+        ('OPEN', _('Open')),
+        ('IN_PROGRESS', _('In Progress')),
+        ('RESOLVED', _('Resolved')),
+        ('CLOSED', _('Closed')),
+    ]
+
+    creator = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='internal_tickets')
+    title = models.CharField(_("title"), max_length=255)
+    description = models.TextField(_("description"))
+    category = models.CharField(_("category"), max_length=20, choices=CATEGORY_CHOICES, default='GENERAL')
+    priority = models.CharField(_("priority"), max_length=10, choices=PRIORITY_CHOICES, default='LOW')
+    status = models.CharField(_("status"), max_length=15, choices=STATUS_CHOICES, default='OPEN')
+    assigned_to = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_internal_tickets', verbose_name=_("assigned to"))
+
+    class Meta:
+        verbose_name = _("internal ticket")
+        verbose_name_plural = _("internal tickets")
+
+    def __str__(self):
+        return f"#{self.id} - {self.title} ({self.status})"
+
+
+class InternalTicketMessage(AuditModel):
+    ticket = models.ForeignKey(InternalTicket, on_delete=models.CASCADE, related_name='messages', verbose_name=_("ticket"))
+    sender = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_("sender"))
+    message = models.TextField(_("message"))
+    is_internal = models.BooleanField(_("is internal"), default=False, help_text=_("Private notes visible only to HR Admins, hidden from standard employees"))
+
+    class Meta:
+        verbose_name = _("internal ticket message")
+        verbose_name_plural = _("internal ticket messages")
+
+    def __str__(self):
+        return f"Message by {self.sender.fullname} on ticket #{self.ticket.id}"
+
+
+class InternalTicketAttachment(AuditModel):
+    ticket = models.ForeignKey(InternalTicket, on_delete=models.CASCADE, related_name='attachments', verbose_name=_("ticket"))
+    file = models.FileField(_("file"), upload_to='tickets/internal/')
+    uploaded_at = models.DateTimeField(_("uploaded at"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("internal ticket attachment")
+        verbose_name_plural = _("internal ticket attachments")
+

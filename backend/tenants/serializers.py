@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RegistrationRequest, Tenant
+from .models import RegistrationRequest, Tenant, PlatformTicket, PlatformTicketMessage
 
 class RegistrationRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,3 +42,45 @@ class TenantSettingsSerializer(serializers.ModelSerializer):
             'is_grace_period', 'is_subscription_active', 'total_employee_capacity', 
             'total_storage_capacity_mb', 'employee_count', 'storage_used_bytes'
         ]
+
+
+class PlatformTicketMessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.ReadOnlyField(source='sender.email')
+
+    class Meta:
+        model = PlatformTicketMessage
+        fields = ['id', 'sender', 'sender_name', 'message', 'created_at']
+        read_only_fields = ['id', 'sender', 'created_at']
+
+
+class PlatformTicketSerializer(serializers.ModelSerializer):
+    tenant_name = serializers.ReadOnlyField(source='tenant.name')
+    assigned_agent_name = serializers.ReadOnlyField(source='assigned_agent.email')
+    messages_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PlatformTicket
+        fields = [
+            'id', 'tenant', 'tenant_name', 'creator_email', 'title', 'description', 
+            'category', 'priority', 'status', 'assigned_agent', 'assigned_agent_name', 
+            'messages_count', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'tenant', 'creator_email', 'status', 'assigned_agent', 'created_at', 'updated_at']
+
+    def get_messages_count(self, obj):
+        return obj.messages.count()
+
+
+class PlatformTicketDetailSerializer(PlatformTicketSerializer):
+    messages = PlatformTicketMessageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PlatformTicket
+        fields = [
+            'id', 'tenant', 'tenant_name', 'creator_email', 'title', 'description', 
+            'category', 'priority', 'status', 'assigned_agent', 'assigned_agent_name', 
+            'messages', 'messages_count', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'tenant', 'creator_email', 'status', 'assigned_agent', 'created_at', 'updated_at']
+
+

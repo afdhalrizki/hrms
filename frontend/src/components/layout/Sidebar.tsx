@@ -22,7 +22,8 @@ import {
   Palette,
   LogOut,
   ShieldCheck,
-  ClipboardList
+  ClipboardList,
+  HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -57,6 +58,13 @@ const menuItems: MenuItem[] = [
     isGlobalAdminMenu: true, 
     allowedGlobalRoles: ['SUPERADMIN'] 
   },
+  { 
+    nameKey: 'tickets', 
+    icon: HelpCircle, 
+    href: '/admin/support', 
+    isGlobalAdminMenu: true, 
+    allowedGlobalRoles: ['SUPERADMIN', 'SUPPORT_AGENT'] 
+  },
   { nameKey: 'profile',    icon: Users,            href: '/profile' },
   { nameKey: 'employees', icon: Users,            href: '/employees', requiredPermission: 'tenant_manage_hr', module: 'core' },
   { nameKey: 'performance', icon: TrendingUp,     href: '/performance', module: 'performance' },
@@ -72,6 +80,7 @@ const menuItems: MenuItem[] = [
   { nameKey: 'audit_logs',icon: FileText,         href: '/settings/audit-logs', requiredPermission: 'tenant_view_audit_logs', module: 'audit' },
   { nameKey: 'api_keys',  icon: GitMerge,         href: '/settings/api-keys', requiredPermission: 'tenant_manage_settings', module: 'core' },
   { nameKey: 'branding',  icon: Palette,         href: '/settings/branding', requiredPermission: 'tenant_manage_settings', module: 'core' },
+  { nameKey: 'tickets',   icon: HelpCircle,       href: '/tickets' },
 ];
 
 export function Sidebar() {
