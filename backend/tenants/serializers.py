@@ -29,7 +29,7 @@ class TenantSettingsSerializer(serializers.ModelSerializer):
             'overtime_rate', 'payroll_overtime_divisor', 'jkk_rate',
             'late_deduction_rate', 'absence_deduction_rate',
             'leave_approval_level', 'overtime_approval_level', 'reimbursement_approval_level', 
-            'is_biometric_enabled', 'attendance_platform_policy',
+            'is_biometric_enabled', 'is_fingerprint_enabled', 'attendance_platform_policy',
             'max_admins',
             'subscription_status', 'expiry_date', 'plan_type', 
             'is_grace_period', 'is_subscription_active',

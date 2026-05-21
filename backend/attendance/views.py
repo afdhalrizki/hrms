@@ -10,11 +10,11 @@ from core.audit import AuditModelMixin
 from core.permissions import HasTenantRBACPermission, FeatureRequiredPermission
 # Using absolute import from core
 from core.models import Employee
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest, FingerprintDevice, DeviceAttendanceLog
 from .serializers import (
     AttendanceSerializer, LeaveRequestSerializer, OvertimeSerializer,
     ShiftSerializer, ScheduleSerializer, LeaveBalanceSerializer,
-    AttendanceCorrectionRequestSerializer
+    AttendanceCorrectionRequestSerializer, FingerprintDeviceSerializer, DeviceAttendanceLogSerializer
 )
 
 
@@ -608,3 +608,200 @@ class AttendanceCorrectionRequestViewSet(TenantIsolationMixin, AuditModelMixin, 
                 
                 from core.audit import AuditLogger
                 AuditLogger.log_change('UPDATE', attendance, actor=user)
+
+
+class FingerprintDeviceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewSet):
+    queryset = FingerprintDevice.objects.all()
+    serializer_class = FingerprintDeviceSerializer
+    permission_classes = [permissions.IsAuthenticated, HasTenantRBACPermission, FeatureRequiredPermission]
+    required_rbac_permission = 'tenant_manage_attendance'
+    required_feature = 'attendance'
+
+    @action(detail=False, methods=['post'], url_path='import-logs')
+    def import_logs(self, request):
+        from django.db import connection
+        from django_tenants.utils import get_tenant_model
+        from django.utils import timezone
+        
+        tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+        if not getattr(tenant, 'is_fingerprint_enabled', False):
+            return Response(
+                {'error': 'Fingerprint integration is disabled by tenant policy.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        file_obj = request.FILES.get('file')
+        if not file_obj:
+            return Response({'error': 'No file uploaded under key "file".'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            import pandas as pd
+            # Read excel
+            df = pd.read_excel(file_obj)
+            
+            # Normalize column names to lowercase for flexibility
+            df.columns = [str(c).strip().lower() for c in df.columns]
+            
+            # Find column mapping
+            pin_col = None
+            for col in ['biometric_pin', 'pin', 'enrollment_id', 'pin_biometric']:
+                if col in df.columns:
+                    pin_col = col
+                    break
+            
+            ts_col = None
+            for col in ['timestamp', 'time', 'waktu', 'datetime', 'tanggal']:
+                if col in df.columns:
+                    ts_col = col
+                    break
+                    
+            state_col = None
+            for col in ['in_out_state', 'state', 'status', 'tipe']:
+                if col in df.columns:
+                    state_col = col
+                    break
+
+            serial_col = None
+            for col in ['device_serial', 'serial', 'device']:
+                if col in df.columns:
+                    serial_col = col
+                    break
+                    
+            if not pin_col or not ts_col:
+                return Response({
+                    'error': 'Excel file must contain at least "biometric_pin" (or "pin") and "timestamp" (or "time") columns.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            inserted_count = 0
+            for _, row in df.iterrows():
+                biometric_pin = str(row[pin_col]).strip()
+                # Remove decimal point if pandas read it as float
+                if biometric_pin.endswith('.0'):
+                    biometric_pin = biometric_pin[:-2]
+                    
+                raw_ts = row[ts_col]
+                if pd.isna(raw_ts) or not biometric_pin:
+                    continue
+                    
+                try:
+                    # Convert to datetime and make it aware if naive
+                    timestamp = pd.to_datetime(raw_ts)
+                    if timestamp.tzinfo is None:
+                        timestamp = timezone.make_aware(timestamp, timezone.get_current_timezone())
+                except Exception:
+                    continue
+                    
+                # Parse state
+                in_out_state = 'AUTO'
+                if state_col and not pd.isna(row[state_col]):
+                    val = str(row[state_col]).strip().upper()
+                    if 'IN' in val or 'MASUK' in val:
+                        in_out_state = 'IN'
+                    elif 'OUT' in val or 'KELUAR' in val:
+                        in_out_state = 'OUT'
+                        
+                # Find device
+                device = None
+                if serial_col and not pd.isna(row[serial_col]):
+                    serial = str(row[serial_col]).strip()
+                    device = FingerprintDevice.objects.filter(serial_number=serial, is_active=True).first()
+                
+                # If no specific device is matched, try to find any active device, or leave it None
+                if not device:
+                    device = FingerprintDevice.objects.filter(is_active=True).first()
+                    
+                log_obj, created = DeviceAttendanceLog.objects.update_or_create(
+                    biometric_pin=biometric_pin,
+                    timestamp=timestamp,
+                    defaults={
+                        'device': device,
+                        'verification_mode': 1,
+                        'in_out_state': in_out_state,
+                        'is_processed': False
+                    }
+                )
+                if created:
+                    inserted_count += 1
+                    
+            processed_count = AttendanceService.process_device_logs()
+            
+            return Response({
+                'status': 'success',
+                'received': len(df),
+                'inserted': inserted_count,
+                'processed': processed_count
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({'error': f'Failed to process file: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+from core.authentication import APIKeyAuthentication
+from django.db import connection
+from django_tenants.utils import get_tenant_model
+
+class DeviceAttendanceLogViewSet(viewsets.ModelViewSet):
+    queryset = DeviceAttendanceLog.objects.all()
+    serializer_class = DeviceAttendanceLogSerializer
+    authentication_classes = [APIKeyAuthentication] + list(viewsets.ModelViewSet.authentication_classes)
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        # Enforce tenant settings check
+        tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+        if not getattr(tenant, 'is_fingerprint_enabled', False):
+            return Response(
+                {'error': 'Fingerprint integration is disabled by tenant policy.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        device_serial = request.data.get('device_serial')
+        logs_data = request.data.get('logs', [])
+
+        if not device_serial:
+            return Response({'error': 'device_serial is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        device = FingerprintDevice.objects.filter(serial_number=device_serial, is_active=True).first()
+        if not device:
+            return Response({'error': f'Device with serial {device_serial} is not registered or active.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        inserted_count = 0
+        for log_item in logs_data:
+            biometric_pin = log_item.get('biometric_pin')
+            timestamp_str = log_item.get('timestamp')
+            verification_mode = log_item.get('verification_mode', 1)
+            in_out_state = log_item.get('in_out_state', 'AUTO')
+
+            if not biometric_pin or not timestamp_str:
+                continue
+
+            try:
+                # Support various datetime formats (like timezone offset +07:00 or Z)
+                # datetime.fromisoformat supports offset since Python 3.7
+                cleaned_ts = timestamp_str.replace('Z', '+00:00')
+                timestamp = datetime.fromisoformat(cleaned_ts)
+                
+                log_obj, created = DeviceAttendanceLog.objects.update_or_create(
+                    biometric_pin=biometric_pin,
+                    timestamp=timestamp,
+                    defaults={
+                        'device': device,
+                        'verification_mode': verification_mode,
+                        'in_out_state': in_out_state,
+                        'is_processed': False
+                    }
+                )
+                if created:
+                    inserted_count += 1
+            except Exception as e:
+                pass
+
+        processed_count = AttendanceService.process_device_logs()
+
+        return Response({
+            'status': 'success',
+            'received': len(logs_data),
+            'inserted': inserted_count,
+            'processed': processed_count
+        }, status=status.HTTP_201_CREATED)

@@ -38,6 +38,8 @@ class Attendance(AuditModel):
         ('MANUAL', 'Manual'),
         ('FACE', 'Face Match'),
         ('LIVENESS', 'Face + Liveness'),
+        ('FINGERPRINT', 'Fingerprint Machine'),
+        ('MOBILE_FINGERPRINT', 'Mobile Fingerprint'),
     ])
     
     is_out_of_bounds = models.BooleanField(default=False)
@@ -190,3 +192,34 @@ class AttendanceCorrectionRequest(AuditModel):
 
     def __str__(self):
         return f"Correction: {self.attendance.employee.fullname} - {self.attendance.date}"
+
+
+class FingerprintDevice(AuditModel):
+    name = models.CharField(max_length=100)
+    device_model = models.CharField(max_length=100, blank=True)
+    serial_number = models.CharField(max_length=100, unique=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True, help_text="IP Lokal jika menggunakan Local Agent")
+    port = models.IntegerField(default=4370)
+    branch = models.ForeignKey('core.Branch', on_delete=models.CASCADE, related_name='fingerprint_devices')
+    is_active = models.BooleanField(default=True)
+    last_sync_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.serial_number} ({self.branch.name})"
+
+
+class DeviceAttendanceLog(AuditModel):
+    device = models.ForeignKey(FingerprintDevice, on_delete=models.SET_NULL, null=True, related_name='logs')
+    biometric_pin = models.CharField(max_length=50, help_text="PIN Karyawan pada mesin")
+    timestamp = models.DateTimeField()
+    verification_mode = models.IntegerField(default=1, help_text="1: Finger, 2: Face, 3: Card, 4: Password")
+    in_out_state = models.CharField(max_length=10, choices=[('IN', 'Masuk'), ('OUT', 'Keluar'), ('AUTO', 'Deteksi Otomatis')], default='AUTO')
+    is_processed = models.BooleanField(default=False)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    processing_error = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('biometric_pin', 'timestamp')
+
+    def __str__(self):
+        return f"Log PIN {self.biometric_pin} at {self.timestamp}"

@@ -8,7 +8,10 @@ class TenantIsolationMixin:
     This prevents search_path leakage between parallel requests in threaded environments.
     """
     def dispatch(self, request, *args, **kwargs):
-        print(f"DEBUG: Mixin Dispatch for {request.path} to {self.__class__.__name__}")
+        try:
+            print(f"DEBUG: Mixin Dispatch for {request.path} to {self.__class__.__name__}")
+        except Exception:
+            pass
         # Use the tenant already resolved by the middleware
         tenant = getattr(request, 'tenant', None)
         if tenant and tenant.schema_name != 'public':

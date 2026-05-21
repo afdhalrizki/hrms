@@ -22,11 +22,12 @@ import {
   CheckCircle2,
   Save,
   Shield,
-  ChevronRight
+  ChevronRight,
+  Fingerprint
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { getBaseUrl } from '@/lib/api';
+import { getBaseUrl, apiFetch } from '@/lib/api';
 
 export default function SettingsPage() {
   const { 
@@ -40,6 +41,7 @@ export default function SettingsPage() {
     jkkRate: initialJkk,
     reimbursementApprovalLevel: initialReimbursementLevel,
     isBiometricEnabled: initialBioEnabled,
+    isFingerprintEnabled: initialFingerprintEnabled,
     attendancePlatformPolicy: initialPlatformPolicy
   } = useTenant();
   
@@ -55,6 +57,7 @@ export default function SettingsPage() {
   const [jkkRate, setJkkRate] = useState(initialJkk || 0.0024);
   const [reimbursementLevel, setReimbursementLevel] = useState(initialReimbursementLevel || 'BOTH');
   const [isBioEnabled, setIsBioEnabled] = useState(initialBioEnabled !== false);
+  const [isFingerprintEnabled, setIsFingerprintEnabled] = useState(initialFingerprintEnabled || false);
   const [attendancePlatformPolicy, setAttendancePlatformPolicy] = useState(initialPlatformPolicy || 'MOBILE');
   
   const [logoPreview, setLogoPreview] = useState<string | null>(initialLogo ? `${getBaseUrl().replace('/api', '')}${initialLogo}` : null);
@@ -73,12 +76,13 @@ export default function SettingsPage() {
     if (initialJkk !== undefined) setJkkRate(initialJkk);
     if (initialReimbursementLevel) setReimbursementLevel(initialReimbursementLevel);
     if (initialBioEnabled !== undefined) setIsBioEnabled(initialBioEnabled);
+    if (initialFingerprintEnabled !== undefined) setIsFingerprintEnabled(initialFingerprintEnabled);
     if (initialPlatformPolicy) setAttendancePlatformPolicy(initialPlatformPolicy);
     if (initialLogo) {
        // Support relative paths from backend
        setLogoPreview(initialLogo.startsWith('http') ? initialLogo : `${getBaseUrl().replace('/api', '')}${initialLogo}`);
     }
-  }, [tenantName, initialAddress, initialPhone, initialLogo]);
+  }, [tenantName, initialAddress, initialPhone, initialLogo, initialFingerprintEnabled]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -104,21 +108,16 @@ export default function SettingsPage() {
       formData.append('jkk_rate', jkkRate.toString());
       formData.append('reimbursement_approval_level', reimbursementLevel);
       formData.append('is_biometric_enabled', isBioEnabled.toString());
+      formData.append('is_fingerprint_enabled', isFingerprintEnabled.toString());
       formData.append('attendance_platform_policy', attendancePlatformPolicy);
       if (selectedFile) {
         formData.append('logo', selectedFile);
       }
 
-      const res = await fetch(`${getBaseUrl()}/tenant/settings/`, {
+      await apiFetch('/tenant/settings/', {
         method: 'PATCH',
         body: formData,
-        // FormData automatically sets correct Content-Type boundary
       });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || 'Failed to update settings');
-      }
 
       setMessage({ type: 'success', text: 'Company profile updated successfully. The page will reload to reflect changes.' });
       
@@ -355,9 +354,30 @@ export default function SettingsPage() {
                           <button 
                             type="button"
                             onClick={() => setIsBioEnabled(!isBioEnabled)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isBioEnabled ? 'bg-primary' : 'bg-white/10'}`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isBioEnabled ? 'bg-primary' : 'bg-slate-200 dark:bg-white/10'}`}
                           >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isBioEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 font-medium">
+                              <Fingerprint size={18} className="text-muted-foreground" />
+                              Enable Fingerprint Integration
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              Aktifkan integrasi mesin sidik jari biometrik (ADMS / Agen lokal). Ini memungkinkan absensi disinkronkan secara real-time dari perangkat fisik.
+                            </p>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => setIsFingerprintEnabled(!isFingerprintEnabled)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isFingerprintEnabled ? 'bg-primary' : 'bg-slate-200 dark:bg-white/10'}`}
+                          >
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isFingerprintEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                           </button>
                         </div>
                       </div>
@@ -462,6 +482,31 @@ export default function SettingsPage() {
                   className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all font-semibold group"
                 >
                   Manage Roles
+                  <ChevronRight className="transition-transform group-hover:translate-x-1" size={18} />
+                </Link>
+              </motion.div>
+            )}
+
+            {!hideOperationalSettings && isFingerprintEnabled && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="glass-card border rounded-3xl p-8 space-y-6 shadow-sm border-primary/20 bg-primary/5 animate-pulse-subtle"
+              >
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Fingerprint size={24} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Fingerprint Devices</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Daftar dan kelola mesin absensi sidik jari fisik di kantor Anda. Hubungkan dengan API keys untuk sinkronisasi.
+                  </p>
+                </div>
+                <Link 
+                  href="/settings/fingerprint-devices"
+                  className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-primary text-white hover:bg-primary/90 transition-all font-semibold group"
+                >
+                  Manage Devices
                   <ChevronRight className="transition-transform group-hover:translate-x-1" size={18} />
                 </Link>
               </motion.div>

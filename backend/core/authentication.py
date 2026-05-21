@@ -38,10 +38,5 @@ class APIKeyAuthentication(authentication.BaseAuthentication):
         api_key.save(update_fields=['last_used_at'])
 
         # Since it's a tenant-specific key, we return None for User (as it's a machine account)
-        # But we need to ensure the Tenant is correctly set in the request
-        # The TenantAccessMiddleware handles the schema, we just verify the key belongs to it.
-        from django.db import connection
-        if api_key.tenant != connection.tenant:
-             raise exceptions.AuthenticationFailed('API Key does not belong to this tenant.')
-
+        # Since APIKey is inside a tenant app (core), any key retrieved is already in the current tenant's schema.
         return (None, api_key) # (User, Auth)

@@ -8,8 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:mobile/api/api_service.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     // Reset ApiService with a mock client to avoid real network calls
     final mockClient = MockClient((request) async {
       return http.Response(jsonEncode({'status': 'success'}), 200);
@@ -49,9 +52,12 @@ void main() {
     expect(find.text('Dark Mode'), findsOneWidget);
     expect(find.text('Email Notifications'), findsOneWidget);
     
-    // Check if Switch is present and has correct value
-    final switchFinder = find.byType(Switch).last;
+    // Check if Switches are present and have correct value
+    final switchFinder = find.byKey(const Key('notification_switch'));
     expect(tester.widget<Switch>(switchFinder).value, isTrue);
+
+    final bioSwitchFinder = find.byKey(const Key('biometric_login_switch'));
+    expect(tester.widget<Switch>(bioSwitchFinder).value, isFalse);
   });
 
   testWidgets('SettingsScreen toggle notification updates value', (WidgetTester tester) async {
@@ -76,14 +82,45 @@ void main() {
       ),
     );
 
-    final switchFinder = find.byType(Switch).last;
+    final switchFinder = find.byKey(const Key('notification_switch'));
     await tester.tap(switchFinder);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(seconds: 5));
+  });
 
-    // Note: Since we don't mock the API here, it will probably fail or log an error,
-    // but the UI state should at least attempt to update or handle the call.
-    // In a real scenario, we'd mock ApiService.
+  testWidgets('SettingsScreen toggle biometric switch updates preference', (WidgetTester tester) async {
+    const userData = {
+      'id': 1,
+      'fullname': 'Test User',
+      'email': 'test@example.com',
+      'employee_nik': 'EMP123',
+      'receive_email_notifications': true,
+    };
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('id')],
+        home: SettingsScreen(userData: userData),
+      ),
+    );
+
+    final bioSwitchFinder = find.byKey(const Key('biometric_login_switch'));
+    expect(tester.widget<Switch>(bioSwitchFinder).value, isFalse);
+
+    // Scroll to the switch to make it visible in the viewport
+    await tester.ensureVisible(bioSwitchFinder);
+    
+    // Toggle switch
+    await tester.tap(bioSwitchFinder);
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Switch>(bioSwitchFinder).value, isTrue);
   });
 }

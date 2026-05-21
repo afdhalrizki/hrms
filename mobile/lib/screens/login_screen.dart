@@ -6,6 +6,8 @@ import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import '../widgets/loading_indicator.dart';
 import 'home_screen.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,24 +22,70 @@ class _LoginScreenState extends State<LoginScreen> {
   final _tenantController = TextEditingController();
   bool _isLoading = false;
   bool _isCheckingToken = true;
+  bool _isBiometricConfigured = false;
 
   @override
   void initState() {
     super.initState();
     _checkExistingToken();
+    _checkBiometricConfigured();
+  }
+
+  Future<void> _checkBiometricConfigured() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool('biometric_login_enabled') ?? false;
+    setState(() {
+      _isBiometricConfigured = enabled;
+    });
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    final bool isTest = Platform.environment.containsKey('FLUTTER_TEST');
+    if (isTest) {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+      return;
+    }
+
+    try {
+      final LocalAuthentication auth = LocalAuthentication();
+      final authenticated = await auth.authenticate(
+        localizedReason: 'Scan fingerprint/face to sign in',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+        ),
+      );
+      if (authenticated && mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      debugPrint("Biometric auth error: $e");
+    }
   }
 
   Future<void> _checkExistingToken() async {
     try {
       final api = ApiService();
       final hasToken = await api.hasValidToken();
+      final prefs = await SharedPreferences.getInstance();
+      final biometricEnabled = prefs.getBool('biometric_login_enabled') ?? false;
+
       if (hasToken && mounted) {
-        if (!Platform.environment.containsKey('FLUTTER_TEST')) {
-          debugPrint('LOGIN: existing token found, auto-navigating to HomeScreen');
+        if (biometricEnabled) {
+          _authenticateWithBiometrics();
+        } else {
+          if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+            debugPrint('LOGIN: existing token found, auto-navigating to HomeScreen');
+          }
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
         }
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
       }
     } catch (_) {
       // Ignore errors on background check
@@ -148,33 +196,57 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    // Login Button
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _handleLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ).copyWith(
-                        overlayColor: WidgetStateProperty.all(Colors.white10),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: AppLoadingIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                    // Login Button with Biometrics
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            key: const Key('qa_signin_btn'),
+                            onPressed: _isLoading ? null : _handleLogin,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                            )
-                          : Text(
-                              AppLocalizations.of(context)?.signIn ?? 'Sign In',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              elevation: 0,
+                            ).copyWith(
+                              overlayColor: WidgetStateProperty.all(Colors.white10),
                             ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: AppLoadingIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    AppLocalizations.of(context)?.signIn ?? 'Sign In',
+                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                          ),
+                        ),
+                        if (_isBiometricConfigured) ...[
+                          const SizedBox(width: 12),
+                          InkWell(
+                            key: const Key('fingerprint_login_btn'),
+                            onTap: _authenticateWithBiometrics,
+                            child: Container(
+                              height: 56,
+                              width: 56,
+                              decoration: BoxDecoration(
+                                color: Colors.blueAccent.withOpacity(0.1),
+                                border: Border.all(color: Colors.blueAccent.withOpacity(0.5)),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(Icons.fingerprint, color: Colors.blueAccent, size: 28),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),

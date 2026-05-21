@@ -181,7 +181,10 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
         Custom create method to handle optional User account provisioning linking.
         Accepts: 'create_user' (bool) and 'is_admin' (bool) in request data.
         """
-        print(f"DEBUG: EmployeeViewSet.create called for {request.path}")
+        try:
+            print(f"DEBUG: EmployeeViewSet.create called for {request.path}")
+        except Exception:
+            pass
         create_user_flag = str(request.data.get('create_user', 'false')).lower() == 'true'
         is_admin_flag = str(request.data.get('is_admin', 'false')).lower() == 'true'
 

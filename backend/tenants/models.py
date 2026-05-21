@@ -66,6 +66,7 @@ class Tenant(TenantMixin):
     storage_used_bytes = models.PositiveBigIntegerField(default=0, help_text="Current storage usage in bytes")
     employee_count = models.PositiveIntegerField(default=0, help_text="Current number of employees in this tenant")
     is_biometric_enabled = models.BooleanField(default=True, help_text="Allow clock-in without photo if disabled (Emergency Storage Fallback)")
+    is_fingerprint_enabled = models.BooleanField(default=False, help_text="Enable fingerprint integration (physical devices and mobile biometrics)")
     
     ATTENDANCE_PLATFORM_CHOICES = [
         ('MOBILE', 'Mobile Only'),

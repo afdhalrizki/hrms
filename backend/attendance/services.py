@@ -1,7 +1,8 @@
 import math
 from decimal import Decimal
 from django.utils import timezone
-from .models import Attendance, Schedule, Shift
+from .models import Attendance, Schedule, Shift, DeviceAttendanceLog, FingerprintDevice
+from core.models import Employee
 
 class AttendanceService:
     @staticmethod
@@ -199,3 +200,90 @@ class AttendanceService:
             attendance.status = new_status
             attendance.save(update_fields=['status'])
         return attendance
+
+    @staticmethod
+    def process_device_logs():
+        """
+        Processes unprocessed DeviceAttendanceLogs and creates or updates daily Attendance records.
+        """
+        unprocessed_logs = DeviceAttendanceLog.objects.filter(is_processed=False).order_by('timestamp')
+        processed_count = 0
+        
+        for log in unprocessed_logs:
+            try:
+                employee = Employee.objects.filter(biometric_pin=log.biometric_pin).first()
+                if not employee:
+                    raise ValueError(f"Employee with biometric_pin {log.biometric_pin} not found.")
+                
+                # Get timezone
+                tz_name = 'Asia/Jakarta'
+                if employee.branch and employee.branch.timezone:
+                    tz_name = employee.branch.timezone
+                
+                import pytz
+                local_tz = pytz.timezone(tz_name)
+                local_timestamp = log.timestamp.astimezone(local_tz)
+                log_date = local_timestamp.date()
+                log_time = local_timestamp.time()
+                
+                attendance = Attendance.objects.filter(employee=employee, date=log_date).first()
+                
+                # Resolve state (IN, OUT, AUTO)
+                state = log.in_out_state
+                if state == 'AUTO':
+                    if not attendance or not attendance.check_in:
+                        state = 'IN'
+                    else:
+                        state = 'OUT'
+                
+                if state == 'IN':
+                    if attendance:
+                        if not attendance.check_in:
+                            attendance.check_in = log_time
+                            is_in_bounds = not attendance.is_out_of_bounds
+                            attendance.status = AttendanceService.get_calculated_status(
+                                employee, log_time, log_date, is_in_bounds
+                            )
+                            attendance.verification_method = 'FINGERPRINT'
+                            attendance.save()
+                    else:
+                        status = AttendanceService.get_calculated_status(
+                            employee, log_time, log_date, is_in_bounds=True
+                        )
+                        Attendance.objects.create(
+                            employee=employee,
+                            date=log_date,
+                            branch=employee.branch or (log.device.branch if log.device else None),
+                            check_in=log_time,
+                            status=status,
+                            verification_method='FINGERPRINT',
+                            is_out_of_bounds=False,
+                            distance_from_branch=0.0
+                        )
+                elif state == 'OUT':
+                    if attendance:
+                        if not attendance.check_out:
+                            attendance.check_out = log_time
+                            attendance.save()
+                    else:
+                        status = 'ABSENT'
+                        Attendance.objects.create(
+                            employee=employee,
+                            date=log_date,
+                            branch=employee.branch or (log.device.branch if log.device else None),
+                            check_out=log_time,
+                            status=status,
+                            verification_method='FINGERPRINT',
+                            is_out_of_bounds=False,
+                            distance_from_branch=0.0
+                        )
+                
+                log.is_processed = True
+                log.processed_at = timezone.now()
+                log.save()
+                processed_count += 1
+            except Exception as e:
+                log.processing_error = str(e)
+                log.save()
+                
+        return processed_count

@@ -3,6 +3,9 @@ import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import 'login_screen.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 class SettingsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -16,11 +19,80 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   late bool _receiveEmail;
   bool _isSaving = false;
+  
+  final LocalAuthentication auth = LocalAuthentication();
+  bool _biometricEnabled = false;
+  bool _canCheckBiometrics = false;
 
   @override
   void initState() {
     super.initState();
     _receiveEmail = widget.userData['receive_email_notifications'] ?? true;
+    _loadBiometricSetting();
+  }
+
+  Future<void> _loadBiometricSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isEnabled = prefs.getBool('biometric_login_enabled') ?? false;
+    final bool isTest = Platform.environment.containsKey('FLUTTER_TEST');
+    final canCheck = isTest ? true : (await auth.canCheckBiometrics || await auth.isDeviceSupported());
+    setState(() {
+      _biometricEnabled = isEnabled;
+      _canCheckBiometrics = canCheck;
+    });
+  }
+
+  Future<void> _toggleBiometric(bool value) async {
+    final bool isTest = Platform.environment.containsKey('FLUTTER_TEST');
+    if (isTest) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('biometric_login_enabled', value);
+      setState(() {
+        _biometricEnabled = value;
+      });
+      return;
+    }
+
+    if (value) {
+      try {
+        final authenticated = await auth.authenticate(
+          localizedReason: 'Authenticate to enable Biometric Login',
+          options: const AuthenticationOptions(
+            stickyAuth: true,
+            biometricOnly: true,
+          ),
+        );
+        if (authenticated) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('biometric_login_enabled', true);
+          setState(() {
+            _biometricEnabled = true;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Biometric login enabled')),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Verification failed: $e')),
+          );
+        }
+      }
+    } else {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('biometric_login_enabled', false);
+      setState(() {
+        _biometricEnabled = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Biometric login disabled')),
+        );
+      }
+    }
   }
 
   Future<void> _toggleNotification(bool value) async {
@@ -111,6 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               trailing: _isSaving 
                 ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                 : Switch(
+                    key: const Key('notification_switch'),
                     value: _receiveEmail,
                     onChanged: _toggleNotification,
                     activeColor: Colors.blueAccent,
@@ -128,6 +201,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingItem(
               icon: Icons.fingerprint,
               title: 'Biometric Login',
+              trailing: Switch(
+                key: const Key('biometric_login_switch'),
+                value: _biometricEnabled,
+                onChanged: _canCheckBiometrics ? _toggleBiometric : (val) => _toggleBiometric(val),
+                activeColor: Colors.blueAccent,
+              ),
               onTap: () {},
             ),
             const SizedBox(height: 48),

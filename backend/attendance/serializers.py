@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest
+from .models import Attendance, LeaveRequest, Overtime, Shift, Schedule, LeaveBalance, AttendanceCorrectionRequest, FingerprintDevice, DeviceAttendanceLog
 
 class AttendanceSerializer(serializers.ModelSerializer):
     employee_name = serializers.ReadOnlyField(source='employee.fullname')
@@ -81,3 +81,19 @@ class AttendanceCorrectionRequestSerializer(serializers.ModelSerializer):
             'reason', 'status', 'current_stage'
         ]
         read_only_fields = ['status', 'current_stage', 'employee']
+
+
+class FingerprintDeviceSerializer(serializers.ModelSerializer):
+    branch_name = serializers.ReadOnlyField(source='branch.name')
+
+    class Meta:
+        model = FingerprintDevice
+        fields = '__all__'
+
+
+class DeviceAttendanceLogSerializer(serializers.ModelSerializer):
+    device_name = serializers.ReadOnlyField(source='device.name')
+
+    class Meta:
+        model = DeviceAttendanceLog
+        fields = '__all__'

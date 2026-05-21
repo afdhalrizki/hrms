@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { useTenant } from '@/context/TenantContext';
 
 interface Employee {
   id: number;
@@ -57,6 +58,7 @@ export default function EmployeesPage() {
   const [accessRoles, setAccessRoles] = useState<DropdownItem[]>([]);
   const [grades, setGrades] = useState<DropdownItem[]>([]);
   const { user, loading: authLoading } = useAuth();
+  const { isFingerprintEnabled } = useTenant();
 
   // Form State
   const [formData, setFormData] = useState({
@@ -74,6 +76,7 @@ export default function EmployeesPage() {
     ptkp_status: 'TK/0',
     create_user: true, 
     is_admin: false,
+    biometric_pin: '',
   });
 
   useEffect(() => {
@@ -143,7 +146,7 @@ export default function EmployeesPage() {
       // Reset Form
       setFormData(prev => ({
         ...prev,
-        nik: '', fullname: '', email: '', phone: '', ktp_number: '', is_admin: false
+        nik: '', fullname: '', email: '', phone: '', ktp_number: '', is_admin: false, biometric_pin: ''
       }));
     } catch (error: any) {
       console.error("Failed to create employee:", error);
@@ -407,6 +410,19 @@ export default function EmployeesPage() {
                       {grades.map(g => <option key={g.id} value={g.id} className="bg-background text-foreground">{g.name}</option>)}
                     </select>
                   </div>
+                  {isFingerprintEnabled && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Biometric PIN (Fingerprint)</label>
+                      <input 
+                        type="text" 
+                        name="biometric_pin" 
+                        value={formData.biometric_pin} 
+                        onChange={handleInputChange} 
+                        className="w-full px-4 py-2 border bg-white/5 rounded-xl text-sm" 
+                        placeholder="e.g. 1001"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="my-6 border-t border-white/10" />

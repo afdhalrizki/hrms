@@ -162,12 +162,25 @@ class Employee(AuditModel):
         help_text=_("Master photo for face recognition")
     )
 
+    # Fingerprint Mapping
+    biometric_pin = models.CharField(
+        _("biometric PIN"), 
+        max_length=50, 
+        blank=True, null=True, unique=True,
+        help_text=_("PIN/Enrollment ID of employee on fingerprint machine")
+    )
+
     class Meta:
         verbose_name = _("employee")
         verbose_name_plural = _("employees")
 
     def __str__(self):
         return f"{self.nik} - {self.fullname}"
+
+    def save(self, *args, **kwargs):
+        if self.biometric_pin == "":
+            self.biometric_pin = None
+        super().save(*args, **kwargs)
 
     @property
     def user(self):
