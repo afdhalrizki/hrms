@@ -2,6 +2,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, readdirSync, writeFileSync, appendFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import os from 'node:os';
 import { ensureDir, log, COLORS, spawnStream, spawnBackground, waitForHttp, isPortInUse, parseMetrics, getPythonExec, formatDuration } from '../../scripts/lib.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -16,7 +17,7 @@ async function main() {
   const skipBackendRestart = args.includes('--skip-backend-restart');
   const coverage = args.includes('--coverage');
   const quick = args.includes('--quick');
-  const numWorkers = 1;
+  const numWorkers = Math.max(2, Math.min(8, os.cpus().length - 2));
 
   log("--- HRMS Frontend Integrated Unit Test Automation ---", COLORS.cyan);
 

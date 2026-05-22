@@ -2,6 +2,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import crypto from 'node:crypto';
+import os from 'node:os';
 import {
   ensureDir,
   log,
@@ -82,7 +83,7 @@ async function main() {
   const noDeps = args.includes('--no-deps');
   const forceDeps = args.includes('--force-deps');
   const workersArg = args.find((a) => a.startsWith('--workers='));
-  const workers = workersArg ? parseInt(workersArg.split('=')[1], 10) : 1;
+  const workers = workersArg ? parseInt(workersArg.split('=')[1], 10) : Math.max(2, Math.min(4, os.cpus().length - 2));
 
   const logDir = join(BackendDir, 'logs');
   await ensureDir(logDir);

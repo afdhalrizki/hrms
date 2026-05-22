@@ -86,6 +86,28 @@ def seed_worker_data(schema_name, preset):
         seed_performance_data(tenant, res['employees'][0])
     return schema_name
 
+def migrate_single_tenant_schema(schema_name):
+    """Subprocess function to migrate a tenant schema."""
+    import django
+    django.setup()
+    from django.db import connection
+    from django.core.management import call_command
+    import time
+    
+    # Close any inherited connections to avoid issues in subprocess
+    connection.close()
+    
+    print(f"   🏗️ Migrating schema for {schema_name}...")
+    for attempt in range(3):
+        try:
+            call_command('migrate_schemas', tenant=True, schema_name=schema_name, interactive=False, verbosity=0)
+            break
+        except Exception as e:
+            if attempt == 2: raise
+            print(f"      Retrying migration for {schema_name}... ({e})")
+            time.sleep(2)
+    return schema_name
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--workers', type=int, default=4)
@@ -102,10 +124,42 @@ def main():
     call_command('migrate_schemas', shared=True, interactive=False, verbosity=0)
     create_public_data()
 
-    print("--- Creating Tenant Schemas and Domains ---")
+    print("--- Creating Tenant Records and Domains (Serial) ---")
     schemas = ['company1', 'company2'] + [f'worker_{i}' for i in range(args.workers)]
+    from tenants.models import Tenant, Domain
     for schema in schemas:
-        setup_tenant(schema, schema.capitalize())
+        tenant, _ = Tenant.objects.get_or_create(
+            schema_name=schema, 
+            defaults={
+                'name': schema.capitalize(), 
+                'plan_type': 'ENTERPRISE',
+                'enabled_modules': ["performance", "core", "attendance", "payroll", "reimbursement"],
+                'late_deduction_rate': 50000,
+                'absence_deduction_rate': 100000,
+                'attendance_platform_policy': 'BOTH'
+            }
+        )
+        Domain.objects.update_or_create(
+            domain=f'{schema}.localhost', 
+            defaults={'tenant': tenant, 'is_primary': True}
+        )
+
+    print("--- Migrating Tenant Schemas (Parallel) ---")
+    # Close connection before parallel execution to prevent inheritance issues
+    connection.close()
+    
+    with ProcessPoolExecutor(max_workers=min(len(schemas), 8)) as executor:
+        futures = [
+            executor.submit(migrate_single_tenant_schema, schema)
+            for schema in schemas
+        ]
+        for future in as_completed(futures):
+            try:
+                name = future.result()
+                print(f"      ✅ Finished migrating schema {name}")
+            except Exception as e:
+                print(f"      ❌ Migration failed: {e}")
+                sys.exit(1)
 
     # 1. Seed critical test tenants serially to ensure data integrity
     print("--- Seeding Critical Tenants (Serial) ---")

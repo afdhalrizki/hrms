@@ -80,6 +80,7 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles empty state successfully', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint.includes('/reimbursement-categories')) return Promise.resolve([]);
       if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
       return realApiFetch.current(endpoint, options);
     });

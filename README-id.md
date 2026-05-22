@@ -152,9 +152,9 @@ graph TD
 
 Platform ini mencapai tingkat kelulusan tes **100% terpadu** di semua lapisan stack.
 
-- **Backend**: 390 Tes (371 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 21 Mei 2026)
-- **Frontend**: 298 Tes (222 Unit + 76 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 21 Mei 2026)
-- **Mobile**: 161 Tes (138 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 21 Mei 2026)
+- **Backend**: 390 Tes (371 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 22 Mei 2026)
+- **Frontend**: 314 Tes (232 Unit + 82 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 22 Mei 2026)
+- **Mobile**: 161 Tes (138 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 22 Mei 2026)
 
 ## 📈 Strategi Skalabilitas: Jalan Menuju 1 Juta Pengguna
 

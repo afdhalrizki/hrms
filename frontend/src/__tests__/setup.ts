@@ -245,6 +245,7 @@ vi.mock('sonner', () => ({
     warning: vi.fn(),
     dismiss: vi.fn(),
     promise: vi.fn(),
+    loading: vi.fn(),
   },
 }));
 

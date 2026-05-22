@@ -423,12 +423,30 @@
     "ctaPrice": "Lihat Paket Harga",
     "featuresTitle": "Fitur Utama HariKerja",
     "featuresDesc": "Solusi lengkap yang dirancang khusus untuk memenuhi kebutuhan operasional dan kepatuhan bisnis di Indonesia.",
-    "feature1": { "title": "Absensi & Kehadiran", "desc": "Pelacakan waktu nyata dengan geofencing GPS dan verifikasi foto untuk mencegah kecurangan." },
-    "feature2": { "title": "Manajemen Karyawan", "desc": "Database pusat untuk semua data karyawan, dokumen (KTP/NPWP), dan struktur organisasi." },
-    "feature3": { "title": "Otomatisasi Payroll", "desc": "Perhitungan gaji otomatis yang sudah terintegrasi dengan PPh 21 (TER 2024) dan iuran BPJS." },
-    "feature4": { "title": "Cuti & Perizinan", "desc": "Alur kerja persetujuan cuti bertingkat yang transparan dan mudah dipantau oleh admin." },
-    "feature5": { "title": "Reimbursement", "desc": "Pengajuan klaim biaya operasional dengan upload kuitansi langsung dari aplikasi mobile." },
-    "feature6": { "title": "Manajemen Kinerja", "desc": "Pantau produktivitas tim dengan pelacakan KPI dan sistem penilaian mandiri (Self-Appraisal)." },
+    "feature1": {
+      "title": "Absensi & Kehadiran",
+      "desc": "Pelacakan waktu nyata dengan geofencing GPS dan verifikasi foto untuk mencegah kecurangan."
+    },
+    "feature2": {
+      "title": "Manajemen Karyawan",
+      "desc": "Database pusat untuk semua data karyawan, dokumen (KTP/NPWP), dan struktur organisasi."
+    },
+    "feature3": {
+      "title": "Otomatisasi Payroll",
+      "desc": "Perhitungan gaji otomatis yang sudah terintegrasi dengan PPh 21 (TER 2024) dan iuran BPJS."
+    },
+    "feature4": {
+      "title": "Cuti & Perizinan",
+      "desc": "Alur kerja persetujuan cuti bertingkat yang transparan dan mudah dipantau oleh admin."
+    },
+    "feature5": {
+      "title": "Reimbursement",
+      "desc": "Pengajuan klaim biaya operasional dengan upload kuitansi langsung dari aplikasi mobile."
+    },
+    "feature6": {
+      "title": "Manajemen Kinerja",
+      "desc": "Pantau produktivitas tim dengan pelacakan KPI dan sistem penilaian mandiri (Self-Appraisal)."
+    },
     "statAccuracy": "Akurasi Payroll",
     "statSupport": "Dukungan",
     "readyTitle": "Siap Modernisasi HR Anda?",
@@ -527,5 +545,58 @@
       "desc5": "tanpa harus melakukan upgrade paket utama.",
       "link": "Pelajari Add-on"
     }
+  },
+  "Settings": {
+    "title": "Pengaturan Perusahaan",
+    "subtitle": "Sesuaikan tampilan merek Anda di portal HRMS.",
+    "company_branding": "Branding Perusahaan",
+    "company_name": "Nama Perusahaan",
+    "company_name_placeholder": "Contoh: PT Maju Bersama",
+    "logo_recommendation": "Format logo yang disarankan: PNG atau SVG dengan latar transparan. Ukuran maksimal: 2MB.",
+    "upload_logo": "Unggah Logo",
+    "read_only": "Baca Saja",
+    "read_only_superadmin": "Hanya Baca: Hanya SUPERADMIN yang dapat mengubah pengaturan platform.",
+    "contact_details": "Detail Kontak",
+    "business_phone": "Telepon Bisnis",
+    "phone_placeholder": "Contoh: +62 21 1234 5678",
+    "headquarters_address": "Alamat Kantor Pusat",
+    "address_placeholder": "Alamat jalan, Kota, Kode Pos...",
+    "attendance_payroll_policies": "Kebijakan Kehadiran & Payroll",
+    "late_deduction_rate": "Tarif Potongan Keterlambatan (Rp)",
+    "late_deduction_hint": "Potongan harian setiap kali terlambat.",
+    "absence_deduction_rate": "Tarif Potongan Alpa (Rp)",
+    "absence_deduction_hint": "Potongan harian jika alpa (tanpa izin).",
+    "jkk_rate": "Tarif JKK (Desimal)",
+    "jkk_rate_hint": "Tarif JKK BPJS (Standar: 0,0024).",
+    "reimbursement_approval": "Persetujuan Reimbursement",
+    "reimbursement_approval_supervisor": "Hanya Supervisor",
+    "reimbursement_approval_hr": "Hanya HR/Admin",
+    "reimbursement_approval_both": "Keduanya (Berurutan)",
+    "security_biometrics": "Keamanan & Biometrik",
+    "require_photo_attendance": "Wajib Foto Saat Absen",
+    "require_photo_hint": "Karyawan wajib mengambil foto saat absen (Biometrik). Menonaktifkan fitur ini akan melewati pengambilan foto jika penyimpanan Anda penuh.",
+    "enable_fingerprint": "Aktifkan Integrasi Sidik Jari",
+    "enable_fingerprint_hint": "Aktifkan integrasi mesin sidik jari biometrik (ADMS / Agen lokal). Ini memungkinkan absensi disinkronkan secara real-time dari perangkat fisik.",
+    "attendance_platform": "Pembatasan Platform Absensi",
+    "attendance_platform_hint": "Kontrol di mana karyawan dapat merekam kehadiran mereka.",
+    "mobile_only": "Mobile Saja",
+    "mobile_only_desc": "Aplikasi saja",
+    "web_mobile": "Web & Mobile",
+    "web_mobile_desc": "Akses fleksibel",
+    "save_profile": "Simpan Profil",
+    "saving": "Menyimpan...",
+    "success_message": "Profil perusahaan berhasil diperbarui. Halaman akan dimuat ulang.",
+    "error_message": "Gagal memperbarui profil perusahaan.",
+    "access_management": "Manajemen Akses",
+    "access_management_desc": "Kontrol Akses Berbasis Peran (RBAC). Tentukan karyawan mana yang dapat mengelola HR, Kehadiran, atau Payroll.",
+    "manage_roles": "Kelola Peran",
+    "fingerprint_devices": "Perangkat Sidik Jari",
+    "fingerprint_devices_desc": "Daftar dan kelola mesin absensi sidik jari fisik di kantor Anda. Hubungkan dengan API keys untuk sinkronisasi.",
+    "manage_devices": "Kelola Perangkat",
+    "two_factor_auth": "Otentikasi Dua Faktor",
+    "two_factor_auth_desc": "Tambahkan lapisan keamanan ekstra ke akun admin Anda. (Segera Hadir)",
+    "subscription_billing": "Langganan & Tagihan",
+    "subscription_billing_desc": "Kelola paket Anda, lihat faktur, dan perbarui metode pembayaran.",
+    "manage_billing": "Kelola Tagihan"
   }
 }

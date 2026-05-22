@@ -4,6 +4,7 @@ import ProfilePage from '../app/[locale]/profile/page';
 import { loginAs } from './setup';
 import { AuthProvider } from '@/context/AuthContext';
 import { NextIntlClientProvider } from 'next-intl';
+import { toast } from 'sonner';
 
 // Mock next-intl but include the provider using the factory argument
 vi.mock('next-intl', async (importOriginal) => {
@@ -28,18 +29,6 @@ vi.mock('framer-motion', () => ({
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
-
-const { mockToast } = vi.hoisted(() => ({
-  mockToast: {
-    success: vi.fn(),
-    error: vi.fn(),
-    loading: vi.fn(),
-  }
-}));
-
-vi.mock('sonner', () => ({
-  toast: mockToast,
 }));
 
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
@@ -134,7 +123,7 @@ describe('ProfilePage (Integrated)', () => {
     render(<ProfilePage />, { wrapper: AllProviders });
     
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalledWith('Fetch failed');
+      expect(toast.error).toHaveBeenCalledWith('Fetch failed');
     });
   });
 
@@ -154,7 +143,7 @@ describe('ProfilePage (Integrated)', () => {
     fireEvent.click(saveButton);
     
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalledWith('Update failed');
+      expect(toast.error).toHaveBeenCalledWith('Update failed');
     });
   });
 

@@ -423,12 +423,30 @@
     "ctaPrice": "View Pricing",
     "featuresTitle": "Core Features of HariKerja",
     "featuresDesc": "Complete solutions designed specifically to meet the operational and compliance needs of businesses in Indonesia.",
-    "feature1": { "title": "Attendance & Presence", "desc": "Real-time tracking with GPS geofencing and photo verification to prevent fraud." },
-    "feature2": { "title": "Employee Management", "desc": "Central database for all employee data, documents (KTP/NPWP), and organizational structure." },
-    "feature3": { "title": "Payroll Automation", "desc": "Automatic salary calculations integrated with PPh 21 (TER 2024) and BPJS contributions." },
-    "feature4": { "title": "Leaves & Permits", "desc": "Transparent multi-level leave approval workflow that is easy for admins to monitor." },
-    "feature5": { "title": "Reimbursement", "desc": "Submission of operational cost claims with receipt uploads directly from the mobile app." },
-    "feature6": { "title": "Performance Management", "desc": "Monitor team productivity with KPI tracking and self-appraisal systems." },
+    "feature1": {
+      "title": "Attendance & Presence",
+      "desc": "Real-time tracking with GPS geofencing and photo verification to prevent fraud."
+    },
+    "feature2": {
+      "title": "Employee Management",
+      "desc": "Central database for all employee data, documents (KTP/NPWP), and organizational structure."
+    },
+    "feature3": {
+      "title": "Payroll Automation",
+      "desc": "Automatic salary calculations integrated with PPh 21 (TER 2024) and BPJS contributions."
+    },
+    "feature4": {
+      "title": "Leaves & Permits",
+      "desc": "Transparent multi-level leave approval workflow that is easy for admins to monitor."
+    },
+    "feature5": {
+      "title": "Reimbursement",
+      "desc": "Submission of operational cost claims with receipt uploads directly from the mobile app."
+    },
+    "feature6": {
+      "title": "Performance Management",
+      "desc": "Monitor team productivity with KPI tracking and self-appraisal systems."
+    },
     "statAccuracy": "Payroll Accuracy",
     "statSupport": "Support",
     "readyTitle": "Ready to Modernize Your HR?",
@@ -527,5 +545,58 @@
       "desc5": "without having to upgrade the main plan.",
       "link": "Learn about Add-ons"
     }
+  },
+  "Settings": {
+    "title": "Company Profile Settings",
+    "subtitle": "Customize how your brand appears across the HRMS portal.",
+    "company_branding": "Company Branding",
+    "company_name": "Company Name",
+    "company_name_placeholder": "e.g. PT Maju Bersama",
+    "logo_recommendation": "Recommended logo format: PNG or SVG with a transparent background. Max size: 2MB.",
+    "upload_logo": "Upload Logo",
+    "read_only": "Read Only",
+    "read_only_superadmin": "Read-Only: Only SUPERADMIN can modify platform settings.",
+    "contact_details": "Contact Details",
+    "business_phone": "Business Phone",
+    "phone_placeholder": "e.g. +62 21 1234 5678",
+    "headquarters_address": "Headquarters Address",
+    "address_placeholder": "Street address, City, ZIP Code...",
+    "attendance_payroll_policies": "Attendance & Payroll Policies",
+    "late_deduction_rate": "Late Deduction Rate (Rp)",
+    "late_deduction_hint": "Daily deduction for each late attendance.",
+    "absence_deduction_rate": "Absence Deduction Rate (Rp)",
+    "absence_deduction_hint": "Daily deduction if absent without permission.",
+    "jkk_rate": "JKK Rate (Decimal)",
+    "jkk_rate_hint": "BPJS JKK Rate (Standard: 0.0024).",
+    "reimbursement_approval": "Reimbursement Approval",
+    "reimbursement_approval_supervisor": "Only Supervisor",
+    "reimbursement_approval_hr": "Only HR/Admin",
+    "reimbursement_approval_both": "Both (Sequential)",
+    "security_biometrics": "Security & Biometrics",
+    "require_photo_attendance": "Require Photo Attendance",
+    "require_photo_hint": "Employees must take a photo when clocking in (Biometric). Disabling this will skip photo capture if your storage is full.",
+    "enable_fingerprint": "Enable Fingerprint Integration",
+    "enable_fingerprint_hint": "Enable biometric fingerprint machine integration (ADMS / Local Agent). This allows real-time attendance sync from physical devices.",
+    "attendance_platform": "Attendance Platform Restriction",
+    "attendance_platform_hint": "Control where employees can record their attendance.",
+    "mobile_only": "Mobile Only",
+    "mobile_only_desc": "App only",
+    "web_mobile": "Web & Mobile",
+    "web_mobile_desc": "Flexible access",
+    "save_profile": "Save Profile",
+    "saving": "Saving...",
+    "success_message": "Company profile updated successfully. The page will reload to reflect changes.",
+    "error_message": "Failed to update company profile.",
+    "access_management": "Access Management",
+    "access_management_desc": "Role-Based Access Control (RBAC). Define which employees can manage HR, Attendance, or Payroll.",
+    "manage_roles": "Manage Roles",
+    "fingerprint_devices": "Fingerprint Devices",
+    "fingerprint_devices_desc": "Manage physical fingerprint attendance machines in your office. Connect with API keys for synchronization.",
+    "manage_devices": "Manage Devices",
+    "two_factor_auth": "Two-Factor Auth",
+    "two_factor_auth_desc": "Add an extra layer of security to your admin accounts. (Coming Soon)",
+    "subscription_billing": "Subscription & Billing",
+    "subscription_billing_desc": "Manage your plan, view invoices, and update payment methods.",
+    "manage_billing": "Manage Billing"
   }
 }
