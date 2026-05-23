@@ -90,7 +90,7 @@ Platform harikerja mengikuti jalur promosi 4-tingkat yang ketat:
 
 ## 🧪 Standar Pengujian
 
-Backend menggunakan `pytest` dengan **tingkat kelulusan 100%** di **390 tes krusial** (371 Unit + 19 E2E).
+Backend menggunakan `pytest` dengan **tingkat kelulusan 100%** di **392 tes krusial** (373 Unit + 19 E2E).
 
 **Jalankan tes logika/unit:**
 
