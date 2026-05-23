@@ -108,7 +108,7 @@ export default function BrandingPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
               <Palette className="text-primary" size={32} />
               {t('title')}
             </h1>
@@ -119,20 +119,20 @@ export default function BrandingPage() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Settings Form */}
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="glass-card p-8 rounded-[40px] border border-white/10 bg-white/[0.02] space-y-8 shadow-2xl">
+            <div className="glass-card p-8 rounded-[40px] border border-primary/10 bg-white/[0.02] space-y-8 shadow-2xl">
               
               {/* Logo Upload */}
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                   <ImageIcon size={14} />
                   {t('logo')}
                 </label>
                 <div className="flex items-center gap-8">
-                  <div className="h-32 w-32 rounded-3xl bg-white/5 border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden relative group">
+                  <div className="h-32 w-32 rounded-3xl bg-primary/5 border-2 border-dashed border-primary/15 flex items-center justify-center overflow-hidden relative group">
                     {previewUrl ? (
                       <img src={previewUrl} alt="Logo Preview" className="h-full w-full object-contain p-4" />
                     ) : (
-                      <ImageIcon className="text-gray-700" size={40} />
+                      <ImageIcon className="text-muted-foreground/60" size={40} />
                     )}
                     <input 
                       type="file" 
@@ -145,8 +145,8 @@ export default function BrandingPage() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-bold text-white">Upload Brand Mark</p>
-                    <p className="text-xs text-gray-500 max-w-[200px]">SVG, PNG or JPG (recommended 256x256px, max 2MB)</p>
+                    <p className="text-sm font-bold text-foreground">Upload Brand Mark</p>
+                    <p className="text-xs text-muted-foreground max-w-[200px]">SVG, PNG or JPG (recommended 256x256px, max 2MB)</p>
                   </div>
                 </div>
               </div>
@@ -154,11 +154,11 @@ export default function BrandingPage() {
               {/* Color Tunnels */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-primary" />
                     {t('primaryColor')}
                   </label>
-                  <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="flex items-center gap-3 bg-primary/5 border border-primary/10 rounded-2xl p-4">
                     <input 
                       type="color" 
                       value={primaryColor}
@@ -170,17 +170,17 @@ export default function BrandingPage() {
                       type="text" 
                       value={primaryColor}
                       onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="bg-transparent text-sm font-mono text-white focus:outline-none w-20"
+                      className="bg-transparent text-sm font-mono text-foreground focus:outline-none w-20"
                       data-testid="primary-color-input"
                     />
                   </div>
                 </div>
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-primary" />
                     {t('secondaryColor')}
                   </label>
-                  <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="flex items-center gap-3 bg-primary/5 border border-primary/10 rounded-2xl p-4">
                     <input 
                       type="color" 
                       value={secondaryColor}
@@ -192,7 +192,7 @@ export default function BrandingPage() {
                       type="text" 
                       value={secondaryColor}
                       onChange={(e) => setSecondaryColor(e.target.value)}
-                      className="bg-transparent text-sm font-mono text-white focus:outline-none w-20"
+                      className="bg-transparent text-sm font-mono text-foreground focus:outline-none w-20"
                       data-testid="secondary-color-input"
                     />
                   </div>
@@ -211,33 +211,33 @@ export default function BrandingPage() {
 
           {/* Preview Pane */}
           <div className="space-y-6">
-            <h2 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-2 px-4">
+            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter flex items-center gap-2 px-4">
               <Eye size={22} className="text-primary" />
               {t('previewTitle')}
             </h2>
             
-            <div className="glass-card rounded-[48px] border border-white/10 p-2 bg-slate-950 shadow-3xl overflow-hidden min-h-[500px] relative">
+            <div className="glass-card rounded-[48px] border border-primary/10 p-2 bg-background shadow-3xl overflow-hidden min-h-[500px] relative">
               {/* Mock Sidebar */}
-              <div className="absolute left-0 top-0 bottom-0 w-16 border-r border-white/5 flex flex-col items-center py-6 gap-6">
-                 <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center">
+              <div className="absolute left-0 top-0 bottom-0 w-16 border-r border-primary/5 flex flex-col items-center py-6 gap-6">
+                 <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
                     {previewUrl ? <img src={previewUrl} className="h-6 w-6 object-contain" /> : <div className="h-6 w-6 rounded-md bg-primary/20" />}
                  </div>
                  <div className="h-8 w-8 rounded-full bg-primary" />
-                 <div className="h-8 w-8 rounded-full bg-white/5" />
-                 <div className="h-8 w-8 rounded-full bg-white/5" />
+                 <div className="h-8 w-8 rounded-full bg-primary/5" />
+                 <div className="h-8 w-8 rounded-full bg-primary/5" />
               </div>
               
               {/* Mock Content */}
               <div className="ml-16 p-8 space-y-6">
-                <div className="h-6 w-32 bg-white/10 rounded-lg" />
+                <div className="h-6 w-32 bg-primary/15 rounded-lg" />
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="h-32 rounded-3xl bg-white/[0.03] border border-white/5 p-4 space-y-3">
+                  <div className="h-32 rounded-3xl bg-primary/5 border border-primary/10 p-4 space-y-3">
                      <div className="h-8 w-8 rounded-xl bg-primary/20" style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}>
                         <ImageIcon size={16} className="m-2" />
                      </div>
-                     <div className="h-4 w-20 bg-white/5 rounded-full" />
+                     <div className="h-4 w-20 bg-primary/10 rounded-full" />
                   </div>
-                  <div className="h-32 rounded-3xl bg-white/[0.03] border border-white/5" />
+                  <div className="h-32 rounded-3xl bg-primary/5 border border-primary/10" />
                 </div>
                 <div className="h-12 w-full rounded-2xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-center text-xs font-bold text-white uppercase tracking-widest" style={{ backgroundColor: primaryColor }}>
                    Action Button

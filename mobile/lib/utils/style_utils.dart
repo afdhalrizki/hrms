@@ -5,30 +5,39 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   static bool get _isTest => Platform.environment.containsKey('FLUTTER_TEST');
 
-  static const Color primaryColor = Color(0xFF6366F1);
-  static const Color scaffoldBackground = Color(0xFF0F172A);
-  static const Color surfaceColor = Color(0xFF1E293B);
+  static const Color primaryColor = Color(0xFF588157); // Premium Rich Olive Green
+  static const Color scaffoldBackground = Color(0xFFF3F6F0); // Glare-free soothing sage cream background
+  static const Color surfaceColor = Color(0xFFFFFFFF); // Premium clean white card surface
+  static const Color textForegroundColor = Color(0xFF2C351F); // Deep forest olive-charcoal text
+  static const Color textMutedColor = Color(0xFF5C6B4D); // Soothing sage subtext
 
-  static TextTheme get darkTextTheme {
-    if (_isTest) return ThemeData.dark().textTheme;
+  static TextTheme get lightTextTheme {
+    if (_isTest) return ThemeData.light().textTheme;
     return GoogleFonts.plusJakartaSansTextTheme(
-      ThemeData.dark().textTheme,
+      ThemeData.light().textTheme,
     );
   }
 
   static ThemeData get darkTheme {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       primaryColor: primaryColor,
       scaffoldBackgroundColor: scaffoldBackground,
       cardColor: surfaceColor,
       useMaterial3: true,
-      textTheme: darkTextTheme,
-      colorScheme: ColorScheme.dark(
+      textTheme: lightTextTheme,
+      colorScheme: const ColorScheme.light(
         primary: primaryColor,
-        secondary: primaryColor.withOpacity(0.8),
+        secondary: Color(0xFFDAD7CD),
         surface: surfaceColor,
         background: scaffoldBackground,
+        onBackground: Color(0xFF2C351F),
+        onSurface: Color(0xFF2C351F),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: scaffoldBackground,
+        foregroundColor: Color(0xFF2C351F),
+        elevation: 0,
       ),
     );
   }

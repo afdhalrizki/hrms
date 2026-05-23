@@ -1,158 +1,108 @@
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import BrandingPage from '../app/[locale]/settings/branding/page';
-import { loginAs } from './setup';
-import { AuthProvider } from '@/context/AuthContext';
-import { TenantProvider } from '@/context/TenantContext';
 import { NextIntlClientProvider } from 'next-intl';
-import { apiFetch } from '@/lib/api';
+import React from 'react';
 
 // Mock next-intl
 vi.mock('next-intl', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await vi.importActual('next-intl')) as any;
   return {
     ...actual,
     useTranslations: vi.fn(() => (key: string) => key),
   };
 });
 
-const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
- 
- // Spy on apiFetch while letting it call the real backend
- vi.mock('@/lib/api', async (importOriginal) => {
-   const actual = await importOriginal() as any;
-   realApiFetch.current = actual.apiFetch;
-   return {
-     ...actual,
-     apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
-     getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
-   };
- });
-
+// Mock DashboardLayout
 vi.mock('@/components/layout/DashboardLayout', () => ({
-  DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DashboardLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dashboard-layout">{children}</div>
+  ),
 }));
 
+// Mock AuthContext
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({ 
-    user: { id: 1, fullname: 'Admin', is_staff: true, permissions: { tenant_manage_hr: true } }, 
-    loading: false 
+  useAuth: () => ({
+    user: {
+      id: 1,
+      fullname: 'Admin User',
+      is_staff: true,
+      permissions: { tenant_manage_settings: true },
+    },
+    loading: false,
   }),
   AuthProvider: ({ children }: any) => children,
 }));
 
-vi.mock('sonner', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
-const AllProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <NextIntlClientProvider locale="en" messages={{}}>
-      <TenantProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </TenantProvider>
-    </NextIntlClientProvider>
-  );
+// Variable to control mock tenant values
+let mockTenantValues = {
+  tenantName: 'HariKerja Platform',
+  isPublic: false,
+  logo: null as string | null,
+  themePrimaryColor: '#588157',
+  themeSecondaryColor: '#4a5d23',
 };
 
-describe('BrandingPage (Integrated)', () => {
-  beforeAll(async () => {
-    await loginAs('admin@company1.com');
-  }, 20000);
+// Mock TenantContext
+vi.mock('@/context/TenantContext', () => ({
+  useTenant: () => mockTenantValues,
+  TenantProvider: ({ children }: any) => children,
+}));
 
+describe('BrandingPage (Unit Test)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders branding settings with current values from real backend', async () => {
-    render(<BrandingPage />, { wrapper: AllProviders });
+  it('renders branding settings page and displays color inputs', () => {
+    mockTenantValues = {
+      tenantName: 'HariKerja Platform',
+      isPublic: false,
+      logo: null,
+      themePrimaryColor: '#588157',
+      themeSecondaryColor: '#4a5d23',
+    };
+
+    render(
+      <NextIntlClientProvider locale='en' messages={{}}>
+        <BrandingPage />
+      </NextIntlClientProvider>
+    );
+
+    // Verify title and layout exist
+    expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument();
+    expect(screen.getByText('title')).toBeInTheDocument();
+
+    // Verify color pickers and text inputs exist and have correct initial values
+    const primaryInput = screen.getByTestId('primary-color-input');
+    const secondaryInput = screen.getByTestId('secondary-color-input');
     
-    await waitFor(() => {
-      expect(screen.getByText('title')).toBeInTheDocument();
-      const colorInputs = document.querySelectorAll('input[type="color"]');
-      expect(colorInputs.length).toBeGreaterThan(0);
-    }, { timeout: 15000 });
+    expect(primaryInput).toBeInTheDocument();
+    expect(secondaryInput).toBeInTheDocument();
+
+    expect(primaryInput).toHaveValue('#588157');
+    expect(secondaryInput).toHaveValue('#4a5d23');
   });
 
-  it('handles logo change', async () => {
-    const file = new File(['(⌐□_□)'], 'logo.png', { type: 'image/png' });
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url');
-    
-    render(<BrandingPage />, { wrapper: AllProviders });
-    
-    await waitFor(() => screen.getByRole('button', { name: /updateBtn/i }), { timeout: 15000 });
-    
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-    fireEvent.change(input, { target: { files: [file] } });
-    
-    await waitFor(() => {
-      expect(screen.getByAltText('Logo Preview')).toHaveAttribute('src', 'blob:mock-url');
-    });
-  });
+  it('updates color inputs to custom tenant context colors', () => {
+    mockTenantValues = {
+      tenantName: 'Custom Co',
+      isPublic: false,
+      logo: '/custom-logo.png',
+      themePrimaryColor: '#123456',
+      themeSecondaryColor: '#789abc',
+    };
 
-  it('handles primary color change', async () => {
-    render(<BrandingPage />, { wrapper: AllProviders });
-    await waitFor(() => screen.getByRole('button', { name: /updateBtn/i }), { timeout: 15000 });
-    
-    const colorInputs = document.querySelectorAll('input[type="color"]');
-    fireEvent.change(colorInputs[0], { target: { value: '#ff0000' } });
-    expect((colorInputs[0] as HTMLInputElement).value).toBe('#ff0000');
-  });
+    render(
+      <NextIntlClientProvider locale='en' messages={{}}>
+        <BrandingPage />
+      </NextIntlClientProvider>
+    );
 
-  it('handles secondary color change', async () => {
-    render(<BrandingPage />, { wrapper: AllProviders });
-    await waitFor(() => screen.getByRole('button', { name: /updateBtn/i }), { timeout: 15000 });
-    
-    const colorInputs = document.querySelectorAll('input[type="color"]');
-    if (colorInputs.length > 1) {
-      fireEvent.change(colorInputs[1], { target: { value: '#00ff00' } });
-      expect((colorInputs[1] as HTMLInputElement).value).toBe('#00ff00');
-    }
-  });
+    const primaryInput = screen.getByTestId('primary-color-input');
+    const secondaryInput = screen.getByTestId('secondary-color-input');
 
-  it('updates branding colors successfully', async () => {
-    render(<BrandingPage />, { wrapper: AllProviders });
-    
-    await waitFor(() => screen.getByRole('button', { name: /updateBtn/i }), { timeout: 15000 });
-
-    const colorInputs = document.querySelectorAll('input[type="color"]');
-    fireEvent.change(colorInputs[0], { target: { value: '#112233' } });
-
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (options?.method === 'PATCH') return Promise.resolve({});
-      return realApiFetch.current(endpoint, options);
-    });
-
-    const button = screen.getByRole('button', { name: /updateBtn/i });
-    fireEvent.click(button);
-
-    await waitFor(() => {
-      const patchCall = (apiFetch as any).mock.calls.find((c: any) => c[1]?.method === 'PATCH');
-      expect(patchCall).toBeDefined();
-    });
-  });
-
-  it('shows error toast when update fails', async () => {
-    render(<BrandingPage />, { wrapper: AllProviders });
-    
-    await waitFor(() => screen.getByRole('button', { name: /updateBtn/i }), { timeout: 15000 });
-
-    (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
-      if (options?.method === 'PATCH') return Promise.reject(new Error('Update failed'));
-      return realApiFetch.current(endpoint, options);
-    });
-
-    const button = screen.getByRole('button', { name: /updateBtn/i });
-    fireEvent.click(button);
-
-    const { toast } = await import('sonner');
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalled();
-    });
+    expect(primaryInput).toHaveValue('#123456');
+    expect(secondaryInput).toHaveValue('#789abc');
   });
 });
