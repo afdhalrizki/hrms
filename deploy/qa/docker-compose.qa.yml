@@ -157,6 +157,18 @@ services:
           cpus: "0.5"
           memory: "256M"
 
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared_tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - nginx
+    networks:
+      - hrms_qa_net
+
 networks:
   hrms_qa_net:
     driver: bridge
