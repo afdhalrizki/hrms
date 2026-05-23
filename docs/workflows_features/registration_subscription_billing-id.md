@@ -77,13 +77,13 @@ stateDiagram-v2
 
 Platform menggunakan **Tier-Based Pricing** (bukan biaya per kepala), dikombinasikan dengan **Kuota Elastis (Add-ons)**.
 
-| Tingkat Paket | Kapasitas Karyawan | Batas Penyimpanan | Modul yang Terbuka |
-| :--- | :--- | :--- | :--- |
-| **FREE** | Maks 10 Karyawan | 50 MB | Core HR, Kehadiran Dasar |
-| **ESSENTIAL** | Maks 25 Karyawan | 250 MB | Kehadiran + Geofencing, Cuti & Izin |
-| **PROFESSIONAL** | Maks 100 Karyawan | 1 GB | Penggajian (PPh 21/BPJS), Reimbursement |
-| **PREMIUM** | Maks 500 Karyawan | 5 GB | KPI & Performance, RBAC Lanjutan |
-| **ENTERPRISE** | Kustom (2000+) | Kustom (20 GB+) | Semua Modul + Audit Logs & Dedicated SLA |
+| Tingkat Paket | Kuota Dasar Karyawan | Batas Maksimal Upgrade | Batas Penyimpanan Dasar | Modul yang Terbuka |
+| :--- | :--- | :--- | :--- | :--- |
+| **FREE** | 10 Karyawan | 10 (Tidak Bisa Upgrade) | 50 MB | Core HR, Kehadiran Dasar |
+| **ESSENTIAL** | 25 Karyawan | 100 Karyawan | 250 MB | Kehadiran + Geofencing, Cuti & Izin |
+| **PROFESSIONAL** | 100 Karyawan | 1.000 Karyawan | 1 GB | Penggajian (PPh 21/BPJS), Reimbursement |
+| **PREMIUM** | 500 Karyawan | 999.999 Karyawan | 5 GB | KPI & Performance, RBAC Lanjutan |
+| **ENTERPRISE** | 2.000 Karyawan (Kustom) | Kustom | 20 GB (Kustom) | Semua Modul + Audit Logs & Dedicated SLA |
 
 ### 3.1 Kuota Elastis (Blok Add-on)
 Tenant dapat membeli kuota tambahan tanpa perlu meningkatkan seluruh tingkat paket langganan mereka:

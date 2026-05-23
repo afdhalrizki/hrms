@@ -8,13 +8,13 @@ Dokumen ini menjelaskan strategi bisnis, rincian tingkatan paket (*subscription 
 
 Platform HariKerja ditawarkan menggunakan sistem harga datar per tingkatan paket (*flat rate per tier*), bukan biaya per karyawan (*per-user pricing*). Model ini dirancang agar biaya operasional HR klien terprediksi dengan baik seiring pertumbuhan organisasi mereka.
 
-| Nama Paket | Biaya Bulanan (IDR) | Batas Karyawan | Batas Penyimpanan | Modul Utama yang Terbuka |
-| :--- | :--- | :--- | :--- | :--- |
-| **FREE** | Rp0 | Maks 10 | 50 MB | Profil Karyawan, Dasbor Kehadiran Dasar |
-| **ESSENTIAL** | Rp125.000 | Maks 25 | 250 MB | Kehadiran GPS + Geofencing, Manajemen Cuti & Izin, Approval Berjenjang |
-| **PROFESSIONAL** | Rp750.000 | Maks 100 | 1 GB | Modul Essential, Modul Payroll Indonesia (TER 2024 PPh 21 & BPJS), Reimbursements |
-| **PREMIUM** | Rp1.500.000 | Maks 500 | 5 GB | Modul Professional, KPI & Performance Management, RBAC Kustom, Integrasi Multi-Cabang |
-| **ENTERPRISE** | Mulai Rp5.000.000 | 2000+ (Kustom) | 20 GB+ (Kustom) | Seluruh Modul Terbuka, Fitur Audit Logs Lengkap, Dedicated Cloud Server, SLA Dukungan 24/7 |
+| Nama Paket | Biaya Bulanan (IDR) | Kuota Dasar Karyawan | Batas Maksimal Upgrade | Batas Penyimpanan Dasar | Modul Utama yang Terbuka |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FREE** | Rp0 | 10 | 10 (Tidak Bisa Upgrade) | 50 MB | Profil Karyawan, Dasbor Kehadiran Dasar |
+| **ESSENTIAL** | Rp125.000 | 25 | 100 Karyawan | 250 MB | Kehadiran GPS + Geofencing, Manajemen Cuti & Izin, Approval Berjenjang |
+| **PROFESSIONAL** | Rp750.000 | 100 | 1.000 Karyawan | 1 GB | Modul Essential, Modul Payroll Indonesia (TER 2024 PPh 21 & BPJS), Reimbursements |
+| **PREMIUM** | Rp1.500.000 | 500 | 999.999 Karyawan | 5 GB | Modul Professional, KPI & Performance Management, RBAC Kustom, Integrasi Multi-Cabang |
+| **ENTERPRISE** | Mulai Rp5.000.000 | 2.000 (Kustom) | Kustom | 20 GB | Seluruh Modul Terbuka, Fitur Audit Logs Lengkap, Dedicated Cloud Server, SLA Dukungan 24/7 |
 
 
 ---

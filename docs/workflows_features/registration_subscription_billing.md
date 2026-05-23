@@ -77,13 +77,13 @@ stateDiagram-v2
 
 The platform uses **Tier-Based Pricing** (flat cost per tier rather than pay-per-employee), combined with **Elastic Quotas (Add-ons)**.
 
-| Plan Level | Employee Capacity | Storage Limit | Unlocked Modules |
-| :--- | :--- | :--- | :--- |
-| **FREE** | Max 10 Employees | 50 MB | Core HR, Basic Attendance |
-| **ESSENTIAL** | Max 25 Employees | 250 MB | Geofenced Attendance, Leaves & Approvals |
-| **PROFESSIONAL** | Max 100 Employees | 1 GB | Indonesian Payroll (PPh 21/BPJS), Reimbursements |
-| **PREMIUM** | Max 500 Employees | 5 GB | KPI & Performance, Advanced RBAC |
-| **ENTERPRISE** | Custom (2000+) | Custom (20 GB+) | Full Suite + Audit Logs & Dedicated SLA |
+| Plan Level | Base Employee Quota | Max Upgrade Limit | Base Storage Limit | Unlocked Modules |
+| :--- | :--- | :--- | :--- | :--- |
+| **FREE** | 10 Employees | 10 (No Upgrade) | 50 MB | Core HR, Basic Attendance |
+| **ESSENTIAL** | 25 Employees | 100 Employees | 250 MB | Geofenced Attendance, Leaves & Approvals |
+| **PROFESSIONAL** | 100 Employees | 1,000 Employees | 1 GB | Indonesian Payroll (PPh 21/BPJS), Reimbursements |
+| **PREMIUM** | 500 Employees | 999,999 Employees | 5 GB | KPI & Performance, Advanced RBAC |
+| **ENTERPRISE** | 2,000 Employees (Custom) | Custom | 20 GB (Custom) | Full Suite + Audit Logs & Dedicated SLA |
 
 ### 3.1 Elastic Quota Add-ons
 Tenants can purchase incremental limits without upgrading their parent plan:

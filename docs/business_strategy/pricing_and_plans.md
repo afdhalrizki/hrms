@@ -8,13 +8,13 @@ This document outlines the business strategy, subscription tiers, resource quota
 
 The HariKerja platform is priced using a flat rate per tier model, rather than per-user pricing. This ensures that clients have predictable HR software costs as their organizations scale.
 
-| Plan Level | Monthly Fee (IDR) | Employee Capacity | Storage Limit | Key Modules Unlocked |
-| :--- | :--- | :--- | :--- | :--- |
-| **FREE** | Rp0 | Max 10 | 50 MB | Employee Profiles, Basic Attendance Dashboard |
-| **ESSENTIAL** | Rp125,000 | Max 25 | 250 MB | GPS Attendance + Geofencing, Leave Management, N-Level Approval Workflows |
-| **PROFESSIONAL** | Rp750,000 | Max 100 | 1 GB | Essential Modules, Indonesian Payroll (TER 2024 PPh 21 & BPJS), Reimbursements |
-| **PREMIUM** | Rp1,500,000 | Max 500 | 5 GB | Professional Modules, KPI & Performance Management, Custom RBAC, Multi-Branch Management |
-| **ENTERPRISE** | From Rp5,000,000 | 2000+ (Custom) | 20 GB+ (Custom) | Full Module Suite, Audit Log Exports, Dedicated Cloud Server, 24/7 Support SLA |
+| Plan Level | Monthly Fee (IDR) | Base Employee Quota | Max Upgrade Limit | Base Storage Limit | Key Modules Unlocked |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FREE** | Rp0 | 10 | 10 (No Upgrade) | 50 MB | Employee Profiles, Basic Attendance Dashboard |
+| **ESSENTIAL** | Rp125,000 | 25 | 100 Employees | 250 MB | GPS Attendance + Geofencing, Leave Management, N-Level Approval Workflows |
+| **PROFESSIONAL** | Rp750,000 | 100 | 1,000 Employees | 1 GB | Essential Modules, Indonesian Payroll (TER 2024 PPh 21 & BPJS), Reimbursements |
+| **PREMIUM** | Rp1,500,000 | 500 | 999,999 Employees | 5 GB | Professional Modules, KPI & Performance Management, Custom RBAC, Multi-Branch Management |
+| **ENTERPRISE** | From Rp5,000,000 | 2,000 (Custom) | Custom | 20 GB | Full Module Suite, Audit Log Exports, Dedicated Cloud Server, 24/7 Support SLA |
 
 
 ---
