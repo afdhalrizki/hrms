@@ -131,7 +131,7 @@ test.describe.serial('Help, Support & Ticketing Lifecycle', () => {
 
   test('Global Superadmin should manage, assign, and resolve the SaaS platform ticket', async ({ page }) => {
     // 1. Login as platform superadmin
-    await page.goto(`${BASE_URL}/id/login/portal-admin`);
+    await page.goto(`${BASE_URL}/id/login/portal-admin-secure-39f28j`);
     
     // Clear and set public tenant context for superadmin
     await page.evaluate(() => {

@@ -65,7 +65,7 @@ export default defineConfig({
     {
       // Frontend server
       command: 'npm run start -- --port 3001',
-      url: 'http://127.0.0.1:3001/en/login/portal-admin',
+      url: 'http://127.0.0.1:3001/en/login/portal-admin-secure-39f28j',
       env: {
         NODE_ENV: 'test',
         NEXT_PUBLIC_E2E: 'true',

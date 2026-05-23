@@ -22,7 +22,7 @@ test.describe('Login & Tenant Restriction', () => {
   test('should fail login for wrong tenant context', async ({ page }) => {
     // Attempting to login to company2 with company1 credentials should fail 
     // because seeded users are strictly isolated to their tenants.
-    await page.goto(getTenantUrl('/en/login/portal-admin', 'company2'));
+    await page.goto(getTenantUrl('/en/login/portal-admin-secure-39f28j', 'company2'));
     await page.fill('input[type="email"]', admin.email);
     await page.fill('input[type="password"]', admin.password);
     await page.click('button[type="submit"]');
@@ -47,7 +47,7 @@ test.describe('Login & Tenant Restriction', () => {
   });
 
   test('should prevent login for non-existent users', async ({ page }) => {
-    await page.goto(getTenantUrl('/en/login/portal-admin'));
+    await page.goto(getTenantUrl('/en/login/portal-admin-secure-39f28j'));
     await page.fill('input[type="email"]', 'ghost@company1.com');
     await page.fill('input[type="password"]', 'wrongpassword');
     await page.click('button[type="submit"]');

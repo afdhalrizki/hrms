@@ -15,10 +15,11 @@ import {
 import { apiFetch, getDomainSuffix } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 
 export default function SignupPage() {
   const t = useTranslations('Signup');
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +76,7 @@ export default function SignupPage() {
             <p className="font-medium">{formData.admin_email}</p>
           </div>
           <button 
-            onClick={() => window.location.href = '/'}
+            onClick={() => router.push('/')}
             className="w-full bg-primary text-white font-bold py-4 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-primary/20"
           >
             {t('backHome')}

@@ -113,3 +113,18 @@ class ConfigSmokeTestCase(TenantTestCase):
         self.assertIn('X-Frame-Options', response.headers)
         self.assertEqual(response.headers['X-Frame-Options'], 'DENY')
         self.assertIn('X-Content-Type-Options', response.headers)
+
+    def test_dynamic_admin_url_resolution(self):
+        """Verify that the admin URL dynamically resolves to the configured setting."""
+        import os
+        from django.urls import resolve
+        
+        # Get the resolved dynamic ADMIN_URL from env or default
+        admin_url = os.environ.get('ADMIN_URL', 'admin/')
+        if not admin_url.endswith('/'):
+            admin_url += '/'
+        admin_url = admin_url.lstrip('/')
+        
+        # Resolve the active path and verify it points to admin index
+        match = resolve(f'/{admin_url}')
+        self.assertEqual(match.view_name, 'admin:index')

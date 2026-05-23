@@ -252,7 +252,7 @@ export async function login(page: Page, email: string, password = 'password123',
   // Go to the specific tenant's home first to set the context correctly
   await page.goto(`${BASE_URL}/en?test_tenant=${effectiveTenant}`, { waitUntil: 'networkidle' }).catch(() => {});
   
-  await page.goto(`${BASE_URL}/en/login/portal-admin?test_tenant=${effectiveTenant}`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j?test_tenant=${effectiveTenant}`, { waitUntil: 'networkidle' });
   await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 20000 });
 
   // 2. Persist tenant for subsequent API calls via X-Tenant header
@@ -326,7 +326,7 @@ export async function login(page: Page, email: string, password = 'password123',
     await page.waitForURL(url => {
       const p = url.pathname.toLowerCase();
       return !p.includes('/login') && 
-             !p.includes('/portal-admin') && 
+             !p.includes('/portal-admin-secure-39f28j') && 
              (p.includes('/en') || p.includes('/id') || p === '/');
     }, { timeout: 30000 });
     console.log(`--- Navigation successful: ${page.url()} ---`);

@@ -123,6 +123,7 @@ mobile/ios/ServiceDefinitions.json
 **/data/db/
 backups/
 *.sql.gz
+portal_admin_url.txt
 
 # Tools (SDKs & Portables) - Large Binaries
 # Ignore all subdirectories in tools/ except for documentation

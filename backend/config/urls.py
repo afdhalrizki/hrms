@@ -67,8 +67,15 @@ router.register(r'billing', BillingViewSet, basename='billing')
 router.register(r'internal-tickets', InternalTicketViewSet, basename='internal-tickets')
 router.register(r'platform-tickets', PlatformTicketViewSet, basename='platform-tickets')
 
+import os
+
+ADMIN_URL = os.environ.get('ADMIN_URL', 'admin/')
+if not ADMIN_URL.endswith('/'):
+    ADMIN_URL += '/'
+ADMIN_URL = ADMIN_URL.lstrip('/')
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(ADMIN_URL, admin.site.urls),
     path('api/health/', health_check, name='health_check'),
     path('api/', include(router.urls)),
     path('api/tenant/settings/', TenantSettingsAPIView.as_view(), name='tenant-settings'),

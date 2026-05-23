@@ -80,6 +80,14 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles empty state successfully', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint.includes('/users/me')) {
+        return Promise.resolve({
+          id: 1,
+          email: 'admin@company1.com',
+          fullname: 'Admin User',
+          employee_nik: 'NIK-001'
+        });
+      }
       if (endpoint.includes('/reimbursement-categories')) return Promise.resolve([]);
       if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
       return realApiFetch.current(endpoint, options);
@@ -94,6 +102,14 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles empty claims and categories', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+       if (endpoint.includes('/users/me')) {
+         return Promise.resolve({
+           id: 1,
+           email: 'admin@company1.com',
+           fullname: 'Admin User',
+           employee_nik: 'NIK-001'
+         });
+       }
        if (endpoint.includes('/reimbursement-categories')) return Promise.resolve([]);
        if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.resolve([]);
        return realApiFetch.current(endpoint, options);
@@ -107,6 +123,14 @@ describe('ReimbursementsPage (Integrated)', () => {
 
   it('handles API error on fetch', async () => {
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint.includes('/users/me')) {
+        return Promise.resolve({
+          id: 1,
+          email: 'admin@company1.com',
+          fullname: 'Admin User',
+          employee_nik: 'NIK-001'
+        });
+      }
       if (endpoint.includes('/reimbursements') && (!options || options.method === 'GET')) return Promise.reject(new Error('Fetch failed'));
       return realApiFetch.current(endpoint, options);
     });
@@ -136,6 +160,14 @@ describe('ReimbursementsPage (Integrated)', () => {
     fireEvent.change(descInput, { target: { value: 'Team Lunch' } });
 
     (apiFetch as any).mockImplementation((endpoint: string, options: any) => {
+      if (endpoint.includes('/users/me')) {
+        return Promise.resolve({
+          id: 1,
+          email: 'admin@company1.com',
+          fullname: 'Admin User',
+          employee_nik: 'NIK-001'
+        });
+      }
       if (endpoint.includes('/reimbursements') && options?.method === 'POST') return Promise.resolve({ id: 123 });
       return realApiFetch.current(endpoint, options);
     });

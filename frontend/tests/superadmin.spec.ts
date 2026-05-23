@@ -26,7 +26,7 @@ test.describe.serial('Superadmin (Platform) Management', () => {
 
     // Login as Platform Superadmin on the public domain
     console.log(`--- Navigating to portal-admin login ---`);
-    await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j`);
     
     // Ensure clean state for superadmin and force public tenant
     await page.evaluate(() => {

@@ -15,7 +15,7 @@ test.describe.serial('Global Admin Management', () => {
       console.warn('DB cleanup warning:', e);
     }
     // Login as Platform Superadmin on the public domain
-    await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j`);
     
     // Ensure clean state for superadmin and force public tenant
     await page.evaluate(() => {
@@ -130,7 +130,7 @@ test.describe.serial('Global Admin Management', () => {
     await expect(page).toHaveURL(/.*\/login/);
     
     // 4. Log in as the support agent on the public domain
-    await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j`);
     // Ensure storage is clean
     await page.evaluate(() => {
       localStorage.clear();

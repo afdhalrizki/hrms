@@ -15,7 +15,7 @@ test.describe.serial('Platform Settings RBAC E2E', () => {
 
   test('should allow superadmin to view and edit platform settings without lock message', async ({ page }) => {
     // 1. Login as Platform Superadmin
-    await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j`);
     
     await page.evaluate(() => {
       localStorage.clear();
@@ -49,7 +49,7 @@ test.describe.serial('Platform Settings RBAC E2E', () => {
   test('should restrict non-superadmin global admin from editing settings and show read-only locked message', async ({ page }) => {
     page.on('console', msg => console.log(`[BROWSER_CONSOLE] ${msg.text()}`));
     // 1. Login as Platform Superadmin to create a support agent first
-    await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j`);
     
     await page.evaluate(() => {
       localStorage.clear();
@@ -98,7 +98,7 @@ test.describe.serial('Platform Settings RBAC E2E', () => {
     await page.waitForURL(/.*\/login/);
 
     // 3. Login as the newly created Support Agent
-    await page.goto(`${BASE_URL}/en/login/portal-admin`);
+    await page.goto(`${BASE_URL}/en/login/portal-admin-secure-39f28j`);
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
