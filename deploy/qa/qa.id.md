@@ -9,10 +9,10 @@ Dokumen ini berisi panduan langkah demi langkah (End-to-End) untuk melakukan dep
 | Tier | vCPU | RAM | Storage | Tujuan Utama |
 | :--- | :--- | :--- | :--- | :--- |
 | **Saat Ini (Aktif)** | 8 Cores | 8 GB | 60 GB SSD | **Sementara Over-provisioned** (NEO Lite MM 8.8) |
-| **Target Ideal** | 4 Cores | 8 GB | 60 GB SSD | **Dioptimalkan untuk UAT Manual & Cek Kewarasan (Sanity)** |
+| **Target Ideal** | 2 Cores | 4 GB | 60 GB SSD | **Dioptimalkan & Hemat Biaya untuk UAT Manual** |
 
 > [!IMPORTANT]
-> **Status Infrastruktur Saat Ini:** Saat ini kita menggunakan **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). Meskipun memberikan daya komputasi yang sangat baik, kita berencana untuk **turun ke 4 Cores** pada siklus penagihan berikutnya untuk mengoptimalkan biaya, karena 4 Cores sudah lebih dari cukup untuk beban kerja UAT manual.
+> **Status Infrastruktur Saat Ini:** Saat ini kita menggunakan **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). Meskipun memberikan daya komputasi yang sangat baik, ini **sangat berlebihan (overkill)** untuk sebuah environment QA internal. Sebagai referensi, environment Produksi-1K hanya menggunakan 4 Cores / 8 GB RAM untuk melayani 1.000 pengguna aktif. Oleh karena itu, kita berencana untuk **turun ke 2 Cores dan 4 GB RAM** (NEO Lite MM 4.2) pada siklus penagihan berikutnya untuk menghemat biaya bulanan sebesar 50-75%, dengan memanfaatkan **Swap 4 GB** agar proses deployment tetap stabil.
 
 ### 🧪 Penggunaan Environment QA & Verifikasi Fitur
 Untuk memastikan semua fitur berfungsi dengan benar sebelum masuk ke produksi, environment QA digunakan untuk:
@@ -24,16 +24,16 @@ Untuk memastikan semua fitur berfungsi dengan benar sebelum masuk ke produksi, e
 5.  **Pengecekan Kesamaan Environment:** Memverifikasi bahwa konfigurasi (Variabel Lingkungan, Nginx, SSL) konsisten dengan pengaturan Produksi-1K.
 
 ### Rekomendasi Paket Provider:
-- **Biznet GIO:** Gunakan **NEO Lite MM 8.4** (Target Ideal) atau **NEO Lite MM 8.8** (Saat Ini).
-- **IDCloudHost:** Gunakan **NVMe 5** untuk interaksi database berkecepatan tinggi.
-- **Hostinger:** Gunakan **KVM 4** untuk performa pengujian manual yang stabil.
+- **Biznet GIO:** Gunakan **NEO Lite MM 4.2** (2 Core, 4 GB RAM) - Target Ideal, atau **NEO Lite MM 8.8** (Saat Ini).
+- **IDCloudHost:** Gunakan **NVMe 3** (2 Cores, 4 GB RAM) untuk pengujian manual hemat biaya.
+- **Hostinger:** Gunakan **KVM 2** (2 Cores, 4 GB RAM) untuk performa pengujian manual yang stabil.
 
-### Alasan Teknis untuk RAM 8GB:
-Bahkan tanpa automated testing, kita mempertahankan **RAM 8GB** sebagai target ideal untuk mendukung:
-1.  **PostgreSQL Buffer Cache:** Operasi database multi-tenant berkinerja tinggi (seeding, resets, dan tes isolasi tenant).
-2.  **Efisiensi Build Docker:** Menyediakan cukup ruang memori untuk proses produksi build Next.js selama deployment.
-3.  **Dukungan Konkurensi:** Mengizinkan banyak pemangku kepentingan untuk melakukan UAT secara bersamaan tanpa penurunan performa.
-4.  **Stabilitas Sistem:** Memastikan cukup ruang untuk OS, Redis, dan Celery background worker berjalan berbarengan dengan aplikasi utama.
+### Alasan Teknis untuk RAM 4GB + Swap 4GB:
+Bahkan tanpa automated testing, kita mempertahankan kombinasi **RAM 4GB + Swap 4GB** sebagai target ideal untuk mendukung:
+1.  **PostgreSQL & Redis Cache:** Operasi database dan caching yang pas untuk tim penguji internal berskala kecil.
+2.  **Efisiensi Build Docker:** Memanfaatkan file Swap 4GB untuk menyediakan ruang memori virtual tambahan selama proses *build* Next.js (`npm run build`), mencegah kegagalan Out-Of-Memory (OOM).
+3.  **Dukungan Konkurensi:** Mengizinkan 5-10 pemangku kepentingan untuk melakukan UAT secara bersamaan tanpa kendala.
+4.  **Penyimpanan Media Lokal:** Menyimpan file unggahan secara lokal di volume Docker tanpa memerlukan kompleksitas dan biaya tambahan dari Biznet NEO Object Storage.
 
 **Persyaratan Umum:**
 - **OS yang Disarankan:** Ubuntu 22.04 LTS / 24.04 LTS
@@ -72,8 +72,8 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl wget git vim htop ufw
 ```
 
-### 2. Setup Swap Memory (Opsional tapi Disarankan)
-Meskipun paket NEO Lite MM 8.4 memiliki RAM ideal 8GB, menambahkan Swap 4GB akan memberikan lapisan keamanan ekstra (praktik terbaik untuk Server Docker):
+### 2. Setup Swap Memory (Wajib untuk RAM 4GB)
+Karena target optimal menggunakan RAM fisik 4GB, penambahan Swap 4GB bersifat **wajib** untuk memastikan proses build Docker tidak mengalami error Out-of-Memory (OOM) selama proses build Next.js (praktik terbaik untuk Server Docker):
 
 ```bash
 sudo fallocate -l 4G /swapfile

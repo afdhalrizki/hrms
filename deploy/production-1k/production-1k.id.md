@@ -65,14 +65,56 @@ Direktori `deploy/production-1k/` berisi:
 
 ## 💡 Catatan Analisis Mendalam (Expert Recommendations)
 
-### A. Strategi Penyimpanan File Media (Biznet GIO NEO Object Storage)
+### A. Strategi Penyimpanan & Media Offloading (Biznet GIO NEO Object Storage vs NEO Elastic Storage)
+
 Untuk 1.000 pengguna aktif yang melakukan check-in dan check-out setiap hari dengan verifikasi foto wajah (selfie):
 - Estimasi 2.000 log kehadiran/hari. Jika 50% memerlukan unggahan foto (ukuran rata-rata terkompresi ~200 KB):
   *   **Harian**: `1.000 foto * 200 KB = 200 MB/hari`
   *   **Bulanan (20 hari kerja)**: `200 MB * 20 = 4 GB/bulan`
-  *   **Tahunan**: `4 GB * 12 = 48 GB/tahun`
+  *   **Tahunan**: `4 GB * 12 = 48 GB/tahun` (hanya untuk file media/foto selfie)
 - Dengan kapasitas SSD lokal sebesar 80 GB yang juga harus menampung OS, Docker image, log sistem, dan database PostgreSQL yang terus berkembang, penyimpanan lokal akan habis dalam waktu kurang dari 1 tahun.
-- **Rekomendasi Utama**: Aktifkan `USE_S3=True` di `.env.production_1k` dan gunakan **Biznet GIO NEO Object Storage (NOS)** untuk menyimpan file statis dan media. Ini akan menghemat penyimpanan NVMe SSD server Anda, menurunkan disk I/O, dan menjaga reliabilitas sistem jangka panjang.
+
+#### Perbandingan Tipe Storage Biznet GIO:
+1. **NEO Object Storage (SANGAT DIREKOMENDASIKAN - Single Region 1)**:
+   *   **Integrasi Kode**: Out-of-the-box via protokol standar AWS S3. Konfigurasi Django di `config/settings.py` sudah siap 100% menggunakan library `django-storages` cukup dengan mengaktifkan `USE_S3=True` di `.env.production_1k`.
+   *   **Efisiensi Biaya**: Menggunakan model tagihan berbasis pemakaian riil (**Rp1.000 / GB / Bulan**). Di awal rilis dengan 4 GB data, Anda hanya membayar **Rp4.000/bulan**. Setelah 1 tahun (~48 GB), tagihan hanya **Rp48.000/bulan**.
+   *   **Performa**: Beban lalu lintas unduhan foto dipindahkan langsung dari server utama ke CDN/storage server Biznet, menghemat network bandwidth publik VPS Anda dan siklus CPU.
+   *   **Penskalan**: Siap digunakan secara paralel oleh banyak VPS sekaligus jika di kemudian hari Anda migrasi ke multi-node cluster (paket 10.000 pengguna).
+2. **NEO Elastic Storage (TIDAK DIREKOMENDASIKAN)**:
+   *   Berupa block storage (SAN) yang harus diformat dan di-mount secara manual ke satu sistem operasi VPS host.
+   *   Membayar biaya flat bulanan yang mahal sejak hari pertama (**Rp220.000 / 100GB / Bulan**) meskipun kapasitas yang terpakai masih di bawah 5 GB.
+   *   Setiap pengunduhan foto membebani bandwidth network dan siklus CPU server utama Anda.
+   *   Hanya bisa di-mount ke satu server aktif saja, sehingga sangat menyulitkan penskalan cluster di masa depan.
+
+- **Rekomendasi Utama**: Aktifkan `USE_S3=True` di `.env.production_1k` dan gunakan **Biznet GIO NEO Object Storage (NOS) - Single Region 1** demi efisiensi biaya, performa VPS yang stabil, dan kemudahan skalabilitas jangka panjang.
+
+#### 🔧 Panduan Konfigurasi Server untuk NEO Object Storage:
+1. **Langkah 1: Membuat Bucket di Dasbor Biznet GIO**
+   - Masuk ke portal Biznet GIO, lalu buat bucket baru di **NEO Object Storage** (misal nama bucket: `harikerja-media-prod`).
+   - Buat sepasang **Access Key** dan **Secret Key** baru melalui menu keamanan/kredensial dasbor.
+2. **Langkah 2: Konfigurasi Variabel Environment**
+   - Buka berkas [`.env.production_1k`](file:///home/afdhal/data/hr/hrms/deploy/environments/.env.production_1k) di server.
+   - Ubah `USE_S3=True`.
+   - Masukkan Access Key, Secret Key, dan nama bucket yang Anda buat ke dalam baris variabel berikut:
+     ```env
+     USE_S3=True
+     AWS_ACCESS_KEY_ID=isi-dengan-access-key-biznet-anda
+     AWS_SECRET_ACCESS_KEY=isi-dengan-secret-key-biznet-anda
+     AWS_STORAGE_BUCKET_NAME=harikerja-media-prod
+     AWS_S3_ENDPOINT_URL=https://nos.id-jkt-1.neo.id
+     AWS_S3_REGION_NAME=id-jkt-1
+     ```
+3. **Langkah 3: Menginstal Dependensi Host (AWS CLI)**
+   - Jalankan perintah berikut pada sistem operasi VPS host Anda agar skrip backup dapat mengunggah cadangan secara otomatis ke S3:
+     ```bash
+     sudo apt update && sudo apt install awscli -y
+     ```
+4. **Langkah 4: Menjalankan Pengujian Backup**
+   - Eksekusi skrip backup untuk memverifikasi kelancaran integrasi:
+     ```bash
+     ./deploy/production-1k/backup_1k.sh
+     ```
+   - Periksa dasbor NEO Object Storage Anda. Berkas backup baru akan muncul di dalam folder `db_backups/` di dalam bucket Anda.
 
 ### B. Konflik Port Binding SSL (Port 443)
 - Pada `docker-compose.1k.yml`, port `443:443` diexpose pada service Nginx. Namun, `nginx.conf` di dalam container hanya mendengarkan port 80 dan tidak mengonfigurasi sertifikat SSL.

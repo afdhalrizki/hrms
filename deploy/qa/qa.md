@@ -9,10 +9,10 @@ The **QA Environment** serves as the primary gateway for functional verification
 | Tier | vCPU | RAM | Storage | Primary Purpose |
 | :--- | :--- | :--- | :--- | :--- |
 | **Current (Active)** | 8 Cores | 8 GB | 60 GB SSD | **Temporary Over-provisioned** (NEO Lite MM 8.8) |
-| **Target Ideal** | 4 Cores | 8 GB | 60 GB SSD | **Optimized for Manual UAT & Sanity Checks** |
+| **Target Ideal** | 2 Cores | 4 GB | 60 GB SSD | **Optimized & Cost-Efficient for Manual UAT** |
 
 > [!IMPORTANT]
-> **Current Infrastructure Status:** We are currently utilizing the **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). While providing excellent compute power, we plan to **downgrade to 4 Cores** in the next billing cycle to optimize costs, as 4 Cores is more than sufficient for manual UAT workloads.
+> **Current Infrastructure Status:** We are currently utilizing the **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). While providing excellent compute power, it is **highly overkill** for an internal QA environment. As a reference, the Production-1K environment only uses 4 Cores / 8 GB RAM to handle 1,000 active users. Therefore, we plan to **downgrade to 2 Cores and 4 GB RAM** (NEO Lite MM 4.2) in the next billing cycle to save over 50-75% in hosting costs, while utilizing a **4 GB Swap File** for stability during Docker builds.
 
 ### 🧪 QA Environment Usage & Feature Verification
 To ensure all features work correctly before hitting production, the QA environment is used for:
@@ -24,16 +24,16 @@ To ensure all features work correctly before hitting production, the QA environm
 5.  **Environment Parity Check:** Verifying that configurations (Env Vars, Nginx, SSL) are consistent with the Production-1K setup.
 
 ### Provider Plan Recommendations:
-- **Biznet GIO:** Use **NEO Lite MM 8.4** (Ideal Target) or **NEO Lite MM 8.8** (Current).
-- **IDCloudHost:** Use **NVMe 5** for high-speed database interactions.
-- **Hostinger:** Use **KVM 4** for stable manual testing performance.
+- **Biznet GIO:** Use **NEO Lite MM 4.2** (2 Core, 4 GB RAM) - Optimized Target, or **NEO Lite MM 8.8** (Current).
+- **IDCloudHost:** Use **NVMe 3** (2 Cores, 4 GB RAM) for cost-efficient manual testing.
+- **Hostinger:** Use **KVM 2** (2 Cores, 4 GB RAM) for stable manual testing performance.
 
-### Technical Rationale for 8GB RAM:
-Even without automated testing, we maintain **8GB RAM** as the ideal target to support:
-1.  **PostgreSQL Buffer Cache:** High-performance multi-tenant database operations (seeding, resets, and tenant isolation tests).
-2.  **Docker Build Efficiency:** Providing enough memory overhead for the Next.js production build process during deployments.
-3.  **Concurrency Support:** Allowing multiple stakeholders to perform UAT simultaneously without performance degradation.
-4.  **System Stability:** Ensuring enough headroom for the OS, Redis, and Celery background workers to run concurrently with the core app.
+### Technical Rationale for 4GB RAM + 4GB Swap:
+Even without automated testing, we maintain **4GB RAM + 4GB Swap** as the ideal target to support:
+1.  **PostgreSQL & Redis Cache:** Cost-effective database operations sized properly for a small team of internal testers.
+2.  **Docker Build Efficiency:** Utilizing the 4GB Swap file to provide the necessary virtual memory headroom during Next.js production builds (`npm run build`), preventing Out-Of-Memory (OOM) crashes.
+3.  **Concurrency Support:** Allowing up to 5-10 stakeholders to perform manual UAT concurrently without any bottleneck.
+4.  **Local Storage Parity:** Storing files locally in a Docker volume without the complexity and cost of Biznet NEO Object Storage.
 
 **General Requirements:**
 - **Recommended OS:** Ubuntu 22.04 LTS / 24.04 LTS
@@ -72,8 +72,8 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl wget git vim htop ufw
 ```
 
-### 2. Setup Swap Memory (Optional but Recommended)
-Although the NEO Lite MM 8.4 package has an ideal 8GB RAM, adding a 4GB Swap will provide an extra layer of security (a best practice for Docker Servers):
+### 2. Setup Swap Memory (Mandatory for 4GB RAM Tiers)
+Since the optimized target uses 4GB physical RAM, adding a 4GB Swap is **mandatory** to ensure Docker builds do not experience Out-of-Memory (OOM) errors during Next.js builds (a best practice for Docker Servers):
 
 ```bash
 sudo fallocate -l 4G /swapfile

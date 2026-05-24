@@ -23,8 +23,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: "1G"
+          cpus: "0.5"
+          memory: "512M"
 
   redis:
     image: redis:7-alpine
@@ -40,8 +40,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "512M"
+          cpus: "0.25"
+          memory: "128M"
 
   pgbouncer:
     image: edoburu/pgbouncer:latest
@@ -63,8 +63,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "256M"
+          cpus: "0.25"
+          memory: "128M"
 
   backend:
     build:
@@ -91,8 +91,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.5"
-          memory: "2G"
+          cpus: "1.0"
+          memory: "1G"
 
   celery:
     build:
@@ -112,8 +112,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "512M"
+          cpus: "0.25"
+          memory: "256M"
 
   frontend:
     build:
@@ -131,7 +131,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: "2G"
+          memory: "1G"
 
   nginx:
     image: nginx:alpine
@@ -154,8 +154,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "256M"
+          cpus: "0.25"
+          memory: "128M"
 
   tunnel:
     image: cloudflare/cloudflared:latest

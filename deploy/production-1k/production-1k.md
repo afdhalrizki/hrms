@@ -46,6 +46,49 @@ Configuration tuned in `.env.production_1k`:
 
 ---
 
+## 📦 Storage & Media Offloading (Biznet GIO)
+
+For 1,000 active users performing daily attendance with selfie/photo verification, local VPS SSD storage will become a bottleneck:
+- **Estimation**: 1,000 users × 2 check-ins/day with compressed selfie uploads (~200 KB/photo) = **~200 MB/day** of new media.
+- **Monthly**: ~4 GB of new photo uploads.
+- **Yearly**: **~48 GB/year**.
+This will quickly exhaust the 80 GB NVMe SSD when combined with OS, Docker images, and PostgreSQL growth.
+
+### Recommended Choice: **NEO Object Storage (Single Region 1)**
+- **Why it fits**: Out-of-the-box integration via standard S3 protocol (already pre-configured in `config/settings.py` when `USE_S3=True` is enabled).
+- **Cost Efficiency**: You only pay for what you use (**Rp 1,000 / GB / Month**), which translates to only Rp 4,000/month initially, and Rp 48,000/month after a year, whereas *NEO Elastic Storage* bills a flat **Rp 220,000 / 100GB / Month** from day one.
+- **Performance & Scalability**: Offloads image download traffic directly to Biznet's CDN/storage servers, saving VPS network bandwidth and CPU cycles. It is also ready for multi-node scaling in the future.
+
+#### 🔧 Server Configuration Guide for NEO Object Storage:
+1. **Step 1: Create a Bucket in the Biznet GIO Portal**
+   - Log in to your Biznet GIO portal and create a new bucket in **NEO Object Storage** (e.g., bucket name: `harikerja-media-prod`).
+   - Generate a new **Access Key** and **Secret Key** pair from the credentials/security menu in the portal.
+2. **Step 2: Configure Environment Variables**
+   - Open your [`.env.production_1k`](file:///home/afdhal/data/hr/hrms/deploy/environments/.env.production_1k) file on the server.
+   - Set `USE_S3=True`.
+   - Fill in your Access Key, Secret Key, and Bucket Name into the following variables:
+     ```env
+     USE_S3=True
+     AWS_ACCESS_KEY_ID=your-biznet-access-key
+     AWS_SECRET_ACCESS_KEY=your-biznet-secret-key
+     AWS_STORAGE_BUCKET_NAME=harikerja-media-prod
+     AWS_S3_ENDPOINT_URL=https://nos.id-jkt-1.neo.id
+     AWS_S3_REGION_NAME=id-jkt-1
+     ```
+3. **Step 3: Install Host Dependency (AWS CLI)**
+   - Run the following command on the host VPS terminal to enable the backup script to push database backups to S3 automatically:
+     ```bash
+     sudo apt update && sudo apt install awscli -y
+     ```
+4. **Step 4: Run a Backup Test**
+   - Execute the backup script to verify the integration works:
+     ```bash
+     ./deploy/production-1k/backup_1k.sh
+     ```
+   - Check your NEO Object Storage dashboard. A new backup file should appear under the `db_backups/` folder inside your bucket.
+
+---
+
 ## 📂 Deployment Structure
 The `deploy/production-1k/` directory contains:
 1. `docker-compose.1k.yml`: Pre-configured container orchestration.
