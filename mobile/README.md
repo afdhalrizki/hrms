@@ -18,7 +18,7 @@ The employee self-service (ESS) application for the **harikerja HRMS** ecosystem
 
 ### 📊 Feature Status & Maturity
 
-For a detailed audit of implemented vs. mocked features, see [**Feature Audit & Gap Analysis**](../docs/project_management/mobile_feature_audit.md) ([**Versi Indonesia**](../docs/project_management/mobile_feature_audit-id.md)).
+For a detailed audit of implemented vs. mocked features, see [**Feature Audit & Gap Analysis**](../docs/project_management/mobile_feature_audit.md) ([**Versi Indonesia**](../docs/project_management/mobile_feature_audit.id.md)).
 
 | Module           | Status       | Dynamic? |
 | :--------------- | :----------- | :------- |

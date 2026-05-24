@@ -174,7 +174,7 @@ To guarantee stability, we have defined a **10-person core team** structure:
 2.  **Next Phase**: 1,000 - 10,000 User Scaling with enhanced monitoring
 3.  **Future Phase**: 100,000+ User scaling with full 10-person team deployment
 
-Detailed scaling strategy: [**Organizational Structure & Scaling Roadmap**](./docs/business_strategy/organization_and_scaling.md) ([**Versi Indonesia**](./docs/business_strategy/organization_and_scaling-id.md))
+Detailed scaling strategy: [**Organizational Structure & Scaling Roadmap**](./docs/business_strategy/organization_and_scaling.md) ([**Versi Indonesia**](./docs/business_strategy/organization_and_scaling.id.md))
 
 ## 📚 Technical Documentation & Directory Map
 
@@ -182,50 +182,50 @@ The platform maintains a comprehensive bilingual (English & Indonesian) document
 
 ### 📖 Module README Files
 
-- [**Root README**](./README.md) ([**Indonesian**](./README-id.md)) - General platform overview, scaling strategy, unified test runner, and quick start.
-- [**Backend README**](./backend/README.md) ([**Indonesian**](./backend/README-id.md)) - Django core REST API setup, Pytest commands, modular tiering schemas, and compliance database seeders.
-- [**Frontend README**](./frontend/README.md) ([**Indonesian**](./frontend/README-id.md)) - Next.js admin dashboard configuration, styling design system, and Vitest/Playwright test suites.
-- [**Mobile README**](./mobile/README.md) ([**Indonesian**](./mobile/README-id.md)) - Flutter app build instructions, face biometrics integration details, and geofencing configurations.
+- [**Root README**](./README.md) ([**Indonesian**](./README.id.md)) - General platform overview, scaling strategy, unified test runner, and quick start.
+- [**Backend README**](./backend/README.md) ([**Indonesian**](./backend/README.id.md)) - Django core REST API setup, Pytest commands, modular tiering schemas, and compliance database seeders.
+- [**Frontend README**](./frontend/README.md) ([**Indonesian**](./frontend/README.id.md)) - Next.js admin dashboard configuration, styling design system, and Vitest/Playwright test suites.
+- [**Mobile README**](./mobile/README.md) ([**Indonesian**](./mobile/README.id.md)) - Flutter app build instructions, face biometrics integration details, and geofencing configurations.
 - [**Deployment README**](./deploy/README.md) - Infrastructure scripts, nginx reverse proxy configs, environment builds, and promotional path scripts.
 
 ### 📚 Platform Documentation Directory (`/docs`)
 
 - **`adr/`**: Architecture Decision Records detailing critical technical choices.
-  - [Employee Counter Optimization](./docs/adr/employee_counter_optimization.md) ([Indonesian](./docs/adr/employee_counter_optimization-id.md))
+  - [Employee Counter Optimization](./docs/adr/employee_counter_optimization.md) ([Indonesian](./docs/adr/employee_counter_optimization.id.md))
 - **`architecture/`**: Systems integration, authentication flow diagrams, and HA designs.
-  - [AWS High Availability Architecture](./docs/architecture/aws_high_availability_architecture.md) ([Indonesian](./docs/architecture/aws_high_availability_architecture-id.md))
-  - [Deployment Strategy](./docs/architecture/deployment_strategy.md) ([Indonesian](./docs/architecture/deployment_strategy-id.md))
-  - [Multi-Tenancy System](./docs/architecture/multi_tenancy_system.md) ([Indonesian](./docs/architecture/multi_tenancy_system-id.md))
-  - [Scalability Architecture Guide](./docs/architecture/scaling_architecture_guide.md) ([Indonesian](./docs/architecture/scaling_architecture_guide-id.md))
-  - [Authentication Architecture: Web vs. Mobile](./docs/architecture/auth_architecture.md) ([Indonesian](./docs/architecture/auth_architecture-id.md))
+  - [AWS High Availability Architecture](./docs/architecture/aws_high_availability_architecture.md) ([Indonesian](./docs/architecture/aws_high_availability_architecture.id.md))
+  - [Deployment Strategy](./docs/architecture/deployment_strategy.md) ([Indonesian](./docs/architecture/deployment_strategy.id.md))
+  - [Multi-Tenancy System](./docs/architecture/multi_tenancy_system.md) ([Indonesian](./docs/architecture/multi_tenancy_system.id.md))
+  - [Scalability Architecture Guide](./docs/architecture/scaling_architecture_guide.md) ([Indonesian](./docs/architecture/scaling_architecture_guide.id.md))
+  - [Authentication Architecture: Web vs. Mobile](./docs/architecture/auth_architecture.md) ([Indonesian](./docs/architecture/auth_architecture.id.md))
 - **`business_strategy/`**: SaaS pricing tiers, SLAs, profit projections, and org charts.
-  - [Subscription Tiers & Pricing Strategy](./docs/business_strategy/pricing_and_plans.md) ([Indonesian](./docs/business_strategy/pricing_and_plans-id.md))
-  - [Business Projections & Financial Model](./docs/business_strategy/business_projections.md) ([Indonesian](./docs/business_strategy/business_projections-id.md))
-  - [Organizational Structure & Scaling Roadmap](./docs/business_strategy/organization_and_scaling.md) ([Indonesian](./docs/business_strategy/organization_and_scaling-id.md))
-  - [SLA Enterprise Standard](./docs/business_strategy/sla_enterprise_standard.md) ([Indonesian](./docs/business_strategy/sla_enterprise_standard-id.md))
+  - [Subscription Tiers & Pricing Strategy](./docs/business_strategy/pricing_and_plans.md) ([Indonesian](./docs/business_strategy/pricing_and_plans.id.md))
+  - [Business Projections & Financial Model](./docs/business_strategy/business_projections.md) ([Indonesian](./docs/business_strategy/business_projections.id.md))
+  - [Organizational Structure & Scaling Roadmap](./docs/business_strategy/organization_and_scaling.md) ([Indonesian](./docs/business_strategy/organization_and_scaling.id.md))
+  - [SLA Enterprise Standard](./docs/business_strategy/sla_enterprise_standard.md) ([Indonesian](./docs/business_strategy/sla_enterprise_standard.id.md))
 - **`modules/`**: Specific backend module guides.
-  - [Attendance](./docs/modules/attendance.md) / [Indonesian](./docs/modules/attendance-id.md)
-  - [Billing](./docs/modules/billing.md) / [Indonesian](./docs/modules/billing-id.md)
-  - [Core HR](./docs/modules/core.md) / [Indonesian](./docs/modules/core-id.md)
-  - [Notifications](./docs/modules/notifications.md) / [Indonesian](./docs/modules/notifications-id.md)
-  - [Payroll](./docs/modules/payroll.md) / [Indonesian](./docs/modules/payroll-id.md)
-  - [Performance](./docs/modules/performance.md) / [Indonesian](./docs/modules/performance-id.md)
-  - [Reimbursement](./docs/modules/reimbursement.md) / [Indonesian](./docs/modules/reimbursement-id.md)
-  - [Tenants](./docs/modules/tenants.md) / [Indonesian](./docs/modules/tenants-id.md)
-  - [Users](./docs/modules/users.md) / [Indonesian](./docs/modules/users-id.md)
+  - [Attendance](./docs/modules/attendance.md) / [Indonesian](./docs/modules/attendance.id.md)
+  - [Billing](./docs/modules/billing.md) / [Indonesian](./docs/modules/billing.id.md)
+  - [Core HR](./docs/modules/core.md) / [Indonesian](./docs/modules/core.id.md)
+  - [Notifications](./docs/modules/notifications.md) / [Indonesian](./docs/modules/notifications.id.md)
+  - [Payroll](./docs/modules/payroll.md) / [Indonesian](./docs/modules/payroll.id.md)
+  - [Performance](./docs/modules/performance.md) / [Indonesian](./docs/modules/performance.id.md)
+  - [Reimbursement](./docs/modules/reimbursement.md) / [Indonesian](./docs/modules/reimbursement.id.md)
+  - [Tenants](./docs/modules/tenants.md) / [Indonesian](./docs/modules/tenants.id.md)
+  - [Users](./docs/modules/users.md) / [Indonesian](./docs/modules/users.id.md)
 - **`project_management/`**: Implementation roadmap checklist and cross-stack knowledge transfers.
-  - [Feature Roadmap Checklist](./docs/project_management/feature_roadmap_checklist.md) ([Indonesian](./docs/project_management/feature_roadmap_checklist-id.md))
-  - [Mobile Feature Audit](./docs/project_management/mobile_feature_audit.md) ([Indonesian](./docs/project_management/mobile_feature_audit-id.md))
+  - [Feature Roadmap Checklist](./docs/project_management/feature_roadmap_checklist.md) ([Indonesian](./docs/project_management/feature_roadmap_checklist.id.md))
+  - [Mobile Feature Audit](./docs/project_management/mobile_feature_audit.md) ([Indonesian](./docs/project_management/mobile_feature_audit.id.md))
 - **`technical_specs/`**: Route maps, API references, and security audits.
-  - [Full-Stack Developer Guide & Technical Specifications](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide-id.md))
-  - [API Reference](./docs/technical_specs/api_reference.md) ([Indonesian](./docs/technical_specs/api_reference-id.md))
-  - [Security Audit & Compliance](./docs/technical_specs/security_audit.md) ([Indonesian](./docs/technical_specs/security_audit-id.md))
+  - [Full-Stack Developer Guide & Technical Specifications](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide.id.md))
+  - [API Reference](./docs/technical_specs/api_reference.md) ([Indonesian](./docs/technical_specs/api_reference.id.md))
+  - [Security Audit & Compliance](./docs/technical_specs/security_audit.md) ([Indonesian](./docs/technical_specs/security_audit.id.md))
 - **`workflows_features/`**: Functional business flows and feature details.
-  - [Mobile Application Workflows & Flowcharts](./docs/workflows_features/mobile_app_workflows.md) ([Indonesian](./docs/workflows_features/mobile_app_workflows-id.md))
-  - [Web Application Workflows & Flowcharts](./docs/workflows_features/web_app_workflows.md) ([Indonesian](./docs/workflows_features/web_app_workflows-id.md))
-  - [Registration, Subscription Lifecycles & Billing](./docs/workflows_features/registration_subscription_billing.md) ([Indonesian](./docs/workflows_features/registration_subscription_billing-id.md))
-  - [Authorization System (RBAC) & Security Classification](./docs/workflows_features/rbac_security.md) ([Indonesian](./docs/workflows_features/rbac_security-id.md))
-  - [Notification System Architecture & Event Mapping](./docs/workflows_features/notification_system.md) ([Indonesian](./docs/workflows_features/notification_system-id.md))
+  - [Mobile Application Workflows & Flowcharts](./docs/workflows_features/mobile_app_workflows.md) ([Indonesian](./docs/workflows_features/mobile_app_workflows.id.md))
+  - [Web Application Workflows & Flowcharts](./docs/workflows_features/web_app_workflows.md) ([Indonesian](./docs/workflows_features/web_app_workflows.id.md))
+  - [Registration, Subscription Lifecycles & Billing](./docs/workflows_features/registration_subscription_billing.md) ([Indonesian](./docs/workflows_features/registration_subscription_billing.id.md))
+  - [Authorization System (RBAC) & Security Classification](./docs/workflows_features/rbac_security.md) ([Indonesian](./docs/workflows_features/rbac_security.id.md))
+  - [Notification System Architecture & Event Mapping](./docs/workflows_features/notification_system.md) ([Indonesian](./docs/workflows_features/notification_system.id.md))
 
 ## 🛠 Tech Stack
 

@@ -106,6 +106,6 @@ The safest way for a solo dev to run migrations is via a temporary "Public" wind
 
 ## Scaling for the Future
 - **Horizontal Scaling:** App Runner will automatically add more instances if the CPU usage is high.
-- **Microservices:** If you need more complex routing later, you can migrate from App Runner to **Amazon EKS** as documented in the [AWS High Availability Architecture](../../docs/architecture/aws_high_availability_architecture.md) ([**Versi Indonesia**](../../docs/architecture/aws_high_availability_architecture-id.md)).
+- **Microservices:** If you need more complex routing later, you can migrate from App Runner to **Amazon EKS** as documented in the [AWS High Availability Architecture](../../docs/architecture/aws_high_availability_architecture.md) ([**Versi Indonesia**](../../docs/architecture/aws_high_availability_architecture.id.md)).
 
 Production is now LIVE. 🚀

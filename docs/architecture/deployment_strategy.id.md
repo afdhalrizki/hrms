@@ -73,10 +73,10 @@ graph LR
 
 ## 📦 Tautan Dokumentasi Penyebaran
 
-- [**Panduan QA Manual**](../../deploy/qa/qa-id.md)
+- [**Panduan QA Manual**](../../deploy/qa/qa.id.md)
 - [**Panduan Staging AWS**](../../deploy/staging/staging.md)
 - [**Panduan Produksi AWS**](../../deploy/production/production.md)
-- [**Desain High Availability (EKS)**](./aws_high_availability_architecture-id.md) ([**English Version**](./aws_high_availability_architecture.md))
+- [**Desain High Availability (EKS)**](./aws_high_availability_architecture.id.md) ([**English Version**](./aws_high_availability_architecture.md))
 
 ---
 

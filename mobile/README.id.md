@@ -18,7 +18,7 @@ Aplikasi employee self-service (ESS) untuk ekosistem **harikerja HRMS**. Aplikas
 
 ### 📊 Status & Kematangan Fitur
 
-Untuk audit mendalam tentang fitur yang diimplementasikan vs fitur tiruan (mocked), lihat [**Audit Fitur & Analisis Kesenjangan**](../docs/project_management/mobile_feature_audit-id.md) ([**English Version**](../docs/project_management/mobile_feature_audit.md)).
+Untuk audit mendalam tentang fitur yang diimplementasikan vs fitur tiruan (mocked), lihat [**Audit Fitur & Analisis Kesenjangan**](../docs/project_management/mobile_feature_audit.id.md) ([**English Version**](../docs/project_management/mobile_feature_audit.md)).
 
 | Modul            | Status       | Dinamis? |
 | :--------------- | :----------- | :------- |
@@ -129,10 +129,10 @@ node scripts/run_tests.mjs
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh platform di direktori `docs/` akar:
 
-- [**Arsitektur Autentikasi: Web vs. Mobile**](../docs/architecture/auth_architecture-id.md)
-- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans-id.md)
-- [**Alur Kerja & Diagram Alir Aplikasi Mobile**](../docs/workflows_features/mobile_app_workflows-id.md)
-- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide-id.md)
+- [**Arsitektur Autentikasi: Web vs. Mobile**](../docs/architecture/auth_architecture.id.md)
+- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans.id.md)
+- [**Alur Kerja & Diagram Alir Aplikasi Mobile**](../docs/workflows_features/mobile_app_workflows.id.md)
+- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide.id.md)
 
 ---
 

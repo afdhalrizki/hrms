@@ -76,7 +76,7 @@ graph LR
 - [**Manual QA Guide**](../../deploy/qa/qa.md)
 - [**AWS Staging Guide**](../../deploy/staging/staging.md)
 - [**AWS Production Guide**](../../deploy/production/production.md)
-- [**High Availability (EKS) Design**](./aws_high_availability_architecture.md) ([**Versi Indonesia**](./aws_high_availability_architecture-id.md))
+- [**High Availability (EKS) Design**](./aws_high_availability_architecture.md) ([**Versi Indonesia**](./aws_high_availability_architecture.id.md))
 
 ---
 

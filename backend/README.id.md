@@ -114,10 +114,10 @@ node scripts/run_tests.mjs
 
 Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh platform di direktori `docs/` akar:
 
-- [**Sistem Multi-Tenancy**](../docs/architecture/multi_tenancy_system-id.md)
-- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans-id.md)
-- [**Sistem Otorisasi (RBAC) & Keamanan**](../docs/workflows_features/rbac_security-id.md)
-- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide-id.md)
+- [**Sistem Multi-Tenancy**](../docs/architecture/multi_tenancy_system.id.md)
+- [**Paket Langganan & Strategi Pricing**](../docs/business_strategy/pricing_and_plans.id.md)
+- [**Sistem Otorisasi (RBAC) & Keamanan**](../docs/workflows_features/rbac_security.id.md)
+- [**Panduan Developer & Spesifikasi Teknis**](../docs/technical_specs/developer_guide.id.md)
 
 ---
 
