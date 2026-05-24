@@ -24,13 +24,13 @@ COMPOSE_FILE="deploy/production-1k/docker-compose.1k.yml"
 echo "🛡️ Phase 0: Ensuring Terminal Stability (SSH KeepAlive)..."
 if [ -f /etc/ssh/sshd_config ] && grep -q "ClientAliveInterval 0" /etc/ssh/sshd_config; then
     echo "🔧 Optimizing SSH settings to prevent terminal disconnection..."
-    # Send "alive" packets every 60 seconds to keep the connection active
-    sudo sed -i 's/ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config
-    sudo sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config
-    sudo systemctl restart ssh
-    echo "✅ SSH optimized. Terminal is now more stable."
+    # Send "alive" packets every 60 seconds to keep the connection active (non-fatal if sudo is unavailable)
+    sudo sed -i 's/ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config || echo "⚠️ Warning: Unable to edit /etc/ssh/sshd_config (permission denied)"
+    sudo sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config || echo "⚠️ Warning: Unable to edit ClientAliveCountMax"
+    sudo systemctl restart ssh || echo "⚠️ Warning: Unable to restart SSH service"
+    echo "✅ SSH optimization attempted."
 else
-    echo "✅ SSH stability already configured."
+    echo "✅ SSH stability already configured or sshd_config not accessible."
 fi
 
 # Change directory to the project root
@@ -175,3 +175,5 @@ docker image prune -f
 # Completed
 # ==========================================
 echo "✅ Production 1K Deployment Successfully Completed!"
+echo "The HRMS platform has been successfully updated to the latest version."
+echo "A database backup has been safely stored in the 'backups/production-1k/' directory."

@@ -11,7 +11,7 @@ To ensure the application remains highly responsive, the following "Sweet Spot" 
 | **vCPU** | 4 Cores (Dedicated) | Sufficient for handling Gunicorn workers and Celery background tasks concurrently. |
 | **RAM** | 8 GB | Optimal for PostgreSQL buffer caching and Next.js server-side rendering. |
 | **Storage** | 80 GB NVMe SSD | High IOPS is mandatory to prevent I/O wait during high-frequency database writes. |
-| **Network** | 10 Gbps (Unmetered) | High-speed pipe from Biznet GIO ensures zero bottleneck during peak attendance hours. |
+| **Network** | 1 Gbps Shared (Public) | High-speed pipe from Biznet GIO ensures zero bottleneck (10 Gbps is available internally for private VPC connectivity). |
 
 ### Recommended Providers:
 - **Biznet GIO**: **NEO Lite Pro MM.8.4** (4 vCPU AMD EPYC™ 3.1 GHz, 8GB RAM, 80GB NVMe). 
@@ -27,13 +27,13 @@ To ensure the application remains highly responsive, the following "Sweet Spot" 
 The following optimizations are applied to maximize the efficiency of the 4 Core / 8 GB setup:
 
 ### 1. Backend (Django/Gunicorn)
-- **Workers**: 9 Workers (Formula: `(2 x 4 Cores) + 1`).
+- **Workers**: 5 Workers (Formula: `(1 x 4 Cores) + 1`). This is conservative for RAM footprint. Since Gunicorn uses `gevent` asynchronous workers, 5 workers can easily handle thousands of concurrent requests without the high memory consumption of 9 workers.
 - **Timeout**: 120 seconds (To prevent timeouts during heavy payroll exports).
 
 ### 2. Database (PostgreSQL)
 Configuration tuned in `.env.production_1k`:
-- `POSTGRES_SHARED_BUFFERS`: **2 GB** (25% of total RAM).
-- `POSTGRES_MAX_CONNECTIONS`: **200**.
+- `POSTGRES_SHARED_BUFFERS`: **1 GB** (Optimized for the `DB_MEM_LIMIT=2.5G` container limit to prevent host/container OOM).
+- `POSTGRES_MAX_CONNECTIONS`: **100** (Reduced since PgBouncer handles up to 500 client connections and pools them into 50 DB connections).
 - `POSTGRES_WORK_MEM`: **32 MB**.
 
 ### 3. Background Processing (Celery)

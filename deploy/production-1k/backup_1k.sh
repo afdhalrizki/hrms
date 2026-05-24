@@ -21,8 +21,8 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 # Load database credentials from env file
-DB_USER=$(grep POSTGRES_USER "$ENV_FILE" | cut -d '=' -f2)
-DB_NAME=$(grep POSTGRES_DB "$ENV_FILE" | cut -d '=' -f2)
+DB_USER=$(grep -E "^DB_USER=" "$ENV_FILE" | cut -d '=' -f2 | tr -d '\r')
+DB_NAME=$(grep -E "^DB_NAME=" "$ENV_FILE" | cut -d '=' -f2 | tr -d '\r')
 CONTAINER_NAME="hrms-db-prod-1k"
 
 echo "📦 Starting Database Backup for Production 1K..."
