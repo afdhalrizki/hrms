@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from '@/i18n/routing';
-import { Github, Twitter, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { getSupportEmail } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
@@ -27,13 +27,10 @@ export const PublicFooter = () => {
             </p>
             <div className="flex gap-4">
               <a href="#" className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all group">
-                <Github size={22} className="group-hover:scale-110 transition-transform" />
-              </a>
-              <a href="#" className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all group">
-                <Twitter size={22} className="group-hover:scale-110 transition-transform" />
-              </a>
-              <a href="#" className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all group">
                 <Linkedin size={22} className="group-hover:scale-110 transition-transform" />
+              </a>
+              <a href="#" className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all group">
+                <Instagram size={22} className="group-hover:scale-110 transition-transform" />
               </a>
             </div>
           </div>
