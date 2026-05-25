@@ -47,7 +47,7 @@ See the full infrastructure journey in **[Roadmap.md](./roadmap.md)**.
 
 | Tool | Location | Usage | Purpose |
 | :--- | :--- | :--- | :--- |
-| **`up.ps1`** | `/` (Root) | `.\up.ps1 [env]` | Windows helper to start the platform. |
+| **`up.mjs`** | `/` (Root) | `node up.mjs [env]` | Cross-platform Node.js helper to orchestrate containers. |
 | **`Makefile`** | `/` (Root) | `make [env]` | Standard orchestration for Linux servers. |
 | **DNS Guide** | `deploy/common/` | **[Read Guide](./common/dns_setup.md)** | **Domain & Wildcard DNS Setup.** |
 | **`.env` files** | `deploy/environments/` | N/A | Centralized secrets and configurations. |
