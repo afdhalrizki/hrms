@@ -1,6 +1,6 @@
 # Downgrade & Transition Guide for QA Server
 
-This document contains step-by-step instructions to downgrade the QA server specifications of the HariKerja HRMS application from the current **8 Cores / 8 GB RAM** (Biznet GIO NEO Lite MM 8.8) to the optimized **2 Cores / 4 GB RAM** (Biznet GIO NEO Lite MM 4.2).
+This document contains step-by-step instructions to downgrade the QA server specifications of the HariKerja HRMS application from the current **8 Cores / 8 GB RAM** (Biznet GIO NEO Lite MM 8.8) to the optimized **2 Cores / 4 GB RAM** (Biznet GIO NEO Lite MS 4.2).
 
 ---
 
@@ -32,7 +32,7 @@ cd /opt/hrms
 
 ### Step 3: Resize the Instance
 1. In the instance details panel, select **Resize** or **Change Package**.
-2. Choose the **NEO Lite MM 4.2** package (2 Cores, 4 GB RAM, 60 GB SSD).
+2. Choose the **NEO Lite MS 4.2** package (2 Cores, 4 GB RAM, 60 GB SSD).
 3. Confirm the package specification changes.
 
 ### Step 4: Restart the Server
@@ -74,7 +74,7 @@ cd /opt/hrms
 ```
 
 ### Step 2: Provision the New VPS
-1. Create a new VPS instance in the Biznet GIO portal using the **NEO Lite MM 4.2** package (2 Cores, 4 GB RAM, 60 GB SSD).
+1. Create a new VPS instance in the Biznet GIO portal using the **NEO Lite MS 4.2** package (2 Cores, 4 GB RAM, 60 GB SSD).
 2. Record the **New Public IP Address** of this server.
 
 ### Step 3: Setup the New Server

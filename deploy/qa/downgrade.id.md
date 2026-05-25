@@ -1,6 +1,6 @@
 # Panduan Downgrade & Transisi Server QA
 
-Dokumen ini berisi panduan langkah demi langkah untuk melakukan transisi penurunan spesifikasi (*downgrade*) server QA aplikasi HariKerja HRMS dari spesifikasi **8 Cores / 8 GB RAM** (Biznet GIO NEO Lite MM 8.8) ke spesifikasi optimal **2 Cores / 4 GB RAM** (Biznet GIO NEO Lite MM 4.2).
+Dokumen ini berisi panduan langkah demi langkah untuk melakukan transisi penurunan spesifikasi (*downgrade*) server QA aplikasi HariKerja HRMS dari spesifikasi **8 Cores / 8 GB RAM** (Biznet GIO NEO Lite MM 8.8) ke spesifikasi optimal **2 Cores / 4 GB RAM** (Biznet GIO NEO Lite MS 4.2).
 
 ---
 
@@ -32,7 +32,7 @@ cd /opt/hrms
 
 ### Langkah 3: Ubah Spesifikasi (Resize)
 1. Pada detail instansi VM, pilih menu **Resize** atau **Change Package**.
-2. Pilih tipe paket **NEO Lite MM 4.2** (2 Cores, 4 GB RAM, 60 GB SSD).
+2. Pilih tipe paket **NEO Lite MS 4.2** (2 Cores, 4 GB RAM, 60 GB SSD).
 3. Konfirmasikan perubahan spesifikasi tersebut.
 
 ### Langkah 4: Nyalakan Kembali Server
@@ -74,7 +74,7 @@ cd /opt/hrms
 ```
 
 ### Langkah 2: Buat VPS QA Baru
-1. Sewa VPS baru di portal Biznet GIO dengan paket **NEO Lite MM 4.2** (2 Cores, 4 GB RAM, 60 GB SSD).
+1. Sewa VPS baru di portal Biznet GIO dengan paket **NEO Lite MS 4.2** (2 Cores, 4 GB RAM, 60 GB SSD).
 2. Catat alamat **IP Publik Baru** dari VPS tersebut.
 
 ### Langkah 3: Setup Awal pada VPS Baru

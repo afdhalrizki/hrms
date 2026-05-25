@@ -12,7 +12,7 @@ Dokumen ini berisi panduan langkah demi langkah (End-to-End) untuk melakukan dep
 | **Target Ideal** | 2 Cores | 4 GB | 60 GB SSD | **Dioptimalkan & Hemat Biaya untuk UAT Manual** |
 
 > [!IMPORTANT]
-> **Status Infrastruktur Saat Ini:** Saat ini kita menggunakan **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). Meskipun memberikan daya komputasi yang sangat baik, ini **sangat berlebihan (overkill)** untuk sebuah environment QA internal. Sebagai referensi, environment Produksi-1K hanya menggunakan 4 Cores / 8 GB RAM untuk melayani 1.000 pengguna aktif. Oleh karena itu, kita berencana untuk **turun ke 2 Cores dan 4 GB RAM** (NEO Lite MM 4.2) pada siklus penagihan berikutnya untuk menghemat biaya bulanan sebesar 50-75%, dengan memanfaatkan **Swap 4 GB** agar proses deployment tetap stabil.
+> **Status Infrastruktur Saat Ini:** Saat ini kita menggunakan **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). Meskipun memberikan daya komputasi yang sangat baik, ini **sangat berlebihan (overkill)** untuk sebuah environment QA internal. Sebagai referensi, environment Produksi-1K hanya menggunakan 4 Cores / 8 GB RAM untuk melayani 1.000 pengguna aktif. Oleh karena itu, kita berencana untuk **turun ke 2 Cores dan 4 GB RAM** (NEO Lite MS 4.2) pada siklus penagihan berikutnya untuk menghemat biaya bulanan sebesar 50-75%, dengan memanfaatkan **Swap 4 GB** agar proses deployment tetap stabil.
 
 ### 🧪 Penggunaan Environment QA & Verifikasi Fitur
 Untuk memastikan semua fitur berfungsi dengan benar sebelum masuk ke produksi, environment QA digunakan untuk:
@@ -24,7 +24,7 @@ Untuk memastikan semua fitur berfungsi dengan benar sebelum masuk ke produksi, e
 5.  **Pengecekan Kesamaan Environment:** Memverifikasi bahwa konfigurasi (Variabel Lingkungan, Nginx, SSL) konsisten dengan pengaturan Produksi-1K.
 
 ### Rekomendasi Paket Provider:
-- **Biznet GIO:** Gunakan **NEO Lite MM 4.2** (2 Core, 4 GB RAM) - Target Ideal, atau **NEO Lite MM 8.8** (Saat Ini).
+- **Biznet GIO:** Gunakan **NEO Lite MS 4.2** (2 Core, 4 GB RAM) - Target Ideal, atau **NEO Lite MM 8.8** (Saat Ini).
 - **IDCloudHost:** Gunakan **NVMe 3** (2 Cores, 4 GB RAM) untuk pengujian manual hemat biaya.
 - **Hostinger:** Gunakan **KVM 2** (2 Cores, 4 GB RAM) untuk performa pengujian manual yang stabil.
 

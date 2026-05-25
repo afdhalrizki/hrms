@@ -12,7 +12,7 @@ The **QA Environment** serves as the primary gateway for functional verification
 | **Target Ideal** | 2 Cores | 4 GB | 60 GB SSD | **Optimized & Cost-Efficient for Manual UAT** |
 
 > [!IMPORTANT]
-> **Current Infrastructure Status:** We are currently utilizing the **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). While providing excellent compute power, it is **highly overkill** for an internal QA environment. As a reference, the Production-1K environment only uses 4 Cores / 8 GB RAM to handle 1,000 active users. Therefore, we plan to **downgrade to 2 Cores and 4 GB RAM** (NEO Lite MM 4.2) in the next billing cycle to save over 50-75% in hosting costs, while utilizing a **4 GB Swap File** for stability during Docker builds.
+> **Current Infrastructure Status:** We are currently utilizing the **Biznet GIO NEO Lite MM 8.8** (8 Core vCPU, 8 GB RAM). While providing excellent compute power, it is **highly overkill** for an internal QA environment. As a reference, the Production-1K environment only uses 4 Cores / 8 GB RAM to handle 1,000 active users. Therefore, we plan to **downgrade to 2 Cores and 4 GB RAM** (NEO Lite MS 4.2) in the next billing cycle to save over 50-75% in hosting costs, while utilizing a **4 GB Swap File** for stability during Docker builds.
 
 ### 🧪 QA Environment Usage & Feature Verification
 To ensure all features work correctly before hitting production, the QA environment is used for:
@@ -24,7 +24,7 @@ To ensure all features work correctly before hitting production, the QA environm
 5.  **Environment Parity Check:** Verifying that configurations (Env Vars, Nginx, SSL) are consistent with the Production-1K setup.
 
 ### Provider Plan Recommendations:
-- **Biznet GIO:** Use **NEO Lite MM 4.2** (2 Core, 4 GB RAM) - Optimized Target, or **NEO Lite MM 8.8** (Current).
+- **Biznet GIO:** Use **NEO Lite MS 4.2** (2 Core, 4 GB RAM) - Optimized Target, or **NEO Lite MM 8.8** (Current).
 - **IDCloudHost:** Use **NVMe 3** (2 Cores, 4 GB RAM) for cost-efficient manual testing.
 - **Hostinger:** Use **KVM 2** (2 Cores, 4 GB RAM) for stable manual testing performance.
 
