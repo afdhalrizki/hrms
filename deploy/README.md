@@ -25,16 +25,11 @@ The infrastructure is organized by target environment:
 *   **Purpose**: Mid-scale launch (up to 10k users) on high-spec VPS nodes.
 *   **Automation**: Includes [deploy_10k_production.sh](./production-10k/deploy_10k_production.sh).
 
-### 5. [Staging 1K (Active Staging)](./staging-1k/staging-1k.md)
-*   **Path**: `deploy/staging-1k/`
-*   **Purpose**: Active staging environment for 1k users integration and scaling tests.
-*   **Automation**: Includes [safe_deploy_staging-1k.sh](./staging-1k/safe_deploy_staging-1k.sh).
-
-### 6. [Staging Global (Paused)](./staging/staging.md)
+### 5. [Staging Global (Paused)](./staging/staging.md)
 *   **Path**: `deploy/staging/`
 *   **Status**: On hold until Phase 3 scaling tests.
 
-### 7. [Enterprise AWS (High-Availability Production)](./production/production.md)
+### 6. [Enterprise AWS (High-Availability Production)](./production/production.md)
 *   **Path**: `deploy/production/`
 *   **Purpose**: Multi-node enterprise AWS cluster targeting 100k+ to 1M users.
 

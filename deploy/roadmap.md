@@ -20,16 +20,15 @@ This document outlines the strategic progression plan for the HariKerja HRMS pla
 
 ---
 
-## 🚀 Phase 1.5: Production & Staging 1K (Sweet Spot)
+## 🚀 Phase 1.5: Production 1K (Sweet Spot)
 
-*   **Target**: Initial client launch and active performance verification for up to **1,000 active users**.
+*   **Target**: Initial client launch for up to **1,000 active users**.
 *   **Infrastructure**: High-performance Single-instance VPS (Biznet GIO / Hetzner).
 *   **Specifications**: 4 Cores, 8 GB RAM, 80 GB NVMe SSD (Biznet NEO Lite Pro MM.8.4 or Hetzner CCX21).
 *   **Key Features**:
     *   **Connection Pooling**: PgBouncer integration to scale database connections efficiently (reduces active DB connections to 50, supporting up to 500 client connections).
     *   **Backend Concurrency**: Gunicorn optimized with 5 asynchronous gevent workers.
     *   **Media Offloading**: Direct integration with S3-compatible object storage (Biznet GIO NEO Object Storage) using standard S3 protocol, saving NVMe SSD space and VPS network bandwidth.
-    *   **Staging Validation**: Active **Staging-1K** mirror environment for simulating peak "Morning Rush" check-in loads (200-300 concurrent requests).
 *   **Goal**: Lean and highly stable initial production launch with zero bottlenecks.
 
 ---
@@ -61,7 +60,7 @@ This document outlines the strategic progression plan for the HariKerja HRMS pla
 
 ---
 
-### Why the 1.5K and 10K VPS Phases?
+### Why the 1K and 10K VPS Phases?
 
 Transitioning directly to managed cloud architectures (like AWS) for 1,000 to 10,000 users is often cost-prohibitive and overly complex for growing startups. A vertically scaled/optimized VPS model provides:
 1.  **Superior Price-to-Performance**: Modern NVMe VPS often outperforms entry-tier cloud RDS in raw CPU performance and I/O latency.

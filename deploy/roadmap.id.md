@@ -20,16 +20,15 @@ Dokumen ini menjelaskan rencana pertumbuhan strategis untuk infrastruktur platfo
 
 ---
 
-## 🚀 Fase 1.5: Production & Staging 1K (Sweet Spot)
+## 🚀 Fase 1.5: Production 1K (Sweet Spot)
 
-*   **Target**: Peluncuran awal klien dan verifikasi kinerja aktif hingga **1.000 pengguna aktif**.
+*   **Target**: Peluncuran awal klien hingga **1.000 pengguna aktif**.
 *   **Infrastruktur**: VPS Single-Instance Kinerja Tinggi (Biznet GIO / Hetzner).
 *   **Spesifikasi**: 4 Core, 8 GB RAM, 80 GB NVMe SSD (Biznet NEO Lite Pro MM.8.4 atau Hetzner CCX21).
 *   **Fitur Utama**:
     *   **Connection Pooling**: Integrasi PgBouncer untuk meningkatkan efisiensi koneksi database (mengurangi koneksi DB aktif menjadi 50 koneksi, mendukung hingga 500 koneksi klien).
     *   **Konkurensi Backend**: Gunicorn dioptimalkan dengan 5 worker gevent asinkron.
     *   **Offloading Media**: Integrasi langsung dengan object storage yang kompatibel dengan S3 (Biznet GIO NEO Object Storage) menggunakan protokol standar S3, menghemat kapasitas NVMe SSD dan bandwidth jaringan VPS.
-    *   **Validasi Staging**: Lingkungan cermin aktif **Staging-1K** untuk mensimulasikan beban puncak check-in pagi hari (200-300 permintaan konkruen).
 *   **Tujuan**: Peluncuran produksi awal yang ramping, sangat stabil, dan tanpa bottleneck.
 
 ---
@@ -61,7 +60,7 @@ Dokumen ini menjelaskan rencana pertumbuhan strategis untuk infrastruktur platfo
 
 ---
 
-### Mengapa Memilih Fase VPS 1.5K dan 10K?
+### Mengapa Memilih Fase VPS 1K dan 10K?
 
 Beralih langsung ke arsitektur cloud terkelola (seperti AWS) untuk 1.000 hingga 10.000 pengguna seringkali memakan biaya sangat besar dan terlalu rumit bagi startup yang sedang berkembang. Model VPS yang diskalakan secara vertikal/dioptimalkan memberikan:
 1.  **Rasio Performa-ke-Harga Unggul**: VPS NVMe modern seringkali mengungguli RDS cloud kelas entri dalam kinerja CPU murni dan latensi I/O.

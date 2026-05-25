@@ -25,16 +25,11 @@ Infrastruktur disusun berdasarkan target lingkungan (environment):
 *   **Tujuan**: Peluncuran skala menengah (hingga 10.000 pengguna aktif) pada node VPS berspesifikasi tinggi.
 *   **Otomatisasi**: Menyertakan [deploy_10k_production.sh](./production-10k/deploy_10k_production.sh).
 
-### 5. [Staging 1K (Staging Aktif)](./staging-1k/staging-1k.md)
-*   **Jalur**: `deploy/staging-1k/`
-*   **Tujuan**: Lingkungan staging aktif untuk pengujian integrasi beban (scaling) dan kesiapan 1.000 pengguna.
-*   **Otomatisasi**: Menyertakan [safe_deploy_staging-1k.sh](./staging-1k/safe_deploy_staging-1k.sh).
-
-### 6. [Staging Global (Ditangguhkan)](./staging/staging.md)
+### 5. [Staging Global (Ditangguhkan)](./staging/staging.md)
 *   **Jalur**: `deploy/staging/`
 *   **Status**: Ditangguhkan (on hold) hingga pengujian beban Fase 3.
 
-### 7. [Enterprise AWS (Produksi High-Availability)](./production/production.md)
+### 6. [Enterprise AWS (Produksi High-Availability)](./production/production.md)
 *   **Jalur**: `deploy/production/`
 *   **Tujuan**: Kluster AWS enterprise multi-node dengan target 100.000 hingga 1 juta lebih pengguna aktif.
 
