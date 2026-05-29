@@ -204,9 +204,16 @@ We have provided a script `deploy/qa/deploy_qa.sh` which handles the entire upda
 - **Stage 7 (Cleanup):** Prunes unused Docker images to free up disk space.
 
 **Usage:**
-```bash
-./deploy/qa/deploy_qa.sh
-```
+*   **Default Deployment (VPN-Only / No Cloudflare - Highly Recommended if Cloudflare is not set up yet):**
+    ```bash
+    ./deploy/qa/deploy_qa.sh
+    ```
+*   **Deployment with Cloudflare Tunnel (Zero Trust) Enabled:**
+    ```bash
+    ./deploy/qa/deploy_qa.sh --with-cloudflare
+    # or using the short flag:
+    ./deploy/qa/deploy_qa.sh -c
+    ```
 
 ### 2. Manual Alternative (If needed)
 If you prefer to run steps manually or are using the built-in *Makefile*:

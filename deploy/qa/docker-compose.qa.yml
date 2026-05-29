@@ -168,6 +168,8 @@ services:
       - nginx
     networks:
       - hrms_qa_net
+    profiles:
+      - cloudflare
 
 networks:
   hrms_qa_net:

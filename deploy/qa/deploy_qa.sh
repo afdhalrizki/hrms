@@ -17,6 +17,25 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." &> /dev/null && pwd )"
 ENV_FILE="deploy/environments/.env.qa"
 
 # ==========================================
+# Parse deployment arguments / options
+# ==========================================
+USE_CLOUDFLARE=false
+for arg in "$@"; do
+    if [ "$arg" == "--with-cloudflare" ] || [ "$arg" == "-c" ]; then
+        USE_CLOUDFLARE=true
+    fi
+done
+
+COMPOSE_ARGS=""
+if [ "$USE_CLOUDFLARE" = true ]; then
+    echo "☁️ Cloudflare Tunnel profile enabled for this deployment."
+    COMPOSE_ARGS="--profile cloudflare"
+else
+    echo "🔒 Default Deployment: Cloudflare Tunnel disabled (VPN Only)."
+fi
+
+
+# ==========================================
 # Phase 0: SSH Connection Stability
 # ==========================================
 # Prevents terminal disconnects (freezes/timeouts) during long deployment processes.
@@ -110,11 +129,11 @@ pre_pull_image "edoburu/pgbouncer:latest" ""
 echo "🏗️ Phase 3: Rebuilding and running containers..."
 # Stop and remove old containers to clear IP and Docker DNS cache.
 # '--remove-orphans' removes containers not defined in the current docker-compose file.
-docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" down --remove-orphans
+docker compose -f deploy/qa/docker-compose.qa.yml $COMPOSE_ARGS --env-file "$ENV_FILE" down --remove-orphans
 
 # Rerun containers in the background ('-d') and force rebuilding images ('--build')
 # so the latest code changes are applied.
-docker compose -f deploy/qa/docker-compose.qa.yml --env-file "$ENV_FILE" up -d --build
+docker compose -f deploy/qa/docker-compose.qa.yml $COMPOSE_ARGS --env-file "$ENV_FILE" up -d --build
 
 # ==========================================
 # Phase 4: Database Migration

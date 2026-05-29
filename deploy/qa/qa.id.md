@@ -204,9 +204,16 @@ Kami telah menyediakan script `deploy/qa/deploy_qa.sh` yang menangani seluruh pr
 - **Tahap 7 (Pembersihan):** Menghapus image Docker yang lama dan tidak terpakai (dangling images) untuk menghemat kapasitas penyimpanan.
 
 **Cara Penggunaan:**
-```bash
-./deploy/qa/deploy_qa.sh
-```
+*   **Deployment Default (VPN-Only / Tanpa Cloudflare - Sangat Direkomendasikan jika Cloudflare belum siap):**
+    ```bash
+    ./deploy/qa/deploy_qa.sh
+    ```
+*   **Deployment dengan Mengaktifkan Cloudflare Tunnel (Zero Trust):**
+    ```bash
+    ./deploy/qa/deploy_qa.sh --with-cloudflare
+    # atau menggunakan alias singkat:
+    ./deploy/qa/deploy_qa.sh -c
+    ```
 
 ### 2. Alternatif Manual (Jika diperlukan)
 Jika Anda lebih suka menjalankan langkah-langkahnya secara manual atau menggunakan *Makefile* bawaan:
