@@ -124,6 +124,8 @@ class GlobalAdminViewSet(viewsets.ModelViewSet):
         return User.objects.exclude(global_role__isnull=True).exclude(global_role='')
 
     def perform_destroy(self, instance):
+        if instance.id == self.request.user.id:
+            raise ValidationError({"detail": "Cannot delete your own account."})
         if instance.global_role == 'SUPERADMIN':
             superadmin_count = User.objects.filter(global_role='SUPERADMIN').count()
             if superadmin_count <= 1:

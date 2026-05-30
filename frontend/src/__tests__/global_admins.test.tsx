@@ -120,4 +120,33 @@ describe('GlobalAdminsPage', () => {
       }));
     });
   });
+
+  it('disables delete button for current logged in user and enables it for others', async () => {
+    (useAuth as any).mockReturnValue({
+      user: mockSuperAdmin,
+      loading: false,
+    });
+
+    render(<GlobalAdminsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('super@harikerja.com')).toBeInTheDocument();
+      expect(screen.getByText('support@harikerja.com')).toBeInTheDocument();
+    });
+
+    const rows = screen.getAllByRole('row');
+    const superadminRow = rows.find(row => row.textContent?.includes('super@harikerja.com'));
+    const supportRow = rows.find(row => row.textContent?.includes('support@harikerja.com'));
+
+    expect(superadminRow).toBeDefined();
+    expect(supportRow).toBeDefined();
+
+    const superadminDeleteBtn = superadminRow?.querySelector('button[title="Cannot delete your own account"]');
+    expect(superadminDeleteBtn).toBeInTheDocument();
+    expect(superadminDeleteBtn).toBeDisabled();
+
+    const supportDeleteBtn = supportRow?.querySelector('button[title="Delete"]');
+    expect(supportDeleteBtn).toBeInTheDocument();
+    expect(superadminDeleteBtn).not.toBe(supportDeleteBtn);
+  });
 });

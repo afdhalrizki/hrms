@@ -11,8 +11,8 @@ test.describe('Sidebar Logout Interaction', () => {
     const sidebar = page.locator('aside');
     await expect(sidebar).toBeVisible({ timeout: 15000 });
     
-    // 3. Verify that the Logout button is present inside the sidebar
-    const logoutBtn = sidebar.locator('button[title="Logout"]');
+    // 3. Verify that the Logout button is present
+    const logoutBtn = page.locator('button[title="Logout"]');
     await expect(logoutBtn).toBeVisible({ timeout: 10000 });
     
     // 4. Perform visual hover and click interaction on the button

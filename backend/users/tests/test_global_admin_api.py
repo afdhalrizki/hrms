@@ -85,22 +85,34 @@ class TestGlobalAdminAPI:
         assert not User.objects.filter(id=support_user.id).exists()
 
     def test_prevent_deleting_last_superadmin(self, api_client, superadmin_user):
-        api_client.force_authenticate(user=superadmin_user)
+        requesting_user = User.objects.create_user(
+            email="admin@harikerja.com",
+            password="password123",
+            is_superuser=True
+        )
+        api_client.force_authenticate(user=requesting_user)
         response = api_client.delete(f'/api/internal/global-admins/{superadmin_user.id}/')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Cannot delete the last SUPERADMIN." in str(response.data)
         assert User.objects.filter(id=superadmin_user.id).exists()
 
     def test_allow_deleting_superadmin_if_multiple_exist(self, api_client, superadmin_user):
-        User.objects.create_user(
+        other_super = User.objects.create_user(
             email="super2@harikerja.com", 
             password="password123", 
             global_role=ROLE_SUPERADMIN
         )
-        api_client.force_authenticate(user=superadmin_user)
+        api_client.force_authenticate(user=other_super)
         response = api_client.delete(f'/api/internal/global-admins/{superadmin_user.id}/')
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not User.objects.filter(id=superadmin_user.id).exists()
+
+    def test_prevent_self_deletion(self, api_client, superadmin_user):
+        api_client.force_authenticate(user=superadmin_user)
+        response = api_client.delete(f'/api/internal/global-admins/{superadmin_user.id}/')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Cannot delete your own account." in str(response.data)
+        assert User.objects.filter(id=superadmin_user.id).exists()
 
     def test_create_global_admin_with_tenants(self, api_client, superadmin_user):
         from tenants.models import Tenant

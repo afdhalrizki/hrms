@@ -9,10 +9,18 @@ import { SuspendedOverlay } from './SuspendedOverlay';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { HelpSupportWidget } from '../shared/HelpSupportWidget';
+import { LogOut } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const tenant = useTenant();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
+  const tCommon = useTranslations('Common');
+
+  const getInitials = (name: string | null) => {
+    if (!name) return '??';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
   const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = React.useState(false);
@@ -159,11 +167,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <span className="text-sm font-black tracking-tight text-foreground/80">System Overview</span>
           </div>
           <div className="flex items-center gap-6">
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Managed by</span>
-              <div className="px-4 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-black border border-primary/20 shadow-sm shadow-primary/5 uppercase tracking-tighter">
-                {tenant.tenantName}
+            {/* User Profile Card */}
+            <div className="glass-card rounded-[1.25rem] px-4 py-2 border border-white/10 flex items-center gap-3 shadow-inner group/user cursor-pointer hover:bg-white/5 transition-all">
+              <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center text-accent font-black text-xs border border-accent/10 shadow-lg">
+                {loading ? '...' : getInitials(user?.fullname || user?.email || 'Admin')}
               </div>
+              <div className="hidden sm:block text-left max-w-[150px]">
+                <p data-testid="sidebar-fullname" className="text-xs font-bold truncate group-hover/user:text-accent transition-colors">
+                  {loading ? tCommon('loading') : (user?.fullname || 'Admin User')}
+                </p>
+                <p className="text-[9px] text-muted-foreground truncate font-medium uppercase tracking-tight opacity-60">
+                  {user?.email || 'admin@hrms.com'}
+                </p>
+              </div>
+              <button 
+                onClick={logout}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-500/10 hover:text-red-500 hover:scale-110 active:scale-95 transition-all shrink-0" 
+                title="Logout"
+              >
+                <LogOut size={14} />
+              </button>
             </div>
           </div>
         </header>

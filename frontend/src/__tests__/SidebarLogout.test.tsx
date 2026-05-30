@@ -2,6 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+
+// Mock HelpSupportWidget so it does not fetch or have side effects in unit tests
+vi.mock('@/components/shared/HelpSupportWidget', () => ({
+  HelpSupportWidget: () => <div data-testid="mock-help-widget" />,
+}));
 
 const mockLogout = vi.fn();
 
@@ -48,8 +54,14 @@ vi.mock('@/context/TenantContext', () => ({
 }));
 
 describe('Sidebar Logout Button Unit Test', () => {
+  beforeEach(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('access_token', 'mock-token');
+    }
+  });
+
   it('should render the logout button in the user profile card', () => {
-    render(<Sidebar />);
+    render(<DashboardLayout><div>Test Child</div></DashboardLayout>);
     
     // The logout button has the title attribute "Logout"
     const logoutBtn = screen.getByTitle('Logout');
@@ -57,7 +69,7 @@ describe('Sidebar Logout Button Unit Test', () => {
   });
 
   it('should trigger the logout method from AuthContext when clicked', () => {
-    render(<Sidebar />);
+    render(<DashboardLayout><div>Test Child</div></DashboardLayout>);
     
     const logoutBtn = screen.getByTitle('Logout');
     fireEvent.click(logoutBtn);

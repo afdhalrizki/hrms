@@ -273,13 +273,23 @@ export default function GlobalAdminsPage() {
                           >
                             <Edit size={18} />
                           </button>
-                          <button 
-                            onClick={() => handleDelete(admin.id)}
-                            className="p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          {admin.id === user?.id ? (
+                            <button 
+                              className="p-2 rounded-lg text-muted-foreground/30 cursor-not-allowed"
+                              title="Cannot delete your own account"
+                              disabled
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => handleDelete(admin.id)}
+                              className="p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </motion.tr>

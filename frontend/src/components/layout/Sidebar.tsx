@@ -88,7 +88,7 @@ export function Sidebar() {
   const tCommon = useTranslations('Common');
   const { enabledModules, planType, isPublic } = useTenant();
 
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   
   const filteredItems = menuItems.filter(item => {
     if (item.isGlobalAdminMenu) {
@@ -111,11 +111,6 @@ export function Sidebar() {
   const { logo, tenantName } = useTenant();
   const { hasPermission } = usePermission();
   const pathname = usePathname();
-
-  const getInitials = (name: string | null) => {
-    if (!name) return '??';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-  };
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 glass-nav border-r border-white/10 transition-transform backdrop-blur-[20px] shadow-2xl">
@@ -186,27 +181,13 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* User Profile Section */}
+        {/* Managed By Section */}
         <div className="p-6 mt-auto">
-          <div className="glass-card rounded-[1.5rem] p-4 border border-white/10 flex items-center gap-4 overflow-hidden shadow-inner group/user cursor-pointer hover:bg-white/5 transition-all">
-            <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center text-accent font-black text-sm border border-accent/10 shadow-lg">
-              {loading ? '...' : getInitials(user?.fullname || user?.email || 'Admin')}
+          <div className="glass-card rounded-[1.25rem] p-4 border border-white/10 flex flex-col gap-2 shadow-inner">
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 text-center">Managed by</span>
+            <div className="px-3 py-2 rounded-xl bg-primary/10 text-primary text-xs font-black border border-primary/20 shadow-sm shadow-primary/5 uppercase tracking-tighter text-center truncate">
+              {tenantName === 'Public' ? 'HariKerja Platform' : tenantName}
             </div>
-            <div className="overflow-hidden flex-1">
-              <p data-testid="sidebar-fullname" className="text-sm font-bold truncate group-hover/user:text-accent transition-colors">
-                {loading ? tCommon('loading') : (user?.fullname || 'Admin User')}
-              </p>
-              <p className="text-[10px] text-muted-foreground truncate font-medium uppercase tracking-tight opacity-60">
-                {user?.email || 'admin@hrms.com'}
-              </p>
-            </div>
-            <button 
-              onClick={logout}
-              className="p-2 rounded-xl text-muted-foreground hover:bg-red-500/10 hover:text-red-500 hover:scale-110 active:scale-95 transition-all shrink-0" 
-              title="Logout"
-            >
-              <LogOut size={16} />
-            </button>
           </div>
         </div>
       </div>

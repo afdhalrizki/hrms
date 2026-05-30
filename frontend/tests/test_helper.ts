@@ -348,20 +348,20 @@ export async function login(page: Page, email: string, password = 'password123',
     await waitForNoLoaders(page);
     
     // 7. Wait for the profile data to hydrate
-    const sidebarProfile = page.locator('aside').getByTestId('sidebar-fullname');
+    const sidebarProfile = page.getByTestId('sidebar-fullname');
     await expect(sidebarProfile).toBeVisible({ timeout: 20000 });
     await expect(sidebarProfile).not.toHaveText(/loading/i, { timeout: 20000 });
     
     // 8. Verify the CORRECT profile email (effectiveEmail) is visible
     // We use a self-healing retry logic here: if it doesn't appear in 10s, we reload once.
     try {
-        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 15000 });
     } catch (e) {
         console.log(`--- Email ${effectiveEmail} not visible after 15s, performing self-healing reload ---`);
         await page.reload();
         await waitForNoLoaders(page);
         await expect(page.locator('aside')).toBeVisible({ timeout: 20000 });
-        await expect(page.locator('aside').getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 20000 });
+        await expect(page.getByText(effectiveEmail, { exact: false })).toBeVisible({ timeout: 20000 });
     }
     
     console.log(`--- Login successful for ${email} ---`);

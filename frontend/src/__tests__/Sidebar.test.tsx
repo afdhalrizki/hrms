@@ -2,10 +2,16 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import React from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { loginAs } from './setup';
 import { AuthProvider } from '@/context/AuthContext';
 import { TenantProvider, useTenant } from '@/context/TenantContext';
 import { NextIntlClientProvider } from 'next-intl';
+
+// Mock HelpSupportWidget so it does not fetch or have side effects in unit tests
+vi.mock('@/components/shared/HelpSupportWidget', () => ({
+  HelpSupportWidget: () => <div data-testid="mock-help-widget" />,
+}));
 
 // Mock TenantContext so we can override it in specific tests
 let mockTenantContextValues: any = null;
@@ -78,7 +84,7 @@ describe('Sidebar Component (Integrated)', () => {
   });
 
   it('renders real user data from backend', async () => {
-    render(<Sidebar />, { wrapper: AllProviders });
+    render(<DashboardLayout><div>Test Child</div></DashboardLayout>, { wrapper: AllProviders });
     
     await waitFor(() => {
       // The Sidebar should display the logged-in user's email.
