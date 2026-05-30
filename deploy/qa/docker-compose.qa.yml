@@ -140,7 +140,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - static_volume_qa:/app/static:ro
       - media_volume_qa:/app/media:ro
-      - ./certbot/conf:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot
     ports:
       - "80:80"
