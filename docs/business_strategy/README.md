@@ -8,17 +8,17 @@ This folder contains strategic business documentation, pricing plans, service le
 
 The comprehensive end-to-end business plan is organized into the following major files, available in both English (`*.md`) and Indonesian (`*.id.md`) versions:
 
-1.  **Business Projections (`business_projections`):** 
+1.  **Business Projections ([business_projections.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.md)):** 
     Presents financial projections, ROI metrics, P&L projections, and platform cash flow analysis.
-2.  **2026 Market Strategy (`market_strategy_2026`):** 
+2.  **2026 Market Strategy ([market_strategy_2026.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.md)):** 
     Focuses on B2B (Business-to-Business) acquisition strategies in Indonesia, corporate client profiles, and sales funnels.
-3.  **Organization & Staffing (`organization_and_scaling`):** 
+3.  **Organization & Staffing ([organization_and_scaling.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/organization_and_scaling.md)):** 
     A roadmap for internal company growth (sales, customer service, dev teams) matching scaling tenant thresholds.
-4.  **Pricing & Plans (`pricing_and_plans`):** 
+4.  **Pricing & Plans ([pricing_and_plans.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/pricing_and_plans.md)):** 
     Details pricing subscription tiers (Trial, Basic, Premium, Enterprise) and core limits for active employees and tenant admins.
-5.  **Service Level Agreement (`sla_enterprise_standard`):** 
+5.  **Service Level Agreement ([sla_enterprise_standard.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/sla_enterprise_standard.md)):** 
     Operational SLA metrics (guaranteed system uptime, support ticket response times, and uptime penalty credits).
-6.  **Path to 1M Users (`ultimate_target_1m_users`):** 
+6.  **Path to 1M Users ([ultimate_target_1m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.md)):** 
     Long-term architectural scaling milestones and customer growth funnels designed to support one million active users.
 
 ---

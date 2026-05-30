@@ -8,25 +8,25 @@ This folder contains detailed functional specifications for all core modules com
 
 Module specifications are organized in separate files, available in both English (`*.md`) and Indonesian (`*.id.md`) versions:
 
-1.  **Attendance Module (`attendance`):** 
+1.  **Attendance Module ([attendance.md](file:///home/afdhal/data/hr/hrms/docs/modules/attendance.md)):** 
     Covers GPS Geofencing configurations, shift management schedules, attendance correction requests, and employee leave requests.
-2.  **Billing & Quota Module (`billing`):** 
+2.  **Billing & Quota Module ([billing.md](file:///home/afdhal/data/hr/hrms/docs/modules/billing.md)):** 
     Manages tenant subscriptions, invoice generations integrated with Midtrans, and data usage auditing.
-3.  **Core Data Module (`core`):** 
+3.  **Core Data Module ([core.md](file:///home/afdhal/data/hr/hrms/docs/modules/core.md)):** 
     Stores master structure models (Branches, Departments, Roles, Grades) and standard employee profile records.
-4.  **Notification Module (`notifications`):** 
+4.  **Notification Module ([notifications.md](file:///home/afdhal/data/hr/hrms/docs/modules/notifications.md)):** 
     Handles transactional and background notifications (via SMTP Email & Web Push) for workflow actions.
-5.  **Payroll Module (`payroll`):** 
+5.  **Payroll Module ([payroll.md](file:///home/afdhal/data/hr/hrms/docs/modules/payroll.md)):** 
     Outlines calculation rules for compensation components (Base Salary, Allowances, Deductions, BPJS, PPh 21 tax), payslip approval gates, and PDF generators.
-6.  **Performance Module (`performance`):** 
+6.  **Performance Module ([performance.md](file:///home/afdhal/data/hr/hrms/docs/modules/performance.md)):** 
     Encompasses employee Key Performance Indicators (KPIs), yearly target settings, and periodic appraisal reviews.
-7.  **Reimbursement Module (`reimbursement`):** 
+7.  **Reimbursement Module ([reimbursement.md](file:///home/afdhal/data/hr/hrms/docs/modules/reimbursement.md)):** 
     Manages employee expense claims, receipt attachments, and multi-tier HR approval matrices.
-8.  **Support Module (`support`):** 
+8.  **Support Module ([support.md](file:///home/afdhal/data/hr/hrms/docs/modules/support.md)):** 
     Handles SaaS helpdesk tickets created by tenant HR Admins, resolving client technical support queries.
-9.  **Tenants & Domain Module (`tenants`):** 
+9.  **Tenants & Domain Module ([tenants.md](file:///home/afdhal/data/hr/hrms/docs/modules/tenants.md)):** 
     Orchestrates the lifecycle of tenant subdomains, database schema provisioning, and registration approval gates.
-10. **Users Module (`users`):** 
+10. **Users Module ([users.md](file:///home/afdhal/data/hr/hrms/docs/modules/users.md)):** 
     Encompasses credential data stores, JWT token issuing, global RBAC permissions, and group bindings.
 
 ---

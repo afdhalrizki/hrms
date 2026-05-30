@@ -8,29 +8,29 @@ This folder contains comprehensive documentation regarding business workflows, p
 
 Workflow documentation is categorized into several major topics, available in both English (`*.md`) and Indonesian (`*.id.md`) versions:
 
-1.  **Deployment & Branching (`deployment_and_branching`):** 
+1.  **Deployment & Branching ([deployment_and_branching.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/deployment_and_branching.md)):** 
     Git branching models (Main, Develop, Feature branches) and CI/CD automation pipelines from dev to production.
-2.  **Employee Lifecycle (`employee_lifecycle`):** 
+2.  **Employee Lifecycle ([employee_lifecycle.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/employee_lifecycle.md)):** 
     Employee transition states including Onboarding, probation review, active service, promotions, and resignations/retirements.
-3.  **Feature Gaps & Roadmap (`feature_gaps_and_roadmap`):** 
+3.  **Feature Gaps & Roadmap ([feature_gaps_and_roadmap.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/feature_gaps_and_roadmap.md)):** 
     Identifies functional discrepancies between the mobile and web clients, mapping roadmaps to reach feature parity.
-4.  **Feature Map & Platform Comparison (`feature_map_and_platform_comparison`):** 
+4.  **Feature Map & Platform Comparison ([feature_map_and_platform_comparison.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/feature_map_and_platform_comparison.md)):** 
     Contrasts functional parity between Next.js web client, Flutter mobile client, and competitor HR systems.
-5.  **Future AI Support (`future_support_ai`):** 
+5.  **Future AI Support ([future_support_ai.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/future_support_ai.md)):** 
     Conceptual design to integrate Large Language Models (LLMs) to analyze employee performance and automate HR support.
-6.  **Ticketing System Design (`help_support_ticketing_design`):** 
+6.  **Ticketing System Design ([help_support_ticketing_design.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/help_support_ticketing_design.md)):** 
     Service flow of helpdesk tickets, from employee issue submission to IT agent resolution.
-7.  **HRMS Operations (`hrms_operations_workflow`):** 
+7.  **HRMS Operations ([hrms_operations_workflow.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/hrms_operations_workflow.md)):** 
     End-to-end operational diagram mapping database integrations for core data, attendance, and payroll.
-8.  **Mobile App Workflows (`mobile_app_workflows`):** 
+8.  **Mobile App Workflows ([mobile_app_workflows.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/mobile_app_workflows.md)):** 
     Details Flutter screen flows, secure credential storage, and offline geofenced attendance synchronization.
-9.  **Notification System (`notification_system`):** 
+9.  **Notification System ([notification_system.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/notification_system.md)):** 
     Async notification triggers issuing automated, priority emails and mobile/web push notifications.
-10. **RBAC Security (`rbac_security`):** 
+10. **RBAC Security ([rbac_security.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_security.md)):** 
     Tenant-level role authorization schemas isolating privileges for Admin, Manager, and Employee roles.
-11. **Subscription & Billing (`registration_subscription_billing`):** 
+11. **Subscription & Billing ([registration_subscription_billing.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/registration_subscription_billing.md)):** 
     SaaS signup flows, company domain provisioning, 14-day trials, and Midtrans checkout integrations.
-12. **Web App Workflows (`web_app_workflows`):** 
+12. **Web App Workflows ([web_app_workflows.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/web_app_workflows.md)):** 
     Next.js dashboard page routing specifications, JWT session management, and API exception handling.
 
 ---

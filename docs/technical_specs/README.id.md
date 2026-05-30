@@ -8,23 +8,23 @@ Folder ini berisi spesifikasi teknis terperinci, panduan implementasi infrastruk
 
 Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, tersedia dalam versi Bahasa Indonesia (`*.id.md`) dan Bahasa Inggris (`*.md`):
 
-1.  **Strategi Proteksi Admin (`admin_portal_protection_strategy`):** 
+1.  **Strategi Proteksi Admin ([admin_portal_protection_strategy.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.id.md)):** 
     Konsep pertahanan berlapis (Defense in Depth) untuk mengamankan portal administratif Django.
-2.  **Perbedaan Portal Admin (`admin_portals_differentiation`):** 
+2.  **Perbedaan Portal Admin ([admin_portals_differentiation.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.id.md)):** 
     Menjelaskan perbedaan arsitektur, URL, dan target pengguna antara *Django Admin* dengan *Next.js SaaS Portal*.
-3.  **Laporan Evaluasi Portal Admin (`admin_portals_review`):** 
+3.  **Laporan Evaluasi Portal Admin ([admin_portals_review.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.id.md)):** 
     Review mendalam kesesuaian implementasi portal admin, status kepatuhan keamanan (VPN & Cloudflare), cakupan testing, serta rekomendasi keamanan masa depan.
-4.  **Referensi API (`api_reference`):** 
+4.  **Referensi API ([api_reference.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.id.md)):** 
     Petunjuk integrasi endpoint API utama, format skema JSON request-response, autentikasi JWT, dan penanganan error.
-5.  **Panduan Akses Klien (`client_access_guide`):** 
+5.  **Panduan Akses Klien ([client_access_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.id.md)):** 
     Panduan praktis non-teknis bagi staf operasional untuk menghubungkan laptop mereka ke halaman admin (baik di Skenario VPN-Only maupun Cloudflare).
-6.  **Panduan Cloudflare Zero Trust (`cloudflare_zero_trust_guide`):** 
+6.  **Panduan Cloudflare Zero Trust ([cloudflare_zero_trust_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.id.md)):** 
     Langkah setup secure outbound-only tunnel (`cloudflared`) dan konfigurasi Access Policy (SSO Email PIN) di dasbor Cloudflare.
-7.  **Panduan Developer (`developer_guide`):** 
+7.  **Panduan Developer ([developer_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.id.md)):** 
     Kitab panduan lengkap developer full-stack mengenai local dev setup, multi-tenant Postgres schema, standar coding, dan perintah test.
-8.  **Audit Keamanan Sistem (`security_audit`):** 
+8.  **Audit Keamanan Sistem ([security_audit.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.id.md)):** 
     Hasil pengujian penetrasi kerentanan OWASP Top 10 pada modul HRMS, audit enkripsi database, dan daftar perbaikan kepatuhan keamanan.
-9.  **Panduan Koneksi VPN (`vpn_connection_guide`):** 
+9.  **Panduan Koneksi VPN ([vpn_connection_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.id.md)):** 
     Panduan lengkap administrator server untuk men-deploy server OpenVPN/WireGuard, nat routing `ufw`, dan whitelisting Nginx proxy.
 
 ---
@@ -33,15 +33,15 @@ Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, ters
 
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
-| **[admin_portal_protection_strategy.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.md)** | Security | Security, Architect | Defense in depth administrative portals |
-| **[admin_portals_differentiation.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.md)** | Architecture | Sysadmin, Developer | Functional isolation Django vs Next.js admin |
-| **[admin_portals_review.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.md)** | Audit & Review | Staf Management, DevOps | Code alignment, VPN/Cloudflare status, test coverage |
-| **[api_reference.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.md)** | Integration | Developer, Third-Party | JSON endpoint schema, JWT Bearer, exception codes |
-| **[client_access_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.md)** | Operations | Staf Admin, Support, QA | Client connection configs via VPN or Cloudflare |
-| **[cloudflare_zero_trust_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.md)** | Networking | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
-| **[developer_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.md)** | Development | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
-| **[security_audit.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.md)** | Compliance | Security Auditor, Dev | OWASP Top 10 penetration testing, DB encryption |
-| **[vpn_connection_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.md)** | Networking | DevOps, Sysadmin | OpenVPN server build, ufw NAT routing, Nginx allow/deny |
+| **[admin_portal_protection_strategy.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.id.md)** | Keamanan | Security, Architect | Konsep Defense in Depth portal admin |
+| **[admin_portals_differentiation.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.id.md)** | Arsitektur | Sysadmin, Developer | Pemisahan fungsional Django vs Next.js admin |
+| **[admin_portals_review.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.id.md)** | Audit & Review | Staf Management, DevOps | Kesesuaian kode, status VPN/Cloudflare, testing |
+| **[api_reference.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.id.md)** | Integrasi | Developer, Third-Party | Endpoint JSON, autentikasi Bearer JWT, error |
+| **[client_access_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.id.md)** | Operasional | Staf Admin, Support, QA | Pengaturan koneksi klien via VPN atau Cloudflare |
+| **[cloudflare_zero_trust_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.id.md)** | Jaringan | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
+| **[developer_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.id.md)** | Pengembangan | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
+| **[security_audit.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.id.md)** | Kepatuhan | Security Auditor, Dev | Penetration testing OWASP Top 10, database encryption |
+| **[vpn_connection_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.id.md)** | Jaringan | DevOps, Sysadmin | Deploy OpenVPN, ufw NAT forwarding, Nginx allow/deny |
 
 ---
 *Dokumen ini merupakan bagian dari standarisasi dokumentasi platform HariKerja HRMS.*

@@ -8,21 +8,21 @@ This folder contains high-level system architecture documentation, infrastructur
 
 Documents in this folder are divided into several key architectural focuses, with most available in both English (`*.md`) and Indonesian (`*.id.md`) versions:
 
-1.  **Authentication System (`auth_architecture`):** 
+1.  **Authentication System ([auth_architecture.md](file:///home/afdhal/data/hr/hrms/docs/architecture/auth_architecture.md)):** 
     Explains the JWT security lifecycle, cross-subdomain secure cookie management, and CSRF protection mechanisms.
-2.  **AWS High Availability (`aws_high_availability_architecture`):** 
+2.  **AWS High Availability ([aws_high_availability_architecture.md](file:///home/afdhal/data/hr/hrms/docs/architecture/aws_high_availability_architecture.md)):** 
     Guide to designing resilient AWS cloud infrastructure using Multi-AZ RDS, Auto-Scaling Groups, and Application Load Balancers.
-3.  **Deployment Strategy (`deployment_strategy`):** 
+3.  **Deployment Strategy ([deployment_strategy.md](file:///home/afdhal/data/hr/hrms/docs/architecture/deployment_strategy.md)):** 
     Outlines zero-downtime release strategies including Blue-Green Deployments and Canary Releases.
-4.  **Email Architecture (`email_architecture`):** 
+4.  **Email Architecture ([email_architecture.md](file:///home/afdhal/data/hr/hrms/docs/architecture/email_architecture.md)):** 
     Details async email delivery architecture utilizing Redis as a broker and Celery task queues.
-5.  **Fingerprint Integration (`fingerprint_integration_design.id.md`):** 
+5.  **Fingerprint Integration ([fingerprint_integration_design.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/fingerprint_integration_design.id.md)):** 
     Indonesian guide covering biometric device integrations communicating directly over TCP/IP protocols to cloud endpoints.
-6.  **Multi-Tenancy System (`multi_tenancy_system`):** 
+6.  **Multi-Tenancy System ([multi_tenancy_system.md](file:///home/afdhal/data/hr/hrms/docs/architecture/multi_tenancy_system.md)):** 
     Technical breakdown of database-level isolation utilizing dynamic PostgreSQL schemas via `django-tenants`.
-7.  **Scaling Guide (`scaling_architecture_guide`):** 
+7.  **Scaling Guide ([scaling_architecture_guide.md](file:///home/afdhal/data/hr/hrms/docs/architecture/scaling_architecture_guide.md)):** 
     Covers read-write database scaling, replication, Redis caching, and connection pooling via PgBouncer.
-8.  **Security Assessment (`security_self_assessment_guide`):** 
+8.  **Security Assessment ([security_self_assessment_guide.md](file:///home/afdhal/data/hr/hrms/docs/architecture/security_self_assessment_guide.md)):** 
     Internal security compliance checklists evaluating OWASP Top 10 vulnerabilities.
 
 ---

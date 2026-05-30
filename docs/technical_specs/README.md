@@ -8,23 +8,23 @@ This folder contains detailed technical specifications, network security infrast
 
 Technical documentation files are categorized into several core topics, available in both English (`*.md`) and Indonesian (`*.id.md`) versions:
 
-1.  **Admin Protection Strategy (`admin_portal_protection_strategy`):** 
+1.  **Admin Protection Strategy ([admin_portal_protection_strategy.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.md)):** 
     Defense-in-depth concepts protecting backend administrative panels.
-2.  **Admin Portals Differentiation (`admin_portals_differentiation`):** 
+2.  **Admin Portals Differentiation ([admin_portals_differentiation.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.md)):** 
     Contrasts the functional focus, URL endpoints, and targets of *Django Admin* versus *Next.js SaaS Portal*.
-3.  **Admin Portals Review (`admin_portals_review`):** 
+3.  **Admin Portals Review ([admin_portals_review.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.md)):** 
     In-depth review of admin portal code alignment, network security status (VPN & Cloudflare), test coverage, and future recommendations.
-4.  **API Reference (`api_reference`):** 
+4.  **API Reference ([api_reference.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.md)):** 
     JSON schema definitions, JWT Bearer tokens, exception responses, and integration guides for API endpoints.
-5.  **Client Access Guide (`client_access_guide`):** 
+5.  **Client Access Guide ([client_access_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.md)):** 
     End-user instructions for administrative staff to securely connect to the panels under both VPN-Only and Cloudflare Zero Trust profiles.
-6.  **Cloudflare Zero Trust Guide (`cloudflare_zero_trust_guide`):** 
+6.  **Cloudflare Zero Trust Guide ([cloudflare_zero_trust_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.md)):** 
     DevOps guide to configure `cloudflared` outbound tunnels and Cloudflare Access PIN challenge policies.
-7.  **Developer Guide (`developer_guide`):** 
+7.  **Developer Guide ([developer_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.md)):** 
     Full-stack developer manual outlining system architectures, multi-tenant databases, coding standards, and test guides.
-8.  **Security Audit (`security_audit`):** 
+8.  **Security Audit ([security_audit.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.md)):** 
     OWASP Top 10 penetration testing audits, AES-256 database column encryption checks, and security updates.
-9.  **VPN Connection Guide (`vpn_connection_guide`):** 
+9.  **VPN Connection Guide ([vpn_connection_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.md)):** 
     DevOps manual to install OpenVPN/WireGuard, set up `ufw` NAT routing, and configure Nginx proxy whitelists.
 
 ---

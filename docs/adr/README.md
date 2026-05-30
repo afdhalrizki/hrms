@@ -8,9 +8,9 @@ This folder contains the documentation of critical architectural decisions (Arch
 
 Each document in this folder is available in both English and Indonesian to support local and global developers:
 
-1.  **`employee_counter_optimization.md` (English):** 
+1.  **[employee_counter_optimization.md](file:///home/afdhal/data/hr/hrms/docs/adr/employee_counter_optimization.md) (English):** 
     Records the architectural decisions regarding the optimization of employee counter statistics to dynamically reduce database query load.
-2.  **`employee_counter_optimization.id.md` (Indonesian):** 
+2.  **[employee_counter_optimization.id.md](file:///home/afdhal/data/hr/hrms/docs/adr/employee_counter_optimization.id.md) (Indonesian):** 
     The localized Indonesian version of the employee counter optimization decision record.
 
 ---
