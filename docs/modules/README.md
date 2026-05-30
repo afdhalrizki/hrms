@@ -36,25 +36,15 @@ Module specifications are organized in separate files, available in both English
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[attendance.md](file:///home/afdhal/data/hr/hrms/docs/modules/attendance.md)** | HR Feature | Developer, Tester | GPS Geofencing, work shifts, leave requests |
-| **[attendance.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/attendance.id.md)** | HR Feature | Developer, Tester | GPS Geofencing, work shifts, leave requests |
 | **[billing.md](file:///home/afdhal/data/hr/hrms/docs/modules/billing.md)** | SaaS Business | DevOps, Finance | Midtrans invoice, subscriptions, quotas |
-| **[billing.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/billing.id.md)** | SaaS Business | DevOps, Finance | Midtrans invoice, subscriptions, quotas |
 | **[core.md](file:///home/afdhal/data/hr/hrms/docs/modules/core.md)** | HR Data | Developer, BA | Org structure, employee biodata, NIK |
-| **[core.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/core.id.md)** | HR Data | Developer, BA | Org structure, employee biodata, NIK |
 | **[notifications.md](file:///home/afdhal/data/hr/hrms/docs/modules/notifications.md)** | Utility | Developer | Email triggers, push notification, SMS |
-| **[notifications.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/notifications.id.md)** | Utility | Developer | Email triggers, push notification, SMS |
 | **[payroll.md](file:///home/afdhal/data/hr/hrms/docs/modules/payroll.md)** | HR Feature | Developer, Finance | Payslip PDF, tax PPh21, BPJS, payroll approval |
-| **[payroll.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/payroll.id.md)** | HR Feature | Developer, Finance | Payslip PDF, tax PPh21, BPJS, payroll approval |
 | **[performance.md](file:///home/afdhal/data/hr/hrms/docs/modules/performance.md)** | HR Feature | Developer, PM | KPI metrics, targets, employee appraisals |
-| **[performance.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/performance.id.md)** | HR Feature | Developer, PM | KPI metrics, targets, employee appraisals |
 | **[reimbursement.md](file:///home/afdhal/data/hr/hrms/docs/modules/reimbursement.md)** | HR Feature | Developer, Finance | Expense claims, invoice uploads, approval flow |
-| **[reimbursement.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/reimbursement.id.md)** | HR Feature | Developer, Finance | Expense claims, invoice uploads, approval flow |
 | **[support.md](file:///home/afdhal/data/hr/hrms/docs/modules/support.md)** | Support | Support Agent, Dev | Support tickets, customer helpdesk, SLA |
-| **[support.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/support.id.md)** | Support | Support Agent, Dev | Support tickets, customer helpdesk, SLA |
 | **[tenants.md](file:///home/afdhal/data/hr/hrms/docs/modules/tenants.md)** | SaaS System | DevOps, Architect | Sub-domain routing, database tenant provisioning |
-| **[tenants.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/tenants.id.md)** | SaaS System | DevOps, Architect | Sub-domain routing, database tenant provisioning |
 | **[users.md](file:///home/afdhal/data/hr/hrms/docs/modules/users.md)** | Security | Security, Developer | JWT authentication, hashing, global RBAC |
-| **[users.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/users.id.md)** | Security | Security, Developer | JWT authentication, hashing, global RBAC |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

@@ -35,25 +35,15 @@ Dokumentasi modul dikelompokkan ke dalam berkas-berkas terpisah, tersedia dalam 
 
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
-| **[attendance.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/attendance.id.md)** | HR Fitur | Developer, Tester | GPS Geofencing, shift kerja, pengajuan cuti |
 | **[attendance.md](file:///home/afdhal/data/hr/hrms/docs/modules/attendance.md)** | HR Feature | Developer, Tester | GPS Geofencing, work shifts, leave requests |
-| **[billing.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/billing.id.md)** | SaaS Bisnis | DevOps, Finance | Invoice Midtrans, lisensi berlangganan, kuota |
 | **[billing.md](file:///home/afdhal/data/hr/hrms/docs/modules/billing.md)** | SaaS Business | DevOps, Finance | Midtrans invoice, subscriptions, quotas |
-| **[core.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/core.id.md)** | HR Data | Developer, BA | Struktur organisasi, biodata karyawan, NIK |
 | **[core.md](file:///home/afdhal/data/hr/hrms/docs/modules/core.md)** | HR Data | Developer, BA | Org structure, employee biodata, NIK |
-| **[notifications.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/notifications.id.md)** | Utilitas | Developer | Email triggers, push notification, SMS |
 | **[notifications.md](file:///home/afdhal/data/hr/hrms/docs/modules/notifications.md)** | Utility | Developer | Email triggers, push notification, SMS |
-| **[payroll.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/payroll.id.md)** | HR Fitur | Developer, Finance | Slip PDF, komponen PPh21, BPJS, approval gaji |
 | **[payroll.md](file:///home/afdhal/data/hr/hrms/docs/modules/payroll.md)** | HR Feature | Developer, Finance | Payslip PDF, tax PPh21, BPJS, payroll approval |
-| **[performance.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/performance.id.md)** | HR Fitur | Developer, PM | KPI, target kerja, appraisal, KPI audit |
 | **[performance.md](file:///home/afdhal/data/hr/hrms/docs/modules/performance.md)** | HR Feature | Developer, PM | KPI metrics, targets, employee appraisals |
-| **[reimbursement.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/reimbursement.id.md)** | HR Fitur | Developer, Finance | Klaim biaya, bukti kuitansi, approval berjenjang |
 | **[reimbursement.md](file:///home/afdhal/data/hr/hrms/docs/modules/reimbursement.md)** | HR Feature | Developer, Finance | Expense claims, invoice uploads, approval flow |
-| **[support.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/support.id.md)** | Layanan | Support Agent, Dev | Tiket bantuan, helpdesk ticketing, SLA |
 | **[support.md](file:///home/afdhal/data/hr/hrms/docs/modules/support.md)** | Support | Support Agent, Dev | Support tickets, customer helpdesk, SLA |
-| **[tenants.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/tenants.id.md)** | SaaS Sistem | DevOps, Architect | Isolasi sub-domain, database tenant provisioning |
 | **[tenants.md](file:///home/afdhal/data/hr/hrms/docs/modules/tenants.md)** | SaaS System | DevOps, Architect | Sub-domain routing, database tenant provisioning |
-| **[users.id.md](file:///home/afdhal/data/hr/hrms/docs/modules/users.id.md)** | Keamanan | Security, Developer | Autentikasi JWT, password hashing, global role |
 | **[users.md](file:///home/afdhal/data/hr/hrms/docs/modules/users.md)** | Security | Security, Developer | JWT authentication, hashing, global RBAC |
 
 ---

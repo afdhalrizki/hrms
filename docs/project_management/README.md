@@ -22,11 +22,8 @@ Documentation inside this folder is classified into three core resources, availa
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[feature_roadmap_checklist.md](file:///home/afdhal/data/hr/hrms/docs/project_management/feature_roadmap_checklist.md)** | Tracking | Project Manager, QA | Feature release checklists, HR module status |
-| **[feature_roadmap_checklist.id.md](file:///home/afdhal/data/hr/hrms/docs/project_management/feature_roadmap_checklist.id.md)** | Tracking | Project Manager, QA | Feature release checklists, HR module status |
 | **[knowledge_transfer_frontend_mobile.md](file:///home/afdhal/data/hr/hrms/docs/project_management/knowledge_transfer_frontend_mobile.md)** | Onboarding | Frontend/Mobile Dev | Next.js & Flutter codebase guides, api integrations |
-| **[knowledge_transfer_frontend_mobile.id.md](file:///home/afdhal/data/hr/hrms/docs/project_management/knowledge_transfer_frontend_mobile.id.md)** | Onboarding | Frontend/Mobile Dev | Next.js & Flutter codebase guides, api integrations |
 | **[mobile_feature_audit.md](file:///home/afdhal/data/hr/hrms/docs/project_management/mobile_feature_audit.md)** | Evaluation | QA, Lead Developer | Flutter feature audits, parity gap analysis |
-| **[mobile_feature_audit.id.md](file:///home/afdhal/data/hr/hrms/docs/project_management/mobile_feature_audit.id.md)** | Evaluation | QA, Lead Developer | Flutter feature audits, parity gap analysis |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

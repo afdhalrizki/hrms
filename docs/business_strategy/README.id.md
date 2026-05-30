@@ -27,17 +27,11 @@ Seluruh rancangan bisnis hulu-ke-hilir ini dikelompokkan ke dalam beberapa topik
 
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
-| **[business_projections.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.id.md)** | Keuangan | Investor, Management | Proyeksi laba rugi, ROI, cash flow, BEP |
-| **[business_projections.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.md)** | Finance | Investor, Management | P&L projections, ROI analysis, financial metrics |
-| **[market_strategy_2026.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.id.md)** | Pemasaran | Sales, Marketing | Strategi B2B, penetrasi pasar Indonesia |
-| **[market_strategy_2026.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.md)** | Marketing | Sales, Marketing | B2B strategy, market acquisition tactics |
-| **[organization_and_scaling.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/organization_and_scaling.id.md)** | Operasional | HR, Management | Struktur tim internal, rencana scaling SDM |
-| **[organization_and_scaling.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/organization_and_scaling.md)** | Operations | HR, Management | Internal team growth structure, staffing plans |
-| **[pricing_and_plans.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/pricing_and_plans.id.md)** | Produk | Product Owner, Sales | Paket harga (Basic, Premium), batasan kuota |
-| **[pricing_and_plans.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/pricing_and_plans.md)** | Product | Product Owner, Sales | Pricing subscription tiers, tier limits |
-| **[sla_enterprise_standard.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/sla_enterprise_standard.id.md)** | Kepatuhan | Enterprise Client, Law | Jaminan uptime server, kompensasi gangguan |
+| **[business_projections.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.md)** | Finance | Investor, Management | Financial models, ROI, cash flows, P&L metrics |
+| **[market_strategy_2026.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.md)** | Marketing | Sales, Marketing | B2B strategy, customer acquisition in Indonesia |
+| **[organization_and_scaling.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/organization_and_scaling.md)** | Operations | HR, Management | Internal team scaling, customer support growth |
+| **[pricing_and_plans.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/pricing_and_plans.md)** | Product | Product Owner, Sales | Subscription tier costs, tenant admin & employee limits |
 | **[sla_enterprise_standard.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/sla_enterprise_standard.md)** | Compliance | Enterprise Client, Law | Uptime guarantee, support response windows |
-| **[ultimate_target_1m_users.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.id.md)** | Visi Jangka Panjang | Management, Architect | Target 1 juta pengguna, strategi infrastruktur |
 | **[ultimate_target_1m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.md)** | Vision | Management, Architect | Path to 1M users, hardware scaling steps |
 
 ---

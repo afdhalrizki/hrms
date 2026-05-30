@@ -34,23 +34,14 @@ Technical documentation files are categorized into several core topics, availabl
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[admin_portal_protection_strategy.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.md)** | Security | Security, Architect | Defense-in-depth administrative portals |
-| **[admin_portal_protection_strategy.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.id.md)** | Security | Security, Architect | Defense-in-depth administrative portals |
 | **[admin_portals_differentiation.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.md)** | Architecture | Sysadmin, Developer | Functional isolation Django vs Next.js admin |
-| **[admin_portals_differentiation.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.id.md)** | Architecture | Sysadmin, Developer | Functional isolation Django vs Next.js admin |
 | **[admin_portals_review.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.md)** | Audit & Review | Staf Management, DevOps | Code alignment, VPN/Cloudflare status, test coverage |
-| **[admin_portals_review.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.id.md)** | Audit & Review | Staf Management, DevOps | Code alignment, VPN/Cloudflare status, test coverage |
 | **[api_reference.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.md)** | Integration | Developer, Third-Party | JSON endpoint schema, JWT Bearer, exception codes |
-| **[api_reference.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.id.md)** | Integration | Developer, Third-Party | JSON endpoint schema, JWT Bearer, exception codes |
 | **[client_access_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.md)** | Operations | Staf Admin, Support, QA | Client connection configs via VPN or Cloudflare |
-| **[client_access_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.id.md)** | Operations | Staf Admin, Support, QA | Client connection configs via VPN or Cloudflare |
 | **[cloudflare_zero_trust_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.md)** | Networking | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
-| **[cloudflare_zero_trust_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.id.md)** | Networking | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
 | **[developer_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.md)** | Development | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
-| **[developer_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.id.md)** | Development | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
 | **[security_audit.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.md)** | Compliance | Security Auditor, Dev | OWASP Top 10 penetration testing, DB encryption |
-| **[security_audit.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.id.md)** | Compliance | Security Auditor, Dev | OWASP Top 10 penetration testing, DB encryption |
 | **[vpn_connection_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.md)** | Networking | DevOps, Sysadmin | OpenVPN server build, ufw NAT routing, Nginx allow/deny |
-| **[vpn_connection_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.id.md)** | Networking | DevOps, Sysadmin | OpenVPN server build, ufw NAT routing, Nginx allow/deny |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

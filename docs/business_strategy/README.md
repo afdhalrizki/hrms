@@ -28,17 +28,11 @@ The comprehensive end-to-end business plan is organized into the following major
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[business_projections.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.md)** | Finance | Investor, Management | Financial models, ROI, cash flows, P&L metrics |
-| **[business_projections.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.id.md)** | Finance | Investor, Management | Financial models, ROI, cash flows, P&L metrics |
 | **[market_strategy_2026.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.md)** | Marketing | Sales, Marketing | B2B strategy, customer acquisition in Indonesia |
-| **[market_strategy_2026.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.id.md)** | Marketing | Sales, Marketing | B2B strategy, customer acquisition in Indonesia |
 | **[organization_and_scaling.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/organization_and_scaling.md)** | Operations | HR, Management | Internal team scaling, customer support growth |
-| **[organization_and_scaling.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/organization_and_scaling.id.md)** | Operations | HR, Management | Internal team scaling, customer support growth |
 | **[pricing_and_plans.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/pricing_and_plans.md)** | Product | Product Owner, Sales | Subscription tier costs, tenant admin & employee limits |
-| **[pricing_and_plans.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/pricing_and_plans.id.md)** | Product | Product Owner, Sales | Subscription tier costs, tenant admin & employee limits |
 | **[sla_enterprise_standard.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/sla_enterprise_standard.md)** | Compliance | Enterprise Client, Law | Uptime guarantee, support response windows |
-| **[sla_enterprise_standard.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/sla_enterprise_standard.id.md)** | Compliance | Enterprise Client, Law | Uptime guarantee, support response windows |
 | **[ultimate_target_1m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.md)** | Vision | Management, Architect | Path to 1M users, hardware scaling steps |
-| **[ultimate_target_1m_users.id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.id.md)** | Vision | Management, Architect | Path to 1M users, hardware scaling steps |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

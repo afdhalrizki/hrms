@@ -19,7 +19,6 @@ Setiap dokumen di folder ini tersedia dalam dua versi bahasa untuk memudahkan pe
 
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
-| **[employee_counter_optimization.id.md](file:///home/afdhal/data/hr/hrms/docs/adr/employee_counter_optimization.id.md)** | Optimalisasi DB | Tech Lead, Developer | Optimasi kueri count, caching Redis, efisiensi database |
 | **[employee_counter_optimization.md](file:///home/afdhal/data/hr/hrms/docs/adr/employee_counter_optimization.md)** | DB Optimization | Tech Lead, Developer | Count query optimization, Redis caching, database efficiency |
 
 ---

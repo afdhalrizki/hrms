@@ -32,20 +32,13 @@ Documents in this folder are divided into several key architectural focuses, wit
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[auth_architecture.md](file:///home/afdhal/data/hr/hrms/docs/architecture/auth_architecture.md)** | Security | Security, Developer | JWT, Secure cookies, CSRF protection, session management |
-| **[auth_architecture.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/auth_architecture.id.md)** | Security | Security, Developer | JWT, Secure cookies, CSRF protection, session management |
 | **[aws_high_availability_architecture.md](file:///home/afdhal/data/hr/hrms/docs/architecture/aws_high_availability_architecture.md)** | Cloud Infra | DevOps, Architect | AWS Multi-AZ RDS, Auto Scaling, ALB, High Availability |
-| **[aws_high_availability_architecture.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/aws_high_availability_architecture.id.md)** | Cloud Infra | DevOps, Architect | AWS Multi-AZ RDS, Auto Scaling, ALB, High Availability |
 | **[deployment_strategy.md](file:///home/afdhal/data/hr/hrms/docs/architecture/deployment_strategy.md)** | Release & CI/CD | DevOps, Developer | Blue-Green, Canary release, zero-downtime |
-| **[deployment_strategy.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/deployment_strategy.id.md)** | Release & CI/CD | DevOps, Developer | Blue-Green, Canary release, zero-downtime |
 | **[email_architecture.md](file:///home/afdhal/data/hr/hrms/docs/architecture/email_architecture.md)** | Integration | Developer, Sysadmin | Email queue, Redis broker, Celery worker async |
-| **[email_architecture.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/email_architecture.id.md)** | Integration | Developer, Sysadmin | Email queue, Redis broker, Celery worker async |
 | **[fingerprint_integration_design.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/fingerprint_integration_design.id.md)** | Biometric | IoT/Hardware, Dev | Biometric TCP/IP protocol, data pulling log |
 | **[multi_tenancy_system.md](file:///home/afdhal/data/hr/hrms/docs/architecture/multi_tenancy_system.md)** | Database | DB Architect, Dev | Postgres schema isolation, django-tenants |
-| **[multi_tenancy_system.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/multi_tenancy_system.id.md)** | Database | DB Architect, Dev | Postgres schema isolation, django-tenants |
 | **[scaling_architecture_guide.md](file:///home/afdhal/data/hr/hrms/docs/architecture/scaling_architecture_guide.md)** | Optimization | DB Architect, DevOps | PgBouncer, DB replication, horizontal scaling |
-| **[scaling_architecture_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/scaling_architecture_guide.id.md)** | Optimization | DB Architect, DevOps | PgBouncer, DB replication, horizontal scaling |
 | **[security_self_assessment_guide.md](file:///home/afdhal/data/hr/hrms/docs/architecture/security_self_assessment_guide.md)** | Compliance | Security Auditor, Dev | OWASP self-audit checklist, encryption audits |
-| **[security_self_assessment_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/architecture/security_self_assessment_guide.id.md)** | Compliance | Security Auditor, Dev | OWASP self-audit checklist, encryption audits |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

@@ -20,7 +20,6 @@ Each document in this folder is available in both English and Indonesian to supp
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[employee_counter_optimization.md](file:///home/afdhal/data/hr/hrms/docs/adr/employee_counter_optimization.md)** | DB Optimization | Tech Lead, Developer | Count query optimization, Redis caching, database efficiency |
-| **[employee_counter_optimization.id.md](file:///home/afdhal/data/hr/hrms/docs/adr/employee_counter_optimization.id.md)** | DB Optimization | Tech Lead, Developer | Count query optimization, Redis caching, database efficiency |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

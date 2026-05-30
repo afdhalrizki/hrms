@@ -33,23 +33,14 @@ Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, ters
 
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
-| **[admin_portal_protection_strategy.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.id.md)** | Keamanan | Security, Architect | Konsep Defense in Depth portal admin |
-| **[admin_portal_protection_strategy.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.md)** | Security | Security, Architect | Defense in Depth administrative portals |
-| **[admin_portals_differentiation.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.id.md)** | Arsitektur | Sysadmin, Developer | Pemisahan fungsional Django vs Next.js admin |
+| **[admin_portal_protection_strategy.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portal_protection_strategy.md)** | Security | Security, Architect | Defense in depth administrative portals |
 | **[admin_portals_differentiation.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_differentiation.md)** | Architecture | Sysadmin, Developer | Functional isolation Django vs Next.js admin |
-| **[admin_portals_review.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.id.md)** | Audit & Review | Staf Manajemen, DevOps | Kesesuaian kode, status VPN/Cloudflare, testing |
-| **[admin_portals_review.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.md)** | Audit & Review | Staf Manajemen, DevOps | Code alignment, VPN/Cloudflare status, test coverage |
-| **[api_reference.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.id.md)** | Integrasi | Developer, Third-Party | Endpoint JSON, autentikasi Bearer JWT, error |
+| **[admin_portals_review.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/admin_portals_review.md)** | Audit & Review | Staf Management, DevOps | Code alignment, VPN/Cloudflare status, test coverage |
 | **[api_reference.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/api_reference.md)** | Integration | Developer, Third-Party | JSON endpoint schema, JWT Bearer, exception codes |
-| **[client_access_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.id.md)** | Operasional | Staf Admin, Support, QA | Pengaturan koneksi klien via VPN atau Cloudflare |
 | **[client_access_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/client_access_guide.md)** | Operations | Staf Admin, Support, QA | Client connection configs via VPN or Cloudflare |
-| **[cloudflare_zero_trust_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.id.md)** | Jaringan | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
 | **[cloudflare_zero_trust_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/cloudflare_zero_trust_guide.md)** | Networking | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
-| **[developer_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.id.md)** | Pengembangan | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
 | **[developer_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/developer_guide.md)** | Development | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
-| **[security_audit.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.id.md)** | Kepatuhan | Security Auditor, Dev | Penetration testing OWASP Top 10, database encryption |
 | **[security_audit.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/security_audit.md)** | Compliance | Security Auditor, Dev | OWASP Top 10 penetration testing, DB encryption |
-| **[vpn_connection_guide.id.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.id.md)** | Jaringan | DevOps, Sysadmin | Deploy OpenVPN, ufw NAT forwarding, Nginx allow/deny |
 | **[vpn_connection_guide.md](file:///home/afdhal/data/hr/hrms/docs/technical_specs/vpn_connection_guide.md)** | Networking | DevOps, Sysadmin | OpenVPN server build, ufw NAT routing, Nginx allow/deny |
 
 ---

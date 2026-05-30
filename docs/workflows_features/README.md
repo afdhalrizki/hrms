@@ -40,29 +40,17 @@ Workflow documentation is categorized into several major topics, available in bo
 | File Name | Category | Primary Audience | Core Topic |
 | :--- | :--- | :--- | :--- |
 | **[deployment_and_branching.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/deployment_and_branching.md)** | DevOps | Developer, DevOps | Git branching model, CI/CD pipeline |
-| **[deployment_and_branching.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/deployment_and_branching.id.md)** | DevOps | Developer, DevOps | Git branching model, CI/CD pipeline |
 | **[employee_lifecycle.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/employee_lifecycle.md)** | HR Business | BA, Developer | Employee status states, contract lifecycle |
-| **[employee_lifecycle.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/employee_lifecycle.id.md)** | HR Business | BA, Developer | Employee status states, contract lifecycle |
 | **[feature_gaps_and_roadmap.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/feature_gaps_and_roadmap.md)** | Tracking | PM, Product Owner | Parity gaps between client apps, roadmaps |
-| **[feature_gaps_and_roadmap.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/feature_gaps_and_roadmap.id.md)** | Tracking | PM, Product Owner | Parity gaps between client apps, roadmaps |
 | **[feature_map_and_platform_comparison.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/feature_map_and_platform_comparison.md)** | Analysis | PM, BA | Competitor comparisons, modular checklists |
-| **[feature_map_and_platform_comparison.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/feature_map_and_platform_comparison.id.md)** | Analysis | PM, BA | Competitor comparisons, modular checklists |
 | **[future_support_ai.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/future_support_ai.md)** | Planning | Product Owner, Dev | LLM integration, HR chatbot, AI recruitment |
-| **[future_support_ai.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/future_support_ai.id.md)** | Planning | Product Owner, Dev | LLM integration, HR chatbot, AI recruitment |
 | **[help_support_ticketing_design.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/help_support_ticketing_design.md)** | Support | Support Agent, Dev | Support ticket escalations, ticketing workflows |
-| **[help_support_ticketing_design.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/help_support_ticketing_design.id.md)** | Support | Support Agent, Dev | Support ticket escalations, ticketing workflows |
 | **[hrms_operations_workflow.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/hrms_operations_workflow.md)** | Diagram | Developer, Architect | Integrated data logs chart, attendance, payroll |
-| **[hrms_operations_workflow.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/hrms_operations_workflow.id.md)** | Diagram | Developer, Architect | Integrated data logs chart, attendance, payroll |
 | **[mobile_app_workflows.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/mobile_app_workflows.md)** | Mobile | Flutter Developer | Flutter screen flows, secure storage, offline geofence |
-| **[mobile_app_workflows.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/mobile_app_workflows.id.md)** | Mobile | Flutter Developer | Flutter screen flows, secure storage, offline geofence |
 | **[notification_system.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/notification_system.md)** | Utility | Developer | Async SMTP triggers, web push notifications |
-| **[notification_system.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/notification_system.id.md)** | Utility | Developer | Async SMTP triggers, web push notifications |
 | **[rbac_security.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_security.md)** | Security | Security, Developer | Tenant authorization, Admin, Manager roles |
-| **[rbac_security.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/rbac_security.id.md)** | Security | Security, Developer | Tenant authorization, Admin, Manager roles |
 | **[registration_subscription_billing.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/registration_subscription_billing.md)** | SaaS Business | DevOps, Finance | Tenant signup, 14-day trials, Midtrans integration |
-| **[registration_subscription_billing.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/registration_subscription_billing.id.md)** | SaaS Business | DevOps, Finance | Tenant signup, 14-day trials, Midtrans integration |
 | **[web_app_workflows.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/web_app_workflows.md)** | Web | Next.js Developer | Next.js visual routing, auth state, API fetch |
-| **[web_app_workflows.id.md](file:///home/afdhal/data/hr/hrms/docs/workflows_features/web_app_workflows.id.md)** | Web | Next.js Developer | Next.js visual routing, auth state, API fetch |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

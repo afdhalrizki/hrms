@@ -21,11 +21,8 @@ Dokumentasi di folder ini diklasifikasikan ke dalam beberapa berkas utama yang t
 
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
-| **[feature_roadmap_checklist.id.md](file:///home/afdhal/data/hr/hrms/docs/project_management/feature_roadmap_checklist.id.md)** | Pelacakan | Project Manager, QA | Checklist fitur siap rilis, status modul HR |
 | **[feature_roadmap_checklist.md](file:///home/afdhal/data/hr/hrms/docs/project_management/feature_roadmap_checklist.md)** | Tracking | Project Manager, QA | Feature release checklists, HR module status |
-| **[knowledge_transfer_frontend_mobile.id.md](file:///home/afdhal/data/hr/hrms/docs/project_management/knowledge_transfer_frontend_mobile.id.md)** | Onboarding | Frontend/Mobile Dev | Struktur kode Next.js & Flutter, state, API |
 | **[knowledge_transfer_frontend_mobile.md](file:///home/afdhal/data/hr/hrms/docs/project_management/knowledge_transfer_frontend_mobile.md)** | Onboarding | Frontend/Mobile Dev | Next.js & Flutter codebase guides, api integrations |
-| **[mobile_feature_audit.id.md](file:///home/afdhal/data/hr/hrms/docs/project_management/mobile_feature_audit.id.md)** | Penilaian | QA, Lead Developer | Audit fungsionalitas Flutter, perbandingan fitur |
 | **[mobile_feature_audit.md](file:///home/afdhal/data/hr/hrms/docs/project_management/mobile_feature_audit.md)** | Evaluation | QA, Lead Developer | Flutter feature audits, parity gap analysis |
 
 ---
