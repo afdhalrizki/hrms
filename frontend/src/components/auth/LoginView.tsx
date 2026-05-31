@@ -191,7 +191,7 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
                       <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-white/5 accent-primary" />
                       <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{t('rememberMe')}</span>
                     </label>
-                    <button type="button" className="text-sm font-semibold text-primary hover:underline underline-offset-4">{t('forgotPassword')}</button>
+                    <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline underline-offset-4">{t('forgotPassword')}</Link>
                   </div>
 
                   <button 

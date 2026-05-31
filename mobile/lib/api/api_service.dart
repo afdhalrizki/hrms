@@ -139,6 +139,26 @@ class ApiService {
     return _track(future.then((value) => value as Map<String, dynamic>));
   }
 
+  Future<Map<String, dynamic>> forgotPassword(String email, String tenant) async {
+    final future = () async {
+      final headers = _headers(tenant);
+      final response = await _client.post(
+        Uri.parse("$baseUrl/auth/forgot-password/"),
+        headers: headers,
+        body: jsonEncode({
+          'email': email,
+        }),
+      ).timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to send reset link: ${response.body}');
+      }
+    }();
+    return _track(future.then((value) => value as Map<String, dynamic>));
+  }
+
   Future<bool> refreshToken() async {
     final future = () async {
       final tenant = await getTenant();

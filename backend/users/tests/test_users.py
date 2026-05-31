@@ -312,6 +312,93 @@ class UserAuthenticationTestCase(TenantTestCase):
         self.assertEqual(refresh_response.status_code, status.HTTP_200_OK)
         self.assertIn('access', refresh_response.data)
 
+    @patch('notifications.tasks.send_notification_email_task.delay')
+    def test_forgot_password_success(self, mock_send_email):
+        """Verify requesting forgot password sends email with token."""
+        url = reverse('auth-forgot-password')
+        payload = {'email': self.user.email}
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(mock_send_email.called)
+        
+        # Verify call args
+        args, kwargs = mock_send_email.call_args
+        self.assertEqual(args[0], self.user.email)
+        self.assertIn("Reset Kata Sandi", args[1])
+        self.assertIn("reset-password?uid=", args[2])
+
+    @patch('notifications.tasks.send_notification_email_task.delay')
+    def test_forgot_password_wrong_email_security(self, mock_send_email):
+        """Verify requesting forgot password for non-existent email returns 200 but doesn't send email."""
+        url = reverse('auth-forgot-password')
+        payload = {'email': 'nonexistent@test.com'}
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(mock_send_email.called)
+
+    @patch('notifications.tasks.send_notification_email_task.delay')
+    def test_forgot_password_wrong_tenant_security(self, mock_send_email):
+        """Verify requesting forgot password for user not belonging to tenant returns 200 but doesn't send email."""
+        # Create user in another tenant
+        with schema_context('public'):
+            other_tenant = Tenant.objects.create(schema_name='other_auth_t', name='Other Auth Co')
+            other_domain = Domain.objects.create(domain=f'otherauth.{settings.TENANT_DOMAIN_SUFFIX}', tenant=other_tenant)
+        
+        other_user = User.objects.create_user(email='other_tenant_user@test.com', password='password')
+        other_user.tenants.add(other_tenant)
+        
+        url = reverse('auth-forgot-password')
+        payload = {'email': other_user.email}
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(mock_send_email.called)
+
+    def test_reset_password_success(self):
+        """Verify resetting password with valid token and uid works."""
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        
+        token = default_token_generator.make_token(self.user)
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        
+        url = reverse('auth-reset-password')
+        payload = {
+            'uid': uid,
+            'token': token,
+            'password': 'new_secure_password'
+        }
+        
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Verify password changed
+        self.client.logout()
+        login_url = reverse('auth-login')
+        login_payload = {'email': self.user.email, 'password': 'new_secure_password'}
+        login_response = self.client.post(login_url, login_payload, format='json', SERVER_NAME=str(self.domain))
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+
+    def test_reset_password_invalid_token(self):
+        """Verify resetting password with invalid token fails."""
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        
+        url = reverse('auth-reset-password')
+        payload = {
+            'uid': uid,
+            'token': 'invalid-token-1234',
+            'password': 'new_secure_password'
+        }
+        
+        response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 class UserManagementTestCase(TenantTestCase):
     def test_email_normalization(self):
         """Verify UserManager normalizes email addresses."""

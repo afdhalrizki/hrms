@@ -6,6 +6,7 @@ import 'package:mobile/utils/style_utils.dart';
 import '../api/api_service.dart';
 import '../widgets/loading_indicator.dart';
 import 'home_screen.dart';
+import 'forgot_password_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -247,6 +248,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      key: const Key('forgot_password_btn'),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        Localizations.localeOf(context).languageCode == 'id'
+                            ? 'Lupa Kata Sandi?'
+                            : 'Forgot Password?',
+                        style: const TextStyle(
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),

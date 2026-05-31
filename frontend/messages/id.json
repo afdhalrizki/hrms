@@ -333,7 +333,21 @@
     "forgotPassword": "Lupa kata sandi?",
     "signIn": "Masuk",
     "noAccount": "Belum punya akun?",
-    "contactHR": "Hubungi HR"
+    "contactHR": "Hubungi HR",
+    "forgotPasswordTitle": "Lupa Kata Sandi",
+    "forgotPasswordDesc": "Masukkan alamat email Anda yang terdaftar di bawah ini, kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.",
+    "sendResetLink": "Kirim Tautan Reset",
+    "backToLogin": "Kembali ke Login",
+    "resetEmailSent": "Tautan reset kata sandi telah dikirim. Silakan periksa kotak masuk email Anda.",
+    "resetPasswordTitle": "Atur Ulang Kata Sandi",
+    "resetPasswordDesc": "Masukkan kata sandi baru Anda di bawah ini.",
+    "newPasswordLabel": "Kata Sandi Baru",
+    "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+    "confirmPasswordPlaceholder": "Ulangi kata sandi baru",
+    "resetBtn": "Simpan Kata Sandi Baru",
+    "resetSuccess": "Kata sandi Anda berhasil diperbarui. Silakan login kembali dengan kata sandi baru Anda.",
+    "passwordsDoNotMatch": "Kata sandi baru dan konfirmasi kata sandi tidak cocok.",
+    "invalidToken": "Token reset password tidak valid atau telah kedaluwarsa."
   },
   "Profile": {
     "title": "Profil Saya",

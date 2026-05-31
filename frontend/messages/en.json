@@ -322,7 +322,21 @@
     "forgotPassword": "Forgot password?",
     "signIn": "Sign In",
     "noAccount": "Don't have an account?",
-    "contactHR": "Contact HR"
+    "contactHR": "Contact HR",
+    "forgotPasswordTitle": "Forgot Password",
+    "forgotPasswordDesc": "Enter your registered email address below, and we will send you a link to reset your password.",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "resetEmailSent": "Password reset link has been sent. Please check your email inbox.",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordDesc": "Enter your new password below.",
+    "newPasswordLabel": "New Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat new password",
+    "resetBtn": "Save New Password",
+    "resetSuccess": "Your password has been successfully updated. Please log in again with your new password.",
+    "passwordsDoNotMatch": "New password and password confirmation do not match.",
+    "invalidToken": "The password reset token is invalid or has expired."
   },
   "Profile": {
     "title": "My Profile",
