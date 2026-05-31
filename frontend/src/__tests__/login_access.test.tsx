@@ -156,4 +156,18 @@ describe('LoginPage Access Restrictions', () => {
       expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
     });
   });
+
+  it('renders "Workspace Tidak Ditemukan" when isValid is false on subdomain', async () => {
+    (useTenant as any).mockReturnValue({
+      isPublic: false,
+      isValid: false,
+      tenantName: 'Acme Corp',
+    });
+
+    render(<LoginView />);
+
+    expect(await screen.findByText(/Workspace Tidak Ditemukan/i)).toBeDefined();
+    expect(screen.queryByLabelText(/emailLabel/i)).toBeNull();
+    expect(screen.queryByText(/restrictedTitle/i)).toBeNull();
+  });
 });

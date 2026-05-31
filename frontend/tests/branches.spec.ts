@@ -6,11 +6,15 @@ test.describe.serial('Branch Management', () => {
   const admin = TEST_USERS.admin;
 
   test.beforeAll(async () => {
-    // Reset database once before the whole suite
-    try {
-      execSync('/home/afdhal/data/hr/hrms/backend/venv/bin/python /home/afdhal/data/hr/hrms/backend/scripts/seed_test_db.py --preset full');
-    } catch (error) {
-      console.error('Failed to seed DB:', error);
+    // Reset database once before the whole suite, but skip if we are running
+    // under the test runner suite (where the db is already seeded) to avoid
+    // concurrent truncation race conditions.
+    if (!process.env.NEXT_PUBLIC_E2E) {
+      try {
+        execSync('/home/afdhal/data/hr/hrms/backend/venv/bin/python /home/afdhal/data/hr/hrms/backend/scripts/seed_test_db.py --preset full');
+      } catch (error) {
+        console.error('Failed to seed DB:', error);
+      }
     }
   });
 

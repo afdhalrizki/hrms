@@ -23,7 +23,7 @@ export const getBaseUrl = () => {
     // In development/local setup, the backend might be on a different port (8000)
     // while frontend is on 3000.
     const apiPort = process.env.NEXT_PUBLIC_API_PORT || '8000';
-    const domainSuffix = process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'localhost';
+    const domainSuffix = getDomainSuffix();
     
     // Check if current host matches dev (localhost) or staging/prod suffixes
     const isLocal = host === 'localhost' || host === '127.0.0.1';
@@ -212,7 +212,11 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     if (process.env.NEXT_PUBLIC_E2E_LOGGING === 'true') {
        console.error(`[API ERROR] ${options.method || 'GET'} ${url} - Status: ${response?.status} - Detail: ${detail}`);
     }
-    throw new Error(detail);
+    const error = new Error(detail);
+    if (response) {
+      (error as any).status = response.status;
+    }
+    throw error;
   }
 
   if (response.status === 204) return null;

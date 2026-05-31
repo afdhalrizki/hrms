@@ -214,7 +214,7 @@ class TenantSettingsAPIView(generics.RetrieveUpdateAPIView):
             serializer.save()
 
 
-class InternalTenantViewSet(viewsets.ReadOnlyModelViewSet):
+class InternalTenantViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, HasGlobalPermission]
     required_global_permission = GLOBAL_MANAGE_USERS
 
@@ -223,8 +223,35 @@ class InternalTenantViewSet(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request):
         tenants = self.get_queryset()
-        data = [{"id": t.id, "name": t.name, "schema_name": t.schema_name} for t in tenants]
+        data = [
+            {
+                "id": t.id, 
+                "name": t.name, 
+                "schema_name": t.schema_name,
+                "subscription_status": t.subscription_status,
+                "plan_type": t.plan_type,
+                "expiry_date": str(t.expiry_date) if t.expiry_date else None,
+                "created_on": str(t.created_on) if t.created_on else None
+            } 
+            for t in tenants
+        ]
         return Response(data)
+
+    @action(detail=True, methods=['post'], url_path='toggle-active')
+    def toggle_active(self, request, pk=None):
+        tenant = self.get_object()
+        if tenant.subscription_status == 'SUSPENDED':
+            tenant.subscription_status = 'ACTIVE'
+            message = f"Tenant {tenant.name} has been activated successfully."
+        else:
+            tenant.subscription_status = 'SUSPENDED'
+            message = f"Tenant {tenant.name} has been suspended successfully."
+        tenant.save()
+        return Response({
+            'message': message, 
+            'subscription_status': tenant.subscription_status
+        })
+
 
 
 class PlatformTicketViewSet(viewsets.ModelViewSet):

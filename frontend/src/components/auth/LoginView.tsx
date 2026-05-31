@@ -16,7 +16,7 @@ export interface LoginViewProps {
 
 export function LoginView({ forceShowForm = false }: LoginViewProps) {
   const t = useTranslations('Auth');
-  const { tenantName, isPublic } = useTenant();
+  const { tenantName, isPublic, isValid } = useTenant();
   const { login } = useAuth();
   const router = useRouter();
   
@@ -24,6 +24,50 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (isValid === false) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 overflow-hidden -z-10">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-red-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-500/10 rounded-full blur-[120px]" />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-[450px]"
+        >
+          <div className="glass-card rounded-[2.5rem] border border-red-500/20 p-10 shadow-2xl space-y-8 text-center">
+            <div className="inline-flex h-16 w-16 rounded-xl bg-red-500/10 border border-red-500/20 items-center justify-center text-red-500 font-black text-2xl shadow-lg shadow-red-500/5 mx-auto mb-2 animate-bounce">
+              ⚠️
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-black tracking-tight text-red-400">Workspace Tidak Ditemukan</h1>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Subdomain <span className="text-foreground font-bold">{tenantName}</span> belum terdaftar di platform kami, atau masa aktif UAT/langganan Anda telah berakhir.
+              </p>
+            </div>
+            <div className="pt-4 flex flex-col gap-3">
+              <Link
+                href="/"
+                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                Kembali ke Beranda
+              </Link>
+              <a 
+                href="/signup" 
+                className="w-full py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                Daftarkan Perusahaan Baru
+                <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   // 1. Not public domain, OR
   // 2. Secret portal access (forceShowForm)

@@ -39,6 +39,17 @@ def clean_slate():
     """Nuclear cleanup: Truncate tables and DROP all non-public schemas."""
     from django.db import connection, transaction
     with connection.cursor() as cursor:
+        print("   🧹 Terminating other database connections to prevent deadlocks...")
+        try:
+            cursor.execute("""
+                SELECT pg_terminate_backend(pg_stat_activity.pid)
+                FROM pg_stat_activity
+                WHERE pg_stat_activity.datname = current_database()
+                  AND pid <> pg_backend_pid();
+            """)
+        except Exception as e:
+            print(f"      ⚠️ Warning: Could not terminate other connections: {e}")
+            
         print("   🧹 Cleaning up existing tenants and users...")
         
         # 1. Truncate shared tables

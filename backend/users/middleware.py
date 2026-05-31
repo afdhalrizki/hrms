@@ -69,6 +69,9 @@ class TenantAccessMiddleware:
 
             # 4. Tenant Admin Restriction: Ensure user is mapped to the current tenant
             if current_tenant and current_tenant.schema_name != 'public':
+                if request.path.startswith('/api/tenant/settings/'):
+                    return self.get_response(request)
+
                 if not request.user.tenants.filter(id=current_tenant.id).exists():
                     # Unauthorized access attempt
                     print(f"DEBUG: TenantAccessMiddleware FAILED - User {request.user.email} not in tenant {current_tenant.schema_name}")

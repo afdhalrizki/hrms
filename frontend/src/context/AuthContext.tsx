@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Don't set error on 401/403 as it's expected if not logged in
-      const isAuthError = err.message?.includes('401') || err.message?.includes('403') || err.name === 'AbortError';
+      const isAuthError = err.status === 401 || err.status === 403 || err.message?.includes('401') || err.message?.includes('403') || err.name === 'AbortError';
       if (!isAuthError) {
         setError(err.message || 'Failed to load user profile');
       } else {

@@ -1,12 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getDomainSuffix } from '@/lib/api';
 
 interface TenantContextType {
   tenantName: string;
   subdomain: string;
   isPublic: boolean;
+  isValid?: boolean;
   logo?: string;
   address?: string;
   phone?: string;
@@ -44,6 +45,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     tenantName: 'HariKerja Platform',
     subdomain: '',
     isPublic: true,
+    isValid: true,
     isLoading: true,
     subscriptionStatus: 'ACTIVE',
     enabledModules: [],
@@ -54,8 +56,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       const hostname = window.location.hostname;
       const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost');
       
-      // Get the configured domain suffix from env, fallback to 'localhost'
-      const domainSuffix = process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'localhost';
+      // Get the domain suffix dynamically from host URL
+      const domainSuffix = getDomainSuffix();
       
       // Check for URL parameter override (more precise for E2E)
       const urlParams = new URLSearchParams(window.location.search);
@@ -123,7 +125,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
               isLoading: false,
             }));
           })
-          .catch(() => setTenant(prev => ({ ...prev, isLoading: false })));
+          .catch((err: any) => {
+            const isNotFound = err.status === 404 || err.message?.includes('404') || err.message?.toLowerCase().includes('not found');
+            setTenant(prev => ({
+              ...prev,
+              isValid: !isNotFound,
+              isLoading: false
+            }));
+          });
         return;
       }
       
@@ -187,8 +196,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 isLoading: false,
               }));
             })
-            .catch((err) => {
-              setTenant(prev => ({ ...prev, isLoading: false }));
+            .catch((err: any) => {
+              const isNotFound = err.status === 404 || err.message?.includes('404') || err.message?.toLowerCase().includes('not found');
+              setTenant(prev => ({
+                ...prev,
+                isValid: !isNotFound,
+                isLoading: false
+              }));
             });
         }
       }

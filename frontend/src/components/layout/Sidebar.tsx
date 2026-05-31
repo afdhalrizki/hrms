@@ -23,7 +23,8 @@ import {
   LogOut,
   ShieldCheck,
   ClipboardList,
-  HelpCircle
+  HelpCircle,
+  Building2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenant } from '@/context/TenantContext';
@@ -50,6 +51,13 @@ const menuItems: MenuItem[] = [
     href: '/admin/registrations', 
     isGlobalAdminMenu: true, 
     allowedGlobalRoles: ['SUPERADMIN', 'ONBOARDING_AGENT'] 
+  },
+  { 
+    nameKey: 'tenants', 
+    icon: Building2, 
+    href: '/admin/tenants', 
+    isGlobalAdminMenu: true, 
+    allowedGlobalRoles: ['SUPERADMIN', 'SUPPORT_AGENT', 'BILLING_ADMIN'] 
   },
   { 
     nameKey: 'global_admins', 

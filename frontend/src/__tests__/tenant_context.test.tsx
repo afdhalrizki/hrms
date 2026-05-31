@@ -6,17 +6,18 @@ import { apiFetch } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
   apiFetch: vi.fn(() => Promise.resolve({})),
-  getDomainSuffix: vi.fn(() => 'harikerja.com'),
+  getDomainSuffix: vi.fn(() => process.env.NEXT_PUBLIC_DOMAIN_SUFFIX || 'harikerja.com'),
 }));
 
 // Helper component to consume context
 const TestConsumer = () => {
-  const { tenantName, subdomain, isPublic } = useTenant();
+  const { tenantName, subdomain, isPublic, isValid } = useTenant();
   return (
     <div>
       <span data-testid="tenant-name">{tenantName}</span>
       <span data-testid="subdomain">{subdomain}</span>
       <span data-testid="is-public">{isPublic.toString()}</span>
+      <span data-testid="is-valid">{isValid?.toString() ?? 'undefined'}</span>
     </div>
   );
 };
@@ -124,6 +125,21 @@ describe('TenantContext', () => {
       expect(getByTestId('tenant-name').textContent).toBe('Company One');
       expect(getByTestId('subdomain').textContent).toBe('company1');
       expect(getByTestId('is-public').textContent).toBe('false');
+    });
+  });
+
+  it('sets isValid to false if tenant settings fetch fails', async () => {
+    vi.stubGlobal('location', { hostname: 'invalid.harikerja.com' });
+    vi.mocked(apiFetch).mockRejectedValueOnce(new Error('Tenant not found'));
+
+    const { getByTestId } = render(
+      <TenantProvider>
+        <TestConsumer />
+      </TenantProvider>
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('is-valid').textContent).toBe('false');
     });
   });
 });

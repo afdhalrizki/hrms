@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
 import { Skeleton } from '@/components/shared/Skeleton';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getDomainSuffix } from '@/lib/api';
 
 import StatCard from '@/components/dashboard/StatCard';
 import QuotaUsageCard from '@/components/dashboard/QuotaUsageCard';
@@ -41,21 +41,21 @@ export default function Home() {
   const tLanding = useTranslations('Landing');
   const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
-  const { isPublic } = useTenant();
+  const { isPublic, isValid, subdomain } = useTenant();
   const router = useRouter();
 
   const [statsData, setStatsData] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  useEffect(() => {
-    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    const isTest = process.env.NEXT_PUBLIC_E2E_TESTING === 'true';
-    const isPublicDomain = isPublic || isLocal || isTest;
+  const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const isTest = process.env.NEXT_PUBLIC_E2E_TESTING === 'true';
+  const isPublicDomain = isPublic || isLocal || isTest;
 
+  useEffect(() => {
     if (!authLoading && !user && !isPublicDomain) {
       router.push('/login');
     }
-  }, [user, authLoading, isPublic, router]);
+  }, [user, authLoading, isPublicDomain, router]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -81,9 +81,49 @@ export default function Home() {
     return () => controller.abort();
   }, [user]);
 
-  const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  const isTest = process.env.NEXT_PUBLIC_E2E_TESTING === 'true';
-  const isPublicDomain = isPublic || isLocal || isTest;
+  if (isValid === false) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative text-white">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 overflow-hidden -z-10">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-red-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-500/10 rounded-full blur-[120px]" />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-[450px]"
+        >
+          <div className="glass-card rounded-[2.5rem] border border-red-500/20 p-10 shadow-2xl space-y-8 text-center bg-black">
+            <div className="inline-flex h-16 w-16 rounded-xl bg-red-500/10 border border-red-500/20 items-center justify-center text-red-500 font-black text-2xl shadow-lg shadow-red-500/5 mx-auto mb-2 animate-bounce">
+              ⚠️
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-black tracking-tight text-red-400">Workspace Tidak Ditemukan</h1>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Subdomain <span className="text-foreground font-bold">{subdomain}</span> belum terdaftar di platform kami, atau masa aktif UAT/langganan Anda telah berakhir.
+              </p>
+            </div>
+            <div className="pt-4 flex flex-col gap-3">
+              <a
+                href={`https://${getDomainSuffix()}`}
+                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                Kembali ke Beranda
+              </a>
+              <a 
+                href={`https://${getDomainSuffix()}/signup`}
+                className="w-full py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                Daftarkan Perusahaan Baru
+                <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   // 1. Landing Page (Public)
   if (!user && isPublicDomain) {
