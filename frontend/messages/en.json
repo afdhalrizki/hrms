@@ -387,7 +387,10 @@
     "heroFeature2Title": "Real-time Analytics",
     "heroFeature2Desc": "Instant insights into attendance and payroll costs.",
     "heroFeature3Title": "Premium UI/UX",
-    "heroFeature3Desc": "Modern interfaces designed for maximum productivity."
+    "heroFeature3Desc": "Modern interfaces designed for maximum productivity.",
+    "errSubdomainInvalid": "Subdomain must contain only lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen.",
+    "errSubdomainReserved": "This subdomain is reserved and cannot be used.",
+    "errSubdomainLength": "Subdomain must be between 3 and 50 characters."
   },
   "PublicNav": {
     "home": "Home",

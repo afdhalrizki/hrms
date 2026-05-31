@@ -387,7 +387,10 @@
     "heroFeature2Title": "Analitik Real-time",
     "heroFeature2Desc": "Wawasan instan tentang kehadiran dan biaya payroll.",
     "heroFeature3Title": "Antarmuka Premium",
-    "heroFeature3Desc": "Desain modern untuk produktivitas maksimal."
+    "heroFeature3Desc": "Desain modern untuk produktivitas maksimal.",
+    "errSubdomainInvalid": "Subdomain hanya boleh berisi huruf kecil, angka, dan tanda hubung (-), serta tidak boleh diawali atau diakhiri dengan tanda hubung.",
+    "errSubdomainReserved": "Subdomain ini adalah kata cadangan sistem dan tidak dapat digunakan.",
+    "errSubdomainLength": "Subdomain harus terdiri dari 3 hingga 50 karakter."
   },
   "PublicNav": {
     "home": "Beranda",

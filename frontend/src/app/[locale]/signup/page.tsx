@@ -35,10 +35,40 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    const subdomain = formData.subdomain_prefix.trim().toLowerCase();
+
+    // 1. Length check
+    if (subdomain.length < 3 || subdomain.length > 50) {
+      setError(t('errSubdomainLength'));
+      setLoading(false);
+      return;
+    }
+
+    // 2. RFC 1123 compliance check (only lowercase alphanumeric and hyphens, no start/end with hyphen)
+    if (!/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(subdomain)) {
+      setError(t('errSubdomainInvalid'));
+      setLoading(false);
+      return;
+    }
+
+    // 3. Reserved subdomains check
+    const reservedSubdomains = [
+      'www', 'public', 'api', 'admin', 'superadmin', 'portal', 
+      'mail', 'static', 'assets', 'dev', 'staging', 'localhost', 'test'
+    ];
+    if (reservedSubdomains.includes(subdomain)) {
+      setError(t('errSubdomainReserved'));
+      setLoading(false);
+      return;
+    }
+
     try {
       await apiFetch('/public/signup', {
         method: 'POST',
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          subdomain_prefix: subdomain
+        }),
         credentials: 'omit',
       });
       setSuccess(true);
@@ -50,9 +80,14 @@ export default function SignupPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value;
+    if (e.target.name === 'subdomain_prefix') {
+      // Lowercase only and strip out any character that isn't lowercase alphanumeric or hyphen
+      val = val.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: val,
     });
   };
 
@@ -183,6 +218,7 @@ export default function SignupPage() {
                       required
                       name="company_name"
                       type="text"
+                      value={formData.company_name}
                       placeholder={t('companyPlaceholder')}
                       onChange={handleChange}
                       className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-white/20"
@@ -200,6 +236,7 @@ export default function SignupPage() {
                       required
                       name="subdomain_prefix"
                       type="text"
+                      value={formData.subdomain_prefix}
                       placeholder={t('subdomainPlaceholder')}
                       onChange={handleChange}
                       className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-32 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-white/20"
@@ -220,6 +257,7 @@ export default function SignupPage() {
                       required
                       name="admin_email"
                       type="email"
+                      value={formData.admin_email}
                       placeholder={t('adminPlaceholder')}
                       onChange={handleChange}
                       className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-white/20"

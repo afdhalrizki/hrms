@@ -49,14 +49,14 @@ export function LoginView({ forceShowForm = false }: LoginViewProps) {
               </p>
             </div>
             <div className="pt-4 flex flex-col gap-3">
-              <Link
-                href="/"
+              <a
+                href={`https://${getDomainSuffix()}`}
                 className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
                 Kembali ke Beranda
-              </Link>
+              </a>
               <a 
-                href="/signup" 
+                href={`https://${getDomainSuffix()}/signup`} 
                 className="w-full py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
               >
                 Daftarkan Perusahaan Baru

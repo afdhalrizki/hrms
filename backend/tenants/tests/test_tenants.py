@@ -94,7 +94,7 @@ class RegistrationFlowTestCase(HRMSTestCase):
             # but let's make sure we have localhost/testserver mapped to public)
             self.public_tenant, _ = Tenant.objects.get_or_create(
                 schema_name='public',
-                name='Public Schema'
+                defaults={'name': 'Public Schema'}
             )
             Domain.objects.get_or_create(
                 domain='localhost',
@@ -295,6 +295,58 @@ class RegistrationFlowTestCase(HRMSTestCase):
         # Should be blocked either by serializer validation or DB integrity handled by view
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_registration_prefix_invalid_characters(self):
+        """Verify that subdomain prefixes with invalid characters (underscores, spaces, symbols) are rejected."""
+        self.client.logout()
+        invalid_prefixes = ['my_company', 'my company', 'company$', 'company!']
+        for prefix in invalid_prefixes:
+            data = {
+                'company_name': 'New Startup',
+                'subdomain_prefix': prefix,
+                'admin_email': 'founder@startup.com'
+            }
+            response = self.client.post(self.signup_url, data)
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn('subdomain_prefix', response.data)
+
+    def test_registration_prefix_too_short(self):
+        """Verify that subdomain prefixes shorter than 3 characters are rejected."""
+        self.client.logout()
+        data = {
+            'company_name': 'New Startup',
+            'subdomain_prefix': 'co',
+            'admin_email': 'founder@startup.com'
+        }
+        response = self.client.post(self.signup_url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('subdomain_prefix', response.data)
+
+    def test_registration_prefix_reserved_word(self):
+        """Verify that reserved subdomain prefixes are rejected."""
+        self.client.logout()
+        for reserved in ['www', 'public', 'api', 'admin', 'superadmin', 'portal']:
+            data = {
+                'company_name': 'New Startup',
+                'subdomain_prefix': reserved,
+                'admin_email': 'founder@startup.com'
+            }
+            response = self.client.post(self.signup_url, data)
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn('subdomain_prefix', response.data)
+
+    def test_registration_prefix_invalid_start_end_hyphen(self):
+        """Verify that subdomain prefixes starting or ending with a hyphen are rejected."""
+        self.client.logout()
+        for prefix in ['-company', 'company-']:
+            data = {
+                'company_name': 'New Startup',
+                'subdomain_prefix': prefix,
+                'admin_email': 'founder@startup.com'
+            }
+            response = self.client.post(self.signup_url, data)
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn('subdomain_prefix', response.data)
+
     def test_registration_duplicate_action_prevention(self):
         """Verify that already approved requests cannot be approved again."""
         registration = RegistrationRequest.objects.create(
@@ -369,7 +421,7 @@ class TenantSettingsTestCase(HRMSTestCase):
             'phone': '0811111111'
         }
         with schema_context('public'):
-            public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='HariKerja Platform')
+            public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', defaults={'name': 'HariKerja Platform'})
             Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
             
         response = self.client.patch(self.settings_url, payload, format='json', HTTP_X_TENANT='public')
@@ -395,7 +447,7 @@ class TenantSettingsTestCase(HRMSTestCase):
             'phone': '0822222222'
         }
         with schema_context('public'):
-            public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='HariKerja Platform')
+            public_tenant, _ = Tenant.objects.get_or_create(schema_name='public', defaults={'name': 'HariKerja Platform'})
             Domain.objects.get_or_create(domain='localhost', tenant=public_tenant, is_primary=True)
             
         response = self.client.patch(self.settings_url, payload, format='json', HTTP_X_TENANT='public')

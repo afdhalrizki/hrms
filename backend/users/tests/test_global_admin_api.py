@@ -13,7 +13,7 @@ def api_client():
 @pytest.fixture(autouse=True)
 def setup_public_tenant(db):
     from tenants.models import Tenant
-    tenant, _ = Tenant.objects.get_or_create(schema_name='public', name='HariKerja Platform')
+    tenant, _ = Tenant.objects.get_or_create(schema_name='public', defaults={'name': 'HariKerja Platform'})
     from django.db import connection
     connection.set_tenant(tenant)
     return tenant
@@ -160,7 +160,7 @@ class TestGlobalAdminAPI:
         from tenants.models import Tenant
         from django_tenants.utils import schema_context
         with schema_context('public'):
-            Tenant.objects.get_or_create(schema_name='assigned_co', name='Assigned Company')
+            Tenant.objects.get_or_create(schema_name='assigned_co', defaults={'name': 'Assigned Company'})
         
         api_client.force_authenticate(user=superadmin_user)
         response = api_client.get('/api/internal/tenants/')

@@ -4,6 +4,7 @@ import React from 'react';
 import { LoginView } from '@/components/auth/LoginView';
 import { useTenant } from '@/context/TenantContext';
 import { useAuth } from '@/context/AuthContext';
+import { getDomainSuffix } from '@/lib/api';
 
 // Mock dependencies
 vi.mock('@/context/TenantContext', () => ({
@@ -169,5 +170,13 @@ describe('LoginPage Access Restrictions', () => {
     expect(await screen.findByText(/Workspace Tidak Ditemukan/i)).toBeDefined();
     expect(screen.queryByLabelText(/emailLabel/i)).toBeNull();
     expect(screen.queryByText(/restrictedTitle/i)).toBeNull();
+
+    // Verify absolute redirect links
+    const domainSuffix = getDomainSuffix();
+    const backBtn = screen.getByRole('link', { name: /Kembali ke Beranda/i });
+    expect(backBtn.getAttribute('href')).toBe(`https://${domainSuffix}`);
+
+    const signupBtn = screen.getByRole('link', { name: /Daftarkan Perusahaan Baru/i });
+    expect(signupBtn.getAttribute('href')).toBe(`https://${domainSuffix}/signup`);
   });
 });

@@ -17,7 +17,7 @@ class MiddlewareCoverageTestCase(TenantTestCase):
             # Ensure public tenant exists
             self.public_tenant, _ = Tenant.objects.get_or_create(
                 schema_name='public',
-                name='Public Schema'
+                defaults={'name': 'Public Schema'}
             )
             Domain.objects.get_or_create(
                 domain='localhost',

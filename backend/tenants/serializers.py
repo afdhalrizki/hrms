@@ -8,8 +8,33 @@ class RegistrationRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'status', 'created_at']
 
     def validate_subdomain_prefix(self, value):
-        # Check for collisions with existing tenants
-        schema_name = value.replace('-', '_').lower()
+        import re
+        # Convert to lowercase
+        value = value.strip().lower()
+
+        # 1. Length check
+        if len(value) < 3:
+            raise serializers.ValidationError("Subdomain must be at least 3 characters long.")
+        if len(value) > 50:
+            raise serializers.ValidationError("Subdomain must be at most 50 characters long.")
+
+        # 2. Check for RFC 1123 compliance (only alphanumeric and hyphens, no start/end with hyphen)
+        if not re.match(r'^[a-z0-9]([-a-z0-9]*[a-z0-9])?$', value):
+            raise serializers.ValidationError(
+                "Subdomain must contain only lowercase letters, numbers, and hyphens, "
+                "and cannot start or end with a hyphen."
+            )
+
+        # 3. Check for reserved keywords
+        reserved_subdomains = {
+            'www', 'public', 'api', 'admin', 'superadmin', 'portal', 
+            'mail', 'static', 'assets', 'dev', 'staging', 'localhost', 'test'
+        }
+        if value in reserved_subdomains:
+            raise serializers.ValidationError(f"The subdomain '{value}' is reserved and cannot be used.")
+
+        # 4. Check for collisions with existing tenants
+        schema_name = value.replace('-', '_')
         if Tenant.objects.filter(schema_name=schema_name).exists():
             raise serializers.ValidationError("This subdomain is already in use by another company.")
         return value

@@ -60,9 +60,59 @@ describe('SignupPage Component', () => {
     fireEvent.change(screen.getByPlaceholderText(/adminPlaceholder/i), { target: { value: 'fail@test.com', name: 'admin_email' } });
     
     fireEvent.click(screen.getByText(/submitBtn/i));
-
+    
     await waitFor(() => {
       expect(screen.queryByText(/Subdomain already exists/i)).not.toBeNull();
+    });
+  });
+
+  it('automatically sanitizes subdomain input on change', () => {
+    render(<SignupPage />);
+    const subdomainInput = screen.getByPlaceholderText(/subdomainPlaceholder/i) as HTMLInputElement;
+
+    fireEvent.change(subdomainInput, { target: { value: 'My_Company 123!', name: 'subdomain_prefix' } });
+    expect(subdomainInput.value).toBe('mycompany123');
+  });
+
+  it('validates subdomain length before submission', async () => {
+    render(<SignupPage />);
+    
+    fireEvent.change(screen.getByPlaceholderText(/companyPlaceholder/i), { target: { value: 'Short Corp', name: 'company_name' } });
+    fireEvent.change(screen.getByPlaceholderText(/subdomainPlaceholder/i), { target: { value: 'co', name: 'subdomain_prefix' } });
+    fireEvent.change(screen.getByPlaceholderText(/adminPlaceholder/i), { target: { value: 'test@short.com', name: 'admin_email' } });
+    
+    fireEvent.click(screen.getByText(/submitBtn/i));
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/errSubdomainLength/i)).not.toBeNull();
+    });
+  });
+
+  it('validates starting/ending hyphens before submission', async () => {
+    render(<SignupPage />);
+    
+    fireEvent.change(screen.getByPlaceholderText(/companyPlaceholder/i), { target: { value: 'Hyphen Corp', name: 'company_name' } });
+    fireEvent.change(screen.getByPlaceholderText(/subdomainPlaceholder/i), { target: { value: '-company-', name: 'subdomain_prefix' } });
+    fireEvent.change(screen.getByPlaceholderText(/adminPlaceholder/i), { target: { value: 'test@hyphen.com', name: 'admin_email' } });
+    
+    fireEvent.click(screen.getByText(/submitBtn/i));
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/errSubdomainInvalid/i)).not.toBeNull();
+    });
+  });
+
+  it('validates reserved subdomains before submission', async () => {
+    render(<SignupPage />);
+    
+    fireEvent.change(screen.getByPlaceholderText(/companyPlaceholder/i), { target: { value: 'Reserved Corp', name: 'company_name' } });
+    fireEvent.change(screen.getByPlaceholderText(/subdomainPlaceholder/i), { target: { value: 'www', name: 'subdomain_prefix' } });
+    fireEvent.change(screen.getByPlaceholderText(/adminPlaceholder/i), { target: { value: 'test@reserved.com', name: 'admin_email' } });
+    
+    fireEvent.click(screen.getByText(/submitBtn/i));
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/errSubdomainReserved/i)).not.toBeNull();
     });
   });
 });
