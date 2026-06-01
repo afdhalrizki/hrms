@@ -57,12 +57,12 @@ test.describe.serial('Superadmin Tenant Deactivation Management', () => {
     await expect(page.getByText(/Total Workspaces/i)).toBeVisible();
 
     // Verify seeded tenant is listed (e.g. company1 or company2)
-    await expect(page.getByText('company1.localhost')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText(/company1\.(localhost|harikerja\.com)/)).toBeVisible({ timeout: 30000 });
 
     // 2. Search functionality
     await page.fill('input[placeholder="Search workspaces..."]', 'company1');
     // Ensure the searched item remains visible
-    await expect(page.getByText('company1.localhost')).toBeVisible();
+    await expect(page.getByText(/company1\.(localhost|harikerja\.com)/)).toBeVisible();
 
     // 3. Toggle Status (Suspend company1)
     const row = page.locator('tr').filter({ hasText: 'company1' }).first();

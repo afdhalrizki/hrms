@@ -56,8 +56,11 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       const hostname = window.location.hostname;
       const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost');
       
+      console.log('[TenantContext] useEffect triggered. Hostname:', hostname, 'isLocal:', isLocal);
+      
       // Get the domain suffix dynamically from host URL
       const domainSuffix = getDomainSuffix();
+      console.log('[TenantContext] domainSuffix:', domainSuffix);
       
       // Check for URL parameter override (more precise for E2E)
       const urlParams = new URLSearchParams(window.location.search);
@@ -66,10 +69,12 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       // Try to recover from sessionStorage for E2E persistence across navigation
       const storedTestTenant = isLocal ? sessionStorage.getItem('test_tenant_e2e') : null;
       const testTenant = testTenantUrl || storedTestTenant;
+      console.log('[TenantContext] testTenantUrl:', testTenantUrl, 'storedTestTenant:', storedTestTenant, 'final testTenant:', testTenant);
 
       // Special override for E2E testing on localhost
       if (testTenant && isLocal) {
         if (testTenant === 'public') {
+          console.log('[TenantContext] Resolving as public tenant via E2E override');
           sessionStorage.setItem('test_tenant_e2e', 'public');
           setTenant({
             tenantName: 'HariKerja Platform',
@@ -84,6 +89,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         sessionStorage.setItem('test_tenant_e2e', testTenant);
         
         const initialName = testTenant.charAt(0).toUpperCase() + testTenant.slice(1);
+        console.log('[TenantContext] Resolving as E2E test tenant:', testTenant);
         setTenant(prev => ({
           ...prev,
           tenantName: initialName,
@@ -94,6 +100,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
         apiFetch('/tenant/settings')
           .then((data) => {
+            console.log('[TenantContext] apiFetch settings success:', data.name);
             setTenant(prev => ({
               ...prev,
               tenantName: data.name || initialName,
@@ -126,6 +133,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             }));
           })
           .catch((err: any) => {
+            console.error('[TenantContext] apiFetch settings failed:', err);
             const isNotFound = err.status === 404 || err.message?.includes('404') || err.message?.toLowerCase().includes('not found');
             setTenant(prev => ({
               ...prev,

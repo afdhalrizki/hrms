@@ -139,16 +139,17 @@ class LoginAPIView(viewsets.GenericViewSet):
                 token = default_token_generator.make_token(user)
                 uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
                 
-                scheme = 'https' if request.is_secure() else 'http'
-                host = request.get_host()
-                
-                # Check for standard frontend URL
-                # If we are on port 8000 (backend), the frontend is usually on port 3000 in dev
-                # Let's replace port 8000 with 3000 to direct the user back to the web frontend!
-                if ':8000' in host:
-                    host = host.replace(':8000', ':3000')
-                
-                reset_link = f"{scheme}://{host}/reset-password?uid={uidb64}&token={token}"
+                origin = request.META.get('HTTP_ORIGIN')
+                if origin:
+                    if origin.endswith('/'):
+                        origin = origin[:-1]
+                    reset_link = f"{origin}/reset-password?uid={uidb64}&token={token}"
+                else:
+                    scheme = 'https' if request.is_secure() else 'http'
+                    host = request.get_host()
+                    if ':8000' in host:
+                        host = host.replace(':8000', ':3000')
+                    reset_link = f"{scheme}://{host}/reset-password?uid={uidb64}&token={token}"
                 
                 subject = "Reset Kata Sandi HariKerja HRMS"
                 message = f"Untuk mengatur ulang kata sandi Anda, silakan klik tautan berikut:\n{reset_link}\n\nTautan ini hanya berlaku sementara. Jika Anda tidak meminta pengaturan ulang ini, silakan abaikan email ini."
