@@ -399,6 +399,15 @@ class UserAuthenticationTestCase(TenantTestCase):
         response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_csrf_exempt_session_authentication_directly(self):
+        """Verify that CsrfExemptSessionAuthentication enforces no CSRF verification."""
+        from users.authentication import CsrfExemptSessionAuthentication
+        authenticator = CsrfExemptSessionAuthentication()
+        
+        request = MagicMock()
+        # enforce_csrf should do nothing and not raise any exception (e.g. PermissionDenied)
+        self.assertIsNone(authenticator.enforce_csrf(request))
+
 class UserManagementTestCase(TenantTestCase):
     def test_email_normalization(self):
         """Verify UserManager normalizes email addresses."""
