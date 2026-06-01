@@ -12,6 +12,13 @@ until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
 done
 echo "✅ Database is ready!"
 
+# If a custom command is passed (like celery), execute it
+if [ $# -gt 0 ]; then
+    echo "🏃 Running custom command: $@"
+    exec "$@"
+fi
+
+
 # Determine if we should run production or dev server
 if [ "$DEBUG" = "False" ] || [ "$PRODUCTION" = "True" ]; then
     echo "🚀 Starting Production Server (Gunicorn)..."

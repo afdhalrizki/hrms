@@ -101,6 +101,9 @@ services:
     command: celery -A config worker -l INFO
     env_file:
       - ../environments/.env.qa
+    environment:
+      - DB_HOST=pgbouncer
+      - DB_PORT=5432
     depends_on:
       db:
         condition: service_healthy
