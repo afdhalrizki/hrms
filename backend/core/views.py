@@ -294,6 +294,22 @@ class EmployeeViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelViewS
                 }, status=status.HTTP_403_FORBIDDEN)
             return Response({'error': err_msg}, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+        # 1. Standard employees cannot delete any employee profile
+        employee = Employee.objects.filter(email=request.user.email).first()
+        is_manager = request.user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_hr'))
+        if not is_manager:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to delete employee profiles.")
+
+        # 2. Managers/HR cannot delete their own employee profile
+        instance = self.get_object()
+        if instance.email == request.user.email:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({"detail": "Cannot delete your own employee profile."})
+
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'])
     def terminate(self, request, pk=None):
         """

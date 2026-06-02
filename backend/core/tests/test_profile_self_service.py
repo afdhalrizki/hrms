@@ -51,6 +51,16 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
             # 4. Setup Admin User
             self.admin = User.objects.create_user(email='admin@test.com', password='password', is_staff=True)
             self.admin.tenants.add(self.tenant)
+            self.admin_employee = Employee.objects.create(
+                nik='EMP-70-003',
+                fullname='Admin Employee',
+                email='admin@test.com',
+                department=self.dept,
+                role=self.role,
+                grade=self.gol,
+                join_date=date.today(),
+                ktp_number='KTPS70003'
+            )
             
             self.domain = self.tenant.domains.first().domain
 
@@ -150,3 +160,34 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
         self.assertTrue(bool(self.employee.ktp_image))
         self.assertTrue(bool(self.employee.npwp_image))
         self.assertEqual(self.employee.address, 'New Address for upload test')
+
+    def test_admin_cannot_delete_own_employee_profile(self):
+        """Verify that an admin cannot delete their own employee profile."""
+        self.client.force_login(self.admin)
+        url = reverse('employee-detail', kwargs={'pk': self.admin_employee.id})
+        
+        response = self.client.delete(url, SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Cannot delete your own employee profile.", str(response.data))
+        
+        # Verify it still exists in db
+        self.assertTrue(Employee.objects.filter(id=self.admin_employee.id).exists())
+
+    def test_admin_can_delete_other_employee_profile(self):
+        """Verify that an admin can delete another employee's profile."""
+        self.client.force_login(self.admin)
+        url = reverse('employee-detail', kwargs={'pk': self.employee.id})
+        
+        response = self.client.delete(url, SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # Verify it is deleted from db
+        self.assertFalse(Employee.objects.filter(id=self.employee.id).exists())
+
+    def test_standard_employee_cannot_delete_any_employee_profile(self):
+        """Verify that a standard employee cannot delete any employee profile (including their own)."""
+        self.client.force_login(self.user)
+        url = reverse('employee-detail', kwargs={'pk': self.employee.id})
+        
+        response = self.client.delete(url, SERVER_NAME=self.domain)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
