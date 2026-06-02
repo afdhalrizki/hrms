@@ -140,8 +140,12 @@ class RegistrationFlowTestCase(HRMSTestCase):
         self.assertEqual(request.company_name, 'New Startup')
         self.assertEqual(request.status, 'PENDING')
         
-        # Verify celery task was called
-        mock_send_email.assert_called_once_with('founder@startup.com')
+        # Verify celery task was called with company details
+        mock_send_email.assert_called_once_with(
+            'founder@startup.com',
+            company_name='New Startup',
+            subdomain_prefix='startup'
+        )
 
     @patch('tenants.views.send_welcome_email_task.delay')
     def test_admin_approval_process(self, mock_send_welcome):
@@ -359,6 +363,57 @@ class RegistrationFlowTestCase(HRMSTestCase):
         response = self.client.post(approve_url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('Only pending requests', response.data['error'])
+
+    def test_get_notification_emails_default(self):
+        """Verify retrieving notification emails defaults to global admins with approval authority."""
+        url = reverse('internal-registration-get-notification-emails')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['emails'], '')
+        self.assertTrue(response.data['is_using_default'])
+        # Default emails should contain the master admin's email since they are superuser/SUPERADMIN
+        self.assertIn('admin@master.com', response.data['default_emails'])
+
+    def test_set_and_get_notification_emails_custom(self):
+        """Verify setting and retrieving custom notification emails."""
+        set_url = reverse('internal-registration-set-notification-emails')
+        get_url = reverse('internal-registration-get-notification-emails')
+        
+        # 1. Set emails
+        payload = {'emails': 'harikerja.hrms@gmail.com, test@example.com'}
+        response = self.client.post(set_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['emails'], 'harikerja.hrms@gmail.com,test@example.com')
+        
+        # 2. Get emails and verify custom list is returned and default flag is false
+        response = self.client.get(get_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['emails'], 'harikerja.hrms@gmail.com,test@example.com')
+        self.assertFalse(response.data['is_using_default'])
+
+    def test_set_notification_emails_validation(self):
+        """Verify invalid emails are rejected."""
+        set_url = reverse('internal-registration-set-notification-emails')
+        
+        # Invalid email format
+        payload = {'emails': 'harikerja.hrms@gmail.com, invalid-email'}
+        response = self.client.post(set_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+    def test_notification_emails_unauthorized(self):
+        """Verify non-global admins are unauthorized to access settings endpoints."""
+        self.client.logout()  # Unauthenticated
+        url = reverse('internal-registration-get-notification-emails')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+        # Authenticated as regular user
+        regular_user = User.objects.create_user(email='employee@company.com', password='password')
+        self.client.force_authenticate(user=regular_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class TenantSettingsTestCase(HRMSTestCase):
     def setUp(self):

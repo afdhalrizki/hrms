@@ -190,4 +190,77 @@ describe('RegistrationsPage Component', () => {
       expect(screen.queryByText('Unauthorized')).toBeNull();
     });
   });
+
+  it('opens Email Settings modal and fetches email configurations', async () => {
+    vi.mocked(api.apiFetch).mockImplementation(async (endpoint: string, opts?: any) => {
+      if (endpoint === '/internal/registrations') {
+        return mockRequests;
+      }
+      if (endpoint === '/internal/registrations/notification-emails') {
+        return {
+          emails: 'test@example.com',
+          default_emails: ['admin@master.com'],
+          is_using_default: false
+        };
+      }
+      return {};
+    });
+
+    render(<RegistrationsPage />);
+    
+    await waitFor(() => screen.getByText('Email Settings'));
+    
+    const settingsBtn = screen.getByText('Email Settings');
+    fireEvent.click(settingsBtn);
+
+    // Verify modal is open and current email values are fetched and rendered
+    await waitFor(() => {
+      expect(screen.getByText('Notification Email Settings')).toBeDefined();
+      expect(screen.getByPlaceholderText('e.g. harikerja.hrms@gmail.com, admin@example.com')).toBeDefined();
+    });
+  });
+
+  it('submits updated settings successfully', async () => {
+    vi.mocked(api.apiFetch).mockImplementation(async (endpoint: string, opts?: any) => {
+      if (endpoint === '/internal/registrations') {
+        return mockRequests;
+      }
+      if (endpoint === '/internal/registrations/notification-emails') {
+        return {
+          emails: '',
+          default_emails: ['admin@master.com'],
+          is_using_default: true
+        };
+      }
+      if (endpoint === '/internal/registrations/set-notification-emails') {
+        return {
+          message: 'Notification emails updated successfully.',
+          emails: 'harikerja.hrms@gmail.com,test@example.com'
+        };
+      }
+      return {};
+    });
+
+    render(<RegistrationsPage />);
+    
+    await waitFor(() => screen.getByText('Email Settings'));
+    
+    const settingsBtn = screen.getByText('Email Settings');
+    fireEvent.click(settingsBtn);
+
+    await waitFor(() => screen.getByText('Notification Email Settings'));
+
+    const textarea = screen.getByPlaceholderText('e.g. harikerja.hrms@gmail.com, admin@example.com');
+    fireEvent.change(textarea, { target: { value: 'harikerja.hrms@gmail.com, test@example.com' } });
+
+    const saveBtn = screen.getByText('Save Settings');
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(api.apiFetch).toHaveBeenCalledWith('/internal/registrations/set-notification-emails', {
+        method: 'POST',
+        body: JSON.stringify({ emails: 'harikerja.hrms@gmail.com, test@example.com' })
+      });
+    });
+  });
 });

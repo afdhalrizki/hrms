@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django_tenants.utils import schema_context
-from .models import RegistrationRequest, Tenant, Domain, PlatformTicket, PlatformTicketMessage
+from .models import RegistrationRequest, Tenant, Domain, PlatformTicket, PlatformTicketMessage, GlobalSetting
 from .serializers import RegistrationRequestSerializer, TenantSettingsSerializer, PlatformTicketSerializer, PlatformTicketDetailSerializer, PlatformTicketMessageSerializer
 from users.models import User
 from core.models import Department, Role, Grade, Employee
@@ -27,7 +27,11 @@ class PublicSignupViewSet(viewsets.GenericViewSet):
         
         # Send email notification asynchronously using Celery
         if getattr(settings, 'ENABLE_EMAIL_NOTIFICATIONS', True):
-            send_registration_email_task.delay(registration.admin_email)
+            send_registration_email_task.delay(
+                registration.admin_email,
+                company_name=registration.company_name,
+                subdomain_prefix=registration.subdomain_prefix
+            )
         
         return Response({
             'message': 'Registration request submitted successfully. Our admin will review it shortly.',
@@ -45,6 +49,55 @@ class RegistrationApprovalViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Always return registrations from the public schema
         return RegistrationRequest.objects.all()
+
+    @action(detail=False, methods=['get'], url_path='notification-emails')
+    def get_notification_emails(self, request):
+        with schema_context('public'):
+            setting, created = GlobalSetting.objects.get_or_create(
+                key='registration_notification_emails',
+                defaults={
+                    'value': '',
+                    'description': 'Dynamic comma-separated email list for registration notifications'
+                }
+            )
+            
+            # If value is empty, we return the default emails (active users with global_role in SUPERADMIN, ONBOARDING_AGENT)
+            default_emails = []
+            if not setting.value:
+                default_emails = list(User.objects.filter(
+                    global_role__in=['SUPERADMIN', 'ONBOARDING_AGENT'],
+                    is_active=True
+                ).values_list('email', flat=True))
+                
+            return Response({
+                'emails': setting.value,
+                'default_emails': default_emails,
+                'is_using_default': not bool(setting.value)
+            })
+
+    @action(detail=False, methods=['post'], url_path='set-notification-emails')
+    def set_notification_emails(self, request):
+        with schema_context('public'):
+            emails = request.data.get('emails', '')
+            
+            # Validate emails
+            email_list = [e.strip() for e in emails.split(',') if e.strip()]
+            import re
+            for email in email_list:
+                if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                    return Response({'error': f'Invalid email address: {email}'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            setting, _ = GlobalSetting.objects.get_or_create(
+                key='registration_notification_emails',
+                defaults={'description': 'Dynamic comma-separated email list for registration notifications'}
+            )
+            setting.value = ','.join(email_list)
+            setting.save()
+            
+            return Response({
+                'message': 'Notification emails updated successfully.',
+                'emails': setting.value
+            })
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):

@@ -1,11 +1,11 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.core import mail
 from django.conf import settings
 from unittest.mock import patch
 from notifications.tasks import send_notification_email_task
 from tenants.tasks import send_registration_email_task, send_welcome_email_task
 
-class EmailContentTestCase(SimpleTestCase):
+class EmailContentTestCase(TestCase):
     """
     Test suite to verify branding 'HariKerja HRMS' in all automatic emails.
     """
@@ -51,6 +51,67 @@ class EmailContentTestCase(SimpleTestCase):
         # Verify Indonesian translation and signature
         self.assertIn("Pendaftaran Anda telah kami terima", sent_message)
         self.assertIn("Terima kasih,\nHariKerja HRMS", sent_message)
+
+    @patch('tenants.tasks.send_mail')
+    def test_registration_received_admin_notification(self, mock_send_mail):
+        """Verify that an email notification is sent to custom recipient list with tenant details."""
+        from tenants.models import GlobalSetting
+        GlobalSetting.objects.create(
+            key='registration_notification_emails',
+            value='harikerja.hrms@gmail.com'
+        )
+        
+        admin_email = "newadmin@tenant.com"
+        company_name = "Super Corp"
+        subdomain_prefix = "supercorp"
+        
+        send_registration_email_task(admin_email, company_name=company_name, subdomain_prefix=subdomain_prefix)
+        
+        # Two emails should have been sent (one to registering admin, one to harikerja.hrms@gmail.com)
+        self.assertEqual(mock_send_mail.call_count, 2)
+        
+        # Verify first call (registrant email)
+        first_args, first_kwargs = mock_send_mail.call_args_list[0]
+        first_recipient = first_kwargs.get('recipient_list') or first_args[3]
+        self.assertEqual(first_recipient, [admin_email])
+        
+        # Verify second call (admin notification email)
+        second_args, second_kwargs = mock_send_mail.call_args_list[1]
+        second_subject = second_kwargs.get('subject') or second_args[0]
+        second_message = second_kwargs.get('message') or second_args[1]
+        second_recipient = second_kwargs.get('recipient_list') or second_args[3]
+        
+        self.assertIn("harikerja.hrms@gmail.com", second_recipient)
+        self.assertIn("Super Corp", second_subject)
+        self.assertIn("Terdapat pendaftaran user/tenant baru", second_message)
+        self.assertIn("Nama Tenant: Super Corp", second_message)
+        self.assertIn("Subdomain: supercorp", second_message)
+        self.assertIn("Email Admin: newadmin@tenant.com", second_message)
+
+    @patch('tenants.tasks.send_mail')
+    def test_registration_received_admin_notification_fallback(self, mock_send_mail):
+        """Verify that notification falls back to global admins if no custom setting is set."""
+        from users.models import User
+        # Create a global admin user
+        User.objects.create_user(
+            email='admin@master.com',
+            password='password123',
+            global_role='SUPERADMIN',
+            is_active=True
+        )
+        
+        admin_email = "newadmin@tenant.com"
+        company_name = "Super Corp"
+        subdomain_prefix = "supercorp"
+        
+        send_registration_email_task(admin_email, company_name=company_name, subdomain_prefix=subdomain_prefix)
+        
+        self.assertEqual(mock_send_mail.call_count, 2)
+        
+        # Verify second call goes to the global admin email
+        second_args, second_kwargs = mock_send_mail.call_args_list[1]
+        second_recipient = second_kwargs.get('recipient_list') or second_args[3]
+        self.assertIn("admin@master.com", second_recipient)
 
     @patch('tenants.tasks.send_mail')
     def test_welcome_email_content(self, mock_send_mail):

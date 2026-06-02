@@ -265,3 +265,15 @@ class PlatformTicketMessage(models.Model):
     def __str__(self):
         return f"Message by {self.sender.email} on platform ticket #{self.ticket.id}"
 
+
+class GlobalSetting(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    value = models.TextField(blank=True, default='')
+    description = models.TextField(blank=True, default='')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.key}: {self.value}"
+

@@ -13,7 +13,9 @@ import {
   ExternalLink,
   MoreVertical,
   Filter,
-  AlertCircle
+  AlertCircle,
+  Settings,
+  Save
 } from 'lucide-react';
 import { apiFetch, getDomainSuffix } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,6 +38,42 @@ export default function RegistrationsPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const { user, loading: authLoading } = useAuth();
 
+  // Settings Modal State
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [emailsText, setEmailsText] = useState('');
+  const [defaultEmails, setDefaultEmails] = useState<string[]>([]);
+  const [isUsingDefault, setIsUsingDefault] = useState(true);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  const fetchNotificationEmails = async () => {
+    try {
+      const data = await apiFetch('/internal/registrations/notification-emails');
+      setEmailsText(data.emails || '');
+      setDefaultEmails(data.default_emails || []);
+      setIsUsingDefault(data.is_using_default);
+    } catch (error) {
+      console.error('Failed to fetch notification emails:', error);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      const data = await apiFetch('/internal/registrations/set-notification-emails', {
+        method: 'POST',
+        body: JSON.stringify({ emails: emailsText })
+      });
+      setIsUsingDefault(!emailsText.trim());
+      toast.success('Notification emails updated successfully');
+      setShowSettingsModal(false);
+    } catch (error: any) {
+      console.error('Failed to save settings:', error);
+      toast.error(error.message || 'Failed to update settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const fetchRequests = async (signal?: AbortSignal) => {
     try {
       const data = await apiFetch('/internal/registrations', { signal });
@@ -52,6 +90,7 @@ export default function RegistrationsPage() {
     if (!authLoading && user) {
       const controller = new AbortController();
       fetchRequests(controller.signal);
+      fetchNotificationEmails();
       return () => controller.abort();
     }
   }, [authLoading, user]);
@@ -138,6 +177,16 @@ export default function RegistrationsPage() {
             </div>
             <button className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <Filter size={20} />
+            </button>
+            <button 
+              onClick={() => {
+                fetchNotificationEmails();
+                setShowSettingsModal(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all font-bold text-sm text-muted-foreground hover:text-white"
+            >
+              <Settings size={18} className="text-primary animate-hover-spin" />
+              <span>Email Settings</span>
             </button>
           </div>
         </div>
@@ -258,6 +307,110 @@ export default function RegistrationsPage() {
           </table>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {showSettingsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="glass-card w-full max-w-lg rounded-[2.5rem] border border-white/10 overflow-hidden bg-zinc-900/90 text-white shadow-2xl"
+            >
+              {/* Modal Header */}
+              <div className="px-8 py-6 border-b border-white/5 bg-white/[0.02]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Settings className="text-primary animate-hover-spin" size={24} />
+                    <h2 className="text-xl font-bold">Notification Email Settings</h2>
+                  </div>
+                  <button 
+                    onClick={() => setShowSettingsModal(false)}
+                    className="p-1 rounded-lg hover:bg-white/5 text-muted-foreground transition-colors"
+                  >
+                    <XCircle size={20} />
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1.5 font-medium">
+                  Configure dynamic destination emails for registration notifications.
+                </p>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Recipient Emails</label>
+                  <textarea
+                    rows={3}
+                    value={emailsText}
+                    onChange={(e) => setEmailsText(e.target.value)}
+                    placeholder="e.g. harikerja.hrms@gmail.com, admin@example.com"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm placeholder:text-muted-foreground font-semibold resize-none"
+                  />
+                  <p className="text-[11px] text-muted-foreground font-medium">
+                    Separate multiple emails with commas. If left empty, notifications will go to the authorized global admins.
+                  </p>
+                </div>
+
+                {/* Default emails info banner */}
+                <div className="p-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-bold">
+                    <span className={cn(
+                      "w-2 h-2 rounded-full",
+                      isUsingDefault ? "bg-emerald-500 animate-pulse" : "bg-zinc-500"
+                    )} />
+                    <span className="text-muted-foreground uppercase tracking-wider">
+                      Mode: {isUsingDefault ? "Default Global Admins" : "Custom Recipient List"}
+                    </span>
+                  </div>
+                  {isUsingDefault && defaultEmails.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                        Authorized Global Admins:
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {defaultEmails.map((email) => (
+                          <span 
+                            key={email} 
+                            className="text-[10px] font-semibold bg-white/5 px-2 py-0.5 rounded border border-white/5 text-zinc-300"
+                          >
+                            {email}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-8 py-5 border-t border-white/5 bg-white/[0.01] flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setShowSettingsModal(false)}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-muted-foreground hover:text-white transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary/95 text-white transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
+                >
+                  {savingSettings ? (
+                    <div className="h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Save size={14} />
+                      <span>Save Settings</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 }
