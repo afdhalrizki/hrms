@@ -97,9 +97,9 @@ Aplikasi menangani multi-tenancy melalui `X-Tenant-Domain` dan build lingkungan.
 
 ## 🧪 Standar Pengujian
 
-Aplikasi mobile memiliki rangkaian pengujian komprehensif yang mencakup logika inti dan alur E2E dengan **tingkat kelulusan 100%** di **161 tes yang kuat**.
+Aplikasi mobile memiliki rangkaian pengujian komprehensif yang mencakup logika inti dan alur E2E dengan **tingkat kelulusan 100%** di **166 tes yang kuat**.
 
-### Unit & Logic Tests - 138 Tes
+### Unit & Logic Tests - 143 Tes
 
 ```bash
 node scripts/run_unit_tests.mjs

@@ -170,4 +170,41 @@ describe('ResetPasswordPage', () => {
       expect(screen.getByText('Invalid token.')).toBeInTheDocument();
     });
   });
+
+  it('toggles password visibility for both password inputs when eye icons are clicked', async () => {
+    (useTenant as any).mockReturnValue({ isPublic: true, tenantName: 'HariKerja' });
+    vi.mocked(useSearchParams).mockReturnValue({
+      get: (key: string) => {
+        if (key === 'uid') return 'mock-uid';
+        if (key === 'token') return 'mock-token';
+        return null;
+      },
+    } as any);
+
+    render(<ResetPasswordPage />);
+
+    const passwordInput = screen.getByLabelText(/newPasswordLabel/i) as HTMLInputElement;
+    const confirmInput = screen.getByLabelText(/confirmPasswordLabel/i) as HTMLInputElement;
+    expect(passwordInput.type).toBe('password');
+    expect(confirmInput.type).toBe('password');
+
+    const togglePasswordBtn = screen.getByLabelText('toggle-password-visibility');
+    const toggleConfirmBtn = screen.getByLabelText('toggle-confirm-password-visibility');
+
+    // Click new password visibility toggle
+    fireEvent.click(togglePasswordBtn);
+    expect(passwordInput.type).toBe('text');
+    expect(confirmInput.type).toBe('password');
+
+    // Click confirm password visibility toggle
+    fireEvent.click(toggleConfirmBtn);
+    expect(passwordInput.type).toBe('text');
+    expect(confirmInput.type).toBe('text');
+
+    // Toggle them off
+    fireEvent.click(togglePasswordBtn);
+    fireEvent.click(toggleConfirmBtn);
+    expect(passwordInput.type).toBe('password');
+    expect(confirmInput.type).toBe('password');
+  });
 });

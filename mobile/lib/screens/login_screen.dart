@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _isCheckingToken = true;
   bool _isBiometricConfigured = false;
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -307,14 +308,28 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: TextField(
             controller: controller,
-            obscureText: isPassword,
+            obscureText: isPassword ? _obscurePassword : false,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: Colors.white38, size: 20),
+              suffixIcon: isPassword
+                  ? IconButton(
+                      key: const Key('toggle_password_visibility_btn'),
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.white38,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    )
+                  : null,
               hintText: hint,
               hintStyle: const TextStyle(color: Colors.white24),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(20),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             ),
           ),
         ),

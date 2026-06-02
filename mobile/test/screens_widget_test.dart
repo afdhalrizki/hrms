@@ -108,6 +108,34 @@ void main() {
     });
   });
 
+  testWidgets('LoginScreen password visibility toggle works', (tester) async {
+    await tester.runAsync(() async {
+      mockSecureStorage.clear();
+      await tester.pumpWidget(createWidgetUnderTest(const LoginScreen()));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+
+      final passwordTextFieldFinder = find.byType(TextField).last;
+      TextField passwordTextField = tester.widget<TextField>(passwordTextFieldFinder);
+      expect(passwordTextField.obscureText, isTrue);
+
+      final toggleBtnFinder = find.byKey(const Key('toggle_password_visibility_btn'));
+      expect(toggleBtnFinder, findsOneWidget);
+      await tester.tap(toggleBtnFinder);
+      await tester.pump();
+
+      passwordTextField = tester.widget<TextField>(passwordTextFieldFinder);
+      expect(passwordTextField.obscureText, isFalse);
+
+      await tester.tap(toggleBtnFinder);
+      await tester.pump();
+
+      passwordTextField = tester.widget<TextField>(passwordTextFieldFinder);
+      expect(passwordTextField.obscureText, isTrue);
+
+      await patientTeardown(tester);
+    });
+  });
+
   testWidgets('SettingsScreen renders and displays profile data', (tester) async {
     final userData = {
       'fullname': 'Admin One',

@@ -97,9 +97,9 @@ The app handles multi-tenancy via `X-Tenant-Domain` and environment builds.
 
 ## 🧪 Testing Standard
 
-The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **161 robust tests**.
+The mobile application has a comprehensive test suite covering core logic and E2E flows with **100% pass rate** across **166 robust tests**.
 
-### Unit & Logic Tests - 138 Tests
+### Unit & Logic Tests - 143 Tests
 
 ```bash
 node scripts/run_unit_tests.mjs

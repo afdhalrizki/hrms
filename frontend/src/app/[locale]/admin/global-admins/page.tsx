@@ -10,7 +10,9 @@ import {
   Plus,
   Edit,
   Trash2,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,6 +41,7 @@ export default function GlobalAdminsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<GlobalAdmin | null>(null);
   const [formData, setFormData] = useState<{
     email: string;
@@ -95,6 +98,7 @@ export default function GlobalAdminsPage() {
 
   const handleOpenModal = (mode: 'create' | 'edit', admin?: GlobalAdmin) => {
     setModalMode(mode);
+    setShowPassword(false);
     if (mode === 'edit' && admin) {
       setSelectedAdmin(admin);
       setFormData({
@@ -395,13 +399,24 @@ export default function GlobalAdminsPage() {
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
                     Password {modalMode === 'edit' && '(Leave blank to keep unchanged)'}
                   </label>
-                  <input 
-                    type="password" 
-                    required={modalMode === 'create'}
-                    value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
+                  <div className="relative">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      required={modalMode === 'create'}
+                      value={formData.password}
+                      onChange={e => setFormData({...formData, password: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none transition-colors"
+                      tabIndex={-1}
+                      aria-label="toggle-password-visibility"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="pt-4 flex items-center justify-end gap-3">

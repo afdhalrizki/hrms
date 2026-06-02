@@ -84,15 +84,15 @@ Platform harikerja mengikuti jalur promosi 4-tingkat yang ketat:
 
 ## 🧪 Standar Pengujian
 
-Frontend menggunakan strategi lapisan ganda dengan **tingkat kelulusan 100%** di **316 tes krusial**.
+Frontend menggunakan strategi lapisan ganda dengan **tingkat kelulusan 100%** di **336 tes krusial**.
 
-### Unit Testing (Vitest) - 232 Tes
+### Unit Testing (Vitest) - 249 Tes
 
 ```bash
 node scripts/run_unit_tests.mjs
 ```
 
-### End-to-End Testing (Playwright) - 84 Tes
+### End-to-End Testing (Playwright) - 87 Tes
 
 **Jalankan dengan API tiruan (Cepat/Terisolasi):**
 

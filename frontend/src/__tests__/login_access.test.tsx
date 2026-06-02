@@ -179,4 +179,22 @@ describe('LoginPage Access Restrictions', () => {
     const signupBtn = screen.getByRole('link', { name: /Daftarkan Perusahaan Baru/i });
     expect(signupBtn.getAttribute('href')).toBe(`https://${domainSuffix}/signup`);
   });
+
+  it('toggles password visibility when the eye icon is clicked', async () => {
+    (useTenant as any).mockReturnValue({ isPublic: false, tenantName: 'Acme Corp' });
+    render(<LoginView />);
+
+    const passwordInput = screen.getByLabelText(/passwordLabel/i) as HTMLInputElement;
+    expect(passwordInput.type).toBe('password');
+
+    const toggleButton = screen.getByLabelText('toggle-password-visibility');
+    
+    // Click once to show password
+    fireEvent.click(toggleButton);
+    expect(passwordInput.type).toBe('text');
+
+    // Click again to hide password
+    fireEvent.click(toggleButton);
+    expect(passwordInput.type).toBe('password');
+  });
 });
