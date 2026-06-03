@@ -184,5 +184,64 @@ test.describe.serial('Employee Management', () => {
     // Verify the terminated employee is visible now
     await expect(page.getByText(fullname)).toBeVisible({ timeout: 15000 });
   });
+
+  test('should delete an employee permanently successfully', async ({ page }) => {
+    await page.goto(getTenantUrl('/en/employees'));
+
+    // Wait for loader to disappear
+    await expect(page.getByText(/Loading employee data/i)).not.toBeVisible({ timeout: 15000 });
+
+    // 1. Provision a new employee so we have a clean target to delete
+    const addBtn = page.getByRole('button', { name: /Add Employee/i });
+    await expect(addBtn).toBeVisible({ timeout: 15000 });
+    await addBtn.click();
+
+    const timestamp = Date.now();
+    const fullname = `Delete Target ${timestamp}`;
+    const nik = `NH${String(timestamp).slice(-6)}`;
+    const email = `deletetarget${timestamp}@company1.com`;
+
+    await page.locator('input[name="fullname"]').fill(fullname);
+    await page.locator('input[name="nik"]').fill(nik);
+    await page.locator('input[name="email"]').fill(email);
+    await page.locator('input[name="ktp_number"]').fill('31710' + String(timestamp).slice(-11));
+
+    await page.locator('select[name="department"]').selectOption({ label: 'Engineering' });
+    await page.locator('select[name="role"]').selectOption({ label: 'Software Engineer' });
+    await page.locator('select[name="grade"]').selectOption({ label: '3A' });
+    await page.locator('select[name="access_role"]').selectOption({ label: 'Finance Staff' });
+
+    const provisionBtn = page.getByRole('button', { name: /Provision Employee/i });
+    await provisionBtn.click();
+
+    // Verify modal closes
+    await expect(page.getByText(/Provision New Employee/i)).not.toBeVisible({ timeout: 15000 });
+
+    // 2. Search for the newly created employee
+    const searchInput = page.getByPlaceholder(/Search by name/i);
+    await searchInput.fill(fullname);
+    await expect(page.getByText(fullname)).toBeVisible({ timeout: 15000 });
+
+    // 3. Click "Delete Permanently" button.
+    // First click the row dropdown actions menu button
+    const row = page.locator('tr', { hasText: fullname });
+    await row.locator('button').first().click();
+
+    // Handle confirm dialog
+    page.once('dialog', async dialog => {
+      expect(dialog.message()).toContain('Delete permanently? This cannot be undone.');
+      await dialog.accept();
+    });
+
+    const deleteBtn = page.getByRole('button', { name: /Delete Permanently/i });
+    await expect(deleteBtn).toBeVisible({ timeout: 5000 });
+    await deleteBtn.click();
+
+    // 4. Verify toast message / success banner
+    await expect(page.getByText(/Employee deleted/i)).toBeVisible({ timeout: 15000 });
+
+    // 5. Verify the employee is no longer visible
+    await expect(page.getByText(fullname)).not.toBeVisible({ timeout: 10000 });
+  });
 });
 

@@ -382,3 +382,54 @@ def prevent_duplicate_active_cross_tenant(sender, instance, **kwargs):
                 raise ValidationError(
                     f"User dengan email {instance.email} masih terdaftar/aktif di perusahaan {other_tenant.name}"
                 )
+
+
+@receiver(post_delete, sender=Employee)
+def cleanup_user_on_employee_delete(sender, instance, **kwargs):
+    """
+    When an Employee profile is deleted permanently:
+    1. Remove the current tenant from their associated User account.
+    2. If the User is no longer linked to any tenants, and is not a global administrator/staff,
+       delete the User account from the public schema.
+    """
+    tenant = connection.tenant
+    if not tenant or tenant.schema_name == 'public':
+        return
+
+    from users.models import User
+    from django_tenants.utils import schema_context
+    from django.core.exceptions import ValidationError
+
+    should_delete = False
+    with schema_context('public'):
+        user = User.objects.filter(email=instance.email).first()
+        if user:
+            # Check if this user is a staff/admin and if they are the last admin of the current tenant
+            is_last_admin = False
+            if user.is_staff and user.is_active:
+                admin_count = User.objects.filter(
+                    tenants=tenant,
+                    is_staff=True,
+                    is_active=True
+                ).exclude(pk=user.pk).count()
+                if admin_count == 0:
+                    is_last_admin = True
+
+            # Only remove the tenant if they are not the last active administrator
+            if not is_last_admin:
+                try:
+                    user.tenants.remove(tenant)
+                except ValidationError:
+                    pass
+            
+            # If the user has no more tenants and is not a superuser/global admin/global role, delete them.
+            if not user.tenants.exists() and not (user.is_superuser or user.is_global_admin or user.global_role):
+                should_delete = True
+
+    if should_delete:
+        user = User.objects.filter(email=instance.email).first()
+        if user:
+            try:
+                user.delete()
+            except ValidationError:
+                pass

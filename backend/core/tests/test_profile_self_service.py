@@ -183,6 +183,8 @@ class EmployeeProfileSelfServiceTest(TenantTestCase):
         
         # Verify it is deleted from db
         self.assertFalse(Employee.objects.filter(id=self.employee.id).exists())
+        with schema_context('public'):
+            self.assertFalse(User.objects.filter(email='emp@test.com').exists())
 
     def test_standard_employee_cannot_delete_any_employee_profile(self):
         """Verify that a standard employee cannot delete any employee profile (including their own)."""
