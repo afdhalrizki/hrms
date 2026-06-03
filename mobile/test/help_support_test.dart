@@ -25,6 +25,7 @@ void main() {
     // Setup Mock Client for API calls
     final mockClient = MockClient((request) async {
       final url = request.url.toString();
+      final method = request.method;
       if (url.contains('/help/guidelines/')) {
         return http.Response(jsonEncode([
           {
@@ -54,6 +55,15 @@ void main() {
         }), 200);
       }
       if (url.contains('/internal-tickets/')) {
+        if (method == 'POST') {
+          return http.Response(jsonEncode({
+            'id': 2,
+            'title': 'Tiket Baru Test',
+            'category': 'GENERAL',
+            'priority': 'LOW',
+            'status': 'OPEN'
+          }), 201);
+        }
         return http.Response(jsonEncode([
           {
             'id': 1,
@@ -143,5 +153,57 @@ void main() {
     // Verify messages thread
     expect(find.text('Apakah pemotongan BPJS sudah benar?'), findsOneWidget);
     expect(find.text('Employee One'), findsOneWidget);
+  });
+
+  testWidgets('HelpSupportScreen can create a new ticket', (WidgetTester tester) async {
+    const userData = {
+      'fullname': 'Employee One',
+      'email': 'employee1@company1.com',
+    };
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('id')],
+        home: HelpSupportScreen(userData: userData),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Tap FloatingActionButton to open the create sheet
+    final fab = find.byType(FloatingActionButton);
+    expect(fab, findsOneWidget);
+    await tester.tap(fab);
+    await tester.pumpAndSettle();
+
+    // Verify sheet title
+    expect(find.text('Buat Tiket Bantuan'), findsOneWidget);
+
+    // Enter subjek / judul
+    final titleField = find.widgetWithText(TextField, 'Subjek / Judul Tiket');
+    expect(titleField, findsOneWidget);
+    await tester.enterText(titleField, 'Tiket Baru Test');
+
+    // Enter deskripsi
+    final descField = find.widgetWithText(TextField, 'Deskripsi Detail Masalah');
+    expect(descField, findsOneWidget);
+    await tester.enterText(descField, 'Deskripsi tiket baru test');
+
+    // Tap Kirim Tiket button
+    final submitBtn = find.widgetWithText(ElevatedButton, 'Kirim Tiket');
+    expect(submitBtn, findsOneWidget);
+    await tester.tap(submitBtn);
+    await tester.pumpAndSettle();
+
+    // Verify sheet closed and success SnackBar shown
+    expect(find.text('Buat Tiket Bantuan'), findsNothing);
+    expect(find.text('Tiket berhasil dibuat'), findsOneWidget);
   });
 }
