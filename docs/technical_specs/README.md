@@ -26,6 +26,8 @@ Technical documentation files are categorized into several core topics, availabl
     OWASP Top 10 penetration testing audits, AES-256 database column encryption checks, and security updates.
 9.  **VPN Connection Guide ([vpn_connection_guide.md](./vpn_connection_guide.md)):** 
     DevOps manual to install OpenVPN/WireGuard, set up `ufw` NAT routing, and configure Nginx proxy whitelists.
+10. **Payment Environment Guide ([payment_environment_guide.md](./payment_environment_guide.md)):**
+    Details Midtrans sandbox configuration, live bank account routing, and production migration guide.
 
 ---
 
@@ -40,6 +42,7 @@ Technical documentation files are categorized into several core topics, availabl
 | **[client_access_guide.md](./client_access_guide.md)** | Operations | Staf Admin, Support, QA | Client connection configs via VPN or Cloudflare |
 | **[cloudflare_zero_trust_guide.md](./cloudflare_zero_trust_guide.md)** | Networking | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
 | **[developer_guide.md](./developer_guide.md)** | Development | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
+| **[payment_environment_guide.md](./payment_environment_guide.md)** | Integration | DevOps, Developer | Midtrans sandbox, live merchant banking, production configs |
 | **[security_audit.md](./security_audit.md)** | Compliance | Security Auditor, Dev | OWASP Top 10 penetration testing, DB encryption |
 | **[vpn_connection_guide.md](./vpn_connection_guide.md)** | Networking | DevOps, Sysadmin | OpenVPN server build, ufw NAT routing, Nginx allow/deny |
 

@@ -26,6 +26,8 @@ Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, ters
     Hasil pengujian penetrasi kerentanan OWASP Top 10 pada modul HRMS, audit enkripsi database, dan daftar perbaikan kepatuhan keamanan.
 9.  **Panduan Koneksi VPN ([vpn_connection_guide.id.md](./vpn_connection_guide.id.md)):** 
     Panduan lengkap administrator server untuk men-deploy server OpenVPN/WireGuard, nat routing `ufw`, dan whitelisting Nginx proxy.
+10. **Panduan Lingkungan Pembayaran ([payment_environment_guide.id.md](./payment_environment_guide.id.md)):**
+    Detail konfigurasi sandbox Midtrans, pencairan rekening merchant live, dan panduan migrasi ke produksi.
 
 ---
 
@@ -40,6 +42,7 @@ Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, ters
 | **[client_access_guide.id.md](./client_access_guide.id.md)** | Operasional | Staf Admin, Support, QA | Pengaturan koneksi klien via VPN atau Cloudflare |
 | **[cloudflare_zero_trust_guide.id.md](./cloudflare_zero_trust_guide.id.md)** | Jaringan | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
 | **[developer_guide.id.md](./developer_guide.id.md)** | Pengembangan | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
+| **[payment_environment_guide.id.md](./payment_environment_guide.id.md)** | Integrasi | DevOps, Developer | Midtrans sandbox, rekening bank merchant live, konfigurasi produksi |
 | **[security_audit.id.md](./security_audit.id.md)** | Kepatuhan | Security Auditor, Dev | Penetration testing OWASP Top 10, database encryption |
 | **[vpn_connection_guide.id.md](./vpn_connection_guide.id.md)** | Jaringan | DevOps, Sysadmin | Deploy OpenVPN, ufw NAT forwarding, Nginx allow/deny |
 

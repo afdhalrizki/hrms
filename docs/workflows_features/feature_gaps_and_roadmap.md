@@ -36,7 +36,7 @@ In terms of daily operational functionalities (Attendance, Leaves, Overtime, Cla
 *   **Analysis**:
     *   Leading Indonesian competitors integrate with banking APIs (e.g., BCA Bank Transfer, Mandiri Corporate Pay, etc.) so that HR Admins can execute payroll payouts with a single click from the dashboard instead of manually uploading CSV files to banking portals.
 *   **Proposed Future Features**:
-    *   **Bulk Payment API Integration**: Partner with B2B payment gateways (such as Midtrans/Xendit Disbursals or local banking APIs) to enable instant salary disbursements.
+    *   **Bulk Payment API Integration**: Partner with B2B payment gateways (such as Midtrans/Xendit Disbursals or local banking APIs) to enable instant salary disbursements. See the detailed [Direct Payroll Payout Integration Plan](./direct_payroll_payout.md) for architecture, schema requirements, and timelines.
     *   **Automated Reconciliation**: Instantly mark payslip status as `PAID` once the bank transfer execution succeeds.
 
 ### 📚 2.4 Learning Management System (LMS) & Training

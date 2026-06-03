@@ -36,7 +36,7 @@ Secara fungsionalitas operasional harian (Absensi, Cuti, Lembur, Klaim Biaya, da
 *   **Analisis**:
     *   Kompetitor terkemuka di Indonesia menyediakan integrasi API perbankan (e.g. Bank Transfer BCA, Mandiri Corporate Pay, dll.) agar HR Admin dapat membayar seluruh gaji karyawan hanya dengan satu klik di dalam dasbor tanpa perlu membuka portal *corporate banking* atau mengunggah berkas CSV secara manual.
 *   **Usulan Fitur Masa Depan**:
-    *   **Bulk Payment API Integration**: Integrasi dengan gerbang pembayaran B2B (seperti Midtrans/Xendit Disbursals or Bank API lokal) untuk pembayaran gaji instan dari rekening deposit tenant ke rekening masing-masing karyawan.
+    *   **Bulk Payment API Integration**: Integrasi dengan gerbang pembayaran B2B (seperti Midtrans/Xendit Disbursals or Bank API lokal) untuk pembayaran gaji instan dari rekening deposit tenant ke rekening masing-masing karyawan. Lihat rincian [Rencana Integrasi Pembayaran Gaji Langsung](./direct_payroll_payout.id.md) untuk penjelasan arsitektur, skema DB, dan garis waktu pengembangan.
     *   **Rekonsiliasi Otomatis**: Menandai status pembayaran slip gaji menjadi `PAID` secara instan setelah status transfer bank berhasil.
 
 ### 📚 2.4 LMS & Pelatihan Karyawan (Learning Management System)
