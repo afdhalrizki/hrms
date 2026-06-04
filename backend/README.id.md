@@ -90,7 +90,7 @@ Platform harikerja mengikuti jalur promosi 4-tingkat yang ketat:
 
 ## 🧪 Standar Pengujian
 
-Backend menggunakan `pytest` dengan **tingkat kelulusan 100%** di **410 tes krusial** (391 Unit + 19 E2E).
+Backend menggunakan `pytest` dengan **tingkat kelulusan 100%** di **416 tes krusial** (397 Unit + 19 E2E).
 
 **Jalankan tes logika/unit:**
 
@@ -121,5 +121,5 @@ Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh pl
 
 ---
 
-**Status Proyek**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Inti Backend Terstandardisasi.
+**Status Proyek**: 🏆 **Platform Gold Release v1.5.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Inti Backend Terstandardisasi.
 **Catatan Branding**: Proyek ini diubah namanya dari Antigravity menjadi **harikerja** pada 16 Maret 2026.

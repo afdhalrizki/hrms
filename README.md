@@ -152,9 +152,9 @@ graph TD
 
 The platform achieves a unified **100% test pass rate** across all layers of the stack.
 
-- **Backend**: 410 Tests (391 Unit + 19 E2E) - Pytest. (Verified 100% Passed - June 2, 2026)
-- **Frontend**: 336 Tests (249 Unit + 87 E2E) - Vitest & Playwright. (Verified 100% Passed - June 2, 2026)
-- **Mobile**: 166 Tests (143 Unit + 23 E2E) - Flutter. (Verified 100% Passed - June 2, 2026)
+- **Backend**: 416 Tests (397 Unit + 19 E2E) - Pytest. (Verified 100% Passed - June 3, 2026)
+- **Frontend**: 339 Tests (251 Unit + 88 E2E) - Vitest & Playwright. (Verified 100% Passed - June 3, 2026)
+- **Mobile**: 167 Tests (144 Unit + 23 E2E) - Flutter. (Verified 100% Passed - June 3, 2026)
 
 ## 📈 Scalability Strategy: Road to 1 Million Users
 
@@ -193,16 +193,21 @@ The platform maintains a comprehensive bilingual (English & Indonesian) document
 - **`adr/`**: Architecture Decision Records detailing critical technical choices.
   - [Employee Counter Optimization](./docs/adr/employee_counter_optimization.md) ([Indonesian](./docs/adr/employee_counter_optimization.id.md))
 - **`architecture/`**: Systems integration, authentication flow diagrams, and HA designs.
+  - [Authentication Architecture: Web vs. Mobile](./docs/architecture/auth_architecture.md) ([Indonesian](./docs/architecture/auth_architecture.id.md))
   - [AWS High Availability Architecture](./docs/architecture/aws_high_availability_architecture.md) ([Indonesian](./docs/architecture/aws_high_availability_architecture.id.md))
   - [Deployment Strategy](./docs/architecture/deployment_strategy.md) ([Indonesian](./docs/architecture/deployment_strategy.id.md))
+  - [Email Architecture](./docs/architecture/email_architecture.md) ([Indonesian](./docs/architecture/email_architecture.id.md))
+  - [Fingerprint Integration Design (Indonesian only)](./docs/architecture/fingerprint_integration_design.id.md)
   - [Multi-Tenancy System](./docs/architecture/multi_tenancy_system.md) ([Indonesian](./docs/architecture/multi_tenancy_system.id.md))
   - [Scalability Architecture Guide](./docs/architecture/scaling_architecture_guide.md) ([Indonesian](./docs/architecture/scaling_architecture_guide.id.md))
-  - [Authentication Architecture: Web vs. Mobile](./docs/architecture/auth_architecture.md) ([Indonesian](./docs/architecture/auth_architecture.id.md))
+  - [Security Assessment Guide](./docs/architecture/security_self_assessment_guide.md) ([Indonesian](./docs/architecture/security_self_assessment_guide.id.md))
 - **`business_strategy/`**: SaaS pricing tiers, SLAs, profit projections, and org charts.
-  - [Subscription Tiers & Pricing Strategy](./docs/business_strategy/pricing_and_plans.md) ([Indonesian](./docs/business_strategy/pricing_and_plans.id.md))
+  - [2026 Market Strategy](./docs/business_strategy/market_strategy_2026.md) ([Indonesian](./docs/business_strategy/market_strategy_2026.id.md))
   - [Business Projections & Financial Model](./docs/business_strategy/business_projections.md) ([Indonesian](./docs/business_strategy/business_projections.id.md))
   - [Organizational Structure & Scaling Roadmap](./docs/business_strategy/organization_and_scaling.md) ([Indonesian](./docs/business_strategy/organization_and_scaling.id.md))
+  - [Path to 1M Users](./docs/business_strategy/ultimate_target_1m_users.md) ([Indonesian](./docs/business_strategy/ultimate_target_1m_users.id.md))
   - [SLA Enterprise Standard](./docs/business_strategy/sla_enterprise_standard.md) ([Indonesian](./docs/business_strategy/sla_enterprise_standard.id.md))
+  - [Subscription Tiers & Pricing Strategy](./docs/business_strategy/pricing_and_plans.md) ([Indonesian](./docs/business_strategy/pricing_and_plans.id.md))
 - **`modules/`**: Specific backend module guides.
   - [Attendance](./docs/modules/attendance.md) / [Indonesian](./docs/modules/attendance.id.md)
   - [Billing](./docs/modules/billing.md) / [Indonesian](./docs/modules/billing.id.md)
@@ -215,17 +220,33 @@ The platform maintains a comprehensive bilingual (English & Indonesian) document
   - [Users](./docs/modules/users.md) / [Indonesian](./docs/modules/users.id.md)
 - **`project_management/`**: Implementation roadmap checklist and cross-stack knowledge transfers.
   - [Feature Roadmap Checklist](./docs/project_management/feature_roadmap_checklist.md) ([Indonesian](./docs/project_management/feature_roadmap_checklist.id.md))
+  - [Frontend & Mobile Knowledge Transfer](./docs/project_management/knowledge_transfer_frontend_mobile.md) ([Indonesian](./docs/project_management/knowledge_transfer_frontend_mobile.id.md))
   - [Mobile Feature Audit](./docs/project_management/mobile_feature_audit.md) ([Indonesian](./docs/project_management/mobile_feature_audit.id.md))
 - **`technical_specs/`**: Route maps, API references, and security audits.
-  - [Full-Stack Developer Guide & Technical Specifications](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide.id.md))
+  - [Admin Portal Protection Strategy](./docs/technical_specs/admin_portal_protection_strategy.md) ([Indonesian](./docs/technical_specs/admin_portal_protection_strategy.id.md))
+  - [Admin Portals Differentiation](./docs/technical_specs/admin_portals_differentiation.md) ([Indonesian](./docs/technical_specs/admin_portals_differentiation.id.md))
+  - [Admin Portals Review](./docs/technical_specs/admin_portals_review.md) ([Indonesian](./docs/technical_specs/admin_portals_review.id.md))
   - [API Reference](./docs/technical_specs/api_reference.md) ([Indonesian](./docs/technical_specs/api_reference.id.md))
+  - [Client Access Guide](./docs/technical_specs/client_access_guide.md) ([Indonesian](./docs/technical_specs/client_access_guide.id.md))
+  - [Cloudflare Zero Trust Guide](./docs/technical_specs/cloudflare_zero_trust_guide.md) ([Indonesian](./docs/technical_specs/cloudflare_zero_trust_guide.id.md))
+  - [Full-Stack Developer Guide & Technical Specifications](./docs/technical_specs/developer_guide.md) ([Indonesian](./docs/technical_specs/developer_guide.id.md))
+  - [Payment Environment Guide](./docs/technical_specs/payment_environment_guide.md) ([Indonesian](./docs/technical_specs/payment_environment_guide.id.md))
   - [Security Audit & Compliance](./docs/technical_specs/security_audit.md) ([Indonesian](./docs/technical_specs/security_audit.id.md))
+  - [VPN Connection Guide](./docs/technical_specs/vpn_connection_guide.md) ([Indonesian](./docs/technical_specs/vpn_connection_guide.id.md))
 - **`workflows_features/`**: Functional business flows and feature details.
-  - [Mobile Application Workflows & Flowcharts](./docs/workflows_features/mobile_app_workflows.md) ([Indonesian](./docs/workflows_features/mobile_app_workflows.id.md))
-  - [Web Application Workflows & Flowcharts](./docs/workflows_features/web_app_workflows.md) ([Indonesian](./docs/workflows_features/web_app_workflows.id.md))
-  - [Registration, Subscription Lifecycles & Billing](./docs/workflows_features/registration_subscription_billing.md) ([Indonesian](./docs/workflows_features/registration_subscription_billing.id.md))
   - [Authorization System (RBAC) & Security Classification](./docs/workflows_features/rbac_security.md) ([Indonesian](./docs/workflows_features/rbac_security.id.md))
+  - [Deployment & Branching Strategy](./docs/workflows_features/deployment_and_branching.md) ([Indonesian](./docs/workflows_features/deployment_and_branching.id.md))
+  - [Direct Payroll Payout Integration Plan](./docs/workflows_features/direct_payroll_payout.md) ([Indonesian](./docs/workflows_features/direct_payroll_payout.id.md))
+  - [Employee Lifecycle States](./docs/workflows_features/employee_lifecycle.md) ([Indonesian](./docs/workflows_features/employee_lifecycle.id.md))
+  - [Feature Gaps & Development Roadmap](./docs/workflows_features/feature_gaps_and_roadmap.md) ([Indonesian](./docs/workflows_features/feature_gaps_and_roadmap.id.md))
+  - [Feature Map & Platform Comparison](./docs/workflows_features/feature_map_and_platform_comparison.md) ([Indonesian](./docs/workflows_features/feature_map_and_platform_comparison.id.md))
+  - [Future AI Support Plans](./docs/workflows_features/future_support_ai.md) ([Indonesian](./docs/workflows_features/future_support_ai.id.md))
+  - [Helpdesk Ticketing System Design](./docs/workflows_features/help_support_ticketing_design.md) ([Indonesian](./docs/workflows_features/help_support_ticketing_design.id.md))
+  - [HRMS Operations Workflow Diagram](./docs/workflows_features/hrms_operations_workflow.md) ([Indonesian](./docs/workflows_features/hrms_operations_workflow.id.md))
+  - [Mobile Application Workflows & Flowcharts](./docs/workflows_features/mobile_app_workflows.md) ([Indonesian](./docs/workflows_features/mobile_app_workflows.id.md))
   - [Notification System Architecture & Event Mapping](./docs/workflows_features/notification_system.md) ([Indonesian](./docs/workflows_features/notification_system.id.md))
+  - [Registration, Subscription Lifecycles & Billing](./docs/workflows_features/registration_subscription_billing.md) ([Indonesian](./docs/workflows_features/registration_subscription_billing.id.md))
+  - [Web Application Workflows & Flowcharts](./docs/workflows_features/web_app_workflows.md) ([Indonesian](./docs/workflows_features/web_app_workflows.id.md))
 
 ## 🛠 Tech Stack
 

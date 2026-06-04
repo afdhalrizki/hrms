@@ -84,15 +84,15 @@ Platform harikerja mengikuti jalur promosi 4-tingkat yang ketat:
 
 ## 🧪 Standar Pengujian
 
-Frontend menggunakan strategi lapisan ganda dengan **tingkat kelulusan 100%** di **336 tes krusial**.
+Frontend menggunakan strategi lapisan ganda dengan **tingkat kelulusan 100%** di **339 tes krusial**.
 
-### Unit Testing (Vitest) - 249 Tes
+### Unit Testing (Vitest) - 251 Tes
 
 ```bash
 node scripts/run_unit_tests.mjs
 ```
 
-### End-to-End Testing (Playwright) - 87 Tes
+### End-to-End Testing (Playwright) - 88 Tes
 
 **Jalankan dengan API tiruan (Cepat/Terisolasi):**
 
@@ -123,5 +123,5 @@ Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh pl
 
 ---
 
-**Status**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Frontend Terstandardisasi.
+**Status**: 🏆 **Platform Gold Release v1.5.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Frontend Terstandardisasi.
 **Catatan Branding**: Proyek ini diubah namanya menjadi **harikerja** pada 16 Maret 2026.

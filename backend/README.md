@@ -90,7 +90,7 @@ The harikerja platform follows a strict 4-tier promotion path:
 
 ## 🧪 Testing Standard
 
-The backend uses `pytest` with **100% pass rate** across **410 mission-critical tests** (391 Unit + 19 E2E).
+The backend uses `pytest` with **100% pass rate** across **416 mission-critical tests** (397 Unit + 19 E2E).
 
 **Run logic/unit tests:**
 
@@ -121,5 +121,5 @@ For in-depth technical details, please refer to the platform-wide documentation 
 
 ---
 
-**Project Status**: 🏆 **Platform Gold Release v1.3.1 (May 11, 2026)**. Scalability Blueprint & Backend Core Standardized.
+**Project Status**: 🏆 **Platform Gold Release v1.5.1 (May 11, 2026)**. Scalability Blueprint & Backend Core Standardized.
 **Branding Note**: This project was rebranded from Antigravity to **harikerja** on March 16, 2026.

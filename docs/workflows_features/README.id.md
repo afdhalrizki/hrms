@@ -10,27 +10,29 @@ Dokumentasi alur kerja dikelompokkan ke dalam beberapa topik utama yang tersedia
 
 1.  **Deployment & Percabangan ([deployment_and_branching.id.md](./deployment_and_branching.id.md)):** 
     Strategi branching Git (Main, Develop, Feature branch) dan alur CI/CD dari lokal hingga produksi.
-2.  **Siklus Hidup Karyawan ([employee_lifecycle.id.md](./employee_lifecycle.id.md)):** 
+2.  **Integrasi Pembayaran Gaji Langsung ([direct_payroll_payout.id.md](./direct_payroll_payout.id.md)):** 
+    Desain teknis dan rencana implementasi transfer gaji langsung ke rekening karyawan menggunakan Payment Gateway B2B (Xendit/Midtrans).
+3.  **Siklus Hidup Karyawan ([employee_lifecycle.id.md](./employee_lifecycle.id.md)):** 
     Tahapan status karyawan dari mulai pendaftaran (Onboarding), evaluasi probation, aktif bekerja, mutasi, hingga resign/pensiun.
-3.  **Kesenjangan Fitur & Roadmap ([feature_gaps_and_roadmap.id.md](./feature_gaps_and_roadmap.id.md)):** 
+4.  **Kesenjangan Fitur & Roadmap ([feature_gaps_and_roadmap.id.md](./feature_gaps_and_roadmap.id.md)):** 
     Analisis kesenjangan modul yang belum diimplementasikan di mobile/web serta peta jalan penyelesaiannya.
-4.  **Peta Fitur & Perbandingan Platform ([feature_map_and_platform_comparison.id.md](./feature_map_and_platform_comparison.id.md)):** 
+5.  **Peta Fitur & Perbandingan Platform ([feature_map_and_platform_comparison.id.md](./feature_map_and_platform_comparison.id.md)):** 
     Perbandingan kesetaraan fungsionalitas antara web client, mobile client, serta aplikasi HR kompetitor.
-5.  **Masa Depan Fitur AI ([future_support_ai.id.md](./future_support_ai.id.md)):** 
+6.  **Masa Depan Fitur AI ([future_support_ai.id.md](./future_support_ai.id.md)):** 
     Konseptual rencana integrasi kecerdasan buatan (LLM) untuk membantu HR menganalisis performa kerja atau otomatisasi rekrutmen.
-6.  **Desain Sistem Tiket Bantuan ([help_support_ticketing_design.id.md](./help_support_ticketing_design.id.md)):** 
+7.  **Desain Sistem Tiket Bantuan ([help_support_ticketing_design.id.md](./help_support_ticketing_design.id.md)):** 
     Alur interaksi tiket helpdesk dari pelaporan kendala oleh karyawan hingga penugasan dan penyelesaian oleh admin.
-7.  **Operasional HRMS ([hrms_operations_workflow.id.md](./hrms_operations_workflow.id.md)):** 
+8.  **Operasional HRMS ([hrms_operations_workflow.id.md](./hrms_operations_workflow.id.md)):** 
     Bagan alur interaksi terpadu end-to-end data absensi, payroll, reimbursement, dan core data di database.
-8.  **Alur Kerja Mobile App ([mobile_app_workflows.id.md](./mobile_app_workflows.id.md)):** 
+9.  **Alur Kerja Mobile App ([mobile_app_workflows.id.md](./mobile_app_workflows.id.md)):** 
     Panduan transisi halaman Flutter, penyimpanan token aman local, sinkronisasi offline presensi GPS.
-9.  **Sistem Notifikasi ([notification_system.id.md](./notification_system.id.md)):** 
+10. **Sistem Notifikasi ([notification_system.id.md](./notification_system.id.md)):** 
     Logika pemicu pengiriman pesan email prioritas dan push notification asinkron via antrean.
-10. **Sistem Keamanan RBAC ([rbac_security.id.md](./rbac_security.id.md)):** 
+11. **Sistem Keamanan RBAC ([rbac_security.id.md](./rbac_security.id.md)):** 
     Otorisasi pembatasan akses data berjenjang di tingkat tenant penyewa (Superadmin, HR Admin, Manager, Karyawan).
-11. **Siklus Langganan & Billing ([registration_subscription_billing.id.md](./registration_subscription_billing.id.md)):** 
+12. **Siklus Langganan & Billing ([registration_subscription_billing.id.md](./registration_subscription_billing.id.md)):** 
     Alur pendaftaran perusahaan baru, konfirmasi domain, pembayaran via Midtrans, dan masa percobaan 14 hari.
-12. **Alur Kerja Web App ([web_app_workflows.id.md](./web_app_workflows.id.md)):** 
+13. **Alur Kerja Web App ([web_app_workflows.id.md](./web_app_workflows.id.md)):** 
     Spesifikasi alur perpindahan halaman dashboard Next.js, interaksi API JWT, dan penanganan error.
 
 ---
@@ -40,6 +42,7 @@ Dokumentasi alur kerja dikelompokkan ke dalam beberapa topik utama yang tersedia
 | Nama Berkas | Kategori | Target Pembaca | Topik Utama |
 | :--- | :--- | :--- | :--- |
 | **[deployment_and_branching.id.md](./deployment_and_branching.id.md)** | DevOps | Developer, DevOps | Git branching model, CI/CD pipeline |
+| **[direct_payroll_payout.id.md](./direct_payroll_payout.id.md)** | Integrasi | Keuangan, Developer | Pembayaran gaji langsung via B2B gateway, transfer bank |
 | **[employee_lifecycle.id.md](./employee_lifecycle.id.md)** | HR Bisnis | BA, Developer | Siklus kerja karyawan, status kontrak |
 | **[feature_gaps_and_roadmap.id.md](./feature_gaps_and_roadmap.id.md)** | Pelacakan | PM, Product Owner | Kesenjangan fungsional mobile/web |
 | **[feature_map_and_platform_comparison.id.md](./feature_map_and_platform_comparison.id.md)** | Analisis | PM, BA | Perbandingan fitur kompetitor, peta modular |

@@ -152,9 +152,9 @@ graph TD
 
 Platform ini mencapai tingkat kelulusan tes **100% terpadu** di semua lapisan stack.
 
-- **Backend**: 410 Tes (391 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 2 Juni 2026)
-- **Frontend**: 336 Tes (249 Unit + 87 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 2 Juni 2026)
-- **Mobile**: 166 Tes (143 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 2 Juni 2026)
+- **Backend**: 416 Tes (397 Unit + 19 E2E) - Pytest. (Terverifikasi 100% Lulus - 3 Juni 2026)
+- **Frontend**: 339 Tes (251 Unit + 88 E2E) - Vitest & Playwright. (Terverifikasi 100% Lulus - 3 Juni 2026)
+- **Mobile**: 167 Tes (144 Unit + 23 E2E) - Flutter. (Terverifikasi 100% Lulus - 3 Juni 2026)
 
 ## 📈 Strategi Skalabilitas: Jalan Menuju 1 Juta Pengguna
 
@@ -193,16 +193,21 @@ Platform ini mempertahankan dokumentasi bilingual (Inggris & Indonesia) yang kom
 - **`adr/`**: Architecture Decision Records (ADR) yang merinci keputusan teknis krusial.
   - [Optimasi Penghitung Karyawan](./docs/adr/employee_counter_optimization.id.md) ([English](./docs/adr/employee_counter_optimization.md))
 - **`architecture/`**: Integrasi sistem, diagram alur otentikasi, dan desain infrastruktur HA.
+  - [Arsitektur Autentikasi: Web vs. Mobile](./docs/architecture/auth_architecture.id.md) ([English](./docs/architecture/auth_architecture.md))
   - [Arsitektur High Availability AWS](./docs/architecture/aws_high_availability_architecture.id.md) ([English](./docs/architecture/aws_high_availability_architecture.md))
   - [Strategi Penyebaran & Jalur Promosi](./docs/architecture/deployment_strategy.id.md) ([English](./docs/architecture/deployment_strategy.md))
+  - [Arsitektur Email](./docs/architecture/email_architecture.id.md) ([English](./docs/architecture/email_architecture.md))
+  - [Desain Integrasi Sidik Jari (Hanya Bhs. Indonesia)](./docs/architecture/fingerprint_integration_design.id.md)
   - [Sistem Multi-Tenancy](./docs/architecture/multi_tenancy_system.id.md) ([English](./docs/architecture/multi_tenancy_system.md))
   - [Panduan Arsitektur Skalabilitas](./docs/architecture/scaling_architecture_guide.id.md) ([English](./docs/architecture/scaling_architecture_guide.md))
-  - [Arsitektur Autentikasi: Web vs. Mobile](./docs/architecture/auth_architecture.id.md) ([English](./docs/architecture/auth_architecture.md))
+  - [Panduan Penilaian Keamanan Mandiri](./docs/architecture/security_self_assessment_guide.id.md) ([English](./docs/architecture/security_self_assessment_guide.md))
 - **`business_strategy/`**: Rencana tingkat harga SaaS, SLA, proyeksi keuntungan, dan struktur tim.
-  - [Paket Langganan & Strategi Pricing](./docs/business_strategy/pricing_and_plans.id.md) ([English](./docs/business_strategy/pricing_and_plans.md))
+  - [Strategi Pasar 2026](./docs/business_strategy/market_strategy_2026.id.md) ([English](./docs/business_strategy/market_strategy_2026.md))
   - [Proyeksi Bisnis & Target Profit](./docs/business_strategy/business_projections.id.md) ([English](./docs/business_strategy/business_projections.md))
   - [Struktur Organisasi & Peta Jalan Skala](./docs/business_strategy/organization_and_scaling.id.md) ([English](./docs/business_strategy/organization_and_scaling.md))
+  - [Jalan Menuju 1 Juta Pengguna](./docs/business_strategy/ultimate_target_1m_users.id.md) ([English](./docs/business_strategy/ultimate_target_1m_users.md))
   - [Standar SLA Enterprise](./docs/business_strategy/sla_enterprise_standard.id.md) ([English](./docs/business_strategy/sla_enterprise_standard.md))
+  - [Paket Langganan & Strategi Pricing](./docs/business_strategy/pricing_and_plans.id.md) ([English](./docs/business_strategy/pricing_and_plans.md))
 - **`modules/`**: Panduan teknis spesifik untuk modul backend.
   - [Kehadiran](./docs/modules/attendance.id.md) / [English](./docs/modules/attendance.md)
   - [Penagihan](./docs/modules/billing.id.md) / [English](./docs/modules/billing.md)
@@ -215,17 +220,33 @@ Platform ini mempertahankan dokumentasi bilingual (Inggris & Indonesia) yang kom
   - [Pengguna](./docs/modules/users.id.md) / [English](./docs/modules/users.md)
 - **`project_management/`**: Checklist peta jalan implementasi dan transfer pengetahuan antar-stack.
   - [Checklist Fitur & Peta Jalan](./docs/project_management/feature_roadmap_checklist.id.md) ([English](./docs/project_management/feature_roadmap_checklist.md))
+  - [Transfer Pengetahuan Frontend & Mobile](./docs/project_management/knowledge_transfer_frontend_mobile.id.md) ([English](./docs/project_management/knowledge_transfer_frontend_mobile.md))
   - [Audit Fitur Mobile](./docs/project_management/mobile_feature_audit.id.md) ([English](./docs/project_management/mobile_feature_audit.md))
 - **`technical_specs/`**: Peta rute otorisasi, referensi API, dan audit keamanan.
-  - [Panduan Developer & Spesifikasi Teknis](./docs/technical_specs/developer_guide.id.md) ([English](./docs/technical_specs/developer_guide.md))
+  - [Strategi Proteksi Portal Admin](./docs/technical_specs/admin_portal_protection_strategy.id.md) ([English](./docs/technical_specs/admin_portal_protection_strategy.md))
+  - [Perbedaan Portal Admin](./docs/technical_specs/admin_portals_differentiation.id.md) ([English](./docs/technical_specs/admin_portals_differentiation.md))
+  - [Laporan Evaluasi Portal Admin](./docs/technical_specs/admin_portals_review.id.md) ([English](./docs/technical_specs/admin_portals_review.md))
   - [Referensi API](./docs/technical_specs/api_reference.id.md) ([English](./docs/technical_specs/api_reference.md))
+  - [Panduan Akses Klien](./docs/technical_specs/client_access_guide.id.md) ([English](./docs/technical_specs/client_access_guide.md))
+  - [Panduan Cloudflare Zero Trust](./docs/technical_specs/cloudflare_zero_trust_guide.id.md) ([English](./docs/technical_specs/cloudflare_zero_trust_guide.md))
+  - [Panduan Developer & Spesifikasi Teknis](./docs/technical_specs/developer_guide.id.md) ([English](./docs/technical_specs/developer_guide.md))
+  - [Panduan Lingkungan Pembayaran](./docs/technical_specs/payment_environment_guide.id.md) ([English](./docs/technical_specs/payment_environment_guide.md))
   - [Dokumentasi Audit Keamanan & Kepatuhan](./docs/technical_specs/security_audit.id.md) ([English](./docs/technical_specs/security_audit.md))
+  - [Panduan Koneksi VPN](./docs/technical_specs/vpn_connection_guide.id.md) ([English](./docs/technical_specs/vpn_connection_guide.md))
 - **`workflows_features/`**: Detail fungsional alur kerja bisnis utama.
-  - [Alur Kerja & Diagram Alir Aplikasi Mobile](./docs/workflows_features/mobile_app_workflows.id.md) ([English](./docs/workflows_features/mobile_app_workflows.md))
-  - [Alur Kerja & Diagram Alir Aplikasi Web](./docs/workflows_features/web_app_workflows.id.md) ([English](./docs/workflows_features/web_app_workflows.md))
-  - [Registrasi, Siklus Hidup Langganan & Billing](./docs/workflows_features/registration_subscription_billing.id.md) ([English](./docs/workflows_features/registration_subscription_billing.md))
   - [Sistem Otorisasi (RBAC) & Klasifikasi Keamanan](./docs/workflows_features/rbac_security.id.md) ([English](./docs/workflows_features/rbac_security.md))
+  - [Deployment & Percabangan Strategy](./docs/workflows_features/deployment_and_branching.id.md) ([English](./docs/workflows_features/deployment_and_branching.md))
+  - [Rencana Integrasi Pembayaran Gaji Langsung](./docs/workflows_features/direct_payroll_payout.id.md) ([English](./docs/workflows_features/direct_payroll_payout.md))
+  - [Tahapan Siklus Hidup Karyawan](./docs/workflows_features/employee_lifecycle.id.md) ([English](./docs/workflows_features/employee_lifecycle.md))
+  - [Kesenjangan Fitur & Peta Jalan Pengembangan](./docs/workflows_features/feature_gaps_and_roadmap.id.md) ([English](./docs/workflows_features/feature_gaps_and_roadmap.md))
+  - [Peta Fitur & Perbandingan Platform](./docs/workflows_features/feature_map_and_platform_comparison.id.md) ([English](./docs/workflows_features/feature_map_and_platform_comparison.md))
+  - [Rencana Masa Depan Fitur AI](./docs/workflows_features/future_support_ai.id.md) ([English](./docs/workflows_features/future_support_ai.md))
+  - [Desain Sistem Tiket Bantuan](./docs/workflows_features/help_support_ticketing_design.id.md) ([English](./docs/workflows_features/help_support_ticketing_design.md))
+  - [Operasional HRMS & Bagan Alur Data](./docs/workflows_features/hrms_operations_workflow.id.md) ([English](./docs/workflows_features/hrms_operations_workflow.md))
+  - [Alur Kerja & Diagram Alir Aplikasi Mobile](./docs/workflows_features/mobile_app_workflows.id.md) ([English](./docs/workflows_features/mobile_app_workflows.md))
   - [Sistem Notifikasi & Pemetaan Peristiwa](./docs/workflows_features/notification_system.id.md) ([English](./docs/workflows_features/notification_system.md))
+  - [Registrasi, Siklus Hidup Langganan & Billing](./docs/workflows_features/registration_subscription_billing.id.md) ([English](./docs/workflows_features/registration_subscription_billing.md))
+  - [Alur Kerja & Diagram Alir Aplikasi Web](./docs/workflows_features/web_app_workflows.id.md) ([English](./docs/workflows_features/web_app_workflows.md))
 
 ## 🛠 Tech Stack
 

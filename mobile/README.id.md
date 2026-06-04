@@ -97,9 +97,9 @@ Aplikasi menangani multi-tenancy melalui `X-Tenant-Domain` dan build lingkungan.
 
 ## 🧪 Standar Pengujian
 
-Aplikasi mobile memiliki rangkaian pengujian komprehensif yang mencakup logika inti dan alur E2E dengan **tingkat kelulusan 100%** di **166 tes yang kuat**.
+Aplikasi mobile memiliki rangkaian pengujian komprehensif yang mencakup logika inti dan alur E2E dengan **tingkat kelulusan 100%** di **167 tes yang kuat**.
 
-### Unit & Logic Tests - 143 Tes
+### Unit & Logic Tests - 144 Tes
 
 ```bash
 node scripts/run_unit_tests.mjs
@@ -136,5 +136,5 @@ Untuk rincian teknis yang mendalam, silakan merujuk ke dokumentasi di seluruh pl
 
 ---
 
-**Status**: 🏆 **Platform Gold Release v1.3.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Mobile Terstandardisasi.
+**Status**: 🏆 **Platform Gold Release v1.5.1 (11 Mei 2026)**. Cetak Biru Skalabilitas & Pengalaman Mobile Terstandardisasi.
 **Catatan Branding**: Proyek ini diubah namanya menjadi **harikerja** pada 16 Maret 2026.
