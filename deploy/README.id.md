@@ -14,6 +14,7 @@ Infrastruktur disusun berdasarkan target lingkungan (environment):
 ### 2. [QA (Quality Assurance)](./qa/qa.id.md)
 *   **Jalur**: `deploy/qa/`
 *   **Tujuan**: Pengujian fungsional dan UAT (User Acceptance Testing) pada domain `harikerja.web.id`.
+*   **Operasional**: Untuk menjalankan perintah shell dan tugas database, lihat **[Panduan Operasional QA](../docs/technical_specs/qa_operations_guide.id.md)** (dijalankan dari root proyek).
 
 ### 3. [Production 1K (VPS Single-Instance)](./production-1k/production-1k.md)
 *   **Jalur**: `deploy/production-1k/`

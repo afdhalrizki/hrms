@@ -14,6 +14,7 @@ The infrastructure is organized by target environment:
 ### 2. [QA (Quality Assurance)](./qa/qa.md)
 *   **Path**: `deploy/qa/`
 *   **Purpose**: Functional testing on `harikerja.web.id`.
+*   **Operations**: For running shell commands and database tasks, see the **[QA Operations Guide](../docs/technical_specs/qa_operations_guide.md)** (run from project root).
 
 ### 3. [Production 1K (Single-Instance VPS)](./production-1k/production-1k.md)
 *   **Path**: `deploy/production-1k/`

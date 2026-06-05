@@ -1,5 +1,4 @@
 import https from 'https';
-import net from 'net';
 
 // Disable SSL verification for testing IP-based connections with custom Host headers
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -46,25 +45,33 @@ const PATHS = {
 
 function checkVpnGateway() {
   return new Promise((resolve) => {
-    const socket = new net.Socket();
-    socket.setTimeout(2000);
-    
-    socket.on('connect', () => {
-      socket.destroy();
+    const options = {
+      hostname: VPN_IP,
+      port: 443,
+      path: '/',
+      method: 'GET',
+      headers: {
+        Host: DOMAIN,
+      },
+      timeout: 1500, // Short timeout for quick check
+    };
+
+    const req = https.request(options, (res) => {
+      res.resume();
+      // Any response from Nginx means the VPN gateway is active and reachable
       resolve(true);
     });
-    
-    socket.on('timeout', () => {
-      socket.destroy();
+
+    req.on('error', () => {
       resolve(false);
     });
-    
-    socket.on('error', () => {
-      socket.destroy();
+
+    req.on('timeout', () => {
+      req.destroy();
       resolve(false);
     });
-    
-    socket.connect(443, VPN_IP);
+
+    req.end();
   });
 }
 

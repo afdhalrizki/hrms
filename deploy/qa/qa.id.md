@@ -227,12 +227,19 @@ docker compose --env-file deploy/environments/.env.qa up -d --build
 
 Proses build akan memakan waktu sekitar **2 - 5 menit**. Anda bisa memantau konsumsi RAM menggunakan perintah `htop` di jendela terminal lain secara bersamaan.
 
-### 3. Jalankan Migrasi Django-Tenants (Jika Setup Gagal)
-Jika Anda perlu menjalankan migrasi pada *Public Schema* (Tenant utama) secara manual:
+### 3. Menjalankan Perintah Administratif & Tugas Django
 
+Untuk menjalankan script Django shell, migrasi database, pemeriksaan sistem, dan lingkungan interaktif di server QA, silakan lihat **[Panduan Operasional & Diagnostik Server QA](../../docs/technical_specs/qa_operations_guide.id.md)**.
+
+Semua perintah wajib dijalankan dari direktori root proyek. Sebagai contoh, jika Anda perlu menjalankan migrasi secara manual atau mengakses skema database:
 ```bash
-docker compose exec backend bash
+# Masuk ke backend shell menggunakan konfigurasi compose QA
+docker compose -f deploy/qa/docker-compose.qa.yml exec backend bash
+
+# Jalankan migrasi shared tenant
 python manage.py migrate_schemas --shared
+
+# Buat tenant utama jika setup gagal
 python manage.py create_tenant --schema_name=public --name="HariKerja QA Master" --domain-domain=harikerja.web.id --is_primary=True
 ```
 

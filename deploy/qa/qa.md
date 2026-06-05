@@ -227,12 +227,19 @@ docker compose --env-file deploy/environments/.env.qa up -d --build
 
 The build process will take about **2 - 5 minutes**. You can monitor the RAM consumption using the `htop` command in a separate terminal window simultaneously.
 
-### 3. Run Django-Tenants Migrations (If Setup Fails)
-If you need to manually run migrations on the *Public Schema* (Main tenant):
+### 3. Running Administrative Commands & Django Tasks
 
+For running Django shell scripts, database migrations, check-ups, and interactive environments on the QA server, see the **[QA Server Operations & Diagnostic Guide](../../docs/technical_specs/qa_operations_guide.md)**.
+
+All commands must be executed from the project root directory. For example, if you need to manually run migrations or access the database schemas:
 ```bash
-docker compose exec backend bash
+# Enter backend shell using the QA compose configuration
+docker compose -f deploy/qa/docker-compose.qa.yml exec backend bash
+
+# Run shared tenant migrations
 python manage.py migrate_schemas --shared
+
+# Create primary tenant if setup fails
 python manage.py create_tenant --schema_name=public --name="HariKerja QA Master" --domain-domain=harikerja.web.id --is_primary=True
 ```
 

@@ -28,6 +28,8 @@ Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, ters
     Panduan lengkap administrator server untuk men-deploy server OpenVPN/WireGuard, nat routing `ufw`, dan whitelisting Nginx proxy.
 10. **Panduan Lingkungan Pembayaran ([payment_environment_guide.id.md](./payment_environment_guide.id.md)):**
     Detail konfigurasi sandbox Midtrans, pencairan rekening merchant live, dan panduan migrasi ke produksi.
+11. **Panduan Operasional QA ([qa_operations_guide.id.md](./qa_operations_guide.id.md)):**
+    Panduan operasional pengembang/DevOps untuk menjalankan perintah Django shell, migrasi database, dan diagnostik di server QA.
 
 ---
 
@@ -43,6 +45,7 @@ Dokumentasi spesifikasi teknis dikelompokkan ke dalam beberapa topik utama, ters
 | **[cloudflare_zero_trust_guide.id.md](./cloudflare_zero_trust_guide.id.md)** | Jaringan | DevOps, Sysadmin | Argo Tunnel cloudflared, SSO Email PIN Access |
 | **[developer_guide.id.md](./developer_guide.id.md)** | Pengembangan | Full-stack Developer | Local dev up.mjs, multi-tenant schema, testing |
 | **[payment_environment_guide.id.md](./payment_environment_guide.id.md)** | Integrasi | DevOps, Developer | Midtrans sandbox, rekening bank merchant live, konfigurasi produksi |
+| **[qa_operations_guide.id.md](./qa_operations_guide.id.md)** | Operasional | DevOps, Developer | Diagnostik server QA, django shell, manajemen kontainer |
 | **[security_audit.id.md](./security_audit.id.md)** | Kepatuhan | Security Auditor, Dev | Penetration testing OWASP Top 10, database encryption |
 | **[vpn_connection_guide.id.md](./vpn_connection_guide.id.md)** | Jaringan | DevOps, Sysadmin | Deploy OpenVPN, ufw NAT forwarding, Nginx allow/deny |
 
