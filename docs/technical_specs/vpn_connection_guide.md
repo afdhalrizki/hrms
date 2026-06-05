@@ -80,7 +80,7 @@ Ubuntu supports native private VPN connections via both GNOME Graphical Interfac
 
 ## 3. Client (User) Guide - Accessing Admin Portals via Web
 
-Once your VPN connection is active (status shown as **Connected** / Green in your VPN client), you can access the admin portals through your web browser. There are two distinct administrative portals depending on your operational role:
+Once your VPN connection is active (status shown as **Connected** / Green in your VPN client) and the domain has been mapped in your local hosts file, you can access both administrative portals through your web browser:
 
 ```mermaid
 graph TD
@@ -101,7 +101,7 @@ This portal is used by **SaaS Superadmins, Customer Support Agents, Finance, and
   * Indonesian: `https://harikerja.web.id/id/login/portal-admin-secure-39f28j`
   * English: `https://harikerja.web.id/en/login/portal-admin-secure-39f28j`
 * **Access & Login Steps:**
-  1. Make sure your VPN connection is established.
+  1. Make sure your VPN connection is active and the domain `harikerja.web.id` has been mapped to IP `10.8.0.1` in your local machine's `hosts` file (see Section C for instructions).
   2. Open your web browser (Chrome, Firefox, Edge, or Safari) and navigate to the appropriate URL above.
   3. Enter the **Email Address** and **Password** registered for your administrator staff account.
   4. Click **Sign In**.
@@ -130,9 +130,17 @@ This console is strictly limited to **DevOps, Sysadmins, and Lead Backend Develo
 
 ### C. Troubleshooting for Clients
 
-* **`403 Forbidden` Error / Page Inaccessible:**
-  * *Cause:* Your VPN is disconnected, or the IP you got from your local ISP network is not within the Nginx whitelist range.
-  * *Solution:* Check your OpenVPN/WireGuard client. Ensure the connection toggle is green. If using terminal, check that the `openvpn` process is still running. If the issue persists, contact DevOps to check if your current public IP needs to be whitelisted.
+* **`403 Forbidden` Error on Django Admin / Page Inaccessible (but Portal Admin works):**
+  * *Cause:* The domain `harikerja.web.id` resolves to the server's public IP. By default, the client operating system routes traffic destined for the VPN server's public IP directly over your physical local internet interface (bypassing the VPN tunnel) to prevent routing loops. As a result, Nginx sees your ISP's public IP rather than your private VPN IP (`10.8.0.x`), leading to a `403 Forbidden` error.
+  * *Solution:* Map the domain `harikerja.web.id` to the private VPN gateway IP (`10.8.0.1`) in your local machine's `hosts` file:
+    * **Linux / macOS (`/etc/hosts`):** Open terminal and run `sudo nano /etc/hosts`, then append:
+      ```text
+      10.8.0.1 harikerja.web.id www.harikerja.web.id
+      ```
+    * **Windows (`C:\Windows\System32\drivers\etc\hosts`):** Run Notepad as Administrator, open the file, and append:
+      ```text
+      10.8.0.1 harikerja.web.id www.harikerja.web.id
+      ```
 * **`502 Bad Gateway` Error:**
   * *Cause:* The Nginx gateway is up, but the backend (Django) or frontend (Next.js) container is stopped or restarting on the server.
   * *Solution:* Contact the server administrator to verify container status using the command `docker compose ps` on the QA server.
@@ -156,9 +164,9 @@ The most secure and efficient way to deploy OpenVPN on Ubuntu is using a standar
    curl -O https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
    chmod +x openvpn-install.sh
    ```
-2. **Execute the script as root:**
+2. **Execute the script as root to perform installation:**
    ```bash
-   sudo ./openvpn-install.sh
+   sudo ./openvpn-install.sh install
    ```
 3. **Configure the following parameters during the interactive prompts:**
    * **IP Address:** Select the public IP of your server.
@@ -171,22 +179,34 @@ The most secure and efficient way to deploy OpenVPN on Ubuntu is using a standar
 ---
 
 ### Step 2: Client Profile Management (Adding & Revoking Users)
-Execute the installation script again to manage VPN clients.
+Execute the installation script with the appropriate subcommands or options to manage VPN clients.
 
 * **Creating a New Client Profile:**
-  1. Run the script: `sudo ./openvpn-install.sh`
-  2. Select option **1) Add a new user**.
-  3. Enter a descriptive client name (e.g., `afdhal-support`).
-  4. Choose whether to protect the private key with a passphrase.
-  5. The script generates a client configuration file at `/home/user/afdhal-support.ovpn` or `/root/afdhal-support.ovpn`.
-  6. Deliver this `.ovpn` file to the user securely via an encrypted channel.
+  You can create a new client profile using either of the following methods:
+  * **Option A: Direct Subcommand (Recommended)**
+    ```bash
+    sudo ./openvpn-install.sh client add <client-name>
+    ```
+    Follow the prompt to choose whether to protect the private key with a passphrase.
+  * **Option B: Interactive Menu**
+    ```bash
+    sudo ./openvpn-install.sh interactive
+    ```
+    Choose option **1) Add a new user**, enter the client name, and choose passphrase protection.
+
+  The script generates a client configuration file (e.g., `/home/<user>/<client-name>.ovpn` or `/root/<client-name>.ovpn`). Deliver this `.ovpn` file to the user securely via an encrypted channel.
 
 * **Revoking a Client Profile:**
   If a staff member leaves the company or their device is compromised, immediately revoke their access:
-  1. Run the script: `sudo ./openvpn-install.sh`
-  2. Select option **2) Revoke an existing user**.
-  3. Select the name of the user you want to revoke.
-  4. Confirm the action. The server will reject any subsequent connection attempts from that profile instantly.
+  * **Option A: Direct Subcommand (Recommended)**
+    ```bash
+    sudo ./openvpn-install.sh client revoke <client-name>
+    ```
+  * **Option B: Interactive Menu**
+    ```bash
+    sudo ./openvpn-install.sh interactive
+    ```
+    Select option **2) Revoke an existing user** and select the name of the user you want to revoke.
 
 ---
 

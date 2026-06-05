@@ -80,7 +80,7 @@ Ubuntu mendukung koneksi VPN privat melalui antarmuka grafis (GUI) maupun termin
 
 ## 3. Panduan Klien (User) - Mengakses Portal Admin via Web
 
-Setelah koneksi VPN Anda aktif (ditandai dengan status **Connected** / Hijau di aplikasi), Anda baru bisa mengakses portal admin melalui web browser. Ada dua portal administratif yang berbeda tergantung pada tugas kerja Anda:
+Setelah koneksi VPN Anda aktif (ditandai dengan status **Connected** / Hijau di aplikasi) serta domain telah dipetakan di file `hosts` komputer lokal Anda, Anda baru bisa mengakses kedua portal administratif melalui web browser:
 
 ```mermaid
 graph TD
@@ -101,7 +101,7 @@ Portal ini digunakan oleh **Superadmin SaaS, Agen Support, Tim Finance, dan Tim 
   * Bahasa Indonesia: `https://harikerja.web.id/id/login/portal-admin-secure-39f28j`
   * Bahasa Inggris: `https://harikerja.web.id/en/login/portal-admin-secure-39f28j`
 * **Langkah Mengakses & Login:**
-  1. Pastikan VPN Anda sudah aktif.
+  1. Pastikan koneksi VPN Anda sudah aktif dan domain `harikerja.web.id` sudah diarahkan ke IP `10.8.0.1` di file `hosts` komputer lokal Anda (lihat bagian C untuk panduannya).
   2. Buka web browser (Chrome, Firefox, Edge, atau Safari) dan navigasikan ke URL di atas.
   3. Masukkan **Alamat Email** dan **Kata Sandi** akun staf admin Anda yang telah didaftarkan.
   4. Klik **Sign In**.
@@ -130,9 +130,17 @@ Portal ini digunakan secara sangat terbatas oleh **DevOps, Sysadmin, dan Lead Ba
 
 ### C. Pemecahan Masalah (Troubleshooting) untuk Klien
 
-* **Error `403 Forbidden` / Halaman Tidak Bisa Diakses:**
-  * *Penyebab:* VPN Anda belum aktif, atau IP yang Anda dapatkan di jaringan lokal tidak masuk dalam rentang whitelist yang diizinkan oleh Nginx server.
-  * *Solusi:* Periksa kembali aplikasi OpenVPN/WireGuard Anda. Pastikan tombol status berwarna hijau. Jika menggunakan terminal, pastikan proses `openvpn` masih berjalan dan tidak mati. Jika masih error, hubungi tim DevOps untuk memverifikasi apakah IP publik lokal Anda perlu didaftarkan sementara.
+* **Error `403 Forbidden` pada Django Admin (tapi Portal Admin bisa diakses):**
+  * *Penyebab:* Domain `harikerja.web.id` mengarah ke IP publik server. Secara default, sistem operasi klien akan merutekan lalu lintas ke IP publik server VPN melalui koneksi internet fisik (bukan melalui VPN) guna menghindari loop perutean (*routing loop*). Akibatnya, Nginx mendeteksi IP publik ISP asli Anda, bukan IP privat VPN (`10.8.0.x`), sehingga diblokir oleh whitelist Nginx.
+  * *Solusi:* Lakukan pemetaan (*mapping*) domain `harikerja.web.id` ke IP privat gateway VPN (`10.8.0.1`) pada file `hosts` komputer lokal Anda:
+    * **Linux / macOS (`/etc/hosts`):** Buka terminal lalu jalankan perintah `sudo nano /etc/hosts`, kemudian tambahkan baris berikut di akhir file:
+      ```text
+      10.8.0.1 harikerja.web.id www.harikerja.web.id
+      ```
+    * **Windows (`C:\Windows\System32\drivers\etc\hosts`):** Buka Notepad dengan akses Administrator (*Run as Administrator*), buka file hosts tersebut, lalu tambahkan baris berikut di akhir file:
+      ```text
+      10.8.0.1 harikerja.web.id www.harikerja.web.id
+      ```
 * **Error `502 Bad Gateway`:**
   * *Penyebab:* Server Nginx aktif, tetapi kontainer backend (Django) atau frontend (Next.js) sedang dalam kondisi mati/restart di server.
   * *Solusi:* Hubungi administrator server untuk mengecek status Docker menggunakan perintah `docker compose ps` di server QA.
@@ -156,9 +164,9 @@ Cara paling cepat dan aman untuk memasang OpenVPN di server Ubuntu adalah menggu
    curl -O https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
    chmod +x openvpn-install.sh
    ```
-2. **Jalankan skrip sebagai root:**
+2. **Jalankan skrip sebagai root untuk memulai instalasi:**
    ```bash
-   sudo ./openvpn-install.sh
+   sudo ./openvpn-install.sh install
    ```
 3. **Konfigurasikan pilihan berikut selama proses instalasi interaktif:**
    * **IP Address:** Pilih IP publik server Anda.
@@ -171,22 +179,34 @@ Cara paling cepat dan aman untuk memasang OpenVPN di server Ubuntu adalah menggu
 ---
 
 ### Langkah 2: Manajemen Profil Klien VPN (Menambah & Menghapus User)
-Gunakan kembali skrip instalasi untuk mengelola pengguna.
+Jalankan skrip instalasi dengan sub-perintah atau opsi yang sesuai untuk mengelola klien VPN.
 
 * **Menambahkan Pengguna Baru:**
-  1. Jalankan kembali skrip: `sudo ./openvpn-install.sh`
-  2. Pilih opsi **1) Add a new user**.
-  3. Masukkan nama pengguna (misal: `afdhal-support`).
-  4. Pilih apakah ingin memproteksi file konfigurasi dengan kata sandi (*passphrase*) atau tidak.
-  5. Skrip akan menghasilkan berkas konfigurasi di lokasi `/home/user/afdhal-support.ovpn` atau `/root/afdhal-support.ovpn`.
-  6. Kirim file `.ovpn` ini secara aman ke staf yang bersangkutan melalui saluran komunikasi privat terenkripsi.
+  Anda dapat menambahkan pengguna baru menggunakan salah satu metode berikut:
+  * **Opsi A: Sub-perintah Langsung (Direkomendasikan)**
+    ```bash
+    sudo ./openvpn-install.sh client add <nama-client>
+    ```
+    Ikuti instruksi untuk menentukan apakah file konfigurasi perlu diproteksi dengan kata sandi (*passphrase*).
+  * **Opsi B: Menu Interaktif**
+    ```bash
+    sudo ./openvpn-install.sh interactive
+    ```
+    Pilih opsi **1) Add a new user**, masukkan nama client, dan pilih proteksi kata sandi.
+
+  Skrip akan menghasilkan berkas konfigurasi di lokasi `/home/<user>/<nama-client>.ovpn` atau `/root/<nama-client>.ovpn`. Kirim file `.ovpn` ini secara aman ke staf yang bersangkutan melalui saluran komunikasi privat terenkripsi.
 
 * **Mencabut Hak Akses Pengguna (Revoke User):**
   Jika ada staf yang keluar atau kehilangan perangkatnya, cabut hak aksesnya segera:
-  1. Jalankan skrip: `sudo ./openvpn-install.sh`
-  2. Pilih opsi **2) Revoke an existing user**.
-  3. Pilih nama pengguna yang ingin dihapus dari daftar.
-  4. Konfirmasi penghapusan. Akses pengguna tersebut akan langsung diblokir oleh server VPN saat itu juga.
+  * **Opsi A: Sub-perintah Langsung (Direkomendasikan)**
+    ```bash
+    sudo ./openvpn-install.sh client revoke <nama-client>
+    ```
+  * **Opsi B: Menu Interaktif**
+    ```bash
+    sudo ./openvpn-install.sh interactive
+    ```
+    Pilih opsi **2) Revoke an existing user** dan pilih nama pengguna yang ingin dihapus.
 
 ---
 

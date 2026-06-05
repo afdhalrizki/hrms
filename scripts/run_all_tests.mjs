@@ -427,6 +427,20 @@ async function main() {
     log(`⏱️ TOTAL GLOBAL TEST TIME: ${formatDuration(totalMs)}`, COLORS.cyan);
     log('========================================', COLORS.cyan);
 
+    // --- VPN Access Security Test ---
+    log('\n🛡️ RUNNING VPN ACCESS SECURITY TEST...', COLORS.cyan);
+    const vpnEnvIdx = args.indexOf('--vpn-env');
+    const vpnEnv = vpnEnvIdx !== -1 ? args[vpnEnvIdx + 1] : (process.env.VPN_ENV || 'qa');
+    const vpnAccessCode = await spawnStream('node', [join(RootDir, 'scripts/test_vpn_access.mjs'), vpnEnv], {
+      cwd: RootDir,
+    });
+    if (vpnAccessCode !== 0) {
+      log('❌ VPN Access Security check failed! Admin portals are exposed or misconfigured.', COLORS.red);
+      allPassed = false;
+    } else {
+      log('✅ VPN Access Security check completed.', COLORS.green);
+    }
+
     process.exit(allPassed ? 0 : 1);
   }
 }
