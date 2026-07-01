@@ -4,6 +4,7 @@ from core.models import Employee, Department, Role, Grade, AccessRole, Branch, A
 from django_tenants.utils import schema_context
 from django.core.management import call_command
 import time
+import os
 
 User = get_user_model()
 
@@ -44,6 +45,19 @@ def create_public_data():
             domain='127.0.0.1', 
             defaults={'tenant': public_tenant, 'is_primary': False}
         )
+        
+        # Also map the configured domain suffix to the public tenant if it is not localhost
+        domain_suffix = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
+        if domain_suffix != 'localhost':
+            Domain.objects.get_or_create(
+                domain=domain_suffix,
+                defaults={'tenant': public_tenant, 'is_primary': False}
+            )
+            for host in ['103.197.190.47', 'qa.harikerja.web.id']:
+                Domain.objects.get_or_create(
+                    domain=host,
+                    defaults={'tenant': public_tenant, 'is_primary': False}
+                )
         print("   ✅ Seeded public schema data and domains.")
 
 def setup_tenant(schema_name, company_name):
@@ -59,8 +73,9 @@ def setup_tenant(schema_name, company_name):
             'attendance_platform_policy': 'BOTH'
         }
     )
+    domain_suffix = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
     Domain.objects.update_or_create(
-        domain=f'{schema_name}.localhost', 
+        domain=f'{schema_name}.{domain_suffix}', 
         defaults={'tenant': tenant, 'is_primary': True}
     )
     

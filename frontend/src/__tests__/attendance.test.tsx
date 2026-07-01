@@ -7,15 +7,6 @@ import { TenantProvider } from '@/context/TenantContext';
 import { NextIntlClientProvider } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 
-// Mock next-intl
-vi.mock('next-intl', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  return {
-    ...actual,
-    useTranslations: vi.fn(() => (key: string) => key),
-  };
-});
-
 const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
 
 vi.mock('@/lib/api', async (importOriginal) => {
@@ -31,14 +22,6 @@ vi.mock('@/lib/api', async (importOriginal) => {
 
 vi.mock('@/components/layout/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    tr: ({ children, ...props }: any) => <tr {...props}>{children}</tr>,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
 const AllProviders = ({ children }: { children: React.ReactNode }) => {

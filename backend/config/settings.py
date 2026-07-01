@@ -133,10 +133,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': os.environ.get('DB_NAME', 'hrms'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+        'USER': os.environ.get('DB_USER', 'hrms_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'hrms_password'),
         'HOST': os.environ.get('DB_HOST', '127.0.0.1' if TESTING else 'db'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'PORT': os.environ.get('DB_PORT', '5433' if TESTING else '5432'),
     }
 }
 DATABASE_ROUTERS = (

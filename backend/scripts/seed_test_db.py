@@ -12,7 +12,7 @@ ROOT_DIR = BACKEND_DIR.parent
 ENV_FILE = ROOT_DIR / 'deploy' / 'environments' / '.env.local'
 
 # Load environment variables
-if ENV_FILE.exists():
+if ENV_FILE.exists() and not os.path.exists('/.dockerenv'):
     load_dotenv(ENV_FILE)
     if os.environ.get('DB_HOST') == 'db':
         os.environ['DB_HOST'] = '127.0.0.1'
@@ -150,8 +150,9 @@ def main():
                 'attendance_platform_policy': 'BOTH'
             }
         )
+        domain_suffix = os.environ.get('TENANT_DOMAIN_SUFFIX', 'localhost')
         Domain.objects.update_or_create(
-            domain=f'{schema}.localhost', 
+            domain=f'{schema}.{domain_suffix}', 
             defaults={'tenant': tenant, 'is_primary': True}
         )
 
