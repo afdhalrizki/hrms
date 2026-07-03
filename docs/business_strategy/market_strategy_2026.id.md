@@ -27,7 +27,7 @@ Tonggak "1 Juta Pengguna" dapat dicapai dengan menargetkan persentase yang sanga
 
 *   **Total UMKM (Kecil-Menengah)**: ± 100.000 Perusahaan (Target Utama untuk Tingkat Professional).
 *   **Total Pekerja Formal**: ± 50-60 Juta Orang (Basis Pengguna yang Dapat Dijangkau).
-*   **Target Pangsa Pasar 2%**: Mengakuisisi **20.000 Perusahaan** (rata-rata 50 orang/perusahaan) menghasilkan **1 Juta Pengguna Aktif**.
+*   **Target Pangsa Pasar 3%**: Mengakuisisi **30.000 Perusahaan** (rata-rata 50 orang/perusahaan) menghasilkan **1,5 Juta Pengguna Aktif**.
 
 ---
 

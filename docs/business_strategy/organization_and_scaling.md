@@ -1,6 +1,6 @@
 # Organizational Structure & Scaling Roadmap
 
-This document outlines the internal organizational design of HariKerja and the developer scaling roadmap from early bootstrapping stages to supporting 1 million active users globally.
+This document outlines the internal organizational design of HariKerja and the developer scaling roadmap from early bootstrapping stages to supporting 1.5 million active users globally.
 
 ---
 

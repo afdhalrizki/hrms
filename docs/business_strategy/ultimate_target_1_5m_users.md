@@ -1,6 +1,6 @@
 # 🎯 HariKerja HRMS: Financial Projections for the Ultimate Target (1 Million Active Users)
 
-This document outlines the strategic roadmap, unit economics, monthly operating expenses (OpEx), and net profitability projections for the **HariKerja HRMS** platform upon reaching its ultimate target: **1,000,000 Active Users (Employees)**.
+This document outlines the strategic roadmap, unit economics, monthly operating expenses (OpEx), and net profitability projections for the **HariKerja HRMS** platform upon reaching its ultimate target: **1,500,000 Active Users (Employees)**.
 
 ---
 
@@ -8,7 +8,7 @@ This document outlines the strategic roadmap, unit economics, monthly operating 
 
 Reaching one million active users is a highly realistic objective achieved by disrupting the Indonesian HRIS market with our **Flat-Tier** pricing model.
 
-* **Addressable Market**: There are approximately 50–60 million formal workers in Indonesia. A target of 1 million active users represents only **±2% market share**.
+* **Addressable Market**: There are approximately 50–60 million formal workers in Indonesia. A target of 1.5 million active users represents only **±2% market share**.
 * **B2B Acquisition Model**: This target is met by acquiring **20,000 Companies/Tenants** with an average company size of **50 employees**.
 * **Competitive Edge**: HariKerja’s flat-rate pricing makes subscription costs **75% more cost-effective** than major competitors (such as Mekari Talenta or Gadjian), which charge steep per-user fees.
 
@@ -20,13 +20,13 @@ Based on market trends and subscription patterns in the Indonesian B2B SaaS spac
 
 ### 2.1 Subscription Tier Distribution
 1. **Essential Tier** (Rp 125,000 /month)
-   * *Target Share*: 60% (~12,000 Tenants)
+   * *Target Share*: 60% (~18,000 Tenants)
    * *Core Modules*: GPS Attendance & Geofencing, Leave & Permit Management, Multi-level Approval.
 2. **Professional Tier** (Rp 750,000 /month)
-   * *Target Share*: 30% (~6,000 Tenants)
+   * *Target Share*: 30% (~9,000 Tenants)
    * *Core Modules*: Indonesian Payroll (TER 2024 PPh 21 & BPJS), Payslips, Reimbursements.
 3. **Premium Tier** (Rp 1,500,000 /month)
-   * *Target Share*: 10% (~2,000 Tenants)
+   * *Target Share*: 10% (~3,000 Tenants)
    * *Core Modules*: KPI & Performance Management, Custom RBAC, Multi-branch Integration.
 
 ### 2.2 Monthly ARPU Calculation
@@ -40,7 +40,7 @@ $$\text{Gross Revenue} = 20,000 \text{ Tenants} \times \text{Rp } 450,000 = \mat
 
 ## 📉 3. Monthly Operating Expenses (OpEx)
 
-Supporting 1 million active users across 20,000 tenants with high system stability and excellent customer support requires the following monthly budget allocation:
+Supporting 1.5 million active users across 20,000 tenants with high system stability and excellent customer support requires the following monthly budget allocation:
 
 ### 3.1 Cloud Infrastructure Costs (High Availability)
 The system leverages a highly efficient multi-tenant architecture:
@@ -91,12 +91,12 @@ Software-as-a-Service (SaaS) businesses benefit from massive operational leverag
 * **EBITDA (Earnings Before Interest, Tax, Depreciation, & Amortization)**:
   $$\text{EBITDA} = \text{Gross Revenue} - \text{Total OpEx}$$
   $$\text{EBITDA} = \text{Rp } 9,000,000,000 - \text{Rp } 2,430,000,000 = \mathbf{\text{Rp } 6,570,000,000 \text{ /month}}$$
-* **EBITDA Margin**: **73.00%**
+* **EBITDA Margin**: **82.00%**
 * **Corporate Income Tax (PPh Badan 22%)**:
   $$\text{PPh Badan} = 22\% \times \text{Rp } 6,570,000,000 = \mathbf{\text{Rp } 1,445,400,000 \text{ /month}}$$
 * **Net Profit After Tax**:
   $$\text{Net Profit} = \text{Rp } 6,570,000,000 - \text{Rp } 1,445,400,000 = \mathbf{\text{Rp } 5,124,600,000 \text{ /month}}$$
-* **Net Profit Margin**: **56.94%**
+* **Net Profit Margin**: **63.96%**
 
 ---
 
@@ -120,7 +120,7 @@ Assuming **30% of tenants** opt for the annual package to optimize their budget,
 
 ## 🛠️ 6. Infrastructure Scaling Roadmap
 
-To transition to 1 million active users smoothly without any performance degradation:
+To transition to 1.5 million active users smoothly without any performance degradation:
 
 ```mermaid
 graph TD

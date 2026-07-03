@@ -1,6 +1,6 @@
 # 📈 Rencana Strategis Bisnis & Proyeksi Finansial
 
-Folder ini berisi dokumentasi rencana strategis bisnis, skema harga langganan (pricing plans), Service Level Agreement (SLA), target pasar tahun 2026, proyeksi keuangan, serta rencana jangka panjang pertumbuhan platform HariKerja HRMS untuk mencapai target 1 juta pengguna aktif.
+Folder ini berisi dokumentasi rencana strategis bisnis, skema harga langganan (pricing plans), Service Level Agreement (SLA), target pasar tahun 2026, proyeksi keuangan, serta rencana jangka panjang pertumbuhan platform HariKerja HRMS untuk mencapai target 1,5 juta pengguna aktif.
 
 ---
 
@@ -18,7 +18,7 @@ Seluruh rancangan bisnis hulu-ke-hilir ini dikelompokkan ke dalam beberapa topik
     Rincian pembagian paket langganan (Trial, Basic, Premium, Enterprise) lengkap dengan batasan kuota administrator dan karyawan.
 5.  **Service Level Agreement ([sla_enterprise_standard.id.md](./sla_enterprise_standard.id.md)):** 
     Jaminan ketersediaan layanan (*uptime*), waktu tanggap penyelesaian masalah (*response time*), serta kebijakan ganti rugi bagi klien tingkat Enterprise.
-6.  **Target 1 Juta Pengguna ([ultimate_target_1m_users.id.md](./ultimate_target_1m_users.id.md)):** 
+6.  **Target 1,5 Juta Pengguna ([ultimate_target_1_5m_users.id.md](./ultimate_target_1_5m_users.id.md)):** 
     Strategi terperinci untuk memperluas kapasitas arsitektur dan penetrasi pasar guna menampung satu juta pengguna aktif di seluruh Indonesia.
 
 ---
@@ -32,7 +32,7 @@ Seluruh rancangan bisnis hulu-ke-hilir ini dikelompokkan ke dalam beberapa topik
 | **[organization_and_scaling.id.md](./organization_and_scaling.id.md)** | Operasional | HR, Management | Struktur tim internal, rencana scaling SDM |
 | **[pricing_and_plans.id.md](./pricing_and_plans.id.md)** | Produk | Product Owner, Sales | Paket harga (Basic, Premium), batasan kuota |
 | **[sla_enterprise_standard.id.md](./sla_enterprise_standard.id.md)** | Kepatuhan | Enterprise Client, Law | Jaminan uptime server, kompensasi gangguan |
-| **[ultimate_target_1m_users.id.md](./ultimate_target_1m_users.id.md)** | Visi Jangka Panjang | Management, Architect | Target 1 juta pengguna, strategi infrastruktur |
+| **[ultimate_target_1_5m_users.id.md](./ultimate_target_1_5m_users.id.md)** | Visi Jangka Panjang | Management, Architect | Target 1,5 juta pengguna, strategi infrastruktur |
 
 ---
 *Dokumen ini merupakan bagian dari standarisasi dokumentasi platform HariKerja HRMS.*

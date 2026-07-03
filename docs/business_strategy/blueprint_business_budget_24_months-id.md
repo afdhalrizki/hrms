@@ -41,13 +41,13 @@ Anggaran ini disusun dengan prinsip **Capital Efficiency**—menjaga tim tetap r
 
 ---
 
-## 3. Analisis Pangsa Pasar & Proyeksi Finansial (Target 1 Juta User)
+## 3. Analisis Pangsa Pasar & Proyeksi Finansial (Target 1,5 Juta User)
 
 ### Validasi Pasar di Indonesia
-Target **1 Juta Karyawan (User Terkelola)** di dalam platform harikerja sangat rasional, mencakup kurang dari **0.7%** total angkatan kerja aktif di Indonesia (~140 juta orang) dan didukung oleh masifnya ekosistem UMKM (>64 juta unit). Pasar ini telah divalidasi oleh kesuksesan kompetitor seperti Mekari (Talenta) yang bernilai triliunan rupiah.
+Target **1,5 Juta Karyawan (User Terkelola)** di dalam platform harikerja sangat rasional, mencakup kurang dari **0.7%** total angkatan kerja aktif di Indonesia (~140 juta orang) dan didukung oleh masifnya ekosistem UMKM (>64 juta unit). Pasar ini telah divalidasi oleh kesuksesan kompetitor seperti Mekari (Talenta) yang bernilai triliunan rupiah.
 
 ### Proyeksi Pendapatan Tahunan (ARR) Konservatif
-Ketika target 1 juta user terkelola tercapai dan terdistribusi ke ±13.500 perusahaan dengan skema model harga *flat rate per tier*:
+Ketika target 1,5 juta user terkelola tercapai dan terdistribusi ke ±20.250 perusahaan dengan skema model harga *flat rate per tier*:
 
 * **Segmen Retail/UMKM (Essential & Professional):**
   * 10.000 Perusahaan Mikro (Paket Essential @Rp125k/bulan) = Rp 1,25 Miliar/bulan
@@ -56,8 +56,8 @@ Ketika target 1 juta user terkelola tercapai dan terdistribusi ke ±13.500 perus
   * 450 Perusahaan Besar (Paket Premium @Rp1.5M/bulan) = Rp 675 Juta/bulan
   * 50 Perusahaan Enterprise (Paket Dedicated @Rp5M/bulan) = Rp 250 Juta/bulan
 
-* **Total Monthly Recurring Revenue (MRR):** Rp 3,22 Miliar / bulan
-* **Total Annual Recurring Revenue (ARR):** **± Rp 38,64 Miliar / tahun**
+* **Total Monthly Recurring Revenue (MRR):** Rp 4,83 Miliar / bulan
+* **Total Annual Recurring Revenue (ARR):** **± Rp 57,9 Miliar / tahun**
 
 Dengan struktur operasional harikerja yang sangat ramping berkat otomatisasi AI, margin keuntungan kotor (*Gross Margin*) SaaS ini mampu menyentuh angka **70% - 80%**, menghasilkan potensi laba bersih tahunan senilai puluhan miliar rupiah.
 

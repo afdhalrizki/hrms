@@ -27,7 +27,7 @@ The "1 Million User" milestone is achievable by targeting a very small percentag
 
 *   **Total SMEs (Small-Medium)**: ± 100,000 Companies (Primary Target for Professional Tier).
 *   **Total Formal Workers**: ± 50-60 Million People (Addressable User Base).
-*   **Targeting 2% Market Share**: Acquiring **20,000 Companies** (avg. 50 pax/company) leads to **1 Million Active Users**.
+*   **Targeting 3% Market Share**: Acquiring **20,000 Companies** (avg. 50 pax/company) leads to **1 Million Active Users**.
 
 ---
 

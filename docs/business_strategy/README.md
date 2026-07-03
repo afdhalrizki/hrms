@@ -1,6 +1,6 @@
 # 📈 Business Strategy & Financial Projections
 
-This folder contains strategic business documentation, pricing plans, service level agreements (SLAs), 2026 market expansion plans, financial models, and long-term scaling targets designed to grow the HariKerja HRMS platform to serve 1 million active users.
+This folder contains strategic business documentation, pricing plans, service level agreements (SLAs), 2026 market expansion plans, financial models, and long-term scaling targets designed to grow the HariKerja HRMS platform to serve 1.5 million active users.
 
 ---
 
@@ -18,7 +18,7 @@ The comprehensive end-to-end business plan is organized into the following major
     Details pricing subscription tiers (Trial, Basic, Premium, Enterprise) and core limits for active employees and tenant admins.
 5.  **Service Level Agreement ([sla_enterprise_standard.md](./sla_enterprise_standard.md)):** 
     Operational SLA metrics (guaranteed system uptime, support ticket response times, and uptime penalty credits).
-6.  **Path to 1M Users ([ultimate_target_1m_users.md](./ultimate_target_1m_users.md)):** 
+6.  **Path to 1M Users ([ultimate_target_1_5m_users.md](./ultimate_target_1_5m_users.md)):** 
     Long-term architectural scaling milestones and customer growth funnels designed to support one million active users.
 
 ---
@@ -32,7 +32,7 @@ The comprehensive end-to-end business plan is organized into the following major
 | **[organization_and_scaling.md](./organization_and_scaling.md)** | Operations | HR, Management | Internal team scaling, customer support growth |
 | **[pricing_and_plans.md](./pricing_and_plans.md)** | Product | Product Owner, Sales | Subscription tier costs, tenant admin & employee limits |
 | **[sla_enterprise_standard.md](./sla_enterprise_standard.md)** | Compliance | Enterprise Client, Law | Uptime guarantee, support response windows |
-| **[ultimate_target_1m_users.md](./ultimate_target_1m_users.md)** | Vision | Management, Architect | Path to 1M users, hardware scaling steps |
+| **[ultimate_target_1_5m_users.md](./ultimate_target_1_5m_users.md)** | Vision | Management, Architect | Path to 1M users, hardware scaling steps |
 
 ---
 *This document is a part of the official HariKerja HRMS platform documentation.*

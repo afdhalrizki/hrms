@@ -1,6 +1,6 @@
 # Struktur Organisasi & Peta Jalan Skala Tim (Scaling Roadmap)
 
-Dokumen ini menjelaskan rancangan struktur organisasi internal HariKerja serta peta jalan (*roadmap*) skala tim pengembang dari fase bootstrap awal hingga mampu mendukung 1 juta pengguna aktif secara global.
+Dokumen ini menjelaskan rancangan struktur organisasi internal HariKerja serta peta jalan (*roadmap*) skala tim pengembang dari fase bootstrap awal hingga mampu mendukung 1,5 juta pengguna aktif secara global.
 
 ---
 
@@ -79,7 +79,7 @@ Seiring bertambahnya jumlah tenant dan pengguna aktif di platform, organisasi ti
     *   Pembentukan tim **Legal & Compliance** untuk memastikan kepatuhan regulasi UU PDP.
 
 ### Tahap 4: Fase Ekspansi Massal (200 - 1.000+ Anggota Tim)
-*   **Target Pengguna**: 5.000+ Tenant (Lebih dari 1 Juta Pengguna Aktif).
+*   **Target Pengguna**: 5.000+ Tenant (Lebih dari 1,5 Juta Pengguna Aktif).
 *   **Fokus Operasional**: Arsitektur High Availability global (Multi-Region AWS), mitigasi latensi data, ekspansi pasar internasional Asia Tenggara.
 *   **Susunan Tim**:
     *   Kantor regional terdistribusi dengan tim Penjualan, Pemasaran, dan Dukungan Teknis lokal.

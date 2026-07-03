@@ -91,7 +91,7 @@ def create_presentation():
     p_sub.space_after = Pt(40)
     
     p_desc = tf.add_paragraph()
-    p_desc.text = "A modern, highly secure multi-tenant platform targeting a 1 Million Active User milestone by making enterprise-grade features affordable across all business scales."
+    p_desc.text = "A modern, highly secure multi-tenant platform targeting a 1.5 Million Active User milestone by making enterprise-grade features affordable across all business scales."
     p_desc.font.name = 'Arial'
     p_desc.font.size = Pt(14)
     p_desc.font.color.rgb = accent_color
@@ -279,7 +279,7 @@ def create_presentation():
     _, tf_callout = add_textbox(slide, Inches(7.8), Inches(2.2), Inches(4.4), Inches(4.0))
     
     p_num = tf_callout.paragraphs[0]
-    p_num.text = "1,000,000"
+    p_num.text = "1,500,000"
     p_num.font.name = 'Arial'
     p_num.font.size = Pt(60)
     p_num.font.bold = True
@@ -297,7 +297,7 @@ def create_presentation():
     p_lbl.space_after = Pt(20)
     
     p_sublbl = tf_callout.add_paragraph()
-    p_sublbl.text = "Achieved by capturing just ~2% of Indonesia's 50-60M formal workforce across all business sizes."
+    p_sublbl.text = "Achieved by capturing just ~3% of Indonesia's 50-60M formal workforce across all business sizes."
     p_sublbl.font.name = 'Arial'
     p_sublbl.font.size = Pt(14)
     p_sublbl.font.color.rgb = muted_color
@@ -310,7 +310,7 @@ def create_presentation():
     # ----------------------------------------------------
     slide = prs.slides.add_slide(blank_layout)
     set_background(slide)
-    add_header(slide, "1M Active Users Scaling Scenarios")
+    add_header(slide, "1.5M Active Users Scaling Scenarios")
     
     # Three column layout of three targets:
     # 1. ARPU, 2. UMK-Dominant, 3. Enterprise-Dominant
@@ -321,42 +321,42 @@ def create_presentation():
     
     columns_data = [
         {
-            "title": "Blueprint baseline (Rp 3.22B MRR)",
-            "stat": "Rp 3.22 Billion",
+            "title": "Blueprint baseline (Rp 4.83B MRR)",
+            "stat": "Rp 4.83 Billion",
             "subtitle": "Gross Revenue / Month",
             "points": [
-                "Requires: 13,500 Tenants",
-                "UMK (Essential): 10,000 tenants",
-                "UMM (Professional): 3,000 tenants",
-                "Enterprise (Premium): 450 tenants",
-                "Dedicated (Large): 50 tenants",
+                "Requires: 20,250 Tenants",
+                "UMK (Essential): 15,000 tenants",
+                "UMM (Professional): 4,500 tenants",
+                "Enterprise (Premium): 675 tenants",
+                "Dedicated (Large): 75 tenants",
                 "Gross Margin: 70% - 80%",
                 "Aligned with business blueprint"
             ]
         },
         {
-            "title": "UMK-Dominant (Rp 5.1B MRR)",
-            "stat": "Rp 5.1 Billion",
+            "title": "UMK-Dominant (Rp 7.65B MRR)",
+            "stat": "Rp 7.65 Billion",
             "subtitle": "Gross Revenue / Month",
             "points": [
-                "Requires: 29,360 Tenants",
-                "UMK (Essential): 25,000 tenants",
-                "UMM (Professional): 4,000 tenants",
-                "Enterprise (Premium): 350 tenants",
-                "Dedicated (Large): 10 tenants",
+                "Requires: 44,040 Tenants",
+                "UMK (Essential): 37,500 tenants",
+                "UMM (Professional): 6,000 tenants",
+                "Enterprise (Premium): 525 tenants",
+                "Dedicated (Large): 15 tenants",
                 "High-volume focus"
             ]
         },
         {
-            "title": "Enterprise-Dominant (Rp 3.3B MRR)",
-            "stat": "Rp 3.3 Billion",
+            "title": "Enterprise-Dominant (Rp 4.95B MRR)",
+            "stat": "Rp 4.95 Billion",
             "subtitle": "Gross Revenue / Month",
             "points": [
-                "Requires: 8,560 Tenants",
-                "UMK (Essential): 5,000 tenants",
-                "UMM (Professional): 2,500 tenants",
-                "Enterprise (Premium): 1,000 tenants",
-                "Dedicated (Large): 60 tenants",
+                "Requires: 12,840 Tenants",
+                "UMK (Essential): 7,500 tenants",
+                "UMM (Professional): 3,750 tenants",
+                "Enterprise (Premium): 1,500 tenants",
+                "Dedicated (Large): 90 tenants",
                 "High-value focus"
             ]
         }

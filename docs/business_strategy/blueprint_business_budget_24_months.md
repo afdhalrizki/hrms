@@ -47,7 +47,7 @@ This budget is structured on the principle of **Capital Efficiency**—keeping t
 A target of **1 Million Active Employees (Managed Users)** on the harikerja platform is highly realistic, representing less than **0.7%** of Indonesia's total active workforce (~140 million people) and supported by a massive MSME ecosystem (>64 million units). This market size is validated by local market leaders like Mekari (Talenta) which is valued at trillions of Rupiah.
 
 ### Conservative Annual Recurring Revenue (ARR) Projections
-When the target of 1 million managed active users is achieved, distributed across ±13,500 companies via our flat-rate subscription tiers:
+When the target of 1 million managed active users is achieved, distributed across ±20,250 companies via our flat-rate subscription tiers:
 
 * **Retail/MSME Segment (Essential & Professional):**
   * 10,000 Micro Companies (Essential @IDR 125k/month) = IDR 1.25 Billion/month
@@ -56,8 +56,8 @@ When the target of 1 million managed active users is achieved, distributed acros
   * 450 Large Companies (Premium @IDR 1.5M/month) = IDR 675 Million/month
   * 50 Enterprise Companies (Dedicated @IDR 5M/month) = IDR 250 Million/month
 
-* **Total Monthly Recurring Revenue (MRR):** IDR 3.22 Billion / month
-* **Total Annual Recurring Revenue (ARR):** **± IDR 38.64 Billion / year**
+* **Total Monthly Recurring Revenue (MRR):** IDR 4.83 Billion / month
+* **Total Annual Recurring Revenue (ARR):** **± IDR 57.9 Billion / year**
 
 Due to harikerja's lean operational structure enabled by AI-powered automation, the platform maintains a **70% - 80% Gross Margin**, generating massive annual net profit potential.
 

@@ -26,7 +26,7 @@ HariKerja disrupts traditional HRIS by offering secure, flat-rate tiers (Rp 125k
 
 ### 4. How big is the market?
 ```text
-We target Indonesia’s 50-60M formal workers. By capturing 2% of the market across UMK, UMM, and Enterprise (13.5k companies), we reach 1M active users. This scale generates Rp 3.22 Billion ($195k USD) in monthly gross revenue (Rp 38.64B ARR) with an efficient 70-80% gross margin.
+We target Indonesia’s 50-60M formal workers. By capturing 3% of the market across UMK, UMM, and Enterprise (20.25k companies), we reach 1.5M active users. This scale generates Rp 4.83 Billion ($292k USD) in monthly gross revenue (Rp 57.9B ARR) with an efficient 70-80% gross margin.
 ```
 *(Character count: 280 / Max: 300)*
 
@@ -45,43 +45,43 @@ Our pricing model utilizes predictable flat rates per tier instead of traditiona
 
 ---
 
-## 📈 1 Million Active User Scenarios
+## 📈 1.5 Million Active User Scenarios
 
-To reach **1,000,000 Active Users**, we model three distinct market distribution scenarios:
+To reach **1,500,000 Active Users**, we model three distinct market distribution scenarios:
 
-### Scenario 1: Blueprint Distribution (Retail + Corporate Focus)
+### Scenario 1: Blueprint Distribution (Retail + Corporate Focus / Baseline)
 *   **Target Composition**:
-    *   *Essential (UMK)*: 10,000 tenants (Avg. 30 employees/co) -> Rp 1.25 B/mo
-    *   *Professional (UMM)*: 3,000 tenants (Avg. 100 employees/co) -> Rp 1.05 B/mo
-    *   *Premium (Enterprise)*: 450 tenants (Avg. 600 employees/co) -> Rp 675 M/mo
-    *   *Dedicated (Large)*: 50 tenants (Avg. 2,600 employees/co) -> Rp 250 M/mo
+    *   *Essential (UMK)*: 15,000 tenants (Avg. 30 employees/co) -> Rp 1.25 B/mo
+    *   *Professional (UMM)*: 4,500 tenants (Avg. 100 employees/co) -> Rp 1.05 B/mo
+    *   *Premium (Enterprise)*: 675 tenants (Avg. 600 employees/co) -> Rp 675 M/mo
+    *   *Dedicated (Large)*: 75 tenants (Avg. 2,600 employees/co) -> Rp 250 M/mo
 *   **Metrics**:
-    *   *Total Tenants Needed*: **13,500 companies**
-    *   *Monthly Recurring Revenue (MRR)*: **Rp 3,220,000,000 (Rp 3.22 Billion)**
-    *   *Annual Recurring Revenue (ARR)*: **Rp 38,640,000,000 (Rp 38.64 Billion)**
+    *   *Total Tenants Needed*: **20,250 companies**
+    *   *Monthly Recurring Revenue (MRR)*: **Rp 4,830,000,000 (Rp 4.83 Billion)**
+    *   *Annual Recurring Revenue (ARR)*: **Rp 57,960,000,000 (Rp 57.9 Billion)**
     *   *Gross Margin*: **70% - 80%**
 
 ### Scenario 2: SME/UMK Dominant (High-Volume Focus)
 *   **Target Composition**:
-    *   *Essential (UMK)*: 25,000 tenants (Avg. 20 employees/co) -> Rp 3.125 B/mo
-    *   *Professional (UMM)*: 4,000 tenants (Avg. 75 employees/co) -> Rp 1.4 B/mo
-    *   *Premium (Enterprise)*: 350 tenants (Avg. 500 employees/co) -> Rp 525 M/mo
-    *   *Dedicated (Large)*: 10 tenants (Avg. 2,500 employees/co) -> Rp 50 M/mo
+    *   *Essential (UMK)*: 37,500 tenants (Avg. 20 employees/co) -> Rp 3.125 B/mo
+    *   *Professional (UMM)*: 6,000 tenants (Avg. 75 employees/co) -> Rp 1.4 B/mo
+    *   *Premium (Enterprise)*: 525 tenants (Avg. 500 employees/co) -> Rp 525 M/mo
+    *   *Dedicated (Large)*: 15 tenants (Avg. 2,500 employees/co) -> Rp 50 M/mo
 *   **Metrics**:
-    *   *Total Tenants Needed*: **29,360 companies**
-    *   *Monthly Recurring Revenue (MRR)*: **Rp 5,100,000,000 (Rp 5.1 Billion)**
-    *   *Annual Recurring Revenue (ARR)*: **Rp 61,200,000,000 (Rp 61.2 Billion)**
+    *   *Total Tenants Needed*: **44,040 companies**
+    *   *Monthly Recurring Revenue (MRR)*: **Rp 7,650,000,000 (Rp 7.65 Billion)**
+    *   *Annual Recurring Revenue (ARR)*: **Rp 91,800,000,000 (Rp 91.8 Billion)**
 
 ### Scenario 3: Enterprise Focus (High-Value / Low-Volume Focus)
 *   **Target Composition**:
-    *   *Essential (UMK)*: 5,000 tenants (Avg. 20 employees/co) -> Rp 625 M/mo
-    *   *Professional (UMM)*: 2,500 tenants (Avg. 100 employees/co) -> Rp 875 M/mo
-    *   *Premium (Enterprise)*: 1,000 tenants (Avg. 500 employees/co) -> Rp 1.5 B/mo
-    *   *Dedicated (Large)*: 60 tenants (Avg. 2,500 employees/co) -> Rp 300 M/mo
+    *   *Essential (UMK)*: 7,500 tenants (Avg. 20 employees/co) -> Rp 625 M/mo
+    *   *Professional (UMM)*: 3,750 tenants (Avg. 100 employees/co) -> Rp 875 M/mo
+    *   *Premium (Enterprise)*: 1,500 tenants (Avg. 500 employees/co) -> Rp 1.5 B/mo
+    *   *Dedicated (Large)*: 90 tenants (Avg. 2,500 employees/co) -> Rp 300 M/mo
 *   **Metrics**:
-    *   *Total Tenants Needed*: **8,560 companies**
-    *   *Monthly Recurring Revenue (MRR)*: **Rp 3,300,000,000 (Rp 3.3 Billion)**
-    *   *Annual Recurring Revenue (ARR)*: **Rp 39,600,000,000 (Rp 39.6 Billion)**
+    *   *Total Tenants Needed*: **12,840 companies**
+    *   *Monthly Recurring Revenue (MRR)*: **Rp 4,950,000,000 (Rp 4.95 Billion)**
+    *   *Annual Recurring Revenue (ARR)*: **Rp 59,400,000,000 (Rp 59.4 Billion)**
 
 ---
 
@@ -96,7 +96,7 @@ Below is the slide outline:
 ### 1. Slide 1: Cover & Vision
 *   **Title:** HariKerja HRMS
 *   **Subtitle:** Democratizing HR Digitization for UMK, UMM, and Enterprise Tiers with Flat-Tier Pricing.
-*   **Key Message:** A modern, secure, and multi-tenant SaaS platform aiming to digitize 1 Million active users by keeping enterprise-grade features affordable.
+*   **Key Message:** A modern, secure, and multi-tenant SaaS platform aiming to digitize 1.5 Million active users by keeping enterprise-grade features affordable.
 
 ### 2. Slide 2: The Problem
 *   **The Scaling Penalty:** Current HRIS market leaders charge expensive per-employee fees. Costs grow linearly, penalizing business expansion.
@@ -115,11 +115,11 @@ Below is the slide outline:
     *   *Enterprise Segment (Premium)*: Flat Rp 1.5M/mo | Max 999,999 seats limit.
     *   *Large Enterprise (Dedicated)*: Custom from Rp 5M/mo | 2,000+ seats, dedicated cloud instance.
 
-### 5. Slide 5: 1M Active Users Scaling Scenarios
-*   **Three Projections to 1M Managed Users**:
-    *   *Blueprint Distribution*: 13.5k tenants, Rp 3.22B MRR (Rp 38.64B ARR) at 70-80% gross margins.
-    *   *UMK Dominant*: 29.3k tenants, Rp 5.1B MRR (Rp 61.2B ARR).
-    *   *Enterprise Focus*: 8.5k tenants, Rp 3.3B MRR (Rp 39.6B ARR).
+### 5. Slide 5: 1.5M Active Users Scaling Scenarios
+*   **Three Projections to 1.5M Managed Users**:
+    *   *Blueprint Distribution*: 20.25k tenants, Rp 4.83B MRR (Rp 57.9B ARR) at 70-80% gross margins.
+    *   *UMK Dominant*: 44.04k tenants, Rp 7.65B MRR (Rp 91.8B ARR).
+    *   *Enterprise Focus*: 12.84k tenants, Rp 4.95B MRR (Rp 59.4B ARR).
 
 ### 6. Slide 6: Go-to-Market Strategy
 *   **High-Intent Search Ads:** Target search keywords like *"Aplikasi Payroll Murah"*, *"Kalkulator PPh 21 TER"*, and *"HRIS Murah"*.
@@ -143,4 +143,4 @@ Below is the slide outline:
 *   Business Blueprint (ID): [blueprint_business_budget_24_months-id.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/blueprint_business_budget_24_months-id.md)
 *   Financial Projections: [business_projections.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.md)
 *   Competitor Analysis: [market_strategy_2026.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.md)
-*   1 Million User Projections: [ultimate_target_1m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.md)
+*   1 Million User Projections: [ultimate_target_1_5m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1_5m_users.md)

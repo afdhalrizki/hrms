@@ -26,7 +26,7 @@ HariKerja mengganggu HRIS tradisional dengan menawarkan tarif flat aman (Rp 125r
 
 ### 4. How big is the market?
 ```text
-Kami menargetkan 50-60 juta pekerja formal Indonesia. Menguasai 2% pasar lintas UMK, UMM, dan Enterprise (13.5rb perusahaan) menghasilkan 1 juta pengguna aktif. Skala ini menghasilkan Rp 3.22 Miliar/bulan (Rp 38.64M ARR) dengan margin kotor efisien 70-80%.
+Kami menargetkan 50-60 juta pekerja formal Indonesia. Menguasai 3% pasar lintas UMK, UMM, dan Enterprise (20,25rb perusahaan) menghasilkan 1,5 juta pengguna aktif. Skala ini menghasilkan Rp 4,83 Miliar/bulan (Rp 57,9M ARR) dengan margin kotor efisien 70-80%.
 ```
 *(Jumlah karakter: 249 / Max: 300)*
 
@@ -45,43 +45,43 @@ Model penetapan harga kami menggunakan tarif flat per tier yang dapat diprediksi
 
 ---
 
-## 📈 Skenario Target 1 Juta Pengguna Aktif
+## 📈 Skenario Target 1,5 Juta Pengguna Aktif
 
-Untuk mencapai **1.000.000 Pengguna Aktif**, kami memodelkan tiga skenario distribusi pasar yang berbeda:
+Untuk mencapai **1.500.000 Pengguna Aktif**, kami memodelkan tiga skenario distribusi pasar yang berbeda:
 
 ### Skenario 1: Distribusi Cetak Biru (Fokus Retail + Korporat / Baseline)
 *   **Komposisi Sasaran**:
-    *   *Essential (UMK)*: 10.000 tenant (Rata-rata 30 karyawan/perusahaan) -> Rp 1,25 Miliar/bulan
-    *   *Professional (UMM)*: 3.000 tenant (Rata-rata 100 karyawan/perusahaan) -> Rp 1,05 Miliar/bulan
-    *   *Premium (Enterprise)*: 450 tenant (Rata-rata 600 karyawan/perusahaan) -> Rp 675 Juta/bulan
-    *   *Dedicated (Large)*: 50 tenant (Rata-rata 2.600 karyawan/perusahaan) -> Rp 250 Juta/bulan
+    *   *Essential (UMK)*: 15.000 tenant (Rata-rata 30 karyawan/perusahaan) -> Rp 1,25 Miliar/bulan
+    *   *Professional (UMM)*: 4.500 tenant (Rata-rata 100 karyawan/perusahaan) -> Rp 1,05 Miliar/bulan
+    *   *Premium (Enterprise)*: 675 tenant (Rata-rata 600 karyawan/perusahaan) -> Rp 675 Juta/bulan
+    *   *Dedicated (Large)*: 75 tenant (Rata-rata 2.600 karyawan/perusahaan) -> Rp 250 Juta/bulan
 *   **Metrik Proyeksi**:
-    *   *Total Perusahaan Dibutuhkan*: **13.500 perusahaan**
-    *   *Pendapatan Recurring Bulanan (MRR)*: **Rp 3.220.000.000 (Rp 3,22 Miliar)**
-    *   *Pendapatan Recurring Tahunan (ARR)*: **Rp 38.640.000.000 (Rp 38,64 Miliar)**
+    *   *Total Perusahaan Dibutuhkan*: **20.250 perusahaan**
+    *   *Pendapatan Recurring Bulanan (MRR)*: **Rp 4.830.000.000 (Rp 4,83 Miliar)**
+    *   *Pendapatan Recurring Tahunan (ARR)*: **Rp 57.960.000.000 (Rp 57,9 Miliar)**
     *   *Margin Kotor (Gross Margin)*: **70% - 80%**
 
 ### Skenario 2: Dominan UKM/UMK (Fokus Volume Tinggi)
 *   **Komposisi Sasaran**:
-    *   *Essential (UMK)*: 25.000 tenant (Rata-rata 20 karyawan/perusahaan) -> Rp 3,125 Miliar/bulan
-    *   *Professional (UMM)*: 4.000 tenant (Rata-rata 75 karyawan/perusahaan) -> Rp 1,4 Miliar/bulan
-    *   *Premium (Enterprise)*: 350 tenant (Rata-rata 500 karyawan/perusahaan) -> Rp 525 Juta/bulan
-    *   *Dedicated (Large)*: 10 tenant (Rata-rata 2.500 karyawan/perusahaan) -> Rp 50 Juta/bulan
+    *   *Essential (UMK)*: 37.500 tenant (Rata-rata 20 karyawan/perusahaan) -> Rp 3,125 Miliar/bulan
+    *   *Professional (UMM)*: 6.000 tenant (Rata-rata 75 karyawan/perusahaan) -> Rp 1,4 Miliar/bulan
+    *   *Premium (Enterprise)*: 525 tenant (Rata-rata 500 karyawan/perusahaan) -> Rp 525 Juta/bulan
+    *   *Dedicated (Large)*: 15 tenant (Rata-rata 2.500 karyawan/perusahaan) -> Rp 50 Juta/bulan
 *   **Metrik Proyeksi**:
-    *   *Total Perusahaan Dibutuhkan*: **29.360 perusahaan**
-    *   *Pendapatan Recurring Bulanan (MRR)*: **Rp 5.100.000.000 (Rp 5,1 Miliar)**
-    *   *Pendapatan Recurring Tahunan (ARR)*: **Rp 61.200.000.000 (Rp 61,2 Miliar)**
+    *   *Total Perusahaan Dibutuhkan*: **44.040 perusahaan**
+    *   *Pendapatan Recurring Bulanan (MRR)*: **Rp 7.650.000.000 (Rp 7,65 Miliar)**
+    *   *Pendapatan Recurring Tahunan (ARR)*: **Rp 91.800.000.000 (Rp 91,8 Miliar)**
 
 ### Skenario 3: Dominan Enterprise (Fokus Nilai Tinggi / Volume Rendah)
 *   **Komposisi Sasaran**:
-    *   *Essential (UMK)*: 5.000 tenant (Rata-rata 20 karyawan/perusahaan) -> Rp 625 Juta/bulan
-    *   *Professional (UMM)*: 2.500 tenant (Rata-rata 100 karyawan/perusahaan) -> Rp 875 Juta/bulan
-    *   *Premium (Enterprise)*: 1.000 tenant (Rata-rata 500 karyawan/perusahaan) -> Rp 1,5 Miliar/bulan
-    *   *Dedicated (Large)*: 60 tenant (Rata-rata 2.500 karyawan/perusahaan) -> Rp 300 Juta/bulan
+    *   *Essential (UMK)*: 7.500 tenant (Rata-rata 20 karyawan/perusahaan) -> Rp 625 Juta/bulan
+    *   *Professional (UMM)*: 3.750 tenant (Rata-rata 100 karyawan/perusahaan) -> Rp 875 Juta/bulan
+    *   *Premium (Enterprise)*: 1.500 tenant (Rata-rata 500 karyawan/perusahaan) -> Rp 1,5 Miliar/bulan
+    *   *Dedicated (Large)*: 90 tenant (Rata-rata 2.500 karyawan/perusahaan) -> Rp 300 Juta/bulan
 *   **Metrik Proyeksi**:
-    *   *Total Perusahaan Dibutuhkan*: **8.560 perusahaan**
-    *   *Pendapatan Recurring Bulanan (MRR)*: **Rp 3.300.000.000 (Rp 3,3 Miliar)**
-    *   *Pendapatan Recurring Tahunan (ARR)*: **Rp 39.600.000.000 (Rp 39,6 Miliar)**
+    *   *Total Perusahaan Dibutuhkan*: **12.840 perusahaan**
+    *   *Pendapatan Recurring Bulanan (MRR)*: **Rp 4.950.000.000 (Rp 4,95 Miliar)**
+    *   *Pendapatan Recurring Tahunan (ARR)*: **Rp 59.400.000.000 (Rp 59,4 Miliar)**
 
 ---
 
@@ -96,7 +96,7 @@ Berikut adalah detail isi per slide:
 ### 1. Slide 1: Cover & Visi
 *   **Judul:** HariKerja HRMS
 *   **Sub-judul:** Mendemokrasikan Digitalisasi HR untuk Segmen UMK, UMM, dan Enterprise dengan Harga Flat-Tier.
-*   **Poin Kunci:** Platform SaaS multi-tenant modern yang aman untuk mendigitalisasi 1 Juta pekerja aktif dengan membuat fitur kelas enterprise terjangkau.
+*   **Poin Kunci:** Platform SaaS multi-tenant modern yang aman untuk mendigitalisasi 1,5 Juta pekerja aktif dengan membuat fitur kelas enterprise terjangkau.
 
 ### 2. Slide 2: Masalah
 *   **Pinalti Skalabilitas:** Pemimpin pasar HRIS saat ini mengenakan biaya per karyawan yang mahal. Biaya membengkak sejalan dengan pertumbuhan bisnis.
@@ -115,11 +115,11 @@ Berikut adalah detail isi per slide:
     *   *Segmen Enterprise (Premium)*: Flat Rp 1.5jt/bln | Batas maks 999.999 karyawan.
     *   *Large Enterprise (Dedicated)*: Kustom dari Rp 5jt/bln | 2.000+ karyawan, server cloud dedikasi.
 
-### 5. Slide 5: Proyeksi Keuangan Skala 1 Juta Pengguna
+### 5. Slide 5: Proyeksi Keuangan Skala 1,5 Juta Pengguna
 *   **3 Skenario Skalabilitas**:
-    *   *Distribusi Cetak Biru*: 13.5rb tenant, Rp 3,22M MRR (Rp 38,64M ARR) dengan margin kotor 70-80%.
+    *   *Distribusi Cetak Biru*: 20,25rb tenant, Rp 4,83M MRR (Rp 57,9M ARR) dengan margin kotor 70-80%.
     *   *Fokus UMK*: 29.3rb tenant, Rp 5,1M MRR (Rp 61,2M ARR).
-    *   *Fokus Enterprise*: 8.5rb tenant, Rp 3,3M MRR (Rp 39,6M ARR).
+    *   *Fokus Enterprise*: 12,84rb tenant, Rp 4,95M MRR (Rp 59,4M ARR).
 
 ### 6. Slide 6: Strategi Pemasaran
 *   **Iklan Search Engine Niat Tinggi:** Memfokuskan anggaran pemasaran pada kata kunci pencarian seperti *"Aplikasi Payroll Murah"*, *"Kalkulator PPh 21 TER"*, dan *"HRIS murah"*.
@@ -143,4 +143,4 @@ Berikut adalah detail isi per slide:
 *   Business Blueprint (EN): [blueprint_business_budget_24_months.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/blueprint_business_budget_24_months.md)
 *   Proyeksi Keuangan: [business_projections.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/business_projections.md)
 *   Analisis Kompetitor: [market_strategy_2026.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/market_strategy_2026.md)
-*   Proyeksi 1 Juta Pengguna: [ultimate_target_1m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1m_users.md)
+*   Proyeksi 1,5 Juta Pengguna: [ultimate_target_1_5m_users.md](file:///home/afdhal/data/hr/hrms/docs/business_strategy/ultimate_target_1_5m_users.md)
