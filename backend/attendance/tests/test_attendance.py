@@ -617,3 +617,79 @@ class AttendanceIntegrationTestCase(TenantTestCase):
         }
         response = self.client.post(url, payload, format='json', SERVER_NAME=str(self.domain))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_late_minutes_calculation(self):
+        """Verify dynamic late_minutes property calculation under different conditions."""
+        self.client.force_login(self.user)
+        
+        with schema_context(self.tenant.schema_name):
+            # Scenario 1: No check-in -> late_minutes = 0
+            att_empty = Attendance.objects.create(
+                employee=self.employee,
+                date=self.today + timedelta(days=50),
+                status='ABSENT'
+            )
+            self.assertEqual(att_empty.late_minutes, 0)
+            
+            # Scenario 2: Standard shift (08:00), check-in at 08:25 -> late_minutes = 25
+            att_late = Attendance.objects.create(
+                employee=self.employee,
+                date=self.today,
+                check_in=time(8, 25),
+                latitude_in=Decimal('-6.2088'),
+                longitude_in=Decimal('106.8456'),
+                status='LATE'
+            )
+            self.assertEqual(att_late.late_minutes, 25)
+
+            # Scenario 3: Standard shift (08:00), check-in at 07:55 (on-time) -> late_minutes = 0
+            date_ontime = self.today + timedelta(days=51)
+            Schedule.objects.create(
+                employee=self.employee,
+                shift=self.shift_morning,
+                date=date_ontime
+            )
+            att_ontime = Attendance.objects.create(
+                employee=self.employee,
+                date=date_ontime,
+                check_in=time(7, 55),
+                latitude_in=Decimal('-6.2088'),
+                longitude_in=Decimal('106.8456'),
+                status='PRESENT'
+            )
+            self.assertEqual(att_ontime.late_minutes, 0)
+
+            # Scenario 4: Flexible shift -> late_minutes = 0 regardless of time
+            shift_flex = Shift.objects.create(
+                name='Flex Shift Test',
+                start_time=time(9, 0),
+                end_time=time(18, 0),
+                is_flexible=True
+            )
+            date_flex = self.today + timedelta(days=52)
+            Schedule.objects.create(
+                employee=self.employee,
+                shift=shift_flex,
+                date=date_flex
+            )
+            att_flex = Attendance.objects.create(
+                employee=self.employee,
+                date=date_flex,
+                check_in=time(10, 15),
+                latitude_in=Decimal('-6.2088'),
+                longitude_in=Decimal('106.8456'),
+                status='PRESENT'
+            )
+            self.assertEqual(att_flex.late_minutes, 0)
+
+            # Scenario 5: No schedule (fallback to 08:00)
+            date_no_sched = self.today + timedelta(days=53)
+            att_no_sched = Attendance.objects.create(
+                employee=self.employee,
+                date=date_no_sched,
+                check_in=time(8, 45),
+                latitude_in=Decimal('-6.2088'),
+                longitude_in=Decimal('106.8456'),
+                status='LATE'
+            )
+            self.assertEqual(att_no_sched.late_minutes, 45)

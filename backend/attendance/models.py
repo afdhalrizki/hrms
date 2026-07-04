@@ -56,10 +56,20 @@ class Attendance(AuditModel):
     def late_minutes(self):
         if not self.check_in:
             return 0
-        # Simple logic: after 08:00 is late
-        from datetime import time
-        if self.check_in > time(8, 0):
-            delta = (datetime.combine(date.min, self.check_in) - datetime.combine(date.min, time(8, 0)))
+
+        # Try to find shift from schedule
+        schedule = Schedule.objects.filter(employee=self.employee, date=self.date).first()
+        if schedule:
+            shift = schedule.shift
+            if shift.is_flexible:
+                return 0
+            shift_start = shift.start_time
+        else:
+            from datetime import time
+            shift_start = time(8, 0)
+
+        if self.check_in > shift_start:
+            delta = (datetime.combine(date.min, self.check_in) - datetime.combine(date.min, shift_start))
             return int(delta.total_seconds() / 60)
         return 0
 
