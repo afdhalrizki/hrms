@@ -94,6 +94,14 @@ void main() {
       );
     });
 
+    test('triggerCheckAbsences triggers check absences endpoint successfully', () async {
+      await loginForTest();
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final tomorrowStr = "${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}";
+      final result = await apiService.triggerCheckAbsences(tomorrowStr);
+      expect(result['status'], equals('success'));
+    });
+
     test('getAttendanceHistory returns data', () async {
       await loginForTest();
       final history = await apiService.getAttendanceRecords();

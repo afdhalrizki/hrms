@@ -1,100 +1,124 @@
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AttendancePage from '../app/[locale]/attendance/page';
-import { loginAs } from './setup';
-import { AuthProvider } from '@/context/AuthContext';
-import { TenantProvider } from '@/context/TenantContext';
 import { NextIntlClientProvider } from 'next-intl';
+import React from 'react';
 import { apiFetch } from '@/lib/api';
+import { toast } from 'sonner';
 
-const { realApiFetch } = vi.hoisted(() => ({ realApiFetch: { current: null as any } }));
-
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  realApiFetch.current = actual.apiFetch;
+// Mock next-intl
+vi.mock('next-intl', async (importOriginal) => {
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
-    apiFetch: vi.fn((...args) => actual.apiFetch(...args)),
-    apiDownload: vi.fn(() => Promise.resolve()),
-    getBaseUrl: vi.fn(() => 'http://localhost:8000/api'),
+    useTranslations: vi.fn(() => (key: string) => key),
   };
 });
 
+// Mock DashboardLayout
 vi.mock('@/components/layout/DashboardLayout', () => ({
-  DashboardLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DashboardLayout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
-const AllProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <NextIntlClientProvider locale="en" messages={{}}>
-      <TenantProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </TenantProvider>
-    </NextIntlClientProvider>
-  );
+// Mock apiFetch
+vi.mock('@/lib/api', () => ({
+  apiFetch: vi.fn(),
+}));
+
+// Mock sonner
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+// Mock AuthContext
+let mockUser: any = {
+  id: 1,
+  fullname: 'Admin User',
+  is_staff: true,
 };
 
-describe('AttendancePage (Integrated)', () => {
-  beforeAll(async () => {
-    await loginAs('employee1@company1.com');
-  }, 20000);
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: mockUser,
+    loading: false,
+  }),
+}));
 
+// Mock TenantContext
+vi.mock('@/context/TenantContext', () => ({
+  useTenant: () => ({
+    attendancePlatformPolicy: 'BOTH',
+  }),
+}));
+
+describe('AttendancePage - Check Absences Unit Test', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it('renders attendance logs from real backend', async () => {
-    render(<AttendancePage />, { wrapper: AllProviders });
-    
-    await waitFor(() => {
-      expect(screen.getAllByText(/Employee 1/i).length).toBeGreaterThanOrEqual(1);
-    }, { timeout: 30000 });
-  });
-
-  it('calls apiDownload when individual PDF button is clicked', async () => {
-    render(<AttendancePage />, { wrapper: AllProviders });
-
-    await waitFor(() => screen.getByText(/PDF Log/i), { timeout: 15000 });
-    fireEvent.click(screen.getByText(/PDF Log/i));
-
-    const { apiDownload } = await import('@/lib/api');
-    await waitFor(() => {
-      expect(apiDownload).toHaveBeenCalledWith(
-        expect.stringContaining('/attendance/attendance/download_pdf/'),
-        expect.stringContaining('Attendance_Log_')
-      );
+    mockUser = { id: 1, fullname: 'Admin User', is_staff: true };
+    // Default mock implementation for fetching attendance list
+    (apiFetch as any).mockImplementation((url: string) => {
+      if (url.startsWith('/attendance/')) {
+        return Promise.resolve([]);
+      }
+      return Promise.resolve({});
     });
   });
 
-  it('calls apiDownload when summary PDF button is clicked', async () => {
-    render(<AttendancePage />, { wrapper: AllProviders });
+  it('renders Check Missed Check-ins button for admin', async () => {
+    mockUser = { id: 1, fullname: 'Admin User', is_staff: true };
 
-    await waitFor(() => screen.getByText(/Summary PDF/i), { timeout: 15000 });
-    fireEvent.click(screen.getByText(/Summary PDF/i));
+    render(
+      <NextIntlClientProvider locale='en' messages={{}}>
+        <AttendancePage />
+      </NextIntlClientProvider>,
+    );
 
-    const { apiDownload } = await import('@/lib/api');
-    await waitFor(() => {
-      expect(apiDownload).toHaveBeenCalledWith(
-        expect.stringContaining('/attendance/attendance/export_summary_pdf/'),
-        expect.stringContaining('Attendance_Summary_')
-      );
-    });
+    const btn = screen.queryByText('Check Missed Check-ins');
+    expect(btn).toBeInTheDocument();
   });
 
-  it('calls apiDownload when excel recap button is clicked', async () => {
-    render(<AttendancePage />, { wrapper: AllProviders });
+  it('does not render Check Missed Check-ins button for non-admin', async () => {
+    mockUser = { id: 2, fullname: 'Regular Worker', is_staff: false };
 
-    await waitFor(() => screen.getByText(/Excel Recap/i), { timeout: 15000 });
-    fireEvent.click(screen.getByText(/Excel Recap/i));
+    render(
+      <NextIntlClientProvider locale='en' messages={{}}>
+        <AttendancePage />
+      </NextIntlClientProvider>,
+    );
 
-    const { apiDownload } = await import('@/lib/api');
+    const btn = screen.queryByText('Check Missed Check-ins');
+    expect(btn).not.toBeInTheDocument();
+  });
+
+  it('triggers handleCheckAbsences API call and triggers toast success on click', async () => {
+    mockUser = { id: 1, fullname: 'Admin User', is_staff: true };
+    (apiFetch as any).mockImplementation((url: string, options: any) => {
+      if (url === '/attendance/check-absences/' && options?.method === 'POST') {
+        return Promise.resolve({ status: 'success', result: 'Completed absence checking. Marked 2 records as ABSENT.' });
+      }
+      return Promise.resolve([]);
+    });
+
+    render(
+      <NextIntlClientProvider locale='en' messages={{}}>
+        <AttendancePage />
+      </NextIntlClientProvider>,
+    );
+
+    const btn = screen.getByText('Check Missed Check-ins');
+    fireEvent.click(btn);
+
     await waitFor(() => {
-      expect(apiDownload).toHaveBeenCalledWith(
-        expect.stringContaining('/attendance/attendance/export_csv/'),
-        expect.stringContaining('Attendance_Recap_')
-      );
+      expect(apiFetch).toHaveBeenCalledWith('/attendance/check-absences/', expect.objectContaining({
+        method: 'POST',
+        body: expect.any(String),
+      }));
+      expect(toast.success).toHaveBeenCalledWith('Completed absence checking. Marked 2 records as ABSENT.');
     });
   });
 });

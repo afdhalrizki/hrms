@@ -578,6 +578,17 @@ class ApiService {
     throw Exception('Failed to fetch attendance history');
   }
 
+  Future<Map<String, dynamic>> triggerCheckAbsences(String dateStr) async {
+    final tenant = await getTenant();
+    final response = await _authenticatedRequest((token) => _client.post(
+      Uri.parse("$baseUrl/attendance/check-absences/"),
+      headers: _headers(tenant, token),
+      body: jsonEncode({'date': dateStr}),
+    ));
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to trigger check-absences: ${response.body}');
+  }
+
   Future<List<dynamic>> getCorrectionRequests() async {
     final tenant = await getTenant();
     final response = await _authenticatedRequest((token) => _client.get(

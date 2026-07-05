@@ -129,7 +129,7 @@ Code changes must verify 100% pass rates on local test suites:
     ```
 
 ### 6.2 CI/CD Pipeline (GitOps with ArgoCD)
-*   **Test Suite Quantity**: The test runner enforces a minimum of **398 unit tests** on the Backend, **339 tests** on the Frontend, and **167 tests** on the Mobile suite.
+*   **Test Suite Quantity**: The test runner enforces a minimum of **403 unit tests** on the Backend, **340 tests** on the Frontend, and **168 tests** on the Mobile suite.
 *   **Vulnerability Scanning**: Automated CI pipelines run static security checks using `Bandit` and `Safety` (for Python) and `npm audit` (for Node.js).
 *   **Docker Multi-stage Builds**: Container images are packaged using multi-stage Dockerfiles to minimize production footprint.
 *   **GitOps Deployment**: Manifes changes in repository trigger **ArgoCD** reconciliations, deploying services automatically into Kubernetes clusters.

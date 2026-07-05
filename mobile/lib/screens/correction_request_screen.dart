@@ -107,9 +107,13 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> with 
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      _buildTimeBadge('In: ${record['check_in'] ?? '--:--'}', Colors.green),
-                      const SizedBox(width: 8),
-                      _buildTimeBadge('Out: ${record['check_out'] ?? '--:--'}', isMissingOut ? Colors.orange : Colors.blue),
+                      if (record['status'] == 'ABSENT')
+                        _buildTimeBadge('ABSENT', Colors.red)
+                      else ...[
+                        _buildTimeBadge('In: ${record['check_in'] ?? '--:--'}', Colors.green),
+                        const SizedBox(width: 8),
+                        _buildTimeBadge('Out: ${record['check_out'] ?? '--:--'}', isMissingOut ? Colors.orange : Colors.blue),
+                      ],
                     ],
                   ),
                 ],

@@ -42,11 +42,22 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
             skipped = self.request.query_params.get('biometric_skipped')
             if skipped:
                 queryset = queryset.filter(biometric_skipped=(skipped.lower() == 'true'))
+                
+            employee_id = self.request.query_params.get('employee_id')
+            date_param = self.request.query_params.get('date')
+            if employee_id:
+                queryset = queryset.filter(employee_id=employee_id)
+            if date_param:
+                queryset = queryset.filter(date=date_param)
             return queryset
             
         # Regular employees only see their own records
         if employee:
-            return Attendance.objects.filter(employee=employee)
+            queryset = Attendance.objects.filter(employee=employee)
+            date_param = self.request.query_params.get('date')
+            if date_param:
+                queryset = queryset.filter(date=date_param)
+            return queryset
         return Attendance.objects.none()
 
     def perform_create(self, serializer):
@@ -304,6 +315,20 @@ class AttendanceViewSet(TenantIsolationMixin, AuditModelMixin, viewsets.ModelVie
             ])
             
         return response
+
+    @action(detail=False, methods=['post'], url_path='check-absences')
+    def check_absences(self, request):
+        user = self.request.user
+        employee = Employee.objects.filter(email=user.email).first()
+        is_manager = user.is_staff or (employee and employee.access_role and employee.access_role.permissions.get('tenant_manage_attendance'))
+        
+        if not is_manager:
+            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        date_str = request.data.get('date')
+        from attendance.tasks import check_absences_for_all_tenants
+        result = check_absences_for_all_tenants(date_str=date_str)
+        return Response({'status': 'success', 'result': result}, status=status.HTTP_200_OK)
 
     def perform_update(self, serializer):
         user = self.request.user

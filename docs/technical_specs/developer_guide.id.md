@@ -129,7 +129,7 @@ Setiap kode baru wajib menyertakan unit test yang lolos pengujian 100%:
     ```
 
 ### 6.2 Integrasi Pipeline CI/CD (GitOps dengan ArgoCD)
-*   **Metrik Kuantitas Tes**: Rangkaian pengujian minimal mencakup **398 tes** pada Backend, **339 tes** pada Frontend, dan **167 tes** pada Mobile.
+*   **Metrik Kuantitas Tes**: Rangkaian pengujian minimal mencakup **403 tes** pada Backend, **340 tes** pada Frontend, dan **168 tes** pada Mobile.
 *   **Keamanan Statis (Static Analysis)**: Pipeline CI/CD menjalankan alat pemindaian kerentanan `Bandit` dan `Safety` untuk Python, serta `npm audit` untuk Node.js.
 *   **Docker Multi-stage Builds**: Gambar kontainer Docker dioptimalkan melalui build multi-tahap (*multi-stage builds*) untuk menghasilkan ukuran gambar produksi seminimal mungkin.
 *   **Penyebaran Otomatis**: GitOps dipicu melalui webhook repositori ke **ArgoCD** untuk mensinkronisasikan manifes Kubernetes secara otomatis pada server staging dan produksi.

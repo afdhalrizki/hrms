@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'test_helper.dart';
 import 'package:mobile/api/api_service.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -489,6 +490,123 @@ void main() {
         
         await safeTap(tester, find.text('Download PDF', skipOffstage: false));
         await waitForSnackBar(tester, 'PDF download started');
+      });
+    });
+
+    testWidgets('[24] Attendance: Absence Badge Visibility', (tester) async {
+      await tester.runAsync(() async {
+        final api = ApiService();
+        final client = http.Client();
+
+        // 1. Login as admin to get employee1's ID and set schedule/absences
+        await api.login('admin@company1.com', 'password123', 'company1');
+        final token = await api.getToken();
+        
+        final schedHeaders = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Tenant-Domain': 'company1.${ApiService.domainSuffix}',
+          'Host': 'company1.${ApiService.domainSuffix}${ApiService.hostSuffix}',
+          'Authorization': 'Bearer $token',
+        };
+
+        // Fetch employee list as admin and find employee1's ID
+        final empResponse = await client.get(
+          Uri.parse("${ApiService.baseUrl}/employees/"),
+          headers: schedHeaders,
+        );
+        final List<dynamic> employees = jsonDecode(empResponse.body);
+        final employee = employees.firstWhere((e) => e['email'] == 'employee1@company1.com');
+        final int employeeId = employee['id'];
+        final testDate = DateTime.now().add(const Duration(days: 96));
+        final testDateStr = "${testDate.year}-${testDate.month.toString().padLeft(2, '0')}-${testDate.day.toString().padLeft(2, '0')}";
+        
+        // Get shifts list to find morning shift or any shift
+        final shiftResponse = await client.get(
+          Uri.parse("${ApiService.baseUrl}/shifts/"),
+          headers: schedHeaders,
+        );
+        final List<dynamic> shifts = jsonDecode(shiftResponse.body);
+        final int shiftId = shifts[0]['id'];
+        
+        // Cleanup any pre-existing schedule on this date
+        final getSchedResponse = await client.get(
+          Uri.parse("${ApiService.baseUrl}/schedules/?employee_id=$employeeId&date=$testDateStr"),
+          headers: schedHeaders,
+        );
+        final List<dynamic> existingScheds = jsonDecode(getSchedResponse.body);
+        for (var s in existingScheds) {
+          await client.delete(
+            Uri.parse("${ApiService.baseUrl}/schedules/${s['id']}/"),
+            headers: schedHeaders,
+          );
+        }
+        
+        // Create schedule
+        final createSchedResponse = await client.post(
+          Uri.parse("${ApiService.baseUrl}/schedules/"),
+          headers: schedHeaders,
+          body: jsonEncode({
+            'employee': employeeId,
+            'shift': shiftId,
+            'date': testDateStr,
+          }),
+        );
+        expect(createSchedResponse.statusCode, equals(201));
+        
+        // Delete any pre-existing attendance on this date to avoid unique constraint
+        final getAttResponse = await client.get(
+          Uri.parse("${ApiService.baseUrl}/attendance/?employee_id=$employeeId&date=$testDateStr"),
+          headers: schedHeaders,
+        );
+        final List<dynamic> existingAtts = jsonDecode(getAttResponse.body);
+        for (var a in existingAtts) {
+          await client.delete(
+            Uri.parse("${ApiService.baseUrl}/attendance/${a['id']}/"),
+            headers: schedHeaders,
+          );
+        }
+        
+        // Trigger check-absences
+        await api.triggerCheckAbsences(testDateStr);
+        
+        // 3. Login as employee1 to view screen
+        await performLogin(tester, email: 'employee1@company1.com');
+        
+        // Navigate to CorrectionRequestScreen
+        final correctionBtn = find.byKey(const Key('qa_correction'), skipOffstage: false);
+        await scrollTo(tester, correctionBtn, scrollable: find.byType(Scrollable, skipOffstage: false).first);
+        await safeTap(tester, correctionBtn);
+        
+        await safeTap(tester, find.text('History', skipOffstage: false));
+        await tester.pumpAndSettle();
+        
+        // Scroll down to find the ABSENT badge
+        final absentBadge = find.text('ABSENT', skipOffstage: false);
+        final listScrollable = find.descendant(of: find.byType(TabBarView), matching: find.byType(Scrollable)).first;
+        await scrollTo(tester, absentBadge, scrollable: listScrollable);
+        
+        expect(absentBadge, findsOneWidget);
+        
+        // CLEANUP
+        final getAttResponseClean = await client.get(
+          Uri.parse("${ApiService.baseUrl}/attendance/?employee_id=$employeeId&date=$testDateStr"),
+          headers: schedHeaders,
+        );
+        final List<dynamic> cleanAtts = jsonDecode(getAttResponseClean.body);
+        for (var a in cleanAtts) {
+          await client.delete(
+            Uri.parse("${ApiService.baseUrl}/attendance/${a['id']}/"),
+            headers: schedHeaders,
+          );
+        }
+        
+        await client.delete(
+          Uri.parse("${ApiService.baseUrl}/schedules/${jsonDecode(createSchedResponse.body)['id']}/"),
+          headers: schedHeaders,
+        );
+        
+        client.close();
       });
     });
 

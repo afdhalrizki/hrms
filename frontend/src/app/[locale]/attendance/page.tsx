@@ -43,9 +43,29 @@ export default function AttendancePage() {
   const [selectedAttendance, setSelectedAttendance] = React.useState<Attendance | null>(null);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const [isCheckingAbsences, setIsCheckingAbsences] = React.useState(false);
   const { attendancePlatformPolicy } = useTenant();
   const { user, loading: authLoading } = useAuth();
   const isWebRestricted = attendancePlatformPolicy === 'MOBILE';
+  const isHRManager = user?.is_staff || false;
+  console.log("isHRManager:", isHRManager, "user:", user);
+
+  const handleCheckAbsences = async () => {
+    try {
+      setIsCheckingAbsences(true);
+      const todayStr = new Date().toLocaleDateString('en-CA'); 
+      const res = await apiFetch('/attendance/check-absences/', {
+        method: 'POST',
+        body: JSON.stringify({ date: todayStr })
+      });
+      toast.success(res.result || 'Absences checked successfully');
+      fetchLogs();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to check absences');
+    } finally {
+      setIsCheckingAbsences(false);
+    }
+  };
 
   const fetchLogs = React.useCallback(async () => {
     if (!user) return;
@@ -216,6 +236,16 @@ export default function AttendancePage() {
               <ShieldAlert size={18} />
               Audit Log
             </a>
+            {isHRManager && (
+              <button 
+                onClick={handleCheckAbsences}
+                disabled={isCheckingAbsences}
+                className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-sm font-medium hover:bg-red-500/20 transition-colors flex items-center gap-2 text-red-500"
+              >
+                <ShieldAlert size={18} />
+                {isCheckingAbsences ? 'Checking...' : 'Check Missed Check-ins'}
+              </button>
+            )}
             <button 
               data-testid="clock-btn"
               onClick={handleClockAction}

@@ -164,3 +164,28 @@ test.describe('Attendance Management', () => {
     await expect(page.getByText(/Correction request submitted successfully!/i)).toBeVisible({ timeout: 15000 });
   });
 });
+
+test.describe('Admin Attendance Actions', () => {
+  test('should allow admin to trigger check absences and display success toast', async ({ page }) => {
+    const adminUser = TEST_USERS.admin;
+    await login(page, adminUser.email, adminUser.password);
+    await page.goto(getTenantUrl('/en/attendance'));
+    await page.waitForLoadState('networkidle');
+
+    const checkBtn = page.getByRole('button', { name: /Check Missed Check-ins/i });
+    await expect(checkBtn).toBeVisible({ timeout: 30000 });
+
+    const apiPromise = page.waitForResponse(
+      resp => resp.url().includes('/api/attendance/check-absences/'),
+      { timeout: 30000 }
+    );
+    await checkBtn.click();
+
+    const resp = await apiPromise;
+    expect(resp.status()).toBe(200);
+
+    const toast = page.locator('[data-sonner-toast]');
+    await expect(toast).toBeVisible({ timeout: 15000 });
+    await expect(toast).toContainText(/completed|success/i);
+  });
+});
